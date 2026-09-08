@@ -5,12 +5,7 @@ Examples assume a TypeScript browser app with a canvas. Use the runnable [first 
 ## Your first scene
 
 ```ts
-import {
-    BrowserGame,
-    component,
-    lerp,
-    type SceneDefinition,
-} from "ngne";
+import { BrowserGame, component, lerp, type SceneDefinition } from "ngne";
 
 const Position = component("position", () => ({ x: 40, previousX: 40 }));
 const scene: SceneDefinition = {
@@ -32,13 +27,7 @@ const scene: SceneDefinition = {
         });
         scene.render((frame, alpha) => {
             points.each((_, p) => {
-                frame.rect(
-                    lerp(p.previousX, p.x, alpha),
-                    100,
-                    16,
-                    16,
-                    0x83e8e1,
-                );
+                frame.rect(lerp(p.previousX, p.x, alpha), 100, 16, 16, 0x83e8e1);
             });
         });
     },
@@ -63,27 +52,30 @@ Rectangles and sprites use **center coordinates**. Distances are logical canvas 
 
 ```ts
 type Progress = { best: number };
-type ProgressCommand = { type: 'score'; value: number };
+type ProgressCommand = { type: "score"; value: number };
 const arena: SceneDefinition<Progress, ProgressCommand> = {
- id: 'arena',
- setup(scene) {
-  const board = scene.resource('board', new Uint8Array(20 * 12));
-  const waves = scene.random('waves');
-  const score = scene.state();
+    id: "arena",
+    setup(scene) {
+        const board = scene.resource("board", new Uint8Array(20 * 12));
+        const waves = scene.random("waves");
+        const score = scene.state();
 
-  scene.system(ctx => {
-    // All three are explicitly injected; there is no global resource registry.
-    board[0] = waves.int(0, 4);
-    if (ctx.input.pressed.includes('Space')) {
-      scene.freeze(4);
-      ctx.emit({ type: 'blast' });
-      score.dispatch({ type: 'score', value: 100 });
-    }
-  });
-  scene.system(ctx => {
-    // Separate effects continue through hitstop.
-  }, { runsDuringFreeze: true });
- }
+        scene.system((ctx) => {
+            // All three are explicitly injected; there is no global resource registry.
+            board[0] = waves.int(0, 4);
+            if (ctx.input.pressed.includes("Space")) {
+                scene.freeze(4);
+                ctx.emit({ type: "blast" });
+                score.dispatch({ type: "score", value: 100 });
+            }
+        });
+        scene.system(
+            (ctx) => {
+                // Separate effects continue through hitstop.
+            },
+            { runsDuringFreeze: true },
+        );
+    },
 };
 ```
 
@@ -117,7 +109,6 @@ frame.sprite({
 
 Call `await app.audio.unlock()` from a user gesture. Create an audio scope during scene setup with `app.audio.scene('room')`, immediately register its `.dispose`, and enqueue `scope.play({ frequency: 440, duration: .15 })` or `scope.play({ buffer, loop: true, volume: .2 })` from systems. Requests flush after commit, never from render callbacks. Scopes have independent volume controls; `audio.duck(.25)` lowers the overall mix and `audio.duck(1)` restores it. Voice count and pending requests are bounded. The showcase includes synthesized effects and a tick-driven bass sequence.
 
-
 ## Entity lifetime and update order
 
 Create queries once in setup and reuse them. Query callbacks receive the entity followed by component values in the requested order. Mutating a component value is immediate. Spawning and despawning are buffered: query membership changes only at the engine-owned commit after scheduled systems return. Entity composition is fixed at spawn; stale or foreign handles cannot address a different entity.
@@ -137,15 +128,15 @@ Each tick runs selected scene systems, commits worlds, advances ordinary events,
 
 ## Lifecycle and ownership
 
-| Operation | Meaning |
-| --- | --- |
+| Operation                                   | Meaning                                                       |
+| ------------------------------------------- | ------------------------------------------------------------- |
 | `game.prepare(definition, { key, signal })` | Acquire scene assets asynchronously; does not publish a world |
-| `app.start(candidate)` | Start the browser host with its initial scene |
-| `ctx.scenes.set(candidate)` | Replace the entire scene stack at a tick boundary |
-| `ctx.scenes.push(candidate)` / `.pop()` | Change the scene stack at a tick boundary |
-| `candidate.release()` | Abandon an unused prepared candidate |
-| `app.stop()` / `app.start()` | Suspend and resume while preserving the mounted scene |
-| `app.dispose()` | Terminal cleanup of owned services and scenes |
+| `app.start(candidate)`                      | Start the browser host with its initial scene                 |
+| `ctx.scenes.set(candidate)`                 | Replace the entire scene stack at a tick boundary             |
+| `ctx.scenes.push(candidate)` / `.pop()`     | Change the scene stack at a tick boundary                     |
+| `candidate.release()`                       | Abandon an unused prepared candidate                          |
+| `app.stop()` / `app.start()`                | Suspend and resume while preserving the mounted scene         |
+| `app.dispose()`                             | Terminal cleanup of owned services and scenes                 |
 
 Bind resources, RNG streams and systems synchronously during setup. Register cleanup immediately with `scene.defer(() => service.dispose())`; the private mount owns rollback when setup fails. Do not add an alternative mount path or manually commit a scene world. Prepared candidates are single-use and belong to their preparing Game; stop invalidates unused candidates.
 

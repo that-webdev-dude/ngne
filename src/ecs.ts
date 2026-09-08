@@ -56,16 +56,11 @@ class QueryRuntime<T extends readonly Component<any>[]> implements Query<T> {
         if (this.types.every((type) => archetype.types.includes(type)))
             this.matches.push({
                 archetype,
-                columns: this.types.map(
-                    (t) => archetype.columns[archetype.types.indexOf(t)],
-                ),
+                columns: this.types.map((t) => archetype.columns[archetype.types.indexOf(t)]),
             });
     }
     get size() {
-        return this.matches.reduce(
-            (n, m) => n + m.archetype.entities.length,
-            0,
-        );
+        return this.matches.reduce((n, m) => n + m.archetype.entities.length, 0);
     }
     each(visit: (entity: Entity, ...values: Values<T>) => void): void {
         this.world.beginRead();
@@ -75,8 +70,7 @@ class QueryRuntime<T extends readonly Component<any>[]> implements Query<T> {
                 const args: any[] = new Array(columns.length + 1);
                 for (let i = 0; i < archetype.entities.length; i++) {
                     args[0] = archetype.entities[i];
-                    for (let c = 0; c < columns.length; c++)
-                        args[c + 1] = columns[c][i];
+                    for (let c = 0; c < columns.length; c++) args[c + 1] = columns[c][i];
                     (visit as Function)(...args);
                 }
             }
@@ -101,8 +95,7 @@ export class World implements WorldAccess {
         despawn: (e: Entity) => this.despawn(e),
         has: (e: Entity) => this.has(e),
         get: <T extends object>(e: Entity, t: Component<T>) => this.get(e, t),
-        query: <T extends readonly Component<any>[]>(...t: T) =>
-            this.query(...t),
+        query: <T extends readonly Component<any>[]>(...t: T) => this.query(...t),
     });
     get size() {
         return this.archetypes.reduce((n, a) => n + a.entities.length, 0);
@@ -144,9 +137,7 @@ export class World implements WorldAccess {
     }
     private slot(e: Entity) {
         const s = this.slots[e.index];
-        return e.owner === this.owner && s?.generation === e.generation
-            ? s
-            : undefined;
+        return e.owner === this.owner && s?.generation === e.generation ? s : undefined;
     }
     has(e: Entity) {
         return !!this.slot(e)?.archetype;
@@ -168,8 +159,7 @@ export class World implements WorldAccess {
         return q;
     }
     commit() {
-        if (this.reading)
-            throw new Error("Cannot commit during query iteration");
+        if (this.reading) throw new Error("Cannot commit during query iteration");
         for (const { entity, values } of this.births) {
             let a = this.archetypes.find(
                 (a) =>
@@ -191,9 +181,7 @@ export class World implements WorldAccess {
             s.row = a.entities.length;
             a.entities.push(entity);
             a.types.forEach((t, i) =>
-                a!.columns[i].push(
-                    values.find((v) => v.component === t)!.value,
-                ),
+                a!.columns[i].push(values.find((v) => v.component === t)!.value),
             );
         }
         this.births.length = 0;

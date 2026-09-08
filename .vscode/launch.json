@@ -1,10 +1,12 @@
 {
     "version": "0.2.0",
-    "configurations": [{
-        "name": "Debug Starfall '89",
-        "request": "launch",
-        "type": "chrome",
-        "url": "http://localhost:5173",
-        "webRoot": "${workspaceFolder}"
-    }]
+    "configurations": [
+        {
+            "name": "Debug Starfall '89",
+            "request": "launch",
+            "type": "chrome",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}"
+        }
+    ]
 }

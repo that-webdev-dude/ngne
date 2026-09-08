@@ -167,9 +167,9 @@ class SceneInstance<S, C> {
             ...this.inspect(),
             world: inspectValue(this.world.enumerate()),
             resources: inspectValue(Object.fromEntries(this.resources)),
-            random: inspectValue(Object.fromEntries(
-                [...this.randomStreams].map(([k, r]) => [k, r.state]),
-            )),
+            random: inspectValue(
+                Object.fromEntries([...this.randomStreams].map(([k, r]) => [k, r.state])),
+            ),
             camera: inspectValue(this.camera),
             freezeRemaining: this.freezeRemaining,
             freezePending: this.freezePending,
@@ -179,13 +179,7 @@ class SceneInstance<S, C> {
     }
 }
 export type Lifecycle =
-    | "Stopped"
-    | "Starting"
-    | "Running"
-    | "Stopping"
-    | "Failed"
-    | "Disposing"
-    | "Disposed";
+    "Stopped" | "Starting" | "Running" | "Stopping" | "Failed" | "Disposing" | "Disposed";
 export interface GameOptions<S, C> {
     seed: number | string;
     state: S;
@@ -207,10 +201,7 @@ export class Game<S = Record<string, never>, C = never> {
     private stateValue: DeepReadonly<S>;
     private stateCommands: DeepReadonly<C>[] = [];
     private updatingScene: SceneInstance<S, C> | undefined;
-    private commands: (
-        | { type: "set" | "push"; candidate: PreparedScene }
-        | { type: "pop" }
-    )[] = [];
+    private commands: ({ type: "set" | "push"; candidate: PreparedScene } | { type: "pop" })[] = [];
     private candidates = new Map<PreparedScene, SceneCandidate<S, C>>();
     private preparations = new Set<AbortController>();
     private initialized = false;
@@ -221,8 +212,7 @@ export class Game<S = Record<string, never>, C = never> {
         this.rootSeed = seedOf(options.seed);
         this.stateValue = immutable(options.state);
         this.dt = options.dt ?? 1 / 60;
-        if (!(this.dt > 0 && Number.isFinite(this.dt)))
-            throw new Error("Invalid tick duration");
+        if (!(this.dt > 0 && Number.isFinite(this.dt))) throw new Error("Invalid tick duration");
     }
     get state(): DeepReadonly<S> {
         return this.stateValue;
@@ -252,21 +242,13 @@ export class Game<S = Record<string, never>, C = never> {
         definition: SceneDefinition<S, C>,
         options: { key: string; seed?: number; signal?: AbortSignal },
     ): Promise<PreparedScene> {
-        if (
-            ["Failed", "Disposing", "Disposed", "Stopping"].includes(
-                this.lifecycle,
-            )
-        )
+        if (["Failed", "Disposing", "Disposed", "Stopping"].includes(this.lifecycle))
             throw new Error("Cannot prepare in " + this.lifecycle);
         if (!definition.id || !options.key)
-            throw new Error(
-                "Scene identity and authored mount key are required",
-            );
+            throw new Error("Scene identity and authored mount key are required");
         if (
             options.seed !== undefined &&
-            (!Number.isSafeInteger(options.seed) ||
-                options.seed < 0 ||
-                options.seed > 0xffffffff)
+            (!Number.isSafeInteger(options.seed) || options.seed < 0 || options.seed > 0xffffffff)
         )
             throw new Error("Scene seed must be uint32");
         const controller = new AbortController();
@@ -278,11 +260,8 @@ export class Game<S = Record<string, never>, C = never> {
         try {
             // Each acquired lease is owned before the next await; rollback is deterministic.
             for (const asset of definition.assets ?? [])
-                leases.push(
-                    await this.assets.acquire(asset, controller.signal),
-                );
-            if (controller.signal.aborted)
-                throw new Error("Scene preparation cancelled");
+                leases.push(await this.assets.acquire(asset, controller.signal));
+            if (controller.signal.aborted) throw new Error("Scene preparation cancelled");
             const candidate: SceneCandidate<S, C> = new SceneCandidate(
                 this.owner,
                 definition,
@@ -317,24 +296,18 @@ export class Game<S = Record<string, never>, C = never> {
             this.nextId++,
             candidate.definition,
             candidate.key,
-            candidate.seed ??
-                seedOf(this.rootSeed, candidate.definition.id, candidate.key),
+            candidate.seed ?? seedOf(this.rootSeed, candidate.definition.id, candidate.key),
         );
         leases.forEach((l) => scene.cleanup.defer(() => l.release()));
         let mounting = true;
         const setupOnly = () => {
-            if (!mounting)
-                throw new Error("Scene bindings are fixed after setup");
+            if (!mounting) throw new Error("Scene bindings are fixed after setup");
         };
         const setup: SceneSetup<S, C> = {
             world: scene.world.access,
             camera: scene.camera,
             assets: new Map(leases.map((l) => [l.id, l.value])),
-            resource: <T>(
-                name: string,
-                value: T,
-                cleanup?: (value: T) => void,
-            ) => {
+            resource: <T>(name: string, value: T, cleanup?: (value: T) => void) => {
                 setupOnly();
                 if (!name || scene.resources.has(name))
                     throw new Error("Invalid or duplicate resource: " + name);
@@ -371,9 +344,7 @@ export class Game<S = Record<string, never>, C = never> {
                     read: () => this.stateValue,
                     dispatch: (command: C) => {
                         if (mounting || !scene.published || this.updatingScene !== scene)
-                            throw new Error(
-                                "State dispatch requires an active system update",
-                            );
+                            throw new Error("State dispatch requires an active system update");
                         this.stateCommands.push(immutable(command));
                     },
                 };
@@ -392,10 +363,7 @@ export class Game<S = Record<string, never>, C = never> {
         };
         try {
             const result = scene.definition.setup(setup) as unknown;
-            if (
-                result &&
-                typeof (result as Promise<void>).then === "function"
-            ) {
+            if (result && typeof (result as Promise<void>).then === "function") {
                 Promise.resolve(result).catch((e) => this.report(e));
                 throw new Error("Scene setup must be synchronous");
             }
@@ -421,19 +389,14 @@ export class Game<S = Record<string, never>, C = never> {
             throw error;
         }
     }
-    async start(
-        initial?: PreparedScene,
-        loop?: { start(): void; stop(): void },
-    ) {
-        if (this.lifecycle !== "Stopped")
-            throw new Error("Cannot start in " + this.lifecycle);
+    async start(initial?: PreparedScene, loop?: { start(): void; stop(): void }) {
+        if (this.lifecycle !== "Stopped") throw new Error("Cannot start in " + this.lifecycle);
         this.#lifecycle = "Starting";
         const cold = !this.initialized;
         let loopAttempted = false;
         try {
             if (cold) {
-                if (!initial)
-                    throw new Error("Initial prepared scene required");
+                if (!initial) throw new Error("Initial prepared scene required");
                 this.stack = [this.mount(initial)];
             }
             loopAttempted = true;
@@ -460,20 +423,15 @@ export class Game<S = Record<string, never>, C = never> {
                 }
             }
             this.#lifecycle =
-                !cold || errors.length > 1 || e instanceof AggregateError
-                    ? "Failed"
-                    : "Stopped";
-            if (errors.length > 1)
-                throw new AggregateError(errors, "Startup rollback failed");
+                !cold || errors.length > 1 || e instanceof AggregateError ? "Failed" : "Stopped";
+            if (errors.length > 1) throw new AggregateError(errors, "Startup rollback failed");
             throw e;
         }
     }
     private cancelPending() {
         const cleanup = new Cleanup();
-        for (const controller of this.preparations)
-            cleanup.defer(() => controller.abort());
-        for (const candidate of this.candidates.values())
-            cleanup.defer(() => candidate.release());
+        for (const controller of this.preparations) cleanup.defer(() => controller.abort());
+        for (const candidate of this.candidates.values()) cleanup.defer(() => candidate.release());
         this.candidates.clear();
         this.commands.length = 0;
         cleanup.dispose();
@@ -501,8 +459,7 @@ export class Game<S = Record<string, never>, C = never> {
         this.enqueue({ type: "pop" });
     }
     private enqueue(command: (typeof this.commands)[number]) {
-        if (this.lifecycle !== "Running")
-            throw new Error("Scene commands require Running");
+        if (this.lifecycle !== "Running") throw new Error("Scene commands require Running");
         this.commands.push(command);
     }
     tick(
@@ -514,8 +471,7 @@ export class Game<S = Record<string, never>, C = never> {
         this.busy = true;
         try {
             const first = this.findUpdateStart();
-            for (let i = 0; i < this.stack.length; i++)
-                this.stack[i].canInterpolate = i >= first;
+            for (let i = 0; i < this.stack.length; i++) this.stack[i].canInterpolate = i >= first;
             const selected = this.stack.slice(first),
                 ordinary = new Set<SceneInstance<S, C>>();
             const scenes: SceneCommands = {
@@ -538,9 +494,7 @@ export class Game<S = Record<string, never>, C = never> {
                     events: scene.inbox,
                     emit: (event: SceneEvent) => {
                         if (scene.freezeRemaining)
-                            throw new Error(
-                                "Gameplay events cannot emit during freeze",
-                            );
+                            throw new Error("Gameplay events cannot emit during freeze");
                         scene.outbox.push(immutable(event));
                     },
                     scenes,
@@ -549,13 +503,8 @@ export class Game<S = Record<string, never>, C = never> {
                 for (const system of scene.schedule)
                     if (!scene.freezeRemaining || system.runsDuringFreeze) {
                         const result = system.update(ctx) as unknown;
-                        if (
-                            result &&
-                            typeof (result as Promise<void>).then === "function"
-                        ) {
-                            Promise.resolve(result).catch((e) =>
-                                this.report(e),
-                            );
+                        if (result && typeof (result as Promise<void>).then === "function") {
+                            Promise.resolve(result).catch((e) => this.report(e));
                             throw new Error("Systems must be synchronous");
                         }
                     }
@@ -571,11 +520,7 @@ export class Game<S = Record<string, never>, C = never> {
                     scene.camera.cut();
                     scene.resets.forEach((f) => f());
                 }
-                scene.freezeRemaining = Math.max(
-                    0,
-                    scene.freezeRemaining - 1,
-                    scene.freezePending,
-                );
+                scene.freezeRemaining = Math.max(0, scene.freezeRemaining - 1, scene.freezePending);
                 scene.freezePending = 0;
             }
             for (const command of this.stateCommands) {
@@ -657,8 +602,7 @@ export class Game<S = Record<string, never>, C = never> {
     enumerate(): GameInspection {
         return Object.freeze({
             compatibility:
-                "NGNE/1;mulberry32/1;" +
-                (this.options.compatibility ?? "unversioned-game"),
+                "NGNE/1;mulberry32/1;" + (this.options.compatibility ?? "unversioned-game"),
             simulationTick: this.simulationTick,
             dt: this.dt,
             rootSeed: this.rootSeed,

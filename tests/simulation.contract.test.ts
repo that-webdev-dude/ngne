@@ -9,10 +9,14 @@ const Value = component("value", () => ({ n: 0 }));
 test("all selected schedules precede world, event, freeze, state and FIFO stack commits", async (t) => {
     const trace: string[] = [];
     const game = new Game<string[], string>({
-        seed: "commit-order", state: [],
+        seed: "commit-order",
+        state: [],
         transition: (state, command) => {
             trace.push(`state:${command}`);
-            assert.deepEqual(game.scenes.map((s) => s.freezeRemaining), [2, 2, 2]);
+            assert.deepEqual(
+                game.scenes.map((s) => s.freezeRemaining),
+                [2, 2, 2],
+            );
             assert.deepEqual(state, ["bottom", "middle", "top"].slice(0, state.length));
             return [...state, command];
         },
@@ -29,7 +33,10 @@ test("all selected schedules precede world, event, freeze, state and FIFO stack 
                 if (ctx.simulationTick !== 1) return;
                 trace.push(`write:${id}`);
                 resource.n++;
-                query.each((entity, value) => { value.n++; ctx.world.despawn(entity); });
+                query.each((entity, value) => {
+                    value.n++;
+                    ctx.world.despawn(entity);
+                });
                 const born = ctx.world.spawn(Value.of({ n: 9 }));
                 assert.equal(ctx.world.has(born), false);
                 ctx.emit({ type: id });
@@ -45,7 +52,10 @@ test("all selected schedules precede world, event, freeze, state and FIFO stack 
                 assert.equal(query.size, 1);
                 assert.deepEqual(ctx.events, []);
                 assert.deepEqual(state.read(), []);
-                assert.deepEqual(game.scenes.map((s) => s.freezeRemaining), [0, 0, 0]);
+                assert.deepEqual(
+                    game.scenes.map((s) => s.freezeRemaining),
+                    [0, 0, 0],
+                );
             });
             scene.resetInterpolation(() => {
                 if (game.simulationTick !== 1) return;
@@ -59,9 +69,13 @@ test("all selected schedules precede world, event, freeze, state and FIFO stack 
                     assert.deepEqual(snapshot.inbox, [{ type: snapshot.definition }]);
                     assert.deepEqual(snapshot.outbox, []);
                     assert.ok(snapshot.world && typeof snapshot.world === "object");
-                    assert.deepEqual(snapshot.world.entities, [{
-                        index: 1, generation: 0, components: [{ name: "value", value: { n: 9 } }],
-                    }]);
+                    assert.deepEqual(snapshot.world.entities, [
+                        {
+                            index: 1,
+                            generation: 0,
+                            components: [{ name: "value", value: { n: 9 } }],
+                        },
+                    ]);
                 }
                 assert.deepEqual(state.read(), []);
             });
@@ -73,7 +87,8 @@ test("all selected schedules precede world, event, freeze, state and FIFO stack 
     game.push(await game.prepare(definition("top"), { key: "top" }));
     game.tick();
     const mounted = (id: string): SceneDefinition<string[], string> => ({
-        id, setup(scene) {
+        id,
+        setup(scene) {
             trace.push(`mount:${id}`);
             assert.deepEqual(scene.state().read(), ["bottom", "middle", "top"]);
             scene.system(() => trace.push(`unexpected-update:${id}`));
@@ -86,12 +101,30 @@ test("all selected schedules precede world, event, freeze, state and FIFO stack 
     game.push(await game.prepare(mounted("overlay"), { key: "overlay" }));
     game.tick();
     assert.deepEqual(trace, [
-        "write:bottom", "read:bottom", "write:middle", "read:middle", "write:top", "read:top",
-        "freeze:bottom", "freeze:middle", "freeze:top", "state:bottom", "state:middle", "state:top",
-        "mount:temporary", "dispose:temporary", "mount:replacement",
-        "dispose:top", "dispose:middle", "dispose:bottom", "mount:overlay",
+        "write:bottom",
+        "read:bottom",
+        "write:middle",
+        "read:middle",
+        "write:top",
+        "read:top",
+        "freeze:bottom",
+        "freeze:middle",
+        "freeze:top",
+        "state:bottom",
+        "state:middle",
+        "state:top",
+        "mount:temporary",
+        "dispose:temporary",
+        "mount:replacement",
+        "dispose:top",
+        "dispose:middle",
+        "dispose:bottom",
+        "mount:overlay",
     ]);
-    assert.deepEqual(game.scenes.map((s) => s.definition), ["replacement", "overlay"]);
+    assert.deepEqual(
+        game.scenes.map((s) => s.definition),
+        ["replacement", "overlay"],
+    );
 });
 
 test("suspension pauses freeze and retains broadcast inboxes for exactly one ordinary update", async (t) => {
@@ -99,18 +132,25 @@ test("suspension pauses freeze and retains broadcast inboxes for exactly one ord
     t.after(() => game.dispose());
     const seen: string[] = [];
     const continuing: number[] = [];
-    const bottom: SceneDefinition = { id: "bottom", setup(scene) {
-        for (const observer of ["a", "b"]) scene.system((ctx) => {
-            for (const event of ctx.events) seen.push(`${observer}:${ctx.simulationTick}:${event.type}`);
-            if (observer === "a" && ctx.simulationTick === 0) {
-                ctx.emit({ type: "hit" });
-                scene.freeze(2);
-            }
-        });
-        scene.system((ctx) => continuing.push(ctx.simulationTick), { runsDuringFreeze: true });
-    } };
+    const bottom: SceneDefinition = {
+        id: "bottom",
+        setup(scene) {
+            for (const observer of ["a", "b"])
+                scene.system((ctx) => {
+                    for (const event of ctx.events)
+                        seen.push(`${observer}:${ctx.simulationTick}:${event.type}`);
+                    if (observer === "a" && ctx.simulationTick === 0) {
+                        ctx.emit({ type: "hit" });
+                        scene.freeze(2);
+                    }
+                });
+            scene.system((ctx) => continuing.push(ctx.simulationTick), { runsDuringFreeze: true });
+        },
+    };
     await game.start(await game.prepare(bottom, { key: "bottom" }));
-    game.push(await game.prepare({ id: "modal", blocksUpdateBelow: true, setup() {} }, { key: "modal" }));
+    game.push(
+        await game.prepare({ id: "modal", blocksUpdateBelow: true, setup() {} }, { key: "modal" }),
+    );
     game.tick(); // Publish the inbox and freeze, then suspend the lower scene.
     const held = game.enumerate().scenes[0];
     game.tick();
@@ -131,71 +171,98 @@ test("suspension pauses freeze and retains broadcast inboxes for exactly one ord
     assert.deepEqual(game.enumerate().scenes[0].inbox, []);
 });
 
-for (const command of ["push", "set"] as const) for (const position of [0, 1, 2]) {
-    test(`${command} mount failure at command ${position + 1} preserves preceding commits and discards the suffix`, async (t) => {
-        const errors: unknown[] = [];
-        const mounts: string[] = [];
-        const cleanup: string[] = [];
-        const failure = new Error("deliberate private mount failure");
-        const game = new Game<number, number>({
-            seed: "failure", state: 0, transition: (s, c) => s + c,
-            diagnostic: (error) => errors.push(error),
-        });
-        t.after(() => game.dispose());
-        const initial: SceneDefinition<number, number> = { id: "initial", setup(scene) {
-            const state = scene.state();
-            scene.system((ctx) => {
-                ctx.world.spawn(Value.of({ n: 7 }));
-                ctx.emit({ type: "committed" });
-                scene.freeze(2);
-                state.dispatch(5);
+for (const command of ["push", "set"] as const)
+    for (const position of [0, 1, 2]) {
+        test(`${command} mount failure at command ${position + 1} preserves preceding commits and discards the suffix`, async (t) => {
+            const errors: unknown[] = [];
+            const mounts: string[] = [];
+            const cleanup: string[] = [];
+            const failure = new Error("deliberate private mount failure");
+            const game = new Game<number, number>({
+                seed: "failure",
+                state: 0,
+                transition: (s, c) => s + c,
+                diagnostic: (error) => errors.push(error),
             });
-        } };
-        await game.start(await game.prepare(initial, { key: "initial" }));
-        let atFailure: GameInspection | undefined;
-        for (const index of [0, 1, 2]) {
-            const candidate = await game.prepare({ id: `scene-${index}`, setup(scene) {
-                mounts.push(`scene-${index}`);
-                assert.equal(scene.state().read(), 5);
-                if (index === position) {
-                    atFailure = game.enumerate();
-                    scene.defer(() => cleanup.push("first"));
-                    scene.defer(() => cleanup.push("second"));
-                    throw failure;
-                }
-            } }, { key: `scene-${index}` });
-            if (index === position) game[command](candidate);
-            else game.push(candidate);
-        }
-        const later = await game.prepare({ id: "later", setup() { mounts.push("later"); } }, { key: "later" });
-        game.pop();
-        game.set(later);
-        game.tick();
-        assert.equal(game.lifecycle, "Running");
-        assert.equal(game.simulationTick, 1);
-        assert.equal(game.state, 5);
-        assert.deepEqual(errors, [failure]);
-        assert.deepEqual(cleanup, ["second", "first"]);
-        assert.deepEqual(mounts, Array.from({ length: position + 1 }, (_, i) => `scene-${i}`));
-        assert.deepEqual(game.scenes.map((s) => s.definition), [
-            "initial", ...Array.from({ length: position }, (_, i) => `scene-${i}`),
-        ]);
-        assert.ok(atFailure);
-        assert.deepEqual(game.enumerate().scenes, atFailure.scenes);
-        assert.equal(atFailure.scenes[0].entityCount, 1);
-        assert.equal(atFailure.scenes[0].freezeRemaining, 2);
-        assert.deepEqual(atFailure.scenes[0].inbox, [{ type: "committed" }]);
-        assert.deepEqual(atFailure.scenes[0].outbox, []);
-        game.tick(); // No discarded command can reappear on the next boundary.
-        assert.deepEqual(game.scenes.map((s) => s.definition), atFailure.scenes.map((s) => s.definition));
-        game.set(later); // Discarded candidates were released, not merely dequeued.
-        game.tick();
-        assert.equal(errors.length, 2);
-        assert.ok(errors[1] instanceof Error);
-        assert.match(errors[1].message, /stale, consumed, or foreign/);
-        assert.equal(mounts.includes("later"), false);
-    });
-}
+            t.after(() => game.dispose());
+            const initial: SceneDefinition<number, number> = {
+                id: "initial",
+                setup(scene) {
+                    const state = scene.state();
+                    scene.system((ctx) => {
+                        ctx.world.spawn(Value.of({ n: 7 }));
+                        ctx.emit({ type: "committed" });
+                        scene.freeze(2);
+                        state.dispatch(5);
+                    });
+                },
+            };
+            await game.start(await game.prepare(initial, { key: "initial" }));
+            let atFailure: GameInspection | undefined;
+            for (const index of [0, 1, 2]) {
+                const candidate = await game.prepare(
+                    {
+                        id: `scene-${index}`,
+                        setup(scene) {
+                            mounts.push(`scene-${index}`);
+                            assert.equal(scene.state().read(), 5);
+                            if (index === position) {
+                                atFailure = game.enumerate();
+                                scene.defer(() => cleanup.push("first"));
+                                scene.defer(() => cleanup.push("second"));
+                                throw failure;
+                            }
+                        },
+                    },
+                    { key: `scene-${index}` },
+                );
+                if (index === position) game[command](candidate);
+                else game.push(candidate);
+            }
+            const later = await game.prepare(
+                {
+                    id: "later",
+                    setup() {
+                        mounts.push("later");
+                    },
+                },
+                { key: "later" },
+            );
+            game.pop();
+            game.set(later);
+            game.tick();
+            assert.equal(game.lifecycle, "Running");
+            assert.equal(game.simulationTick, 1);
+            assert.equal(game.state, 5);
+            assert.deepEqual(errors, [failure]);
+            assert.deepEqual(cleanup, ["second", "first"]);
+            assert.deepEqual(
+                mounts,
+                Array.from({ length: position + 1 }, (_, i) => `scene-${i}`),
+            );
+            assert.deepEqual(
+                game.scenes.map((s) => s.definition),
+                ["initial", ...Array.from({ length: position }, (_, i) => `scene-${i}`)],
+            );
+            assert.ok(atFailure);
+            assert.deepEqual(game.enumerate().scenes, atFailure.scenes);
+            assert.equal(atFailure.scenes[0].entityCount, 1);
+            assert.equal(atFailure.scenes[0].freezeRemaining, 2);
+            assert.deepEqual(atFailure.scenes[0].inbox, [{ type: "committed" }]);
+            assert.deepEqual(atFailure.scenes[0].outbox, []);
+            game.tick(); // No discarded command can reappear on the next boundary.
+            assert.deepEqual(
+                game.scenes.map((s) => s.definition),
+                atFailure.scenes.map((s) => s.definition),
+            );
+            game.set(later); // Discarded candidates were released, not merely dequeued.
+            game.tick();
+            assert.equal(errors.length, 2);
+            assert.ok(errors[1] instanceof Error);
+            assert.match(errors[1].message, /stale, consumed, or foreign/);
+            assert.equal(mounts.includes("later"), false);
+        });
+    }
 
 test("owned state agrees at every tick across presentation cadence and preparation completion order", async () => {
     const regular = await runTimingScenario([1], false);
@@ -211,19 +278,35 @@ test("owned state agrees at every tick across presentation cadence and preparati
     assert.deepEqual(regular.completed, ["room", "modal"]);
     assert.deepEqual(mixed.completed, ["modal", "room"]);
     assert.equal(regular.snapshots.length, 24);
-    assert.deepEqual(regular.snapshots[3].scenes.map((s) => s.definition), ["base", "room"]);
-    assert.deepEqual(regular.snapshots[4].scenes.map((s) => s.definition), ["base", "room", "modal"]);
-    assert.deepEqual(regular.snapshots[9].scenes.map((s) => s.definition), ["base", "room"]);
+    assert.deepEqual(
+        regular.snapshots[3].scenes.map((s) => s.definition),
+        ["base", "room"],
+    );
+    assert.deepEqual(
+        regular.snapshots[4].scenes.map((s) => s.definition),
+        ["base", "room", "modal"],
+    );
+    assert.deepEqual(
+        regular.snapshots[9].scenes.map((s) => s.definition),
+        ["base", "room"],
+    );
 });
 
 async function runTimingScenario(cadence: readonly number[], reverse: boolean) {
-    const game = new Game<number, number>({ seed: "timing", state: 0, dt: 0.125, transition: (s, c) => s + c });
+    const game = new Game<number, number>({
+        seed: "timing",
+        state: 0,
+        dt: 0.125,
+        transition: (s, c) => s + c,
+    });
     const snapshots: GameInspection[] = [];
     const completed: string[] = [];
     const tickCounts: number[] = [];
     let renders = 0;
     const definition = (id: string, asset?: Asset<number>): SceneDefinition<number, number> => ({
-        id, blocksUpdateBelow: id === "modal", assets: asset ? [asset] : [],
+        id,
+        blocksUpdateBelow: id === "modal",
+        assets: asset ? [asset] : [],
         setup(scene) {
             const state = scene.state();
             const resource = scene.resource("simulation", { updates: 0, events: 0, input: 0 });
@@ -255,8 +338,14 @@ async function runTimingScenario(cadence: readonly number[], reverse: boolean) {
         await game.start(await game.prepare(definition("base"), { key: "base-key" }));
         const roomLoad = Promise.withResolvers<number>();
         const modalLoad = Promise.withResolvers<number>();
-        const roomPromise = game.prepare(definition("room", { id: "room-data", load: () => roomLoad.promise }), { key: "room-key" });
-        const modalPromise = game.prepare(definition("modal", { id: "modal-data", load: () => modalLoad.promise }), { key: "modal-key" });
+        const roomPromise = game.prepare(
+            definition("room", { id: "room-data", load: () => roomLoad.promise }),
+            { key: "room-key" },
+        );
+        const modalPromise = game.prepare(
+            definition("modal", { id: "modal-data", load: () => modalLoad.promise }),
+            { key: "modal-key" },
+        );
         const step = new FixedStep(game.dt);
         const frame = new Frame();
         const render = (alpha: number) => {
@@ -264,27 +353,51 @@ async function runTimingScenario(cadence: readonly number[], reverse: boolean) {
             frame.reset();
             game.render(frame, alpha);
             assert.ok(frame.count > 0);
-            assert.deepEqual(game.enumerate(), before, "frame preparation cannot mutate owned simulation state");
+            assert.deepEqual(
+                game.enumerate(),
+                before,
+                "frame preparation cannot mutate owned simulation state",
+            );
         };
         const tick = () => {
-            const input = Object.freeze({ ...emptyInput(), axes: Object.freeze([game.simulationTick % 3 - 1]) });
+            const input = Object.freeze({
+                ...emptyInput(),
+                axes: Object.freeze([(game.simulationTick % 3) - 1]),
+            });
             game.tick(input);
             // Public inspection already omits world-owner symbols from ECS handles.
             // Compare everything it exposes, including allocator, camera, events and RNG.
             snapshots.push(game.enumerate());
         };
         tick(); // Active simulation proceeds while both loads are pending.
-        if (reverse) { modalLoad.resolve(20); await modalPromise; completed.push("modal"); }
-        else { roomLoad.resolve(10); await roomPromise; completed.push("room"); }
+        if (reverse) {
+            modalLoad.resolve(20);
+            await modalPromise;
+            completed.push("modal");
+        } else {
+            roomLoad.resolve(10);
+            await roomPromise;
+            completed.push("room");
+        }
         render(0.25);
         tick();
-        if (reverse) { roomLoad.resolve(10); await roomPromise; completed.push("room"); }
-        else { modalLoad.resolve(20); await modalPromise; completed.push("modal"); }
+        if (reverse) {
+            roomLoad.resolve(10);
+            await roomPromise;
+            completed.push("room");
+        } else {
+            modalLoad.resolve(20);
+            await modalPromise;
+            completed.push("modal");
+        }
         if (reverse) render(0.75);
         tick();
         const room = await roomPromise;
         const modal = await modalPromise;
-        assert.deepEqual(game.scenes.map((s) => s.definition), ["base"]);
+        assert.deepEqual(
+            game.scenes.map((s) => s.definition),
+            ["base"],
+        );
         let frameIndex = 0;
         while (game.simulationTick < 24) {
             const ticksLeft = 24 - game.simulationTick;

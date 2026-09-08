@@ -6,8 +6,19 @@ export * from "./assets.js";
 export * from "./input.js";
 export { Game } from "./scene.js";
 export type {
-    DisplaySnapshot, GameInspection, GameOptions, Lifecycle, PreparedScene, SceneCommands,
-    SceneDefinition, SceneEvent, SceneInspection, SceneSetup, SceneStateInspection, StateAccess, SystemContext,
+    DisplaySnapshot,
+    GameInspection,
+    GameOptions,
+    Lifecycle,
+    PreparedScene,
+    SceneCommands,
+    SceneDefinition,
+    SceneEvent,
+    SceneInspection,
+    SceneSetup,
+    SceneStateInspection,
+    StateAccess,
+    SystemContext,
 } from "./scene.js";
 export type { InspectionValue } from "./inspection.js";
 export * from "./renderer.js";

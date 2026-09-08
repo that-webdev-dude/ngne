@@ -21,19 +21,19 @@ The engine uses fixed-step simulation, renders after simulation, supports severa
 
 ## Main terms
 
-| Term | Meaning |
-| --- | --- |
-| Platform frame | One callback from the host display loop. |
-| Simulation tick | One fixed-duration simulation step. |
-| Scene definition | Portable authoring data used to create scene instances. |
-| Scene instance | One mounted scene with its own world and runtime state. |
-| Scene resource | Non-entity data owned by one scene instance. |
-| Committed game state | Game-authored state visible for the whole current tick. |
-| Gameplay freeze | A scene-local gate that temporarily skips ordinary gameplay systems. |
-| Commit | The boundary where buffered simulation changes are published. |
+| Term                      | Meaning                                                                                                           |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Platform frame            | One callback from the host display loop.                                                                          |
+| Simulation tick           | One fixed-duration simulation step.                                                                               |
+| Scene definition          | Portable authoring data used to create scene instances.                                                           |
+| Scene instance            | One mounted scene with its own world and runtime state.                                                           |
+| Scene resource            | Non-entity data owned by one scene instance.                                                                      |
+| Committed game state      | Game-authored state visible for the whole current tick.                                                           |
+| Gameplay freeze           | A scene-local gate that temporarily skips ordinary gameplay systems.                                              |
+| Commit                    | The boundary where buffered simulation changes are published.                                                     |
 | Simulation-state snapshot | A future capture of authoritative simulation state at a completed commit; it excludes future environmental input. |
-| Frame preparation | Conversion of committed scene data into renderer input. |
-| Asset lease | A scene's claim on a shared engine asset. |
+| Frame preparation         | Conversion of committed scene data into renderer input.                                                           |
+| Asset lease               | A scene's claim on a shared engine asset.                                                                         |
 
 ## Ownership and state lifetimes
 
@@ -65,12 +65,12 @@ flowchart TD
 
 State belongs to the narrowest lifetime that needs it.
 
-| State | Owner | Survives | Ends with |
-| --- | --- | --- | --- |
-| Root seed and committed game state | `Game` | Scene replacement and stop/resume | `dispose()` |
-| World, resources, RNG, freeze, events, camera | Scene instance | Suspension and stop/resume | Scene unmount |
-| Shared authored or decoded assets | Asset service | Scene replacement | Asset-service disposal or cache eviction |
-| GPU resources | Renderer | Scene replacement when shared | Renderer disposal or device replacement |
+| State                                         | Owner          | Survives                          | Ends with                                |
+| --------------------------------------------- | -------------- | --------------------------------- | ---------------------------------------- |
+| Root seed and committed game state            | `Game`         | Scene replacement and stop/resume | `dispose()`                              |
+| World, resources, RNG, freeze, events, camera | Scene instance | Suspension and stop/resume        | Scene unmount                            |
+| Shared authored or decoded assets             | Asset service  | Scene replacement                 | Asset-service disposal or cache eviction |
+| GPU resources                                 | Renderer       | Scene replacement when shared     | Renderer disposal or device replacement  |
 
 The `Game` owns order and lifetime, not gameplay rules, ECS layout, or renderer batching.
 
@@ -142,12 +142,12 @@ Scenes are ordered bottom-to-top. `set`, `push`, and `pop` commands are buffered
 
 Communication uses the existing ownership boundaries:
 
-| Need | Mechanism |
-| --- | --- |
-| Immediate coordination inside one scene | Components, scene resources, or scene events |
-| Durable facts needed by later or mounted scenes | Committed game state |
-| Modal behavior and scene replacement | Scene-stack commands |
-| Live HUD | Frame preparation in the gameplay scene |
+| Need                                            | Mechanism                                    |
+| ----------------------------------------------- | -------------------------------------------- |
+| Immediate coordination inside one scene         | Components, scene resources, or scene events |
+| Durable facts needed by later or mounted scenes | Committed game state                         |
+| Modal behavior and scene replacement            | Scene-stack commands                         |
+| Live HUD                                        | Frame preparation in the gameplay scene      |
 
 General transient messaging between independently mounted worlds is deferred until a concrete game requires it. Direct access to another scene's world, entities, queries, or resources is not allowed.
 

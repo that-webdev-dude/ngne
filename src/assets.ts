@@ -13,8 +13,7 @@ export function imageAsset(id: string, url: string): Asset<ImageBitmap> {
         id,
         async load(signal) {
             const response = await fetch(url, { signal });
-            if (!response.ok)
-                throw new Error(`Image load failed: ${response.status}`);
+            if (!response.ok) throw new Error(`Image load failed: ${response.status}`);
             return createImageBitmap(await response.blob());
         },
         dispose: (bitmap) => bitmap.close(),
@@ -32,12 +31,8 @@ type Entry = {
 export class Assets {
     private entries = new Map<string, Entry>();
     private disposed = false;
-    async acquire<T>(
-        definition: Asset<T>,
-        signal?: AbortSignal,
-    ): Promise<Lease<T>> {
-        if (this.disposed || signal?.aborted)
-            throw new Error("Asset acquisition cancelled");
+    async acquire<T>(definition: Asset<T>, signal?: AbortSignal): Promise<Lease<T>> {
+        if (this.disposed || signal?.aborted) throw new Error("Asset acquisition cancelled");
         let entry = this.entries.get(definition.id);
         if (entry && entry.definition !== definition)
             throw new Error(`Conflicting asset identity: ${definition.id}`);
@@ -48,9 +43,7 @@ export class Assets {
                 controller,
                 refs: 0,
                 loaded: false,
-                promise: Promise.resolve().then(() =>
-                    definition.load(controller.signal),
-                ),
+                promise: Promise.resolve().then(() => definition.load(controller.signal)),
             };
             const owned = entry;
             entry.promise = entry.promise.then((value) => {
@@ -73,8 +66,7 @@ export class Assets {
             owned.refs--;
             if (!owned.refs && !owned.loaded) {
                 owned.controller.abort();
-                if (this.entries.get(definition.id) === owned)
-                    this.entries.delete(definition.id);
+                if (this.entries.get(definition.id) === owned) this.entries.delete(definition.id);
             }
         };
         let abort!: () => void;
@@ -108,7 +100,6 @@ export class Assets {
             }
         }
         this.entries.clear();
-        if (errors.length)
-            throw new AggregateError(errors, "Asset disposal failed");
+        if (errors.length) throw new AggregateError(errors, "Asset disposal failed");
     }
 }

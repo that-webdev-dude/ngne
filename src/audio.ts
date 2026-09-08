@@ -18,8 +18,7 @@ export function audioAsset(id: string, url: string): Asset<AudioBuffer> {
         id,
         async load(signal) {
             const response = await fetch(url, { signal });
-            if (!response.ok)
-                throw new Error(`Audio load failed: ${response.status}`);
+            if (!response.ok) throw new Error(`Audio load failed: ${response.status}`);
             const bytes = await response.arrayBuffer();
             const decoder = new OfflineAudioContext(1, 1, 44100);
             return decoder.decodeAudioData(bytes);
@@ -50,8 +49,7 @@ export class Audio {
         this.mix();
     }
     private mix() {
-        if (this.master)
-            this.master.gain.value = this.mutedValue ? 0 : 0.3 * this.ducking;
+        if (this.master) this.master.gain.value = this.mutedValue ? 0 : 0.3 * this.ducking;
     }
     async unlock() {
         if (this.disposed) throw new Error("Audio is disposed");
@@ -108,13 +106,11 @@ export class Audio {
         for (const { scope, sound } of queue) {
             if (this.voices.size >= this.maxVoices) break;
             if ("buffer" in sound) {
-                if (
-                    !(
-                        Number.isFinite(sound.rate ?? 1) &&
-                        (sound.rate ?? 1) > 0 &&
-                        Number.isFinite(sound.volume ?? 0.2)
-                    )
-                )
+                if (!(
+                    Number.isFinite(sound.rate ?? 1) &&
+                    (sound.rate ?? 1) > 0 &&
+                    Number.isFinite(sound.volume ?? 0.2)
+                ))
                     continue;
                 const source = ctx.createBufferSource(),
                     gain = ctx.createGain();
@@ -133,35 +129,24 @@ export class Audio {
                 source.start();
                 continue;
             }
-            if (
-                !(
-                    sound.frequency > 0 &&
-                    Number.isFinite(sound.frequency) &&
-                    sound.duration > 0 &&
-                    Number.isFinite(sound.duration) &&
-                    Number.isFinite(sound.volume ?? 0.2)
-                )
-            )
+            if (!(
+                sound.frequency > 0 &&
+                Number.isFinite(sound.frequency) &&
+                sound.duration > 0 &&
+                Number.isFinite(sound.duration) &&
+                Number.isFinite(sound.volume ?? 0.2)
+            ))
                 continue;
             const oscillator = ctx.createOscillator(),
                 gain = ctx.createGain();
             oscillator.type = sound.type ?? "square";
-            oscillator.frequency.setValueAtTime(
-                sound.frequency,
-                ctx.currentTime,
-            );
+            oscillator.frequency.setValueAtTime(sound.frequency, ctx.currentTime);
             oscillator.frequency.exponentialRampToValueAtTime(
                 Math.max(1, sound.endFrequency ?? sound.frequency),
                 ctx.currentTime + sound.duration,
             );
-            gain.gain.setValueAtTime(
-                Math.max(0.0001, sound.volume ?? 0.2),
-                ctx.currentTime,
-            );
-            gain.gain.exponentialRampToValueAtTime(
-                0.0001,
-                ctx.currentTime + sound.duration,
-            );
+            gain.gain.setValueAtTime(Math.max(0.0001, sound.volume ?? 0.2), ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + sound.duration);
             oscillator.connect(gain);
             gain.connect(this.bus(scope));
             this.voices.set(oscillator, { gain, scope });
@@ -228,7 +213,6 @@ export class Audio {
         }
         this.context = undefined;
         this.master = undefined;
-        if (errors.length)
-            throw new AggregateError(errors, "Audio disposal failed");
+        if (errors.length) throw new AggregateError(errors, "Audio disposal failed");
     }
 }

@@ -1,5 +1,6 @@
 import {
-    Game, FAIL_GAME,
+    Game,
+    FAIL_GAME,
     type GameOptions,
     type PreparedScene,
     type DisplaySnapshot,
@@ -94,8 +95,7 @@ export class BrowserGame<S, C> {
             this.game.render(this.frame, result.alpha);
             this.renderer!.render(this.frame, this.options.clear);
             const end = performance.now();
-            this.stats.fps +=
-                ((elapsed ? 1 / elapsed : 60) - this.stats.fps) * 0.05;
+            this.stats.fps += ((elapsed ? 1 / elapsed : 60) - this.stats.fps) * 0.05;
             this.stats.frameMs = end - begin;
             this.stats.updateMs = updated - begin;
             this.stats.renderMs = end - updated;
@@ -108,8 +108,7 @@ export class BrowserGame<S, C> {
                     droppedTicks: result.dropped,
                 });
             this.options.afterFrame?.(this.stats);
-            if (this.enabled)
-                this.raf = this.scheduler.request(callback);
+            if (this.enabled) this.raf = this.scheduler.request(callback);
         } catch (e) {
             this.enabled = false;
             this.game[FAIL_GAME]();
@@ -126,11 +125,8 @@ export class BrowserGame<S, C> {
         const cold = !this.attached;
         try {
             if (cold) {
-                this.renderer = new Renderer(
-                    this.options.canvas,
-                    this.width,
-                    this.height,
-                    (e) => this.game.report(e),
+                this.renderer = new Renderer(this.options.canvas, this.width, this.height, (e) =>
+                    this.game.report(e),
                 );
                 this.input.attach(this.options.canvas, this.width, this.height);
             } else await this.audio.resume();
@@ -215,15 +211,20 @@ export class BrowserGame<S, C> {
         this.run++;
         // Start every independent teardown now; a pending audio close must not
         // keep the world, renderer or input alive.
-        this.disposal = Promise.allSettled([
-            () => this.scheduler.cancel(this.raf),
-            () => this.game.dispose(),
-            () => this.audio.dispose(),
-            () => this.renderer?.dispose(),
-            () => this.input.dispose(),
-        ].map(async (action) => { await action(); })).then((results) => {
+        this.disposal = Promise.allSettled(
+            [
+                () => this.scheduler.cancel(this.raf),
+                () => this.game.dispose(),
+                () => this.audio.dispose(),
+                () => this.renderer?.dispose(),
+                () => this.input.dispose(),
+            ].map(async (action) => {
+                await action();
+            }),
+        ).then((results) => {
             const errors = results.flatMap((result) =>
-                result.status === "rejected" ? [result.reason] : []);
+                result.status === "rejected" ? [result.reason] : [],
+            );
             if (errors.length) throw new AggregateError(errors, "Dispose failed");
         });
         return this.disposal;

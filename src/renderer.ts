@@ -69,23 +69,7 @@ export class Frame {
         layer = 0,
         screen = false,
     ) {
-        this.add(
-            x,
-            y,
-            width,
-            height,
-            color,
-            alpha,
-            layer,
-            0,
-            undefined,
-            0,
-            0,
-            1,
-            1,
-            0,
-            screen,
-        );
+        this.add(x, y, width, height, color, alpha, layer, 0, undefined, 0, 0, 1, 1, 0, screen);
     }
     private add(
         x: number,
@@ -188,8 +172,7 @@ export class Renderer {
         this.gpuBytes = 0;
         try {
             this.initialize();
-            for (const [id, source] of this.sources)
-                this.uploadTexture(id, source);
+            for (const [id, source] of this.sources) this.uploadTexture(id, source);
         } catch (e) {
             this.lost = true;
             this.onError(e);
@@ -208,10 +191,7 @@ export class Renderer {
             stencil: false,
             preserveDrawingBuffer: false,
         });
-        if (!gl)
-            throw new Error(
-                "NGNE requires WebGL 2. Enable browser hardware acceleration.",
-            );
+        if (!gl) throw new Error("NGNE requires WebGL 2. Enable browser hardware acceleration.");
         this.gl = gl;
         canvas.width = width;
         canvas.height = height;
@@ -246,23 +226,14 @@ export class Renderer {
         gl.deleteShader(vs);
         gl.deleteShader(fs);
         if (!gl.getProgramParameter(this.program, gl.LINK_STATUS))
-            throw new Error(
-                gl.getProgramInfoLog(this.program) ?? "Program link failed",
-            );
+            throw new Error(gl.getProgramInfoLog(this.program) ?? "Program link failed");
         this.buffer = gl.createBuffer()!;
         this.vao = gl.createVertexArray()!;
         gl.bindVertexArray(this.vao);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
         for (let i = 0; i < 4; i++) {
             gl.enableVertexAttribArray(i);
-            gl.vertexAttribPointer(
-                i,
-                i === 3 ? 1 : 4,
-                gl.FLOAT,
-                false,
-                STRIDE * 4,
-                i * 16,
-            );
+            gl.vertexAttribPointer(i, i === 3 ? 1 : 4, gl.FLOAT, false, STRIDE * 4, i * 16);
             gl.vertexAttribDivisor(i, 1);
         }
         const white = gl.createTexture()!;
@@ -304,14 +275,7 @@ export class Renderer {
         const texture = gl.createTexture()!;
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-        gl.texImage2D(
-            gl.TEXTURE_2D,
-            0,
-            gl.RGBA,
-            gl.RGBA,
-            gl.UNSIGNED_BYTE,
-            source,
-        );
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
         this.parameters();
         this.textures.set(id, texture);
     }
@@ -342,34 +306,18 @@ export class Renderer {
         gl.bindVertexArray(this.vao);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
         if (this.gpuBytes < this.upload.byteLength) {
-            gl.bufferData(
-                gl.ARRAY_BUFFER,
-                this.upload.byteLength,
-                gl.DYNAMIC_DRAW,
-            );
+            gl.bufferData(gl.ARRAY_BUFFER, this.upload.byteLength, gl.DYNAMIC_DRAW);
             this.gpuBytes = this.upload.byteLength;
         }
-        gl.bufferSubData(
-            gl.ARRAY_BUFFER,
-            0,
-            this.upload.subarray(0, frame.count * STRIDE),
-        );
-        gl.uniform2f(
-            gl.getUniformLocation(this.program, "resolution"),
-            this.width,
-            this.height,
-        );
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.upload.subarray(0, frame.count * STRIDE));
+        gl.uniform2f(gl.getUniformLocation(this.program, "resolution"), this.width, this.height);
         gl.activeTexture(gl.TEXTURE0);
         gl.uniform1i(gl.getUniformLocation(this.program, "atlas"), 0);
         let start = 0;
         while (start < frame.count) {
             const texture = frame.textures[frame.order[start]] ?? "";
             let end = start + 1;
-            while (
-                end < frame.count &&
-                (frame.textures[frame.order[end]] ?? "") === texture
-            )
-                end++;
+            while (end < frame.count && (frame.textures[frame.order[end]] ?? "") === texture) end++;
             const handle = this.textures.get(texture);
             if (!handle) throw new Error("Texture is not uploaded: " + texture);
             gl.bindTexture(gl.TEXTURE_2D, handle);

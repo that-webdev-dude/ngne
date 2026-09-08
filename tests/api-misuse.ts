@@ -2,15 +2,22 @@ import { component, Game, type PreparedScene, type SceneSetup, type SystemContex
 import * as engine from "ngne";
 
 // Compiled against source during typecheck and emitted declarations during build.
-function authoringBoundary(game: Game, setup: SceneSetup, ctx: SystemContext, candidate: PreparedScene): void {
+function authoringBoundary(
+    game: Game,
+    setup: SceneSetup,
+    ctx: SystemContext,
+    candidate: PreparedScene,
+): void {
     const Position = component("position", () => ({ x: 0 }));
     const entity = ctx.world.spawn(Position.of());
     ctx.world.get(entity, Position);
-    ctx.world.query(Position).each((_, position) => { position.x++; });
+    ctx.world.query(Position).each((_, position) => {
+        position.x++;
+    });
     ctx.world.despawn(entity);
     setup.resource("counter", { value: 0 });
     candidate.release();
-    game.scenes.map(scene => scene.id);
+    game.scenes.map((scene) => scene.id);
     game.enumerate();
 
     // @ts-expect-error Lifecycle is runtime-owned.
@@ -54,7 +61,10 @@ function authoringBoundary(game: Game, setup: SceneSetup, ctx: SystemContext, ca
 }
 void authoringBoundary;
 
-interface Progress { rooms: { scores: number[] }; best: number }
+interface Progress {
+    rooms: { scores: number[] };
+    best: number;
+}
 type Command = { type: "score"; payload: { values: number[] } };
 function committedStateBoundary(game: Game<Progress, Command>): void {
     const scene: engine.SceneDefinition<Progress, Command> = {
@@ -80,16 +90,23 @@ function committedStateBoundary(game: Game<Progress, Command>): void {
     void game.prepare(scene, { key: "valid" });
     const portable: engine.SceneDefinition = { id: "portable", setup() {} };
     void game.prepare(portable, { key: "portable" });
-    const wrongState: engine.SceneDefinition<{ best: string }, Command> = { id: "wrong", setup() {} };
+    const wrongState: engine.SceneDefinition<{ best: string }, Command> = {
+        id: "wrong",
+        setup() {},
+    };
     // @ts-expect-error A Game cannot mount a scene expecting unrelated state.
     void game.prepare(wrongState, { key: "wrong" });
-    const wrongCommand: engine.SceneDefinition<Progress, { type: "reset" }> = { id: "wrong", setup() {} };
+    const wrongCommand: engine.SceneDefinition<Progress, { type: "reset" }> = {
+        id: "wrong",
+        setup() {},
+    };
     // @ts-expect-error A Game cannot mount a scene dispatching unsupported commands.
     void game.prepare(wrongCommand, { key: "wrong" });
     // @ts-expect-error Host reads are also deeply read-only.
     game.state.rooms.scores[0] = 9;
     const options: engine.GameOptions<Progress, Command> = {
-        seed: 1, state: { rooms: { scores: [] }, best: 0 },
+        seed: 1,
+        state: { rooms: { scores: [] }, best: 0 },
         transition(state, command) {
             // @ts-expect-error Transitions cannot mutate the previous snapshot.
             state.rooms.scores.push(1);
@@ -99,12 +116,22 @@ function committedStateBoundary(game: Game<Progress, Command>): void {
         },
     };
     // @ts-expect-error Transitions must return synchronous data.
-    options.transition = async state => state;
-    const inferred = new Game({ seed: 1, state: { best: 0 }, transition: (s, c: number) => ({ best: s.best + c }) });
-    void inferred.prepare({ id: "inferred", setup(s) {
-        s.state().dispatch(1);
-        // @ts-expect-error Inferred commands remain numeric.
-        s.state().dispatch("wrong");
-    } }, { key: "inferred" });
+    options.transition = async (state) => state;
+    const inferred = new Game({
+        seed: 1,
+        state: { best: 0 },
+        transition: (s, c: number) => ({ best: s.best + c }),
+    });
+    void inferred.prepare(
+        {
+            id: "inferred",
+            setup(s) {
+                s.state().dispatch(1);
+                // @ts-expect-error Inferred commands remain numeric.
+                s.state().dispatch("wrong");
+            },
+        },
+        { key: "inferred" },
+    );
 }
 void committedStateBoundary;

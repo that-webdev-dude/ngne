@@ -22,8 +22,7 @@ export const emptyInput = (): InputSnapshot =>
         axes: Object.freeze([0, 0, 0, 0]),
     });
 export const down = (i: InputSnapshot, key: string) => i.held.includes(key);
-export const pressed = (i: InputSnapshot, key: string) =>
-    i.pressed.includes(key);
+export const pressed = (i: InputSnapshot, key: string) => i.pressed.includes(key);
 export class Input {
     private held = new Set<string>();
     private presses = new Set<string>();
@@ -50,17 +49,8 @@ export class Input {
         };
         on(window, "keydown", (e) => {
             const k = e as KeyboardEvent;
-            if ((k.target as HTMLElement)?.matches("input,textarea,select"))
-                return;
-            if (
-                [
-                    "Space",
-                    "ArrowUp",
-                    "ArrowDown",
-                    "ArrowLeft",
-                    "ArrowRight",
-                ].includes(k.code)
-            )
+            if ((k.target as HTMLElement)?.matches("input,textarea,select")) return;
+            if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(k.code))
                 k.preventDefault();
             this.set(k.code, true);
         });
@@ -85,9 +75,7 @@ export class Input {
             canvas.setPointerCapture(p.pointerId);
             this.set("Pointer" + p.button, true);
         });
-        on(canvas, "pointerup", (e) =>
-            this.set("Pointer" + (e as PointerEvent).button, false),
-        );
+        on(canvas, "pointerup", (e) => this.set("Pointer" + (e as PointerEvent).button, false));
         on(canvas, "pointercancel", () => {
             this.set("Pointer0", false);
             this.set("Pointer2", false);
@@ -106,17 +94,13 @@ export class Input {
                 : undefined;
         const current = new Set<string>();
         if (pad) {
-            axes = axes.map((_, i) =>
-                Math.abs(pad.axes[i] ?? 0) > 0.15 ? pad.axes[i] : 0,
-            );
+            axes = axes.map((_, i) => (Math.abs(pad.axes[i] ?? 0) > 0.15 ? pad.axes[i] : 0));
             pad.buttons.forEach((b, i) => {
                 if (b.pressed) current.add("Pad" + i);
             });
         }
-        for (const key of current)
-            if (!this.padHeld.has(key)) this.presses.add(key);
-        for (const key of this.padHeld)
-            if (!current.has(key)) this.releases.add(key);
+        for (const key of current) if (!this.padHeld.has(key)) this.presses.add(key);
+        for (const key of this.padHeld) if (!current.has(key)) this.releases.add(key);
         this.padHeld = current;
         const result = Object.freeze({
             held: Object.freeze([...this.held, ...current]),

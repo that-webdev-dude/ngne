@@ -106,9 +106,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                 bossWave: number;
                 finished: boolean;
             });
-            const sound = options.audio?.scene(
-                options.attract ? "attract" : "arena",
-            );
+            const sound = options.audio?.scene(options.attract ? "attract" : "arena");
             if (sound) s.defer(() => sound.dispose());
             const stars = s.resource(
                 "stars",
@@ -133,13 +131,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
             );
             const moving = s.world.query(Position, Body, Visual),
                 particles = s.world.query(Position, Particle);
-            const spawn = (
-                x: number,
-                y: number,
-                kind: number,
-                vx = 0,
-                vy = 0,
-            ) =>
+            const spawn = (x: number, y: number, kind: number, vx = 0, vy = 0) =>
                 s.world.spawn(
                     Position.of({ x, y, px: x, py: y }),
                     Body.of({
@@ -147,12 +139,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                         vx,
                         vy,
                         radius: kind === 5 ? 22 : kind === 0 ? 5 : 7,
-                        hp:
-                            kind === 5
-                                ? 160 + run.wave * 10
-                                : kind === 2
-                                  ? 3
-                                  : 1,
+                        hp: kind === 5 ? 160 + run.wave * 10 : kind === 2 ? 3 : 1,
                         cooldown: rng.int(40, 140),
                     }),
                     Visual.of({
@@ -166,25 +153,12 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                                     : kind === 3 || kind === 4
                                       ? 3
                                       : kind,
-                        size:
-                            kind === 5
-                                ? 68
-                                : kind === 0
-                                  ? 28
-                                  : kind >= 3 && kind <= 4
-                                    ? 12
-                                    : 26,
+                        size: kind === 5 ? 68 : kind === 0 ? 28 : kind >= 3 && kind <= 4 ? 12 : 26,
                     }),
                 );
             const player = s.resource("player", spawn(W / 2, H * 0.65, 0));
             // The player handle is immutable; all mutable gameplay data is owned above.
-            const burst = (
-                x: number,
-                y: number,
-                color: number,
-                count: number,
-                speed = 95,
-            ) => {
+            const burst = (x: number, y: number, color: number, count: number, speed = 95) => {
                 for (let i = 0; i < count; i++) {
                     const a = fx.range(0, Math.PI * 2),
                         v = fx.range(10, speed),
@@ -205,13 +179,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
             const enemy = (initial = false) => {
                 const x = rng.range(25, W - 25),
                     y = initial ? rng.range(25, H * 0.55) : -20;
-                spawn(
-                    x,
-                    y,
-                    rng.next() < 0.22 ? 2 : 1,
-                    rng.range(-20, 20),
-                    rng.range(15, 35),
-                );
+                spawn(x, y, rng.next() < 0.22 ? 2 : 1, rng.range(-20, 20), rng.range(15, 35));
             };
             for (let i = 0; i < (run.stress ? 240 : 16); i++) enemy(true);
             if (run.stress)
@@ -268,20 +236,12 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                     return;
                 }
                 let mx =
-                    (down(ctx.input, "KeyD") || down(ctx.input, "ArrowRight")
-                        ? 1
-                        : 0) -
-                    (down(ctx.input, "KeyA") || down(ctx.input, "ArrowLeft")
-                        ? 1
-                        : 0) +
+                    (down(ctx.input, "KeyD") || down(ctx.input, "ArrowRight") ? 1 : 0) -
+                    (down(ctx.input, "KeyA") || down(ctx.input, "ArrowLeft") ? 1 : 0) +
                     ctx.input.axes[0];
                 let my =
-                    (down(ctx.input, "KeyS") || down(ctx.input, "ArrowDown")
-                        ? 1
-                        : 0) -
-                    (down(ctx.input, "KeyW") || down(ctx.input, "ArrowUp")
-                        ? 1
-                        : 0) +
+                    (down(ctx.input, "KeyS") || down(ctx.input, "ArrowDown") ? 1 : 0) -
+                    (down(ctx.input, "KeyW") || down(ctx.input, "ArrowUp") ? 1 : 0) +
                     ctx.input.axes[1];
                 if (options.attract) {
                     mx = Math.cos(run.seconds * 0.7) * 0.8;
@@ -291,16 +251,8 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                 pb.vx = (mx / length) * 145;
                 pb.vy = (my / length) * 145;
                 if (down(ctx.input, "TouchMove")) {
-                    pb.vx = clamp(
-                        (ctx.input.pointer.x - playerPosition.x) * 8,
-                        -150,
-                        150,
-                    );
-                    pb.vy = clamp(
-                        (ctx.input.pointer.y - playerPosition.y) * 8,
-                        -150,
-                        150,
-                    );
+                    pb.vx = clamp((ctx.input.pointer.x - playerPosition.x) * 8, -150, 150);
+                    pb.vy = clamp((ctx.input.pointer.y - playerPosition.y) * 8, -150, 150);
                 }
                 if (
                     (pressed(ctx.input, "Space") ||
@@ -323,13 +275,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                             burst(p.x, p.y, 0x83e8e1, 8);
                         }
                     });
-                    burst(
-                        playerPosition.x,
-                        playerPosition.y,
-                        0x83e8e1,
-                        180,
-                        250,
-                    );
+                    burst(playerPosition.x, playerPosition.y, 0x83e8e1, 180, 250);
                     sound?.play({
                         frequency: 150,
                         endFrequency: 25,
@@ -350,13 +296,8 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                     aimY = -100,
                     distance = Infinity;
                 moving.each((_, p, b) => {
-                    if (
-                        (b.kind === 1 || b.kind === 2 || b.kind === 5) &&
-                        b.active
-                    ) {
-                        const d =
-                            (p.x - playerPosition!.x) ** 2 +
-                            (p.y - playerPosition!.y) ** 2;
+                    if ((b.kind === 1 || b.kind === 2 || b.kind === 5) && b.active) {
+                        const d = (p.x - playerPosition!.x) ** 2 + (p.y - playerPosition!.y) ** 2;
                         if (d < distance) {
                             distance = d;
                             aimX = p.x;
@@ -372,10 +313,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                     aimX = playerPosition.x + ctx.input.axes[2] * 100;
                     aimY = playerPosition.y + ctx.input.axes[3] * 100;
                 }
-                const aim = Math.atan2(
-                    aimY - playerPosition.y,
-                    aimX - playerPosition.x,
-                );
+                const aim = Math.atan2(aimY - playerPosition.y, aimX - playerPosition.x);
                 s.world.get(player, Visual)!.angle = aim + Math.PI / 2;
                 if (--run.shotTicks <= 0) {
                     run.shotTicks = run.stress ? 3 : 7;
@@ -404,10 +342,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                     p.py = p.y;
                     b.age++;
                     if (b.kind === 1 || b.kind === 2) {
-                        const a = Math.atan2(
-                            playerPosition!.y - p.y,
-                            playerPosition!.x - p.x,
-                        );
+                        const a = Math.atan2(playerPosition!.y - p.y, playerPosition!.x - p.x);
                         const speed = b.kind === 2 ? 20 : 24 + run.wave * 2;
                         b.vx = Math.cos(a) * speed;
                         b.vy = Math.sin(a) * speed;
@@ -421,13 +356,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                         const count = b.kind === 5 ? 24 : 5;
                         for (let i = 0; i < count; i++) {
                             const a = (i / count) * Math.PI * 2 + b.age * 0.025;
-                            spawn(
-                                p.x,
-                                p.y,
-                                4,
-                                Math.cos(a) * 65,
-                                Math.sin(a) * 65,
-                            );
+                            spawn(p.x, p.y, 4, Math.cos(a) * 65, Math.sin(a) * 65);
                         }
                     }
                     p.x += b.vx * ctx.dt;
@@ -464,12 +393,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                     run.score += (b.kind === 5 ? 2000 : 100) * run.combo;
                     run.combo = Math.min(8, run.combo + 1);
                     run.comboTicks = 120;
-                    burst(
-                        p.x,
-                        p.y,
-                        b.kind === 5 ? 0xffb276 : 0xff6d82,
-                        b.kind === 5 ? 150 : 18,
-                    );
+                    burst(p.x, p.y, b.kind === 5 ? 0xffb276 : 0xff6d82, b.kind === 5 ? 150 : 18);
                     run.shake = b.kind === 5 ? 10 : 2;
                     ctx.emit({ type: "destroyed", boss: b.kind === 5 });
                     if (b.kind === 5) {
@@ -495,21 +419,18 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                                 for (const target of grid[y * 20 + x]) {
                                     if (
                                         target.b.active &&
-                                        (p.x - target.p.x) ** 2 +
-                                            (p.y - target.p.y) ** 2 <
+                                        (p.x - target.p.x) ** 2 + (p.y - target.p.y) ** 2 <
                                             (target.b.radius + 5) ** 2
                                     ) {
                                         b.active = false;
                                         s.world.despawn(e);
-                                        if (--target.b.hp <= 0)
-                                            kill(target.e, target.p, target.b);
+                                        if (--target.b.hp <= 0) kill(target.e, target.p, target.b);
                                         break;
                                     }
                                 }
                     } else if (
                         b.kind !== 0 &&
-                        (p.x - playerPosition!.x) ** 2 +
-                            (p.y - playerPosition!.y) ** 2 <
+                        (p.x - playerPosition!.x) ** 2 + (p.y - playerPosition!.y) ** 2 <
                             (b.radius + 5) ** 2
                     ) {
                         if (b.kind === 6) {
@@ -523,22 +444,13 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                                 duration: 0.2,
                                 volume: 0.2,
                             });
-                        } else if (
-                            !run.invulnerable &&
-                            !options.attract &&
-                            !run.stress
-                        ) {
+                        } else if (!run.invulnerable && !options.attract && !run.stress) {
                             run.hp--;
                             run.invulnerable = 100;
                             run.flash = 6;
                             run.shake = 8;
                             s.freeze(4);
-                            burst(
-                                playerPosition!.x,
-                                playerPosition!.y,
-                                0x83e8e1,
-                                45,
-                            );
+                            burst(playerPosition!.x, playerPosition!.y, 0x83e8e1, 45);
                             sound?.play({
                                 frequency: 220,
                                 endFrequency: 40,
@@ -550,13 +462,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                     }
                 });
                 if (run.ticks % 3 === 0)
-                    burst(
-                        playerPosition.x,
-                        playerPosition.y + 8,
-                        0xffb276,
-                        1,
-                        20,
-                    );
+                    burst(playerPosition.x, playerPosition.y + 8, 0xffb276, 1, 20);
             });
             s.system(
                 (ctx) => {
@@ -595,12 +501,9 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
             });
             s.system(() => {
                 if (!options.attract && run.ticks % 15 === 0) {
-                    const notes = [
-                        110, 110, 165, 110, 130.81, 130.81, 196, 146.83,
-                    ];
+                    const notes = [110, 110, 165, 110, 130.81, 130.81, 196, 146.83];
                     sound?.play({
-                        frequency:
-                            notes[Math.floor(run.ticks / 15) % notes.length],
+                        frequency: notes[Math.floor(run.ticks / 15) % notes.length],
                         duration: 0.15,
                         volume: 0.05,
                         type: "triangle",
@@ -616,9 +519,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                         b.size,
                         b.size,
                         b.color,
-                        b.maxLife > 100
-                            ? 0.65
-                            : Math.max(0, b.life / b.maxLife),
+                        b.maxLife > 100 ? 0.65 : Math.max(0, b.life / b.maxLife),
                         1,
                     ),
                 );
@@ -642,9 +543,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                     if (b.kind === 5) {
                         frame.rect(p.x, p.y - 28, 64, 3, 0x442b43, 1, 5);
                         frame.rect(
-                            p.x -
-                                32 +
-                                32 * Math.max(0, b.hp / (160 + run.wave * 10)),
+                            p.x - 32 + 32 * Math.max(0, b.hp / (160 + run.wave * 10)),
                             p.y - 28,
                             64 * Math.max(0, b.hp / (160 + run.wave * 10)),
                             3,
@@ -655,16 +554,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                     }
                 });
                 if (run.flash && !options.reducedMotion)
-                    frame.rect(
-                        W / 2,
-                        H / 2,
-                        W,
-                        H,
-                        0x83e8e1,
-                        run.flash * 0.022,
-                        9,
-                        true,
-                    );
+                    frame.rect(W / 2, H / 2, W, H, 0x83e8e1, run.flash * 0.022, 9, true);
                 options.onView?.({ ...run });
             });
         },
@@ -683,18 +573,11 @@ function backdrop(
             85 + y,
             half * 2,
             4,
-            y < -24
-                ? 0x28465d
-                : y < 0
-                  ? 0x294e60
-                  : y < 28
-                    ? 0x233d55
-                    : 0x1b2f47,
+            y < -24 ? 0x28465d : y < 0 ? 0x294e60 : y < 28 ? 0x233d55 : 0x1b2f47,
             1,
             -4,
         );
-        if (y % 12 === 0)
-            frame.rect(505, 85 + y, half * 1.5, 4, 0x20384f, 1, -3);
+        if (y % 12 === 0) frame.rect(505, 85 + y, half * 1.5, 4, 0x20384f, 1, -3);
     }
     for (const star of stars)
         frame.rect(

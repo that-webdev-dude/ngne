@@ -19,11 +19,11 @@ Each `Game` owns one game-authored state host. Authorized systems read one commi
 
 ### Alternatives not selected
 
-| Alternative | Reason |
-| --- | --- |
-| Global mutable state | Has no `Game`-scoped lifetime and bypasses commit timing. |
-| Persistent state in every tick context | Hides dependencies and exposes it to every system. |
-| Transfer entities between scenes | Crosses world ownership and creates competing sources of truth. |
+| Alternative                            | Reason                                                          |
+| -------------------------------------- | --------------------------------------------------------------- |
+| Global mutable state                   | Has no `Game`-scoped lifetime and bypasses commit timing.       |
+| Persistent state in every tick context | Hides dependencies and exposes it to every system.              |
+| Transfer entities between scenes       | Crosses world ownership and creates competing sources of truth. |
 
 ### Consequences
 
@@ -48,12 +48,12 @@ Non-entity scene data belongs to typed resources owned by one scene instance. Bi
 
 ### Alternatives not selected
 
-| Alternative | Reason |
-| --- | --- |
-| Model every value as an entity | Adds unnecessary ECS and query overhead. |
-| Buffer every resource write | Makes sequential algorithms awkward and creates a second visibility rule. |
-| Universal resource bag | Hides dependencies and gives every system broad access. |
-| Store all scene data in committed game state | Gives temporary data the wrong lifetime. |
+| Alternative                                  | Reason                                                                    |
+| -------------------------------------------- | ------------------------------------------------------------------------- |
+| Model every value as an entity               | Adds unnecessary ECS and query overhead.                                  |
+| Buffer every resource write                  | Makes sequential algorithms awkward and creates a second visibility rule. |
+| Universal resource bag                       | Hides dependencies and gives every system broad access.                   |
+| Store all scene data in committed game state | Gives temporary data the wrong lifetime.                                  |
 
 ### Consequences
 
@@ -77,11 +77,11 @@ Each platform frame runs at most a fixed positive number of simulation ticks. Wh
 
 ### Alternatives not selected
 
-| Alternative | Reason |
-| --- | --- |
-| Unlimited catch-up | Can turn overload into a lasting spiral. |
-| One enlarged tick | Changes movement, collision, and deterministic behavior. |
-| Retain all backlog | Keeps later frames under catch-up pressure. |
+| Alternative        | Reason                                                   |
+| ------------------ | -------------------------------------------------------- |
+| Unlimited catch-up | Can turn overload into a lasting spiral.                 |
+| One enlarged tick  | Changes movement, collision, and deterministic behavior. |
+| Retain all backlog | Keeps later frames under catch-up pressure.              |
 
 ### Consequences
 
@@ -105,11 +105,11 @@ Each `Game` resolves one root seed. A scene instance derives named deterministic
 
 ### Alternatives not selected
 
-| Alternative | Reason |
-| --- | --- |
-| Platform-global randomness | Is outside simulation ownership and cannot be restored reliably. |
-| One game-wide mutable stream | Couples all scenes and systems to global draw order. |
-| Universal RNG in tick context | Hides dependencies and encourages accidental sharing. |
+| Alternative                   | Reason                                                           |
+| ----------------------------- | ---------------------------------------------------------------- |
+| Platform-global randomness    | Is outside simulation ownership and cannot be restored reliably. |
+| One game-wide mutable stream  | Couples all scenes and systems to global draw order.             |
+| Universal RNG in tick context | Hides dependencies and encourages accidental sharing.            |
 
 ### Consequences
 
@@ -136,12 +136,12 @@ Gameplay timers that should pause use remaining-duration counters changed only b
 
 ### Alternatives not selected
 
-| Alternative | Reason |
-| --- | --- |
-| Scene push or pop for hitstop | Uses heavyweight lifecycle machinery for frequent timing. |
-| Zero delta to all systems | Still runs gameplay and requires every system to handle it. |
-| General time-domain graph | Adds rules not required by binary hitstop. |
-| Separate gameplay clock | Gives authors two timing models when counters are sufficient. |
+| Alternative                   | Reason                                                        |
+| ----------------------------- | ------------------------------------------------------------- |
+| Scene push or pop for hitstop | Uses heavyweight lifecycle machinery for frequent timing.     |
+| Zero delta to all systems     | Still runs gameplay and requires every system to handle it.   |
+| General time-domain graph     | Adds rules not required by binary hitstop.                    |
+| Separate gameplay clock       | Gives authors two timing models when counters are sufficient. |
 
 ### Consequences
 
@@ -171,10 +171,10 @@ The architecture preserves one future simulation-state snapshot boundary immedia
 
 ### Alternatives not selected
 
-| Alternative | Reason |
-| --- | --- |
-| Define full restore now | Requires compatibility, asset reacquisition, and failure rules without a consumer. |
-| Snapshot only ECS worlds | Misses game state, resources, RNG, events, freeze, and scene identity. |
+| Alternative                    | Reason                                                                                     |
+| ------------------------------ | ------------------------------------------------------------------------------------------ |
+| Define full restore now        | Requires compatibility, asset reacquisition, and failure rules without a consumer.         |
+| Snapshot only ECS worlds       | Misses game state, resources, RNG, events, freeze, and scene identity.                     |
 | Serialize every runtime object | Includes services, caches, closures, and platform resources that are not simulation state. |
 
 ### Consequences
@@ -199,11 +199,11 @@ An entity receives its complete component set at spawn and keeps it until despaw
 
 ### Alternatives not selected
 
-| Alternative | Reason |
-| --- | --- |
+| Alternative                            | Reason                                                                 |
+| -------------------------------------- | ---------------------------------------------------------------------- |
 | Runtime component addition and removal | Requires migration and component-lifecycle rules not currently needed. |
-| Immediate spawn or despawn | Can invalidate active iteration. |
-| Public object pools | Exposes a storage optimization as gameplay policy. |
+| Immediate spawn or despawn             | Can invalidate active iteration.                                       |
+| Public object pools                    | Exposes a storage optimization as gameplay policy.                     |
 
 ### Consequences
 

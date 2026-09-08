@@ -2,19 +2,19 @@
 
 This document states what the architecture must accommodate. It does not prescribe APIs or storage formats.
 
-| Capability | Status |
-| --- | --- |
-| Persistent progression | Required |
-| Simulation snapshot readiness | Required |
-| Grid, tilemap, and non-entity scene state | Required |
-| Entity lifetime and structural churn | Required |
-| Deterministic randomness | Required |
-| Camera interpolation and pixel snapping | Required |
-| Gameplay-local freeze | Required |
-| Speculative scene preparation | Required |
-| Cross-world transient messaging | Deferred |
-| Fractional and selective time scaling | Deferred |
-| Local multiplayer input | Out of scope |
+| Capability                                | Status       |
+| ----------------------------------------- | ------------ |
+| Persistent progression                    | Required     |
+| Simulation snapshot readiness             | Required     |
+| Grid, tilemap, and non-entity scene state | Required     |
+| Entity lifetime and structural churn      | Required     |
+| Deterministic randomness                  | Required     |
+| Camera interpolation and pixel snapping   | Required     |
+| Gameplay-local freeze                     | Required     |
+| Speculative scene preparation             | Required     |
+| Cross-world transient messaging           | Deferred     |
+| Fractional and selective time scaling     | Deferred     |
+| Local multiplayer input                   | Out of scope |
 
 ## Persistent progression
 

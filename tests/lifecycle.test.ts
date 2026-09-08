@@ -8,7 +8,8 @@ test("stopping before first start cancels preparation and releases late data", a
     const loading = Promise.withResolvers<object>();
     const released = Promise.withResolvers<void>();
     const definition: SceneDefinition = {
-        id: "slow", setup() {},
+        id: "slow",
+        setup() {},
         assets: [{ id: "slow", load: () => loading.promise, dispose: () => released.resolve() }],
     };
     const pending = game.prepare(definition, { key: "slow" });
@@ -28,8 +29,14 @@ test("cancelling one preparation preserves another consumer of its shared load",
     const entered = Promise.withResolvers<AbortSignal>();
     let releases = 0;
     const asset: Asset<object> = {
-        id: "shared", load(signal) { entered.resolve(signal); return loading.promise; },
-        dispose() { releases++; },
+        id: "shared",
+        load(signal) {
+            entered.resolve(signal);
+            return loading.promise;
+        },
+        dispose() {
+            releases++;
+        },
     };
     const definition: SceneDefinition = { id: "shared", assets: [asset], setup() {} };
     const cancel = new AbortController();
@@ -52,12 +59,20 @@ test("disposal rejects pending preparation and stays terminal after late resolut
         const game = new Game({ seed: 1, state: {}, transition: (s) => s });
         const loading = Promise.withResolvers<object>();
         const settled = Promise.withResolvers<void>();
-        const pending = game.prepare({
-            id: "late", setup() {}, assets: [{
-                id: "late", load: () => loading.promise,
-                dispose: () => settled.resolve(),
-            }],
-        }, { key: "late" });
+        const pending = game.prepare(
+            {
+                id: "late",
+                setup() {},
+                assets: [
+                    {
+                        id: "late",
+                        load: () => loading.promise,
+                        dispose: () => settled.resolve(),
+                    },
+                ],
+            },
+            { key: "late" },
+        );
         const rejected = assert.rejects(pending);
         await Promise.resolve();
         game.dispose();
@@ -81,10 +96,31 @@ test("cold rollback attempts scene cleanup despite loop cleanup failure and reta
     const startup = new Error("startup");
     const cleanup = new Error("loop cleanup");
     let cleaned = false;
-    const scene = await game.prepare({ id: "initial", setup(s) { s.defer(() => { cleaned = true; }); } }, { key: "initial" });
-    await assert.rejects(game.start(scene, {
-        start() { throw startup; }, stop() { throw cleanup; },
-    }), (error: unknown) => error instanceof AggregateError && error.errors[0] === startup && error.errors[1] === cleanup);
+    const scene = await game.prepare(
+        {
+            id: "initial",
+            setup(s) {
+                s.defer(() => {
+                    cleaned = true;
+                });
+            },
+        },
+        { key: "initial" },
+    );
+    await assert.rejects(
+        game.start(scene, {
+            start() {
+                throw startup;
+            },
+            stop() {
+                throw cleanup;
+            },
+        }),
+        (error: unknown) =>
+            error instanceof AggregateError &&
+            error.errors[0] === startup &&
+            error.errors[1] === cleanup,
+    );
     assert.equal(cleaned, true);
     assert.equal(game.lifecycle, "Failed");
     assert.equal(game.scenes.length, 0);

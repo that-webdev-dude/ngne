@@ -14,7 +14,9 @@ const scene: SceneDefinition = {
             });
         });
         scene.resetInterpolation(() => {
-            points.each((_, p) => { p.previousX = p.x; });
+            points.each((_, p) => {
+                p.previousX = p.x;
+            });
         });
         scene.render((frame, alpha) => {
             points.each((_, p) => {
@@ -30,6 +32,6 @@ const app = new BrowserGame({
     height: 240,
     seed: "hello",
     state: {},
-    transition: state => state,
+    transition: (state) => state,
 });
 await app.start(await app.game.prepare(scene, { key: "first-room" }));

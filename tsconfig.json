@@ -5,18 +5,9 @@
         "moduleResolution": "Bundler",
         "strict": true,
         "paths": { "ngne": ["./src/index.ts"] },
-        "lib": [
-            "ES2022",
-            "DOM",
-            "DOM.Iterable"
-        ],
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
         "skipLibCheck": true,
         "noEmit": true
     },
-    "include": [
-        "src",
-        "demo",
-        "examples",
-        "tests/api-misuse.ts"
-    ]
+    "include": ["src", "demo", "examples", "tests/api-misuse.ts"]
 }

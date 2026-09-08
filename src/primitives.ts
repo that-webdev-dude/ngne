@@ -1,10 +1,8 @@
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-export const clamp = (n: number, lo: number, hi: number) =>
-    Math.max(lo, Math.min(hi, n));
+export const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
 export function seedOf(...parts: (string | number)[]) {
     let h = 2166136261;
-    for (const char of JSON.stringify(parts))
-        h = Math.imul(h ^ char.charCodeAt(0), 16777619);
+    for (const char of JSON.stringify(parts)) h = Math.imul(h ^ char.charCodeAt(0), 16777619);
     return h >>> 0;
 }
 /** Mulberry32, version 1. State is owned and enumerable by the mounted scene. */
@@ -71,22 +69,14 @@ export class FixedStep {
         readonly dt = 1 / 60,
         readonly maxTicks = 5,
     ) {
-        if (
-            !(
-                Number.isFinite(dt) &&
-                dt > 0 &&
-                Number.isSafeInteger(maxTicks) &&
-                maxTicks > 0
-            )
-        )
+        if (!(Number.isFinite(dt) && dt > 0 && Number.isSafeInteger(maxTicks) && maxTicks > 0))
             throw new Error("Invalid fixed-step configuration");
     }
     reset() {
         this.accumulator = 0;
     }
     advance(seconds: number, tick: () => void) {
-        if (!Number.isFinite(seconds) || seconds < 0)
-            throw new Error("Invalid frame duration");
+        if (!Number.isFinite(seconds) || seconds < 0) throw new Error("Invalid frame duration");
         this.accumulator += seconds;
         let ticks = 0;
         while (this.accumulator + 1e-12 >= this.dt && ticks < this.maxTicks) {
@@ -111,17 +101,28 @@ export function immutable<T>(value: T | DeepReadonly<T>): DeepReadonly<T> {
 }
 
 function copyImmutable(value: unknown, copies: Map<object, object>): unknown {
-    if (value === null || value === undefined || typeof value === "string" ||
-        typeof value === "boolean" || typeof value === "number" || typeof value === "bigint")
+    if (
+        value === null ||
+        value === undefined ||
+        typeof value === "string" ||
+        typeof value === "boolean" ||
+        typeof value === "number" ||
+        typeof value === "bigint"
+    )
         return value;
     if (typeof value !== "object")
         throw new Error("Committed state, commands and events require plain data");
     const existing = copies.get(value);
     if (existing) return existing;
     const prototype = Object.getPrototypeOf(value);
-    if (prototype !== Object.prototype && prototype !== null &&
-        !(Array.isArray(value) && prototype === Array.prototype))
-        throw new Error("Committed state, commands and events require plain objects, arrays and primitives");
+    if (
+        prototype !== Object.prototype &&
+        prototype !== null &&
+        !(Array.isArray(value) && prototype === Array.prototype)
+    )
+        throw new Error(
+            "Committed state, commands and events require plain objects, arrays and primitives",
+        );
     const copy: object = Array.isArray(value) ? new Array(value.length) : Object.create(prototype);
     copies.set(value, copy);
     for (const key of Reflect.ownKeys(value)) {
@@ -130,7 +131,8 @@ function copyImmutable(value: unknown, copies: Map<object, object>): unknown {
         if (typeof key !== "string" || !descriptor?.enumerable || !("value" in descriptor))
             throw new Error("Plain data requires enumerable string-keyed data properties");
         Object.defineProperty(copy, key, {
-            value: copyImmutable(descriptor.value, copies), enumerable: true,
+            value: copyImmutable(descriptor.value, copies),
+            enumerable: true,
         });
     }
     return Object.freeze(copy);
