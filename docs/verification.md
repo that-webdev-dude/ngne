@@ -17,8 +17,9 @@ Windows x64, Node v24.15.0, Git with `core.autocrlf=true`:
   `.test-output` subfolder before `.prettierignore` applies.
 - CI runs `npm run format:check` before tests. RULES.md and README point at the
   scripts instead of describing style.
-- Mechanical format: **45 files** rewritten in a separate commit with no other
-  change. `git diff -w --numstat` over that commit is 1,097 added / 761 removed
+- Mechanical format: Prettier rewrote **45 files**; the ten touched by the tooling
+  commit were formatted there, the other **35** in a separate commit with no other
+  change. `git diff -w --numstat` over that commit is 1,085 added / 750 removed
   lines, all line wrapping at width 100, tests moving from 2 to 4 spaces, and
   Prettier's default punctuation; no statement, expression or document content changed.
 - `npm run format:check`: passed. A deliberately misformatted temporary file
