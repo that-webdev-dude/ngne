@@ -227,7 +227,8 @@ export class Game<S = Record<string, never>, C = never> {
         return this.#lifecycle;
     }
     [FAIL_GAME](): void {
-        this.#lifecycle = "Failed";
+        if (this.lifecycle !== "Disposing" && this.lifecycle !== "Disposed")
+            this.#lifecycle = "Failed";
     }
     /** Fresh frozen summaries in stack order; compare ids across inspections. */
     get scenes(): readonly SceneInspection[] {
@@ -470,8 +471,7 @@ export class Game<S = Record<string, never>, C = never> {
         cleanup.dispose();
     }
     stop() {
-        if (this.lifecycle === "Stopped") return;
-        if (this.lifecycle !== "Running")
+        if (this.lifecycle !== "Running" && this.lifecycle !== "Stopped")
             throw new Error("Cannot stop in " + this.lifecycle);
         this.#lifecycle = "Stopping";
         try {

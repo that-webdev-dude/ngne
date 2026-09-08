@@ -5,6 +5,7 @@ import {
   BrowserGame,
   type FrameScheduler,
 } from "../src/index.js";
+import { checkBrowserLifecycle } from "./browser-lifecycle-checks.js";
 const results: string[] = [];
 const check = (condition: unknown, message: string) => {
   if (!condition) throw new Error(message);
@@ -144,6 +145,7 @@ async function main() {
     app.game.lifecycle === "Disposed" && cancelled >= 2,
     "browser teardown completes",
   );
+  await checkBrowserLifecycle(check);
   document.getElementById("results")!.textContent =
     results.join("\n") + "\n\nALL CHECKS PASSED";
 }

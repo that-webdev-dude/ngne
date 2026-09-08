@@ -64,6 +64,36 @@ RNG: FNV-1a over JSON-encoded seed parts, followed by Mulberry32 streams. Root i
 
 ## Platform and lifecycle
 
+Browser lifecycle overlaps:
+
+| Call while another operation is pending | Result |
+| --- | --- |
+| `start()` or `stop()` during start/resume or stop | Reject before side effects; the original operation continues. Await it before retrying. |
+| `dispose()` during start/resume | Immediately disable frames and begin all teardown; late start success rejects as cancelled, and late failure retains its original error. Neither changes terminal lifecycle. |
+| `dispose()` during stop | Begin teardown immediately. Stop may settle successfully or reject its own failures; it cannot replace `Disposed` with `Failed`. |
+| Repeated `dispose()` | Return the same promise, including its aggregated rejection; cleanup is attempted once. |
+| Start/stop after disposal begins | Reject without recreating services. |
+
+The browser operation guard spans audio promises and Game startup completion.
+`game.lifecycle` describes simulation lifecycle, so it may already be `Stopped`
+while browser audio suspension is pending. Use BrowserGame lifecycle methods for
+a browser-owned Game. Frame callbacks belong to one run; callbacks from a previous
+run remain invalid even after successful resume.
+
+Disposal initiates each independent cleanup without waiting for audio close before
+releasing renderer/input. Its promise settles after all cleanup results and aggregates
+all original failures. A superseded start/stop reports its own outcome through its
+own promise; callers must handle both promises. Disposal does not wait for an
+unsettled resume/suspend promise.
+
+Headless `Game.start()` performs mounting and loop startup synchronously, although
+its result is a promise. Invalid lifecycle calls reject. `Game.stop()` also cancels
+preparations and unused candidates when already stopped, including before first
+start. Cancellation cannot publish a late candidate; a shared asset load stays alive
+while another consumer needs it. Cancelled loaders that eventually return data
+dispose that data. An external loader that ignores abort may remain pending until
+it settles, without retaining permission to activate a scene.
+
 `Game` is headless. `BrowserGame` owns its input, renderer, audio and host frame scheduler. The injected scheduler must follow requestAnimationFrame semantics: asynchronous callbacks, cancellable IDs and monotonic millisecond timestamps. Late callbacks do no work after disabling. Cold loop failure rolls back the initial mounted world. Resume loop failure preserves it for terminal disposal. All independent teardown actions are attempted.
 
 Default step: 1/60 second; budget: five ticks per platform frame. Excess whole ticks are dropped and reported, fractional remainder retained. No variable simulation delta. Display dimensions are fixed logical pixels; the backing canvas matches them and CSS scales presentation. Each frame latches display once. Each consuming tick receives one frozen input snapshot shared by every selected scene; pending edges survive frames without ticks. Native key codes, `Pointer0`, `Pad0` etc. identify inputs; a snapshot exposes held/pressed/released arrays, normalized gamepad axes, logical pointer coordinates/deltas and wheel delta. Hot-plug ownership/local multiplayer are not implemented.

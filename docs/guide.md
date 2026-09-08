@@ -148,6 +148,13 @@ A `blocksUpdateBelow` scene suspends lower updates while retaining their renderi
 
 `Game` supports headless simulation; `BrowserGame` adds input, rendering, audio and frame scheduling. A failed simulation enters `Failed`, where only disposal is supported. See the [contract](contracts/NGNE.md) for the distinct rollback behavior of scene-command and startup failures.
 
+Await `app.start()` and `app.stop()` before issuing another start/stop call. Those
+overlaps reject before changing the active operation. `app.dispose()` can interrupt
+either operation; a pending start then rejects and cannot enable frames. Repeated
+disposal returns the same completion promise. Use the browser host's lifecycle
+methods when it owns the Game. Calling `game.stop()` while already stopped also
+cancels pending preparation and releases unused candidates.
+
 ## Audio example
 
 After unlocking audio from a click or other user gesture, register a scope inside the scene's setup:

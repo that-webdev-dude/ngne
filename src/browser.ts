@@ -50,6 +50,10 @@ export class BrowserGame<S, C> {
     private last = 0;
     private enabled = false;
     private attached = false;
+    private operation?: "start" | "stop";
+    private disposed = false;
+    private disposal?: Promise<void>;
+    private run = 0;
     readonly width: number;
     readonly height: number;
     private scheduler: FrameScheduler;
@@ -70,8 +74,8 @@ export class BrowserGame<S, C> {
             cancel: (id) => cancelAnimationFrame(id),
         };
     }
-    private frameCallback = (now: number) => {
-        if (!this.enabled) return;
+    private frameCallback = (now: number, run: number, callback: FrameRequestCallback) => {
+        if (!this.enabled || run !== this.run) return;
         try {
             const elapsed = this.last ? (now - this.last) / 1000 : 0;
             this.last = now;
@@ -105,16 +109,20 @@ export class BrowserGame<S, C> {
                 });
             this.options.afterFrame?.(this.stats);
             if (this.enabled)
-                this.raf = this.scheduler.request(this.frameCallback);
+                this.raf = this.scheduler.request(callback);
         } catch (e) {
             this.enabled = false;
             this.game[FAIL_GAME]();
             this.game.report(e);
         }
     };
-    async start(initial?: PreparedScene) {
+    async start(initial?: PreparedScene): Promise<void> {
+        this.requireIdle();
         if (this.game.lifecycle !== "Stopped")
             throw new Error("Cannot start in " + this.game.lifecycle);
+        this.operation = "start";
+        const run = ++this.run;
+        const callback: FrameRequestCallback = (time) => this.frameCallback(time, run, callback);
         const cold = !this.attached;
         try {
             if (cold) {
@@ -126,17 +134,20 @@ export class BrowserGame<S, C> {
                 );
                 this.input.attach(this.options.canvas, this.width, this.height);
             } else await this.audio.resume();
+            if (this.disposed) throw new Error("Start cancelled by disposal");
             this.loop.reset();
             this.last = 0;
             await this.game.start(initial, {
                 start: () => {
-                    this.raf = this.scheduler.request(this.frameCallback);
+                    this.raf = this.scheduler.request(callback);
                 },
                 stop: () => this.scheduler.cancel(this.raf),
             });
+            if (this.disposed) throw new Error("Start cancelled by disposal");
             this.enabled = true;
             this.attached = true;
         } catch (e) {
+            if (this.disposed) throw e;
             this.enabled = false;
             if (cold) {
                 const errors: unknown[] = [e];
@@ -150,56 +161,76 @@ export class BrowserGame<S, C> {
                 } catch (error) {
                     errors.push(error);
                 }
-                if ((this.game.lifecycle as string) === "Running")
-                    this.game.stop();
                 if (errors.length > 1) {
                     this.game[FAIL_GAME]();
-                    throw new AggregateError(errors);
+                    throw new AggregateError(errors, "Browser startup rollback failed");
                 }
             } else this.game[FAIL_GAME]();
             throw e;
+        } finally {
+            this.operation = undefined;
         }
     }
-    async stop() {
+    async stop(): Promise<void> {
+        this.requireIdle();
+        if (!["Running", "Stopped"].includes(this.game.lifecycle))
+            throw new Error("Cannot stop in " + this.game.lifecycle);
+        this.operation = "stop";
         this.enabled = false;
+        this.run++;
         const errors: unknown[] = [];
         try {
-            this.scheduler.cancel(this.raf);
-        } catch (e) {
-            errors.push(e);
-        }
-        try {
-            this.game.stop();
-        } catch (e) {
-            errors.push(e);
-        }
-        this.input.clear();
-        try {
-            await this.audio.suspend();
-        } catch (e) {
-            errors.push(e);
-        }
-        if (errors.length) {
-            this.game[FAIL_GAME]();
-            throw new AggregateError(errors, "Stop failed");
+            try {
+                this.scheduler.cancel(this.raf);
+            } catch (e) {
+                errors.push(e);
+            }
+            try {
+                this.game.stop();
+            } catch (e) {
+                errors.push(e);
+            }
+            try {
+                this.input.clear();
+            } catch (e) {
+                errors.push(e);
+            }
+            try {
+                await this.audio.suspend();
+            } catch (e) {
+                errors.push(e);
+            }
+            if (errors.length) {
+                if (!this.disposed) this.game[FAIL_GAME]();
+                throw new AggregateError(errors, "Stop failed");
+            }
+        } finally {
+            this.operation = undefined;
         }
     }
-    async dispose() {
+    dispose(): Promise<void> {
+        if (this.disposal) return this.disposal;
+        this.disposed = true;
         this.enabled = false;
-        const errors: unknown[] = [];
-        for (const action of [
+        this.run++;
+        // Start every independent teardown now; a pending audio close must not
+        // keep the world, renderer or input alive.
+        this.disposal = Promise.allSettled([
             () => this.scheduler.cancel(this.raf),
             () => this.game.dispose(),
             () => this.audio.dispose(),
             () => this.renderer?.dispose(),
             () => this.input.dispose(),
-        ]) {
-            try {
-                await action();
-            } catch (e) {
-                errors.push(e);
-            }
-        }
-        if (errors.length) throw new AggregateError(errors, "Dispose failed");
+        ].map(async (action) => { await action(); })).then((results) => {
+            const errors = results.flatMap((result) =>
+                result.status === "rejected" ? [result.reason] : []);
+            if (errors.length) throw new AggregateError(errors, "Dispose failed");
+        });
+        return this.disposal;
+    }
+    private requireIdle(): void {
+        if (this.disposed) throw new Error("Browser game is disposed");
+        if (this.operation)
+            throw new Error("Lifecycle operation already pending: " + this.operation);
     }
 }

@@ -70,6 +70,11 @@ and leave world commits to the engine. See the [API migration notes](docs/contra
 
 ## Verify
 
+Await browser `start()` and `stop()` before another start/stop call; overlapping
+calls reject. `dispose()` may interrupt either operation and remains terminal.
+Repeated disposal calls share the same completion, including cleanup failures.
+See the [lifecycle contract](docs/contracts/NGNE.md#platform-and-lifecycle).
+
 ```sh
 npm test
 npm run typecheck

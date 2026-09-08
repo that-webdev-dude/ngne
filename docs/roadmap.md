@@ -16,6 +16,11 @@ NGNE 0.1 is an early engine baseline with a playable showcase. The public API ma
 
 See [verification](verification.md) for measured evidence and its limits.
 
+NGNE-2 lifecycle hardening is implemented in `src/browser.ts` and `src/scene.ts`:
+overlap rejection, terminal disposal, run-specific callbacks and stopped preparation
+cancellation. Regression coverage lives in `tests/lifecycle.test.ts` and
+`tests/browser-lifecycle-checks.ts`, invoked by `/validation.html`.
+
 ## Next validation
 
 - Exercise the authoring API in another small game before expanding it.

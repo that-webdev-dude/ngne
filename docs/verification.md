@@ -1,5 +1,39 @@
 # NGNE verification
 
+## NGNE-2 — 8 September 2026
+
+Windows x64, Node v24.15.0, Chromium-based Codex browser:
+
+- `npm test`: all 31 headless tests passed. New controlled-promise cases cover
+  cancellation before first start, shared preparation consumers, late loader
+  success/failure after disposal, and aggregated cold rollback failures.
+- `npm run typecheck` and `npm run build`: passed, including emitted declarations
+  and the existing consumer API misuse fixture.
+- The new browser regression module also passed a separate strict TypeScript check
+  with `--target ES2022 --module ESNext --moduleResolution Bundler
+  --lib ES2024,DOM,DOM.Iterable --skipLibCheck --noEmit`.
+- `/validation.html`: all 27 checks passed, with no console errors. The 14 added
+  checks cover overlap rejection, preserved scene/resource/RNG/freeze/state data,
+  stale callbacks after restart, cold and resume rollback, terminal disposal across
+  both late resume outcomes and late stop failure, repeated disposal and independent
+  cleanup aggregation. Lifecycle races use controlled promises and an injected
+  scheduler; only the existing WebGL restoration check uses a timer.
+- `git diff --check`: passed.
+
+The local server and production build required approved execution outside the
+filesystem restriction because the bundler could not read parent-directory paths.
+
+Updated the contract, README, guide and roadmap alongside the implementation.
+Architecture, capabilities and decisions need no changes: this enforces the existing
+terminal-disposal, rollback and ownership rules. Assets and audio need no source
+changes: shared-load cancellation and terminal audio ownership already satisfy this
+ticket; coordination belongs to Game/BrowserGame. Historical verification and
+`prototypes/ngne/v00` remain unchanged.
+
+Browser coverage uses real local WebGL services and controlled audio method promises;
+it does not claim physical audio-device timing, mobile/gamepad testing or additional
+browser coverage. No performance improvement or new device compatibility is claimed.
+
 ## NGNE-1 — 8 September 2026
 
 Windows x64, Node v24.15.0, Chromium-based Codex browser:
