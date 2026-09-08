@@ -1,5 +1,28 @@
 # NGNE verification
 
+## NGNE-18 — 8 September 2026
+
+Windows x64, Node v24.15.0:
+
+- Removed the frozen `prototypes/ngne/v00` snapshot (20 tracked files) with
+  `git rm -r prototypes/`. History was not rewritten. Recovery revision:
+  **`1c8a76b`**, the last commit containing `prototypes/`. Restore with
+  `git checkout 1c8a76b -- prototypes/` or read one file with
+  `git show 1c8a76b:prototypes/ngne/v00/AUDIT.md`.
+- `git ls-files --others prototypes` was empty before removal; NGNE-24 was Done.
+- Repaired the references in README, roadmap, this record and the Jira skill
+  context so no guidance requires a working prototype copy. Historical entries
+  below now say "v00 prototype" instead of the removed path; their evidence is
+  unchanged. `package.json`, tsconfig files, Vite config and CI never referenced
+  the prototype paths, so no config change was needed.
+- `git grep -n prototypes/` returns only these recovery notes.
+- `npm test`: all **54 tests passed**. `npm run typecheck` and `npm run build`
+  passed. `git diff --check`: clean.
+
+No engine, demo or example code changed, so browser validation and benchmarks
+were not rerun. Architecture, capabilities, decisions and the implementation
+contract need no edit: they never referenced the prototype folder.
+
 ## NGNE-6 — 8 September 2026
 
 Windows x64, Node v24.15.0; Codex in-app Chromium 152, DPR 1.
@@ -49,7 +72,7 @@ The added presentation state is one boolean per scene; no per-entity storage cha
 Updated README, guide, rendering contract, architecture, decisions and roadmap.
 Capabilities need no edit: existing interpolation, freeze and ownership requirements
 remain intact. Starfall already separates ordinary/effect resets; no demo edit or
-new public helper was needed. Frozen `prototypes/ngne/v00` remains untouched.
+new public helper was needed. The frozen v00 prototype remains untouched.
 Additional browsers, DPRs and physical mobile/gamepad devices remain untested; no
 cross-device, GPU timing, replay, editor or save/restore claim is made.
 
@@ -78,7 +101,7 @@ Updated README, implementation contract, capabilities clarification and roadmap
 alongside this evidence. Architecture and decisions need no edit: explicit owners
 and deferred capture remain unchanged. Guide and examples need no migration:
 the API additions are diagnostic metadata only, with guidance in README/contract.
-Historical `prototypes/ngne/v00` remains untouched.
+The historical v00 prototype remains untouched.
 
 Limits: inspection is lossy and may observe partial state outside completed
 commits; live internal enumeration, accessor effects, graph/handle identity loss,
@@ -122,7 +145,7 @@ No production defect was found, so no runtime or API change was needed. Roadmap
 coverage and this verification record are updated. Architecture, capabilities,
 decisions, implementation contract, guide and examples need no changes: these
 tests exercise existing rules without clarifying or changing supported behavior.
-Historical `prototypes/ngne/v00` remains untouched.
+The historical v00 prototype remains untouched.
 
 Limits: deterministic headless evidence only. No browser-dependent code changed,
 so browser/device validation was not rerun. No benchmark or performance claim is
@@ -151,7 +174,7 @@ Windows x64, Node v24.15.0, Chromium-based Codex browser:
   Chaos simulation/preparation 0.642/0.836 ms, 7,209 peak sprites and 6,986 slots.
   CPU only; this is workload evidence, not a before/after engine speed claim.
 - `git diff --check`: passed. Current documentation links checked; historical
-  `prototypes/ngne/v00` is untouched.
+  the v00 prototype is untouched.
 
 A focused before/after data-boundary measurement compared `c5860b8`'s
 `immutable(structuredClone(value))` with the new `immutable(value)` on the same
@@ -210,7 +233,7 @@ Architecture, capabilities and decisions need no changes: this enforces the exis
 terminal-disposal, rollback and ownership rules. Assets and audio need no source
 changes: shared-load cancellation and terminal audio ownership already satisfy this
 ticket; coordination belongs to Game/BrowserGame. Historical verification and
-`prototypes/ngne/v00` remain unchanged.
+the v00 prototype remain unchanged.
 
 Browser coverage uses real local WebGL services and controlled audio method promises;
 it does not claim physical audio-device timing, mobile/gamepad testing or additional
@@ -247,7 +270,7 @@ passed with approved execution outside that filesystem restriction.
 Documentation updated: implementation contract (complete public-symbol inventory,
 inspection semantics and migration), README, authoring guide and roadmap. Architecture,
 capabilities and decisions require no changes: the implementation enforces their
-existing ownership rules. `prototypes/ngne/v00` remains untouched historical evidence.
+existing ownership rules. The v00 prototype remains untouched historical evidence.
 
 These checks establish the local API change, not cross-device compatibility. No new
 physical mobile/gamepad, Firefox/Safari, GPU timing or throughput claim is made.
@@ -325,4 +348,4 @@ The cumulative dropped counter was already 9 at the start and remained 9. These 
 
 ## Limits
 
-No mobile hardware, physical gamepad, Firefox or Safari run was performed. WebGL 2 is required. Save/restore, replay controllers, networking, editors, local multiplayer and other explicitly deferred capabilities were not implemented. The process and source audit are recorded in `prototypes/ngne/v00/AUDIT.md`.
+No mobile hardware, physical gamepad, Firefox or Safari run was performed. WebGL 2 is required. Save/restore, replay controllers, networking, editors, local multiplayer and other explicitly deferred capabilities were not implemented. The process and source audit are recorded in the v00 prototype audit; see the NGNE-18 entry for its Git recovery revision.

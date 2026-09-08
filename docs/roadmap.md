@@ -52,4 +52,4 @@ continuing hitstop effects retain interpolation. See verification for local evid
 
 Snapshot capture/restore, replay controllers, networking, editors, multiple views, local multiplayer, fractional time scaling, cross-scene messaging and multithreading remain deferred until a concrete game requires them. Enumeration is an inspection boundary, not a save format.
 
-The [architecture](architecture.md), [capabilities](capabilities.md) and [decisions](decisions.md) retain the design rationale. The current [implementation contract](contracts/NGNE.md) defines the implemented choices. The [v00 audit](../prototypes/ngne/v00/AUDIT.md) preserves the original integrated promotion history; its prototype is not maintained alongside production.
+The [architecture](architecture.md), [capabilities](capabilities.md) and [decisions](decisions.md) retain the design rationale. The current [implementation contract](contracts/NGNE.md) defines the implemented choices. Historical prototype: the v00 audit and snapshot are kept in Git history (`git show 1c8a76b:prototypes/ngne/v00/AUDIT.md`, or `git checkout 1c8a76b -- prototypes/`); no prototype is maintained alongside production.

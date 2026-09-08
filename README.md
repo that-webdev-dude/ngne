@@ -130,7 +130,7 @@ Save/restore, replay controllers, networking, editors and local multiplayer are 
 
 Change `src/` for the engine, `demo/` for Starfall and `tests/` for regression coverage. Run the checks above; use browser validation for rendering or browser lifecycle changes. Update the relevant guide or contract when behavior changes. Keep fixes small and report reproduction steps in issues.
 
-The [prototypes](prototypes/README.md) are frozen historical evidence, not a second implementation to maintain.
+Historical prototype: the frozen `prototypes/ngne/v00` snapshot was removed in NGNE-18 and lives in Git history. Recover it with `git checkout 1c8a76b -- prototypes/` or inspect a file with `git show 1c8a76b:prototypes/ngne/v00/AUDIT.md`.
 
 ## License
 
