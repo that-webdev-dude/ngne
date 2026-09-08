@@ -23,7 +23,8 @@ code changed.
   "Deferred decisions" list (APIs it called deferred are pinned in the contract)
   now points at the contract and roadmap.
 - Documentation line count across README, RULES, AGENTS, `docs/` and the Jira
-  skill: **2,062 → 1,897** (−165 lines, −8%).
+  skill: **2,062 → 1,897** (−165 lines, −8%), measured before this entry was
+  added; 1,928 including it.
 - Relative Markdown links and heading anchors resolved with a scratch script:
   **61 links, 0 broken**. `git grep` finds no reference to `capabilities.md`.
 - `npm run format:check`, `npm run build`, `git diff --check`: passed.
