@@ -1,0 +1,5 @@
+# Starfall '89
+
+Experience surface: the running game is the primary artifact. User delegated the game choice and art direction. The design seed selected direction 3; the chosen world is a late-eighties Japanese arcade instruction panel and luminous raster playfield. Other grounded directions considered: cartridge label, vector cockpit, arcade instruction panel, magazine review, hi-score terminal, planetarium chart, handheld LCD. The catalog's folded paper, brine jars and poster systems make shooting controls harder to identify and were not selected.
+
+Players sit close to a luminous screen, so the playfield uses a dark indigo sky with muted terrain. Peach is friendly fire, coral is danger, ice cyan is the player and pickups. Cream lettering belongs to the physical instruction surround. Use crisp authored pixel sprites, bitmap title lettering, thin frame dividers, restrained chamfered controls. No decorative glow or blur. The wide playfield dominates; instructions form a narrow right rail that moves below on mobile. Start, pause, death, victory and stress states stay legible above the game. Reduced motion removes screen shake and decorative pulses.

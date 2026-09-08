@@ -1,0 +1,6 @@
+{
+  "name": "ngne", "version": "0.1.0", "type": "module", "private": true,
+  "scripts": {"dev": "vite --host 127.0.0.1", "build": "tsc --noEmit && vite build && tsc -p tsconfig.lib.json", "typecheck": "tsc --noEmit", "test": "tsx --test tests/*.test.ts", "bench": "tsx tests/benchmark.ts"},
+  "exports": {".": {"types": "./dist/engine/index.d.ts", "import": "./dist/engine/index.js"}},
+  "devDependencies": {"typescript": "^5.9.3", "vite": "^7.3.1", "tsx": "^4.21.0"}
+}

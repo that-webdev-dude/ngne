@@ -1,0 +1,47 @@
+# NGNE implementation contracts
+
+These contracts pin the previously deferred API and storage choices. The high-level architecture remains authoritative.
+
+## ECS
+
+`component(name, factory)` creates a stable typed definition; `.of(overrides)` creates a value. Names must be nonempty and unambiguous within a world. Complete component values are supplied to `spawn`. Queries are cached and match archetypes created later. Query membership does not change before commit. Value changes are immediate. `despawn` is idempotent; pending births can also be despawned at the same boundary.
+
+Storage: dense entity/column arrays per fixed composition, a generation-bearing slot allocator, a free stack, and swap removal. Storage follows peak demand. Handles contain world identity, slot and generation. Systems receive `WorldAccess`, which excludes commit/enumeration. The private scene runtime commits after all selected schedules finish. No runtime component changes or public pools exist.
+
+Query callbacks may enqueue lifetime changes, but cannot commit during iteration. Disposal empties existing query storage. Component definitions, query plans and callbacks are code; authoritative values and allocator state are inspectable through `World.enumerate()`.
+
+## Scenes and state
+
+Definitions contain identity, assets, policy and synchronous setup. Candidates are asynchronous leased intent, owned by exactly one Game, consumed once. `key` is authored, not allocated from timing or load order. Explicit scene seeds are uint32. Stop/dispose cancels pending preparation and releases unconsumed candidates. Shared loads remain available to other live consumers.
+
+Private mounting owns a reverse cleanup stack before setup runs. Setup binds resources and named RNG, registers the immutable system schedule, initial entities and frame preparation. Setup failures dispose everything acquired, report aggregated cleanup errors, and never publish the partial world. `set` mounts first, then unmounts old scenes. Cleanup failures never republish a torn-down scene.
+
+Tick order is selected scene updates, world commits, ordinary event advances, freeze commits, authored state commands, then FIFO scene commands. A failing scene command preserves all preceding commits and successful commands, discards later commands and leaves the Game Running. Arbitrary system/transition faults enter Failed. Only disposal is then supported.
+
+State dispatch is update-only. All systems read the same frozen snapshot for a tick. Transitions apply in dispatch order. Scene setup after state commit sees the new snapshot. State must contain plain objects, arrays and primitive facts, never world objects or service handles. Match the explicit state access generic to the owning Game.
+
+Events are cloned/frozen on emit, broadcast on the next ordinary update, and held through suspension/freeze. Frozen systems cannot emit gameplay events. Freeze requests use positive integer ticks and resolve to maximum duration at commit. Suspension pauses the countdown. Ordinary transform interpolation reset callbacks and camera cuts execute when freeze first activates.
+
+RNG: FNV-1a over JSON-encoded seed parts, followed by Mulberry32 streams. Root input is hashed; scene seed derives from root/definition/key, and stream seed derives from scene seed/name. Explicit scene seed bypasses scene derivation. These algorithms have compatibility version 1. Rendering uses no simulation stream.
+
+## Platform and lifecycle
+
+`Game` is headless. `BrowserGame` owns its input, renderer, audio and host frame scheduler. The injected scheduler must follow requestAnimationFrame semantics: asynchronous callbacks, cancellable IDs and monotonic millisecond timestamps. Late callbacks do no work after disabling. Cold loop failure rolls back the initial mounted world. Resume loop failure preserves it for terminal disposal. All independent teardown actions are attempted.
+
+Default step: 1/60 second; budget: five ticks per platform frame. Excess whole ticks are dropped and reported, fractional remainder retained. No variable simulation delta. Display dimensions are fixed logical pixels; the backing canvas matches them and CSS scales presentation. Each frame latches display once. Each consuming tick receives one frozen input snapshot shared by every selected scene; pending edges survive frames without ticks. Native key codes, `Pointer0`, `Pad0` etc. identify inputs; a snapshot exposes held/pressed/released arrays, normalized gamepad axes, logical pointer coordinates/deltas and wheel delta. Hot-plug ownership/local multiplayer are not implemented.
+
+## Renderer
+
+`Frame` packs 13 float32 values per sprite: centered XY/size, normalized UV rectangle, RGBA, rotation radians. Sorting uses scene, layer, depth and insertion. Contiguous texture runs batch safely without texture-driven reordering. One drawArraysInstanced call per run. Reusable CPU/GPU buffers grow geometrically. There is no per-entity GPU object. Renderer sees no ECS or scene runtime.
+
+Camera base and gameplay poses share interpolation; snapping happens after composing camera and pose, without simulation writes. Shake is a separate offset. Authors own previous/current component fields and register resets. Presentation systems that continue during freeze own separate particle values. Mounting initializes previous/current together.
+
+WebGL 2 is required. Transparent straight-alpha sprites use nearest sampling, source-alpha blending, no depth and no MSAA. The renderer owns texture uploads and retains decoded sources for context restoration. Shared asset cache retains decoded data until disposal. Device loss skips submission and restoration recreates shaders, buffers, VAO and textures.
+
+## Assets and audio
+
+Asset identity must map to one definition object per service. Leases release once; loaded cache entries remain until disposal. Cancelling one consumer does not abort a load still needed by another. The last cancelled pending consumer aborts the loader. Late completion after cancellation disposes its returned value and cannot activate a scene.
+
+Audio is an explicit roadmap addition. The playback device is optional until unlocked by a user gesture. Named scopes are internally instance-isolated, even with the same authored name. Effects use oscillator envelopes; clips use decoded AudioBuffers, optionally looping. Scope buses support independent gain; the master supports mute and ducking. Requests flush after simulation commit, and unmount removes queued/active scope voices. Limits: 128 pending requests and 32 active voices; excess is dropped. Audio presentation state is outside simulation enumeration.
+
+The engine provides no entity collision schema. Starfall owns a spatial grid resource and collision rules. Snapshot capture, restore, replay, editors and other deferred domains remain absent deliberately.

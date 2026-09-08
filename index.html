@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101727"><meta name="description" content="Starfall '89: a retro arcade survival shooter built with the NGNE TypeScript game engine."><title>Starfall '89 — NGNE Arcade</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%2383e8e1' d='M7 0h2v5h2v3h3v5h-4v-2H6v2H2V8h3V5h2z'/%3E%3C/svg%3E"></head>
+<body><div id="app">
+  <header class="masthead"><a class="brand" href="/" aria-label="NGNE Arcade home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 19V5h4l5 8V5h4v14h-4l-5-8v8zm16-14h4v4h-4zm0 6h4v8h-4z" fill="currentColor"/></svg>NGNE<span>ARCADE</span></a><span class="edition">ORIGINAL GAME / 001</span><button id="sound" class="quiet" aria-pressed="false">Sound off</button></header>
+  <main>
+    <div class="game-heading"><div><h1 id="game-title">STARFALL '89</h1><p>One pilot. An endless sky. Make every second count.</p></div><span class="genre">2D SURVIVAL SHOOTER</span></div>
+    <div class="arcade-layout">
+      <section class="cabinet" aria-label="Starfall game">
+        <div class="hud"><div><span>SCORE</span><strong id="score">000000</strong></div><div class="hull"><span>HULL</span><div id="hull" aria-label="5 of 5 hull points"><i></i><i></i><i></i><i></i><i></i></div></div><div><span id="wave-label">SECTOR 01</span><strong id="timer">03:00</strong></div></div>
+        <div class="screen"><canvas id="game" tabindex="0" aria-label="Starfall playfield. Move with WASD or arrow keys. Weapons fire automatically. Space triggers a nova. P pauses."></canvas>
+          <div id="overlay" class="overlay"><div class="intro-art" aria-hidden="true"><svg viewBox="0 0 48 48"><path fill="#426886" d="M20 4h8v12h4v8h8v12H8V24h8v-8h4z"/><path fill="#83e8e1" d="M22 4h4v12h4v12h8v4H10v-4h8V16h4z"/><path fill="#fff1ce" d="M22 17h4v15h-4z"/><path fill="#ffb276" d="M18 36h4v8h-4zm8 0h4v8h-4z"/></svg></div><h2 id="overlay-title">THE SKY IS YOURS.</h2><p id="overlay-copy">Survive three minutes of beautiful chaos.<br>Keep moving. Your weapons do the talking.</p><button id="play" class="primary" disabled>Preparing flight…</button><span id="overlay-hint">WASD TO MOVE · AUTO-FIRE IS ON</span></div>
+          <div id="wave-banner" aria-live="polite"></div>
+        </div>
+        <div class="flight-bar"><span><i class="signal"></i><span id="flight-state">ATTRACT MODE</span></span><span id="combo">AUTO-FIRE / ONLINE</span><button id="pause" class="quiet" disabled>Pause <kbd>P</kbd></button></div>
+        <div class="touch-controls" aria-label="Touch controls"><div class="dpad"><button data-key="ArrowUp" aria-label="Move up">↑</button><button data-key="ArrowLeft" aria-label="Move left">←</button><button data-key="ArrowDown" aria-label="Move down">↓</button><button data-key="ArrowRight" aria-label="Move right">→</button></div><button id="touch-nova" data-key="Space">NOVA</button></div>
+      </section>
+      <aside class="instructions">
+        <section class="mission"><h2>FLIGHT MANUAL</h2><p>Hold the line for <strong>180 seconds.</strong> Destroy the swarm. Bring your ship home.</p><div class="control"><div><kbd>W</kbd><br><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div><span>Move your ship<small>or arrow keys / left stick</small></span></div><div class="control"><kbd>SPACE</kbd><span>Nova blast<small>clear the sky · 15s recharge</small></span></div><div class="control"><kbd>P</kbd><span>Take a breath<small>pause / resume</small></span></div><p class="aim-note">Weapons auto-target. Hold the mouse to aim manually, or use the right stick.</p></section>
+        <section class="nova"><div><h2>NOVA CHARGE</h2><strong id="nova-state">READY</strong></div><div class="charge-track"><div id="charge"></div></div></section>
+        <section class="record"><h2>PERSONAL BEST</h2><strong id="best">000000</strong><span>THIS SESSION</span></section>
+        <button id="chaos" class="chaos" disabled><span>CHAOS LAB</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><small>6,000 particles. No damage. Go wild.</small></button>
+      </aside>
+    </div>
+    <section class="telemetry" aria-label="Live engine performance"><div class="telemetry-title"><span class="signal"></span><strong>NGNE / LIVE</strong><span id="engine-status">INITIALIZING</span></div><div><strong id="fps">—</strong><span>FPS</span></div><div><strong id="sprites">—</strong><span>SPRITES</span></div><div><strong id="frame-time">—</strong><span>CPU FRAME / MS</span></div><div><strong id="draws">—</strong><span>DRAW CALLS</span></div><svg id="frame-graph" viewBox="0 0 140 30" aria-label="Recent CPU frame times"><path id="graph-path" d="" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></section>
+    <footer><span>BUILT WITH NGNE <span class="muted">/</span> FIXED 60 HZ · INSTANCED WEBGL 2</span><span>NO DOWNLOADS. NO QUARTERS.</span></footer>
+    <p id="error" role="alert" hidden></p>
+  </main>
+</div><script type="module" src="/demo/main.ts"></script></body></html>
