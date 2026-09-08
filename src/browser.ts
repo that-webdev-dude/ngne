@@ -1,5 +1,5 @@
 import {
-    Game,
+    Game, FAIL_GAME,
     type GameOptions,
     type PreparedScene,
     type DisplaySnapshot,
@@ -108,7 +108,7 @@ export class BrowserGame<S, C> {
                 this.raf = this.scheduler.request(this.frameCallback);
         } catch (e) {
             this.enabled = false;
-            this.game.lifecycle = "Failed";
+            this.game[FAIL_GAME]();
             this.game.report(e);
         }
     };
@@ -153,10 +153,10 @@ export class BrowserGame<S, C> {
                 if ((this.game.lifecycle as string) === "Running")
                     this.game.stop();
                 if (errors.length > 1) {
-                    this.game.lifecycle = "Failed";
+                    this.game[FAIL_GAME]();
                     throw new AggregateError(errors);
                 }
-            } else this.game.lifecycle = "Failed";
+            } else this.game[FAIL_GAME]();
             throw e;
         }
     }
@@ -180,7 +180,7 @@ export class BrowserGame<S, C> {
             errors.push(e);
         }
         if (errors.length) {
-            this.game.lifecycle = "Failed";
+            this.game[FAIL_GAME]();
             throw new AggregateError(errors, "Stop failed");
         }
     }

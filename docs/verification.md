@@ -1,5 +1,43 @@
 # NGNE verification
 
+## NGNE-1 — 8 September 2026
+
+Windows x64, Node v24.15.0, Chromium-based Codex browser:
+
+- `npm test`: all 27 headless tests passed, including detached/frozen inspection,
+  read-only lifecycle/tick values, restricted world capabilities, candidate handle
+  ownership, deterministic showcase execution and the full Chaos run.
+- `npm run typecheck`: passed. `tests/api-misuse.ts` verifies forbidden runtime
+  exports, lifecycle/tick writes, foreign world/resource access, query membership
+  changes and manual candidate consumption fail compilation.
+- `npm run build`: passed, including the same API misuse fixture against emitted
+  package declarations (`tsc -p tests/tsconfig.api.json`). The demo and hello build
+  from the package's emitted ESM exports; development still resolves to source.
+- Direct Node ESM import from `ngne`: restricted runtime names absent; scene
+  preparation, spawn, tick, inspection, getter protection and disposal passed.
+- `/validation.html`: all 13 checks passed, including the added browser frame-fault
+  transition through the internal lifecycle capability.
+- Production preview: Starfall launch, pause and resume passed; hello rendered its
+  cyan rectangle. Neither production page reported console errors.
+- `git diff --check`: passed.
+- `npm run bench`: completed after migrating capacity inspection. ECS 20,000-entity
+  median/p95: 0.374/0.512 ms; Chaos simulation/preparation: 0.668/0.971 ms,
+  with 7,209 peak sprites and 6,986 slots. Same harness/method as below; CPU only,
+  not a controlled before/after comparison or performance improvement claim.
+
+The normal sandbox blocked the bundler's parent-directory lookup; the same build
+passed with approved execution outside that filesystem restriction.
+
+Documentation updated: implementation contract (complete public-symbol inventory,
+inspection semantics and migration), README, authoring guide and roadmap. Architecture,
+capabilities and decisions require no changes: the implementation enforces their
+existing ownership rules. `prototypes/ngne/v00` remains untouched historical evidence.
+
+These checks establish the local API change, not cross-device compatibility. No new
+physical mobile/gamepad, Firefox/Safari, GPU timing or throughput claim is made.
+Enumeration is diagnostic enumerable data, with the representation limits in the
+contract; it is not a lossless snapshot or serialization format.
+
 ## Release preparation — 8 September 2026
 
 Windows x64, Node v24.15.0, Chromium-based Codex browser:

@@ -27,7 +27,7 @@ test("showcase runs deterministically with churn and rendered sprites", async ()
   const frame = new Frame();
   a.render(frame, 0.5);
   assert.ok(frame.count > 200);
-  assert.ok(a.scenes[0].world.capacity < 2000);
+  assert.ok(a.scenes[0].entityCapacity < 2000);
   a.dispose();
   b.dispose();
 });
@@ -38,6 +38,6 @@ test("chaos survives a full run, commits victory and high score, uses bounded li
   assert.equal(g.state.runs, 1);
   assert.equal(g.state.victories, 1);
   assert.ok(g.state.best > 0);
-  assert.ok(g.scenes[0].world.capacity < 20000);
+  assert.ok(g.scenes[0].entityCapacity < 20000);
   g.dispose();
 });

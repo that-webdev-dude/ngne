@@ -12,7 +12,7 @@ import {
     type Frame,
     type Audio,
     type Asset,
-} from "../src/index.js";
+} from "ngne";
 
 export const W = 640,
     H = 400;

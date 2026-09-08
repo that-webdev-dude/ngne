@@ -1,5 +1,6 @@
+import { World } from "../src/ecs.js";
 import { performance } from "node:perf_hooks";
-import { World, component, Game, Frame } from "../src/index.js";
+import { component, Game, Frame } from "../src/index.js";
 import { arena, type Progress, type ProgressCommand } from "../demo/game.js";
 const p = component("position", () => ({ x: 0, y: 0 })),
   v = component("velocity", () => ({ x: 1, y: 2 }));
@@ -58,7 +59,7 @@ console.log(
       chaos: {
         ticks: 900,
         peakSprites: peak,
-        peakEntitySlots: g.scenes[0].world.capacity,
+        peakEntitySlots: g.scenes[0].entityCapacity,
         medianSimulationAndPreparationMs: full[Math.floor(full.length * 0.5)],
         p95SimulationAndPreparationMs: full[Math.floor(full.length * 0.95)],
       },

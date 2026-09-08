@@ -3,6 +3,10 @@ import { Assets, type Asset, type Lease } from "./assets.js";
 import { Camera, Cleanup, immutable, Random, seedOf } from "./primitives.js";
 import { emptyInput, type InputSnapshot } from "./input.js";
 import type { Frame } from "./renderer.js";
+import { inspectValue, type InspectionValue } from "./inspection.js";
+
+/** Internal browser-host capability; deliberately absent from the package entry point. */
+export const FAIL_GAME = Symbol("fail game");
 
 export interface DisplaySnapshot {
     readonly width: number;
@@ -55,7 +59,11 @@ export interface SceneSetup {
     freeze(ticks: number): void;
     defer(cleanup: () => void): void;
 }
-export class PreparedScene {
+export interface PreparedScene {
+    release(): void;
+}
+class SceneCandidate {
+    readonly handle: PreparedScene = Object.freeze({ release: () => this.release() });
     private status: "ready" | "used" | "released" = "ready";
     constructor(
         readonly owner: symbol,
@@ -80,7 +88,34 @@ export class PreparedScene {
         cleanup.dispose();
     }
 }
-export class SceneInstance {
+export interface SceneInspection {
+    readonly id: number;
+    readonly definition: string;
+    readonly key: string;
+    readonly seed: number;
+    readonly blocksUpdateBelow: boolean;
+    readonly entityCount: number;
+    readonly entityCapacity: number;
+    readonly freezeRemaining: number;
+}
+export interface SceneStateInspection extends SceneInspection {
+    readonly world: InspectionValue;
+    readonly resources: InspectionValue;
+    readonly random: InspectionValue;
+    readonly camera: InspectionValue;
+    readonly freezePending: number;
+    readonly inbox: InspectionValue;
+    readonly outbox: InspectionValue;
+}
+export interface GameInspection {
+    readonly compatibility: string;
+    readonly simulationTick: number;
+    readonly rootSeed: number;
+    readonly nextInstanceId: number;
+    readonly state: InspectionValue;
+    readonly scenes: readonly SceneStateInspection[];
+}
+class SceneInstance {
     readonly world = new World();
     readonly resources = new Map<string, unknown>();
     readonly randomStreams = new Map<string, Random>();
@@ -109,24 +144,32 @@ export class SceneInstance {
         this.published = false;
         this.cleanup.dispose();
     }
-    enumerate() {
-        return {
+    inspect(): SceneInspection {
+        return Object.freeze({
             id: this.id,
             definition: this.definition.id,
             key: this.key,
             seed: this.seed,
             blocksUpdateBelow: !!this.definition.blocksUpdateBelow,
-            world: this.world.enumerate(),
-            resources: Object.fromEntries(this.resources),
-            random: Object.fromEntries(
+            entityCount: this.world.size,
+            entityCapacity: this.world.capacity,
+            freezeRemaining: this.freezeRemaining,
+        });
+    }
+    enumerate(): SceneStateInspection {
+        return Object.freeze({
+            ...this.inspect(),
+            world: inspectValue(this.world.enumerate()),
+            resources: inspectValue(Object.fromEntries(this.resources)),
+            random: inspectValue(Object.fromEntries(
                 [...this.randomStreams].map(([k, r]) => [k, r.state]),
-            ),
-            camera: { ...this.camera },
+            )),
+            camera: inspectValue(this.camera),
             freezeRemaining: this.freezeRemaining,
             freezePending: this.freezePending,
-            inbox: this.inbox,
-            outbox: this.outbox,
-        };
+            inbox: inspectValue(this.inbox),
+            outbox: inspectValue(this.outbox),
+        });
     }
 }
 export type Lifecycle =
@@ -150,8 +193,8 @@ export class Game<S = Record<string, never>, C = never> {
     readonly rootSeed: number;
     readonly assets = new Assets();
     readonly dt: number;
-    simulationTick = 0;
-    lifecycle: Lifecycle = "Stopped";
+    #simulationTick = 0;
+    #lifecycle: Lifecycle = "Stopped";
     private owner = Symbol("game");
     private stack: SceneInstance[] = [];
     private nextId = 1;
@@ -161,7 +204,7 @@ export class Game<S = Record<string, never>, C = never> {
         | { type: "set" | "push"; candidate: PreparedScene }
         | { type: "pop" }
     )[] = [];
-    private candidates = new Set<PreparedScene>();
+    private candidates = new Map<PreparedScene, SceneCandidate>();
     private preparations = new Set<AbortController>();
     private initialized = false;
     private busy = false;
@@ -177,8 +220,18 @@ export class Game<S = Record<string, never>, C = never> {
     get state() {
         return this.stateValue;
     }
-    get scenes(): readonly SceneInstance[] {
-        return this.stack.slice();
+    get simulationTick(): number {
+        return this.#simulationTick;
+    }
+    get lifecycle(): Lifecycle {
+        return this.#lifecycle;
+    }
+    [FAIL_GAME](): void {
+        this.#lifecycle = "Failed";
+    }
+    /** Fresh frozen summaries in stack order; compare ids across inspections. */
+    get scenes(): readonly SceneInspection[] {
+        return Object.freeze(this.stack.map((scene) => scene.inspect()));
     }
     report(error: unknown) {
         try {
@@ -222,16 +275,16 @@ export class Game<S = Record<string, never>, C = never> {
                 );
             if (controller.signal.aborted)
                 throw new Error("Scene preparation cancelled");
-            const candidate = new PreparedScene(
+            const candidate = new SceneCandidate(
                 this.owner,
                 definition,
                 options.key,
                 options.seed,
                 leases,
-                () => this.candidates.delete(candidate),
+                () => this.candidates.delete(candidate.handle),
             );
-            this.candidates.add(candidate);
-            return candidate;
+            this.candidates.set(candidate.handle, candidate);
+            return candidate.handle;
         } catch (e) {
             const errors: unknown[] = [e];
             for (const l of leases.reverse()) {
@@ -247,9 +300,11 @@ export class Game<S = Record<string, never>, C = never> {
             options.signal?.removeEventListener("abort", cancel);
         }
     }
-    private mount(candidate: PreparedScene) {
+    private mount(handle: PreparedScene) {
+        const candidate = this.candidates.get(handle);
+        if (!candidate) throw new Error("Scene candidate is stale, consumed, or foreign");
         const leases = candidate.consume(this.owner);
-        this.candidates.delete(candidate);
+        this.candidates.delete(handle);
         const scene = new SceneInstance(
             this.nextId++,
             candidate.definition,
@@ -364,7 +419,7 @@ export class Game<S = Record<string, never>, C = never> {
     ) {
         if (this.lifecycle !== "Stopped")
             throw new Error("Cannot start in " + this.lifecycle);
-        this.lifecycle = "Starting";
+        this.#lifecycle = "Starting";
         const cold = !this.initialized;
         let loopAttempted = false;
         try {
@@ -376,7 +431,7 @@ export class Game<S = Record<string, never>, C = never> {
             loopAttempted = true;
             loop?.start();
             this.initialized = true;
-            this.lifecycle = "Running";
+            this.#lifecycle = "Running";
         } catch (e) {
             const errors: unknown[] = [e];
             if (loopAttempted) {
@@ -395,7 +450,7 @@ export class Game<S = Record<string, never>, C = never> {
                     }
                 }
             }
-            this.lifecycle =
+            this.#lifecycle =
                 !cold || errors.length > 1 || e instanceof AggregateError
                     ? "Failed"
                     : "Stopped";
@@ -408,7 +463,7 @@ export class Game<S = Record<string, never>, C = never> {
         const cleanup = new Cleanup();
         for (const controller of this.preparations)
             cleanup.defer(() => controller.abort());
-        for (const candidate of this.candidates)
+        for (const candidate of this.candidates.values())
             cleanup.defer(() => candidate.release());
         this.candidates.clear();
         this.commands.length = 0;
@@ -418,12 +473,12 @@ export class Game<S = Record<string, never>, C = never> {
         if (this.lifecycle === "Stopped") return;
         if (this.lifecycle !== "Running")
             throw new Error("Cannot stop in " + this.lifecycle);
-        this.lifecycle = "Stopping";
+        this.#lifecycle = "Stopping";
         try {
             this.cancelPending();
-            this.lifecycle = "Stopped";
+            this.#lifecycle = "Stopped";
         } catch (e) {
-            this.lifecycle = "Failed";
+            this.#lifecycle = "Failed";
             throw e;
         }
     }
@@ -562,9 +617,9 @@ export class Game<S = Record<string, never>, C = never> {
                     break;
                 }
             }
-            this.simulationTick++;
+            this.#simulationTick++;
         } catch (e) {
-            this.lifecycle = "Failed";
+            this.#lifecycle = "Failed";
             this.report(e);
             throw e;
         } finally {
@@ -578,21 +633,22 @@ export class Game<S = Record<string, never>, C = never> {
             scene.prepare(frame, alpha);
         }
     }
-    enumerate() {
-        return {
+    /** Detached frozen enumerable data; call on demand, not in the frame hot path. */
+    enumerate(): GameInspection {
+        return Object.freeze({
             compatibility:
                 "NGNE/1;mulberry32/1;" +
                 (this.options.compatibility ?? "unversioned-game"),
             simulationTick: this.simulationTick,
             rootSeed: this.rootSeed,
             nextInstanceId: this.nextId,
-            state: this.stateValue,
-            scenes: this.stack.map((s) => s.enumerate()),
-        };
+            state: inspectValue(this.stateValue),
+            scenes: Object.freeze(this.stack.map((s) => s.enumerate())),
+        });
     }
     dispose() {
         if (this.lifecycle === "Disposed") return;
-        this.lifecycle = "Disposing";
+        this.#lifecycle = "Disposing";
         const cleanup = new Cleanup();
         cleanup.defer(() => this.assets.dispose());
         for (const s of this.stack) cleanup.defer(() => s.dispose());
@@ -603,7 +659,7 @@ export class Game<S = Record<string, never>, C = never> {
             cleanup.dispose();
         } finally {
             this.stateValue = undefined as S;
-            this.lifecycle = "Disposed";
+            this.#lifecycle = "Disposed";
         }
     }
 }

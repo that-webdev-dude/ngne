@@ -91,6 +91,7 @@ async function main() {
   const surface = document.createElement("canvas");
   let callback: FrameRequestCallback = () => {};
   let cancelled = 0;
+  let failFrame = false;
   const scheduler: FrameScheduler = {
     request: (fn) => {
       callback = fn;
@@ -106,6 +107,9 @@ async function main() {
     state: {},
     transition: (s) => s,
     scheduler,
+    afterFrame: () => {
+      if (failFrame) throw new Error("Injected frame failure");
+    },
   });
   let updates = 0;
   const candidate = await app.game.prepare(
@@ -129,9 +133,12 @@ async function main() {
   callback(20000);
   callback(20017);
   check(
-    updates === 2 && app.game.scenes[0] === mounted,
+    updates === 2 && app.game.scenes[0].id === mounted.id,
     "resume preserves scene and resets wall-clock accumulator",
   );
+  failFrame = true;
+  callback(20034);
+  check(app.game.lifecycle === "Failed", "browser frame faults enter Failed through the internal boundary");
   await app.dispose();
   check(
     app.game.lifecycle === "Disposed" && cancelled >= 2,

@@ -1,7 +1,8 @@
+import { World } from "../src/ecs.js";
+import { Cleanup } from "../src/primitives.js";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  World,
   component,
   Game,
   FixedStep,
@@ -10,7 +11,6 @@ import {
   Input,
   Camera,
   Frame,
-  Cleanup,
   Assets,
   type SceneDefinition,
   type SceneSetup,
@@ -217,7 +217,7 @@ test("FIFO scene failure keeps earlier commands and commits state; later command
   g.set(later);
   g.tick();
   assert.deepEqual(
-    g.scenes.map((s) => s.definition.id),
+    g.scenes.map((s) => s.definition),
     ["test", "good"],
   );
   assert.equal(g.state.score, 1);
@@ -250,7 +250,7 @@ test("private mount rolls back in reverse order, failed replacement preserves or
   g.set(bad);
   g.tick();
   assert.deepEqual(cleanup, ["third", "second", "first"]);
-  assert.equal(g.scenes[0].definition.id, "test");
+  assert.equal(g.scenes[0].definition, "test");
   g.dispose();
 });
 test("scene setup cannot dispatch and saved setup capabilities cannot rebind", async () => {
@@ -278,7 +278,7 @@ test("stop/resume preserves state, scene instance, resources and RNG; dispose is
   g.tick();
   assert.equal(g.simulationTick, 1);
   await g.start();
-  assert.equal(g.scenes[0], scene);
+  assert.equal(g.scenes[0].id, scene.id);
   assert.deepEqual(g.enumerate(), snap);
   g.dispose();
   g.dispose();
@@ -363,7 +363,7 @@ test("stop invalidates candidates; foreign candidates cannot be mounted", async 
   await a.start();
   a.set(c);
   a.tick();
-  assert.equal(a.scenes[0].definition.id, "test");
+  assert.equal(a.scenes[0].definition, "test");
   a.dispose();
   b.dispose();
 });
@@ -426,7 +426,7 @@ test("loop startup failure rolls back cold mount; resume failure preserves it fo
   g.stop();
   await assert.rejects(() => g.start(undefined, failing));
   assert.equal(g.lifecycle, "Failed");
-  assert.equal(g.scenes[0], scene);
+  assert.equal(g.scenes[0].id, scene.id);
   assert.equal(cleaned, 1);
   g.dispose();
   assert.equal(cleaned, 2);
@@ -454,10 +454,10 @@ test("same definition mounts own independent resources and named RNG", async () 
   g.push(await g.prepare(def, { key: "same" }));
   g.tick();
   g.tick();
-  const [a, b] = g.scenes;
-  assert.notEqual(a.resources.get("counter"), b.resources.get("counter"));
-  assert.deepEqual(a.resources.get("counter"), { n: 2 });
-  assert.deepEqual(b.resources.get("counter"), { n: 1 });
+  const [a, b] = g.enumerate().scenes;
+  assert.notEqual(a.resources.counter, b.resources.counter);
+  assert.deepEqual(a.resources.counter, { n: 2 });
+  assert.deepEqual(b.resources.counter, { n: 1 });
   g.dispose();
 });
 test("cancelled speculative preparation never publishes after its loader finishes", async () => {
@@ -486,4 +486,64 @@ test("cancelled speculative preparation never publishes after its loader finishe
   assert.equal(released, 1);
   assert.equal(g.scenes.length, 1);
   g.dispose();
+});
+
+test("inspection is frozen detached data and cannot change runtime ownership", async () => {
+  const counter = { nested: { n: 0 }, values: new Uint8Array([7]) };
+  let setup: SceneSetup | undefined;
+  const g = await boot((s) => {
+    setup = s;
+    s.resource("counter", counter);
+    s.resource("map", new Map([["key", counter.nested]]));
+    s.world.spawn(Position.of({ x: 4 }));
+    const positions = s.world.query(Position);
+    s.system(() => {
+      counter.nested.n++;
+      positions.each((_, p) => { p.x++; });
+    });
+  });
+  const summary = g.scenes[0];
+  const snapshot = g.enumerate();
+  assert.equal(summary.entityCount, 1);
+  assert.equal("world" in summary, false);
+  assert.equal("resources" in summary, false);
+  assert.equal(Reflect.set(g, "lifecycle", "Disposed"), false);
+  assert.equal(Reflect.set(g, "simulationTick", 99), false);
+  assert.equal(Reflect.set(summary, "freezeRemaining", 99), false);
+  assert.throws(() => g.scenes.pop());
+  const resources = snapshot.scenes[0].resources;
+  assert.throws(() => { resources.counter.nested.n = 99; });
+  assert.throws(() => { resources.counter.values[0] = 99; });
+  assert.throws(() => { resources.map[0][1].n = 99; });
+  assert.throws(() => { snapshot.scenes[0].world.entities[0].components[0].value.x = 99; });
+  assert.throws(() => setup?.resource("late", {}));
+  assert.equal("commit" in setup.world, false);
+  assert.equal("enumerate" in setup.world, false);
+  g.tick();
+  assert.equal(g.lifecycle, "Running");
+  assert.equal(g.simulationTick, 1);
+  assert.equal(g.scenes[0].id, summary.id);
+  assert.equal(resources.counter.nested.n, 0);
+  assert.equal(counter.nested.n, 1);
+  assert.equal(snapshot.scenes[0].world.entities[0].components[0].value.x, 4);
+  assert.equal(g.enumerate().scenes[0].world.entities[0].components[0].value.x, 5);
+  g.dispose();
+});
+
+test("prepared handles expose release only and reject forged or reused activation", async () => {
+  let released = 0;
+  const g = game();
+  const candidate = await g.prepare({ id: "handle", setup(s) { s.defer(() => released++); } }, { key: "handle" });
+  assert.deepEqual(Object.keys(candidate), ["release"]);
+  assert.ok(Object.isFrozen(candidate));
+  await assert.rejects(() => g.start({ release() {} }));
+  await g.start(candidate);
+  candidate.release();
+  assert.equal(released, 0);
+  const id = g.scenes[0].id;
+  g.set(candidate);
+  g.tick();
+  assert.equal(g.scenes[0].id, id);
+  g.dispose();
+  assert.equal(released, 1);
 });

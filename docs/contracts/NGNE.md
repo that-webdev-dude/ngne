@@ -2,13 +2,51 @@
 
 These contracts pin the previously deferred API and storage choices. The high-level architecture remains authoritative.
 
+## Public API and inspection
+
+The package entry point is the supported boundary. Runtime modules are internal;
+the package export map exposes no subpaths. The NGNE-1 consumer inventory is:
+
+| Category | Public symbols | Consumers and ownership |
+| --- | --- | --- |
+| Authoring | `component`; types `Component`, `ComponentValue`, `Entity`, `Query`, `WorldAccess`; `SceneDefinition`, `SceneSetup`, `SystemContext`, `SceneCommands`, `SceneEvent`, `StateAccess`, `PreparedScene` | Starfall, hello and authoring tests. Setup injects scene capabilities; systems cannot commit, enumerate, or change query membership. Candidates expose only idempotent `release()`; the owning Game validates handle identity and consumes them. |
+| Authoring and presentation | `Camera`, `Random`, `clamp`, `lerp`, `seedOf`, `down`, `pressed`, `imageAsset`, `audioAsset`; types `Asset`, `Lease`, `Sprite`, `Sound`, `Clip` | Scene authors use explicitly acquired/injected values. Constructors operate on caller-owned values; inspection never returns a live camera or RNG. |
+| Platform integration | `Game`, `BrowserGame`, `Assets`, `Input`, `Frame`, `Renderer`, `Audio`, `FixedStep`, `emptyInput`; types `GameOptions`, `BrowserOptions`, `FrameScheduler`, `DisplaySnapshot`, `InputSnapshot`, `Stats` | Browser host, headless runners, renderer/audio/asset tests and benchmarks. Host lifecycle, tick, render and service operations remain intentional integration APIs. |
+| Inspection | `Lifecycle`, `SceneInspection`, `SceneStateInspection`, `GameInspection`, `InspectionValue` | Tests, benchmark capacity reporting and diagnostics. No mutable foreign world or resource binding is returned. |
+| Internal only | `World`, query runtime, `SceneInstance`, candidate runtime, `Cleanup`, `immutable`, browser failure capability | Runtime modules; direct ECS tests and benchmark import their internal modules deliberately. No public runtime constructor for scenes, queries or prepared candidates. |
+
+- `Game.lifecycle` and `simulationTick` are getter-only values backed by private
+  fields. Browser faults use an internal capability, not a writable public field.
+- `Game.scenes` returns a fresh frozen array of frozen summaries in stack order:
+  instance `id`, definition ID string, authored `key`, seed, blocking policy,
+  entity count/capacity and remaining freeze ticks. Compare `id`, not object identity,
+  across reads. Old summaries remain unchanged after updates or unmount.
+- `Game.enumerate()` returns detached, recursively frozen diagnostic data. Resource
+  bindings, component values, camera, RNG, event data and game state cannot be
+  mutated through this result. Dynamic values use `InspectionValue` and require
+  narrowing. Enumeration copies on demand and is unsuitable for per-frame telemetry.
+- Enumeration preserves enumerable string-keyed data and cycles. Arrays remain arrays;
+  Maps become entry arrays, Sets become value arrays, and typed arrays become indexed
+  records. Symbols become descriptions and functions become `"[Function]"`; prototypes,
+  methods, non-enumerable and symbol-keyed properties are omitted. Opaque objects with
+  no enumerable data inspect as empty records. This is neither a lossless snapshot nor
+  a save/restore format, and it never grants entity ownership.
+
+Migration: replace `scene.definition.id` with `scene.definition`,
+`scene.world.capacity` with `scene.entityCapacity`, and retained scene object comparisons
+with `scene.id` comparisons. Use `game.enumerate()` for detached diagnostic values;
+keep gameplay mutation in setup-injected resources and world capabilities. Replace
+direct `World` construction in application code with a headless `Game` and scene setup;
+the Game owns commits. Create components with `component()` and prepare candidates
+with `game.prepare()`. Never assign lifecycle or simulation tick.
+
 ## ECS
 
 `component(name, factory)` creates a stable typed definition; `.of(overrides)` creates a value. Names must be nonempty and unambiguous within a world. Complete component values are supplied to `spawn`. Queries are cached and match archetypes created later. Query membership does not change before commit. Value changes are immediate. `despawn` is idempotent; pending births can also be despawned at the same boundary.
 
 Storage: dense entity/column arrays per fixed composition, a generation-bearing slot allocator, a free stack, and swap removal. Storage follows peak demand. Handles contain world identity, slot and generation. Systems receive `WorldAccess`, which excludes commit/enumeration. The private scene runtime commits after all selected schedules finish. No runtime component changes or public pools exist.
 
-Query callbacks may enqueue lifetime changes, but cannot commit during iteration. Disposal empties existing query storage. Component definitions, query plans and callbacks are code; authoritative values and allocator state are inspectable through `World.enumerate()`.
+Query callbacks may enqueue lifetime changes, but cannot commit during iteration. Disposal empties existing query storage. Component definitions, query plans and callbacks are code; authoritative values and allocator state are inspectable through `Game.enumerate()`. The internal world enumeration is runtime-owned.
 
 ## Scenes and state
 

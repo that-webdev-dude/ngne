@@ -4,7 +4,7 @@ import {
   type PreparedScene,
   type Asset,
   type Stats,
-} from "../src/index.js";
+} from "ngne";
 import {
   arena,
   overlay,

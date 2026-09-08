@@ -5,7 +5,7 @@
     "private": true,
     "scripts": {
         "dev": "vite --host 127.0.0.1",
-        "build": "tsc --noEmit && vite build && tsc -p tsconfig.lib.json",
+        "build": "tsc --noEmit && tsc -p tsconfig.lib.json && tsc -p tests/tsconfig.api.json && vite build",
         "typecheck": "tsc --noEmit",
         "test": "tsx --test tests/*.test.ts",
         "bench": "tsx tests/benchmark.ts",

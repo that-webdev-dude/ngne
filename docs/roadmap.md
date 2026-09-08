@@ -11,6 +11,8 @@ NGNE 0.1 is an early engine baseline with a playable showcase. The public API ma
 - Instanced WebGL 2 sprites, texture batching and context restoration.
 - Scoped audio, synthesized effects and decoded clips.
 - Starfall '89 and its Chaos Lab stress mode.
+- NGNE-1: restricted public runtime access, read-only lifecycle/tick values,
+  frozen scene summaries, detached enumeration and compile-time API misuse coverage.
 
 See [verification](verification.md) for measured evidence and its limits.
 

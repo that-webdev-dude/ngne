@@ -42,7 +42,11 @@ export interface WorldAccess {
     get<T extends object>(entity: Entity, type: Component<T>): T | undefined;
     query<T extends readonly Component<any>[]>(...types: T): Query<T>;
 }
-export class Query<T extends readonly Component<any>[]> {
+export interface Query<T extends readonly Component<any>[]> {
+    readonly size: number;
+    each(visit: (entity: Entity, ...values: Values<T>) => void): void;
+}
+class QueryRuntime<T extends readonly Component<any>[]> implements Query<T> {
     private matches: { archetype: Archetype; columns: any[][] }[] = [];
     constructor(
         private world: World,
@@ -86,7 +90,7 @@ export class World implements WorldAccess {
     private slots: Slot[] = [];
     private free: number[] = [];
     private archetypes: Archetype[] = [];
-    private queries: Query<any>[] = [];
+    private queries: QueryRuntime<any>[] = [];
     private births: { entity: Entity; values: ComponentValue[] }[] = [];
     private deaths = new Set<Entity>();
     private reading = 0;
@@ -158,7 +162,7 @@ export class World implements WorldAccess {
     }
     query<T extends readonly Component<any>[]>(...types: T): Query<T> {
         if (this.disposed) throw new Error("World is disposed");
-        const q = new Query(this, types);
+        const q = new QueryRuntime(this, types);
         this.queries.push(q);
         this.archetypes.forEach((a) => q.add(a));
         return q;

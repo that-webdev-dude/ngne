@@ -36,7 +36,7 @@ Small screens offer touch controls. **Chaos Lab** adds 6,000 persistent particle
 Create components, spawn entities during scene setup, register update systems and prepare draw commands. NGNE owns the fixed-step loop and scene cleanup.
 
 ```ts
-import { component, type SceneDefinition } from "./src/index.js";
+import { component, type SceneDefinition } from "ngne";
 
 const Position = component("position", () => ({ x: 40, y: 100 }));
 
@@ -58,6 +58,15 @@ const scene: SceneDefinition = {
 Positions are sprite centers in logical pixels; `dt` is seconds. See the [runnable first scene](examples/hello/main.ts) for browser startup and smooth interpolation, then the [engine guide](docs/guide.md) for lifecycle, resources, state, assets and audio.
 
 NGNE is not published to npm. Build this checkout to obtain ESM modules and declarations in `dist/engine/`; the entry point is `dist/engine/index.js`. The game build lives in `dist/`. The package remains private to prevent accidental npm publishing.
+
+The demo and hello example use the package entry point. Development resolves it to
+source; production builds emit the engine first and bundle both consumers against
+those exports. Build also checks forbidden API usage against the emitted declarations.
+
+`game.scenes` provides frozen summaries (`id`, definition ID, entity count/capacity,
+freeze ticks), never live scenes. `game.enumerate()` provides detached frozen diagnostic
+data. Lifecycle and simulation tick are read-only. Create scenes with `game.prepare()`
+and leave world commits to the engine. See the [API migration notes](docs/contracts/NGNE.md#public-api-and-inspection).
 
 ## Verify
 

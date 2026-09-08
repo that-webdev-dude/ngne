@@ -10,7 +10,7 @@ import {
     component,
     lerp,
     type SceneDefinition,
-} from "./src/index.js";
+} from "ngne";
 
 const Position = component("position", () => ({ x: 40, previousX: 40 }));
 const scene: SceneDefinition = {
@@ -117,7 +117,16 @@ Call `await app.audio.unlock()` from a user gesture. Create an audio scope durin
 
 Create queries once in setup and reuse them. Query callbacks receive the entity followed by component values in the requested order. Mutating a component value is immediate. Spawning and despawning are buffered: query membership changes only at the engine-owned commit after scheduled systems return. Entity composition is fixed at spawn; stale or foreign handles cannot address a different entity.
 
-Systems receive `WorldAccess`, not commit or enumeration authority. For standalone headless ECS use, a `World` owner calls `commit()` outside query iteration. Scene authors leave this to the runtime.
+Systems receive `WorldAccess`, not commit or enumeration authority. For headless use,
+create a `Game`, prepare/start a scene, then call `game.tick()`; the runtime owns world
+commits. Direct `World` construction is internal. Queries expose only `size` and `each`.
+
+For diagnostics, `game.scenes` returns frozen summaries with instance IDs, definition
+ID strings, entity counts/capacities and freeze ticks. Compare instance IDs across
+reads. `game.enumerate()` copies enumerable simulation data into a detached frozen
+inspection result; it does not expose mutable resources or foreign worlds. Use
+explicitly injected capabilities for gameplay writes. See the
+[inspection contract and migration](contracts/NGNE.md#public-api-and-inspection).
 
 Each tick runs selected scene systems, commits worlds, advances ordinary events, commits freeze and game-state commands, then applies scene commands in FIFO order. Events emitted now become visible on the next ordinary update. Frozen ordinary simulation retains events; systems marked `runsDuringFreeze` can continue presentation effects.
 

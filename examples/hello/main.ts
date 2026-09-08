@@ -1,4 +1,4 @@
-import { BrowserGame, component, lerp, type SceneDefinition } from "../../src/index.js";
+import { BrowserGame, component, lerp, type SceneDefinition } from "ngne";
 
 const Position = component("position", () => ({ x: 40, previousX: 40 }));
 const scene: SceneDefinition = {
