@@ -79,7 +79,7 @@ const arena: SceneDefinition<Progress, ProgressCommand> = {
 };
 ```
 
-Use the same state/command types on `SceneDefinition<S,C>` and `Game<S,C>`; `prepare()` checks compatibility and `scene.state()` infers access. Unparameterized definitions remain portable but cannot dispatch. State reads and transition inputs are deeply read-only. Initial state, dispatch payloads and transition results are copied and deeply frozen, so later changes to caller-owned data cannot change queued commands. Transitions must be synchronous and return plain data. Setup can read; only the owning scene's system update can dispatch. Plain objects, arrays, primitives and cycles are supported; built-ins, functions, accessors and symbol keys are rejected. See the [data contract](contracts/NGNE.md#committed-state-typing-and-ownership) for exact rules. Resources and RNG streams bind once during setup. Register cleanup immediately with `scene.defer()` or a resource cleanup argument.
+Use the same state/command types on `SceneDefinition<S,C>` and `Game<S,C>`; `prepare()` checks compatibility and `scene.state()` infers access. Unparameterized definitions remain portable but cannot dispatch. Treat state reads and transition inputs as read-only, keep transitions synchronous, and dispatch only from the owning scene's system update; the [data contract](contracts/NGNE.md#committed-state-typing-and-ownership) defines which values are accepted and how they are copied. Resources and RNG streams bind once during setup. Register cleanup immediately with `scene.defer()` or a resource cleanup argument.
 
 Prepare scene candidates asynchronously using `game.prepare(definition, { key, signal })`. Preparation acquires assets but does not create a world. Use `ctx.scenes.push(candidate)`, `.set(candidate)`, or `.pop()` to request a boundary transition. A candidate belongs to one Game, is single-use, and can be abandoned with `.release()`. `blocksUpdateBelow: true` makes a pause/menu scene suspend lower simulation while preserving its rendered world.
 
@@ -117,14 +117,13 @@ Systems receive `WorldAccess`, not commit or enumeration authority. For headless
 create a `Game`, prepare/start a scene, then call `game.tick()`; the runtime owns world
 commits. Direct `World` construction is internal. Queries expose only `size` and `each`.
 
-For diagnostics, `game.scenes` returns frozen summaries with instance IDs, definition
-ID strings, entity counts/capacities and freeze ticks. Compare instance IDs across
-reads. `game.enumerate()` copies enumerable simulation data into a detached frozen
-inspection result; it does not expose mutable resources or foreign worlds. Use
-explicitly injected capabilities for gameplay writes. See the
-[inspection contract and migration](contracts/NGNE.md#public-api-and-inspection).
+For diagnostics, read `game.scenes` and `game.enumerate()` after `game.tick()` returns;
+both return detached read-only data, never live worlds or resources. Use explicitly
+injected capabilities for gameplay writes. The
+[inspection contract](contracts/NGNE.md#public-api-and-inspection) defines what each
+result contains and its limits.
 
-Each tick runs selected scene systems, commits worlds, advances ordinary events, commits freeze and game-state commands, then applies scene commands in FIFO order. Events emitted now become visible on the next ordinary update. Frozen ordinary simulation retains events; systems marked `runsDuringFreeze` can continue presentation effects.
+Commit order is fixed by the [architecture](architecture.md#platform-frame-and-tick-commit). In practice: events emitted now become visible on the next ordinary update, frozen ordinary simulation retains events, and systems marked `runsDuringFreeze` can continue presentation effects.
 
 ## Lifecycle and ownership
 
@@ -140,23 +139,21 @@ Each tick runs selected scene systems, commits worlds, advances ordinary events,
 
 Bind resources, RNG streams and systems synchronously during setup. Register cleanup immediately with `scene.defer(() => service.dispose())`; the private mount owns rollback when setup fails. Do not add an alternative mount path or manually commit a scene world. Prepared candidates are single-use and belong to their preparing Game; stop invalidates unused candidates.
 
-A `blocksUpdateBelow` scene suspends lower updates while retaining their rendering. Hitstop freezes ordinary systems for whole ticks; interpolation reset callbacks prevent rendering a stale in-between pose. Render callbacks prepare presentation from committed state and must not drive gameplay, consume simulation RNG or enqueue sound.
-
-Suspension renders current poses with alpha 1, including the blocking push frame.
-Uncovering a scene or resuming the host keeps alpha 1 until its next update. Use the
-callback's alpha for both ordinary and continuing effects; keep effect poses outside
-ordinary freeze reset callbacks. For teleports, set previous/current together; camera
-cuts use `camera.cut()`. See the [authoring pattern](../README.md#build-a-game) and
-[boundary table](contracts/NGNE.md#interpolation-and-discontinuities).
+A `blocksUpdateBelow` scene suspends lower updates while retaining their rendering. Hitstop freezes ordinary systems for whole ticks. Render callbacks prepare presentation from committed state and must not drive gameplay, consume simulation RNG or enqueue sound.
 
 `Game` supports headless simulation; `BrowserGame` adds input, rendering, audio and frame scheduling. A failed simulation enters `Failed`, where only disposal is supported. See the [contract](contracts/NGNE.md) for the distinct rollback behavior of scene-command and startup failures.
 
-Await `app.start()` and `app.stop()` before issuing another start/stop call. Those
-overlaps reject before changing the active operation. `app.dispose()` can interrupt
-either operation; a pending start then rejects and cannot enable frames. Repeated
-disposal returns the same completion promise. Use the browser host's lifecycle
-methods when it owns the Game. Calling `game.stop()` while already stopped also
-cancels pending preparation and releases unused candidates.
+Await `app.start()` and `app.stop()` before issuing another start/stop call; overlaps reject. `app.dispose()` is terminal and may interrupt either operation. Use the browser host's lifecycle methods when it owns the Game. The [lifecycle contract](contracts/NGNE.md#platform-and-lifecycle) tabulates every overlap and cancellation case.
+
+## Interpolation
+
+- Spawn with previous and current coordinates equal. Before ordinary movement, copy current to previous; render with `lerp(previous, current, alpha)` using the alpha supplied to the render callback. NGNE snapshots the camera before ordinary systems.
+- Teleport an actor by assigning both coordinates together, e.g. `p.px = p.x = x`; use `camera.cut(x, y)` for a camera cut. The two are independent; reset both axes when applicable.
+- Register `scene.resetInterpolation(() => ...)` to copy ordinary current poses to previous. NGNE invokes it after mount commit and when freeze first activates, so a stale in-between pose is never rendered.
+- Continuing effects own separate poses, copy them in a `runsDuringFreeze` system and stay outside the ordinary reset callback. They keep using the supplied alpha.
+- Suspended scenes, and resumed scenes awaiting an update, receive alpha 1. Snapping rounds composed screen coordinates and never writes back to poses.
+
+The [boundary table](contracts/NGNE.md#interpolation-and-discontinuities) defines what NGNE does at each discontinuity; `/validation.html` includes selectable transition frames.
 
 ## Audio example
 

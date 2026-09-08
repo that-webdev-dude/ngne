@@ -28,15 +28,15 @@ Name real prerequisite outcomes using ticket keys when known. Explain which port
 
 ## Documentation required before completion
 
-Identify each affected document and what must change. Examples:
+Name the owning document for each fact the work changes, and only that document:
 
-- Implementation contract: exact new public behavior, ownership, failure semantics or constraints.
-- README/examples: revised authoring workflow and runnable sample when usage changes.
-- Verification record: actual commands, hardware/browser context, results and remaining limits.
-- Roadmap: affected status and current implementation paths.
-- Architecture/decisions: resolve a genuine contract change before implementing divergent behavior; do not rewrite the architecture to excuse an accidental implementation.
+- Ownership rules, exact public behavior, failure semantics and migration: `docs/contracts/NGNE.md`.
+- Rationale for a changed or new rule: `docs/decisions.md`. Resolve a genuine contract change before implementing divergent behavior; do not rewrite the architecture to excuse an accidental implementation.
+- Authoring usage and runnable samples: `docs/guide.md` and `examples/`.
+- Actual commands, hardware/browser context, results and remaining limits: `docs/verification.md`.
+- Status and direction: `docs/roadmap.md`.
 
-Documentation changes belong with the implementation or evidence-producing change, not in an untracked later task. A task cannot be complete while its affected current documentation contradicts its result. For conditional documents that need no change, require a brief reason in the handoff. Preserve historical evidence as history.
+Other documents link to the owning one instead of repeating the fact. Documentation changes belong with the implementation or evidence-producing change, not in an untracked later task. A task cannot be complete while its owning documentation contradicts its result. Preserve historical evidence as history.
 
 ## Completion handoff
 

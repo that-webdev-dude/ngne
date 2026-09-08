@@ -57,51 +57,11 @@ const scene: SceneDefinition = {
 };
 ```
 
-For durable state, declare `SceneDefinition<State, Command>` and obtain explicitly injected access with `scene.state()`. `Game.prepare()` checks that the scene matches its Game; snapshots and transition inputs are deeply read-only, and commands are copied when dispatched. See the [state contract and migration](docs/contracts/NGNE.md#committed-state-typing-and-ownership).
+Positions are sprite centers in logical pixels; `dt` is seconds. See the [runnable first scene](examples/hello/main.ts) for browser startup and smooth interpolation, then the [engine guide](docs/guide.md) for lifecycle, committed state, resources, interpolation, assets, audio and diagnostics. The [implementation contract](docs/contracts/NGNE.md) defines exact semantics and migration notes.
 
-Positions are sprite centers in logical pixels; `dt` is seconds. See the [runnable first scene](examples/hello/main.ts) for browser startup and smooth interpolation, then the [engine guide](docs/guide.md) for lifecycle, resources, state, assets and audio.
-
-For interpolated poses:
-
-- Spawn with previous/current coordinates equal. Before ordinary movement, copy
-  current to previous; render with `lerp(previous, current, alpha)` using the supplied
-  scene alpha. NGNE snapshots the camera before ordinary systems.
-- Teleport an actor by assigning both coordinates together, e.g. `p.px = p.x = x`;
-  use `camera.cut(x, y)` for a camera cut. Reset both axes when applicable.
-- Register `scene.resetInterpolation(() => ...)` to copy ordinary current poses to
-  previous. NGNE invokes it after mount commit and when freeze first activates.
-- Continuing effects own separate poses, copy them in a `runsDuringFreeze` system,
-  and stay outside the ordinary reset callback. Keep using the supplied alpha.
-- Suspended scenes and resumed scenes awaiting an update receive alpha 1. Snapping
-  rounds composed screen coordinates; it never writes back to poses.
-
-The [interpolation contract](docs/contracts/NGNE.md#interpolation-and-discontinuities)
-defines boundary ordering; `/validation.html` includes selectable transition frames.
-
-NGNE is not published to npm. Build this checkout to obtain ESM modules and declarations in `dist/engine/`; the entry point is `dist/engine/index.js`. The game build lives in `dist/`. The package remains private to prevent accidental npm publishing.
-
-The demo and hello example use the package entry point. Development resolves it to
-source; production builds emit the engine first and bundle both consumers against
-those exports. Build also checks forbidden API usage against the emitted declarations.
-
-`game.scenes` provides frozen summaries (`id`, definition ID, entity count/capacity,
-freeze ticks), never live scenes. `game.enumerate()` provides detached frozen diagnostic
-data. Lifecycle and simulation tick are read-only. Create scenes with `game.prepare()`
-and leave world commits to the engine. See the [API migration notes](docs/contracts/NGNE.md#public-api-and-inspection).
-
-Inspect after `game.tick()` returns for completed-commit diagnostics. Enumeration
-includes tick duration and allocator/archetype order, but omits pending host commands
-and preparation; mid-update inspection may show partial state. It cannot restore
-entities or preserve identity across all resource graphs. Keep mutable gameplay data
-in components or named scene resources, including handles and timers. See the
-[ownership inventory and inspection limits](docs/contracts/NGNE.md#simulation-state-ownership-inventory-ngne-5).
+NGNE is not published to npm. Build this checkout to obtain ESM modules and declarations in `dist/engine/`; the entry point is `dist/engine/index.js`. The demo and hello example consume that same package entry point, and the build checks forbidden API usage against the emitted declarations.
 
 ## Verify
-
-Await browser `start()` and `stop()` before another start/stop call; overlapping
-calls reject. `dispose()` may interrupt either operation and remains terminal.
-Repeated disposal calls share the same completion, including cleanup failures.
-See the [lifecycle contract](docs/contracts/NGNE.md#platform-and-lifecycle).
 
 ```sh
 npm run format:check
@@ -119,21 +79,19 @@ GitHub Actions runs the format check, tests, typechecking and the build on pull 
 
 ## Documentation
 
-| Document                                          | Purpose                                   |
-| ------------------------------------------------- | ----------------------------------------- |
-| [Engine guide](docs/guide.md)                     | Authoring examples and lifecycle rules    |
-| [Architecture](docs/architecture.md)              | Authoritative ownership and runtime model |
-| [Capabilities](docs/capabilities.md)              | Required and deferred engine behavior     |
-| [Implementation contract](docs/contracts/NGNE.md) | Precise implemented semantics             |
-| [Decisions](docs/decisions.md)                    | Design rationale                          |
-| [Roadmap](docs/roadmap.md)                        | Current scope and next validation         |
-| [Showcase design](demo/DESIGN.md)                 | Starfall '89 art direction                |
-
-Save/restore, replay controllers, networking, editors and local multiplayer are deferred. Enumeration supports inspection; it is not a serialization format. Physical mobile/gamepad controls and additional browsers still need validation.
+| Document                                          | Purpose                                                          |
+| ------------------------------------------------- | ---------------------------------------------------------------- |
+| [Engine guide](docs/guide.md)                     | Authoring examples and lifecycle rules                           |
+| [Architecture](docs/architecture.md)              | Authoritative ownership, runtime model and required capabilities |
+| [Implementation contract](docs/contracts/NGNE.md) | Precise implemented semantics and migration notes                |
+| [Decisions](docs/decisions.md)                    | Design rationale                                                 |
+| [Roadmap](docs/roadmap.md)                        | Status, direction and deferred work                              |
+| [Verification](docs/verification.md)              | Dated evidence and hardware limits                               |
+| [Showcase design](demo/DESIGN.md)                 | Starfall '89 art direction                                       |
 
 ## Contribute
 
-Change `src/` for the engine, `demo/` for Starfall and `tests/` for regression coverage. Run the checks above; use browser validation for rendering or browser lifecycle changes. Update the relevant guide or contract when behavior changes. Keep fixes small and report reproduction steps in issues.
+Change `src/` for the engine, `demo/` for Starfall and `tests/` for regression coverage. Run the checks above; use browser validation for rendering or browser lifecycle changes. Update the owning document (contract for semantics, guide for usage) when behavior changes. Keep fixes small and report reproduction steps in issues.
 
 Historical prototype: the frozen `prototypes/ngne/v00` snapshot was removed in NGNE-18 and lives in Git history. Recover it with `git checkout 1c8a76b -- prototypes/` or inspect a file with `git show 1c8a76b:prototypes/ngne/v00/AUDIT.md`.
 

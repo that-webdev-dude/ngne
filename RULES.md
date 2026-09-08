@@ -6,8 +6,8 @@ layout, and performance requirements.
 ## Precedence and adoption
 
 - Architecture and contract documents outrank style preferences. Start with
-  [architecture](docs/architecture.md), [capabilities](docs/capabilities.md),
-  [decisions](docs/decisions.md), and the relevant [implementation contracts](docs/contracts/NGNE.md).
+  [architecture](docs/architecture.md), [decisions](docs/decisions.md), and the
+  relevant [implementation contracts](docs/contracts/NGNE.md).
 - Style does not redefine behavior, ownership, lifetime, ordering, or cost.
 - Apply these rules to new and modified code. Address existing substantive
   violations through focused stability work; avoid unrelated style rewrites.
@@ -178,10 +178,13 @@ layout, and performance requirements.
   workflows, or data flow better than prose. Keep explanations close to diagrams.
 - Preserve precise API semantics, lifecycle ordering, ownership rules, performance
   methodology, and execution instructions; concision must not remove required detail.
-- A task changing public APIs or observable behavior must update affected contracts,
-  guides, examples, and validation documentation in the same task. Include migration
-  guidance for breaking changes. If no documentation update is needed, explain why.
-- Jira work items must identify affected documentation and include its update in
-  acceptance criteria, or provide a concrete reason no update is required.
+- Each fact has one owning document: ownership rules and exact API semantics in
+  the implementation contract, rationale in decisions, usage in the guide and
+  examples, evidence in verification, direction in the roadmap. README orients
+  and links. A task changing public APIs or observable behavior updates the owning
+  document in the same task; other documents link to it instead of restating it.
+  Include migration guidance for breaking changes in the contract.
+- Jira work items must name the owning document for each expected change and
+  include its update in acceptance criteria.
 - Keep proposals, implemented behavior, and verified results distinguishable.
 - On completion, report what changed, what was verified, and any remaining limits.

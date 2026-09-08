@@ -25,7 +25,7 @@ Turn a scoped backlog into tickets another contributor can execute without readi
 
 Read [references/ticket-format.md](references/ticket-format.md) and use its structure. Scale detail to the task, but retain context, relevant entry points, required work, objective acceptance checks, validation, documentation obligations, and completion handoff. Include genuine dependencies; distinguish hard blockers from related work or coordination.
 
-Every ticket must identify the relevant documentation by path and the behavior/evidence to update. The same change must update affected docs before the task is complete. If a listed conditional update is unnecessary, the completion handoff must explain why. Updating a verification record does not mean claiming checks that were not run. Preserve immutable historical audits and prototype snapshots; update current contracts and evidence instead.
+Every ticket must name the owning document for each fact it will change: ownership rules and exact API semantics in `docs/contracts/NGNE.md`, rationale in `docs/decisions.md`, usage in `docs/guide.md`, evidence in `docs/verification.md`, direction in `docs/roadmap.md`. The change updates that owning document before the task is complete; other documents link to it rather than restating the fact. Updating a verification record does not mean claiming checks that were not run. Preserve dated evidence and historical audits as history; prototype snapshots are recovered through Git, not kept as working copies.
 
 For this repository, consult [references/ngne-context.md](references/ngne-context.md) when creating NGNE work. Recheck its paths and current project metadata rather than treating this reference as a live status report.
 

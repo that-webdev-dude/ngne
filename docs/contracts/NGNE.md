@@ -111,7 +111,7 @@ Definitions contain identity, assets, policy and synchronous setup. Candidates a
 
 Private mounting owns a reverse cleanup stack before setup runs. Setup binds resources and named RNG, registers the immutable system schedule, initial entities and frame preparation. Setup failures dispose everything acquired, report aggregated cleanup errors, and never publish the partial world. `set` mounts first, then unmounts old scenes. Cleanup failures never republish a torn-down scene.
 
-Tick order is selected scene updates, world commits, ordinary event advances, freeze commits, authored state commands, then FIFO scene commands. A failing scene command preserves all preceding commits and successful commands, discards later commands and leaves the Game Running. Arbitrary system/transition faults enter Failed. Only disposal is then supported.
+Tick commit order and scene-command failure isolation follow the [architecture](../architecture.md#platform-frame-and-tick-commit); scene commands apply FIFO. Arbitrary system/transition faults enter Failed. Only disposal is then supported.
 
 ### Committed state typing and ownership
 

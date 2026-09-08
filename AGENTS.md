@@ -5,11 +5,11 @@ completion requirements before making changes in this repository.
 
 ## Authoritative documentation
 
-- [Architecture](docs/architecture.md)
-- [Capabilities](docs/capabilities.md)
-- [Decisions](docs/decisions.md)
-- [Implementation contracts](docs/contracts/NGNE.md) and other relevant files in
-  `docs/contracts/`
+- [Architecture](docs/architecture.md): model, ownership, execution order and required capabilities
+- [Decisions](docs/decisions.md): rationale
+- [Implementation contracts](docs/contracts/NGNE.md): exact API semantics and migration
+- [Guide](docs/guide.md): usage; [roadmap](docs/roadmap.md): direction;
+  [verification](docs/verification.md): dated evidence
 
 Architecture and contracts take precedence over style. Read the relevant
 documents before changing behavior. Apply the rules to new and modified code
@@ -23,7 +23,7 @@ without unrelated repository-wide rewrites.
 - Use the scripts in `package.json`: `npm run typecheck`, `npm test`,
   `npm run build`, and `npm run bench` as appropriate to the change. Include
   browser validation when changing browser-dependent behavior.
-- Complete relevant documentation updates alongside behavior and API changes.
+- Update the owning document for each changed fact alongside the change; link from others.
 - Report changes, checks and results, and any unverified behavior or remaining decisions.
 
 ## Git commits

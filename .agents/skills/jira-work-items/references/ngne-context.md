@@ -2,13 +2,13 @@
 
 This is a starting map, not a status record. Read the current files before authoring a ticket.
 
-- `docs/architecture.md`: authoritative ownership, execution order and lifecycle model.
-- `docs/capabilities.md`: required capabilities and explicit deferrals.
+- `docs/architecture.md`: authoritative ownership, execution order, lifecycle model and required capabilities.
 - `docs/decisions.md`: architectural reasoning and accepted decisions.
-- `docs/contracts/NGNE.md`: current implementation/API contract.
-- `docs/roadmap.md`: implementation status and historical dependency plan.
+- `docs/contracts/NGNE.md`: current implementation/API contract and migration notes.
+- `docs/guide.md`, `examples/hello/`: engine authoring and consumption guidance.
+- `docs/roadmap.md`: implementation status, direction and explicit deferrals.
 - `docs/verification.md`: dated checks, measurements and limitations.
-- `README.md`, `examples/hello/`: engine authoring and consumption guidance.
+- `README.md`: orientation and links only.
 - `src/`: engine implementation; `demo/`: Starfall showcase and game-owned rules.
 - `tests/`: headless, benchmark and browser-validation sources; `validation.html`: local browser checks.
 - `.github/workflows/ci.yml`: existing automation; inspect before proposing new CI.

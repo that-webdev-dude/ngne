@@ -4,7 +4,7 @@
 
 This document is the authoritative high-level model for a 2D sprite game engine.
 
-The engine uses fixed-step simulation, renders after simulation, supports several active scenes, and gives each mounted scene its own ECS world. Exact APIs, storage layouts, and renderer formats are deferred.
+The engine uses fixed-step simulation, renders after simulation, supports several active scenes, and gives each mounted scene its own ECS world. Exact APIs, storage layouts, and renderer formats are pinned in the [implementation contract](contracts/NGNE.md); the reasoning behind the rules below lives in [decisions](decisions.md).
 
 ## Core rules
 
@@ -18,6 +18,23 @@ The engine uses fixed-step simulation, renders after simulation, supports severa
 8. Rendering reads committed scene state after simulation.
 9. Asynchronous preparation finishes before private synchronous mounting begins.
 10. Services and scenes are published only after they are fully ready.
+
+## Required capabilities
+
+The model must accommodate these capabilities without prescribing APIs or storage formats. Each links to the section holding its rules; work that is explicitly not required yet is listed in the [roadmap](roadmap.md#deferred).
+
+| Capability                                | Rules                                                                                                          |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Persistent progression                    | [Committed game state](#committed-game-state)                                                                  |
+| Simulation snapshot readiness             | [Simulation snapshots and replay readiness](#simulation-snapshots-and-replay-readiness)                        |
+| Grid, tilemap, and non-entity scene state | [Scene resources](#scene-resources)                                                                            |
+| Entity lifetime and structural churn      | [Mutation and scene events](#mutation-and-scene-events)                                                        |
+| Deterministic randomness and replay input | [Deterministic randomness](#deterministic-randomness), [snapshots](#simulation-snapshots-and-replay-readiness) |
+| Camera interpolation and pixel snapping   | [Rendering and cameras](#rendering-and-cameras)                                                                |
+| Gameplay-local freeze                     | [Systems and gameplay freeze](#systems-and-gameplay-freeze)                                                    |
+| Speculative scene preparation             | [Loading, mounting, and teardown](#loading-mounting-and-teardown)                                              |
+
+Cross-world transient messaging is deferred and local multiplayer input is out of scope; both are recorded in the roadmap.
 
 ## Main terms
 
@@ -92,7 +109,8 @@ Rules:
 - Systems read the same committed snapshot for a whole tick and never mutate it directly.
 - Commands publish after scene updates and before scene-stack commands.
 - Scene setup may read committed state but may not enqueue state commands.
-- The host stores durable game facts such as progression and room history, never scene entities, entity handles, queries, cameras, or event queues.
+- The host stores durable game facts such as progression and room history keyed by stable authored identities, never scene entities, entity handles, queries, cameras, or event queues.
+- Committed facts survive scene replacement, suspension, and stop/resume for the lifetime of one `Game`; separate `Game` instances remain isolated.
 - Re-entering a scene rebuilds its entities from committed facts; entities do not move between worlds.
 - Serialization and external storage remain deferred.
 
@@ -123,6 +141,7 @@ flowchart LR
 - Shared immutable definitions remain asset-owned and are leased by the scene.
 - Durable results are written deliberately to committed game state.
 - Authoritative resource state cannot live only in a closure and must be enumerable for future snapshot work. No snapshot registration scheme is required yet.
+- The engine defines no board, tilemap, collision, or hitbox schema; dense boards may use arrays or grids and static definitions may remain immutable asset data.
 
 ### Deterministic randomness
 
@@ -201,6 +220,7 @@ An entity receives its complete component set when it spawns. Runtime component 
 - An entity queued for despawn remains visible and writable for the current update.
 - Immediate logical exclusion uses an ordinary value such as `active = false` before despawn is queued.
 - Committed despawns release reusable storage, and stale handles cannot target later entities that reuse it.
+- Storage growth follows live or peak demand, not cumulative spawn count.
 
 Each scene owns an event inbox and outbox. Events emitted during one ordinary update become a read-only broadcast inbox for that scene's next ordinary update. A suspended or gameplay-frozen scene holds its inbox. Events end with the scene.
 
@@ -256,7 +276,7 @@ At that boundary, explicit owners must make all authoritative simulation state e
 - Live entities, component values, allocator state, authoritative scene resources, RNG state, freeze state, and event buffers.
 - Camera state when it can affect future simulation.
 
-Systems and closures cannot be the only owners of authoritative state. GPU state, decoded caches, wall-clock state, the platform-frame accumulator, and future environmental input are outside a simulation-state snapshot.
+Systems and closures cannot be the only owners of authoritative state. GPU state, decoded caches, wall-clock state, the platform-frame accumulator, and future environmental input are outside a simulation-state snapshot. The [ownership inventory](contracts/NGNE.md#simulation-state-ownership-inventory-ngne-5) records the current production owners and external inputs; public enumeration is lossy diagnostic data, not a capture of those owners.
 
 A replay from the beginning requires:
 
@@ -360,11 +380,6 @@ If loop startup fails during resume, work stays disabled, the engine makes a bes
 
 `dispose()` is terminal. It disables work, stops the loop, cancels loading, unmounts scenes, and releases game state, renderer, assets, input, and display in reverse dependency order. Every cleanup is attempted. Failures are reported together and the final state is always `Disposed`.
 
-## Deferred decisions
+## Deferred work
 
-- Exact ECS, query, public TypeScript, packed-frame, and renderer APIs.
-- Exact game-state, resource-injection, RNG, freeze, and diagnostic APIs.
-- General cross-scene transient messaging.
-- Snapshot capture, restore, formats, compatibility policy, save games, replay control, and rollback.
-- Fractional or selective time scaling and local multiplayer input.
-- Multiple views, audio, networking, editor support, hot reload, and multithreading.
+API, storage, and renderer choices this model once left open are pinned in the [implementation contract](contracts/NGNE.md). Work deferred until a concrete game needs it is listed in the [roadmap](roadmap.md#deferred).

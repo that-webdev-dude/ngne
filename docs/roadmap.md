@@ -1,6 +1,6 @@
 # Roadmap
 
-NGNE 0.1 is an early engine baseline with a playable showcase. The public API may change while more games exercise it.
+NGNE 0.1 is an early engine baseline with a playable showcase. The public API may change while more games exercise it. This document records status and direction only: the [implementation contract](contracts/NGNE.md) defines current behaviour, [decisions](decisions.md) hold the reasoning and [verification](verification.md) holds dated evidence.
 
 ## Implemented
 
@@ -11,36 +11,20 @@ NGNE 0.1 is an early engine baseline with a playable showcase. The public API ma
 - Instanced WebGL 2 sprites, texture batching and context restoration.
 - Scoped audio, synthesized effects and decoded clips.
 - Starfall '89 and its Chaos Lab stress mode.
-- NGNE-1: restricted public runtime access, read-only lifecycle/tick values,
-  frozen scene summaries, detached enumeration and compile-time API misuse coverage.
 
-See [verification](verification.md) for measured evidence and its limits.
+| Ticket | Outcome                                                                                   | Regression coverage                                                                   |
+| ------ | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| NGNE-1 | Restricted public runtime access, read-only lifecycle/tick, frozen summaries, enumeration | `tests/api-misuse.ts` compile-time fixture                                            |
+| NGNE-2 | Browser lifecycle overlap rejection, terminal disposal, run-specific callbacks            | `tests/lifecycle.test.ts`, `tests/browser-lifecycle-checks.ts` via `/validation.html` |
+| NGNE-3 | Typed, deeply read-only committed state with validated plain-data commands                | `tests/state.test.ts`, `tests/api-misuse.ts`                                          |
+| NGNE-4 | Combined multi-scene commit order, suspension retention and mount-failure isolation       | `tests/simulation.contract.test.ts`                                                   |
+| NGNE-5 | Simulation-state ownership inventory; enumeration adds `dt` and archetype order           | `tests/ownership.test.ts`                                                             |
+| NGNE-6 | Alpha 1 through suspension and host resume; continuing hitstop effects interpolate        | `tests/interpolation.test.ts`, `tests/browser-interpolation-checks.ts`                |
 
-NGNE-2 lifecycle hardening is implemented in `src/browser.ts` and `src/scene.ts`:
-overlap rejection, terminal disposal, run-specific callbacks and stopped preparation
-cancellation. Regression coverage lives in `tests/lifecycle.test.ts` and
-`tests/browser-lifecycle-checks.ts`, invoked by `/validation.html`.
+## Direction
 
-NGNE-3 committed-state hardening is implemented in `src/scene.ts` and
-`src/primitives.ts`: typed scene/Game compatibility, deeply read-only snapshots,
-validated plain-data graphs and dispatch-time command ownership. Regressions live in
-`tests/state.test.ts` and the public declaration fixture `tests/api-misuse.ts`.
-
-NGNE-4 combined simulation coverage lives in `tests/simulation.contract.test.ts`:
-multi-scene commit order, inbox retention through suspension and freeze,
-determinism across presentation/preparation timing, and first/middle/last FIFO
-mount failures. All nine added scenarios pass without runtime changes.
-
-NGNE-5 ownership audit is recorded in `docs/contracts/NGNE.md`, covering engine,
-Starfall and hello state plus inspection limitations. Enumeration now includes fixed
-tick duration and empty/live archetype order. `tests/ownership.test.ts` covers allocator
-reuse and showcase render/stop/resume preservation; no snapshot registry was added.
-
-NGNE-6 interpolation discontinuity coverage lives in `tests/interpolation.test.ts`
-and the shared `tests/interpolation-scenario.ts`. `/validation.html` adds numeric/GPU
-checks and selectable frames through `tests/browser-interpolation-checks.ts`.
-`src/scene.ts` prevents stale movement replay during suspension and host resume;
-continuing hitstop effects retain interpolation. See verification for local evidence.
+- A second game on the current engine (epic NGNE-17): the two-level platformer (NGNE-15) exercises the authoring API before it expands.
+- Typed-array SoA component storage (NGNE-20), a WebGPU renderer (NGNE-21) and an owned simulation worker boundary (NGNE-22) are grouped under the SoA and WebGPU migration epic (NGNE-23). Their contracts are written when each lands; nothing about them is a requirement yet.
 
 ## Next validation
 
@@ -52,4 +36,15 @@ continuing hitstop effects retain interpolation. See verification for local evid
 
 Snapshot capture/restore, replay controllers, networking, editors, multiple views, local multiplayer, fractional time scaling, cross-scene messaging and multithreading remain deferred until a concrete game requires them. Enumeration is an inspection boundary, not a save format.
 
-The [architecture](architecture.md), [capabilities](capabilities.md) and [decisions](decisions.md) retain the design rationale. The current [implementation contract](contracts/NGNE.md) defines the implemented choices. Historical prototype: the v00 audit and snapshot are kept in Git history (`git show 1c8a76b:prototypes/ngne/v00/AUDIT.md`, or `git checkout 1c8a76b -- prototypes/`); no prototype is maintained alongside production.
+Explicitly not required by the current [capabilities](architecture.md#required-capabilities):
+
+- Progression: disk storage, save workflows and an engine-defined gameplay schema.
+- Snapshots: capture, restoration, compatibility policy, storage formats, rollback and a snapshot-registration scheme for mutable resources.
+- Scene state: board, tilemap, collision and hitbox schemas.
+- Entity lifetime: public pooling, fixed capacity, allocation-free spawning and a final performance target.
+- Randomness: a complete replay controller, a final RNG algorithm and cross-version migration.
+- Cameras: multiple views and engine-authored camera behaviour.
+- Freeze: fractional slow motion, named time domains, per-entity scaling and zero-delta updates.
+- Preparation: a room graph, prediction manager, background scene simulation and mandatory eviction policy.
+- Cross-world transient messaging: a general router is designed only when a concrete pair of independently mounted worlds needs it; that use case must establish addressing, timing and recipient-lifetime rules. Direct foreign-world access remains prohibited.
+- Local multiplayer input is out of scope: the engine exposes one logical-player snapshot. Indexed players, controller assignment, hot-plug ownership and local co-op or versus routing require a scope change.

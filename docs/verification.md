@@ -1,5 +1,36 @@
 # NGNE verification
 
+## NGNE-25 — 8 September 2026
+
+Windows x64, Node v24.15.0. Documentation-only change; no engine, demo or example
+code changed.
+
+- One owning document per topic: ownership rules and exact API semantics in the
+  implementation contract, rationale in decisions, usage in the guide, evidence
+  here, direction in the roadmap; README orients and links. AGENTS.md, RULES.md and
+  the Jira skill now state that rule instead of requiring every affected document
+  to be listed and updated per ticket.
+- `docs/capabilities.md` deleted after relocating its content: the capability table
+  and its unique rules (stable authored identities, `Game` isolation, no
+  board/tilemap/collision schema, storage growth follows peak demand, the
+  ownership-inventory pointer) moved into the architecture; every "not required
+  yet" list and the deferred/out-of-scope statuses moved into the roadmap.
+- README lost its restated state, interpolation, inspection and lifecycle
+  paragraphs; the interpolation authoring steps now live only in the guide. The
+  roadmap's per-ticket prose became one status table; SoA/WebGPU/worker direction
+  is one line pointing at NGNE-23. The contract and guide link to the architecture
+  for tick commit order instead of restating it. The architecture's stale
+  "Deferred decisions" list (APIs it called deferred are pinned in the contract)
+  now points at the contract and roadmap.
+- Documentation line count across README, RULES, AGENTS, `docs/` and the Jira
+  skill: **2,062 → 1,897** (−165 lines, −8%).
+- Relative Markdown links and heading anchors resolved with a scratch script:
+  **61 links, 0 broken**. `git grep` finds no reference to `capabilities.md`.
+- `npm run format:check`, `npm run build`, `git diff --check`: passed.
+
+Dated entries below are unchanged. No new rules were added and no behaviour claim
+changed.
+
 ## NGNE-19 — 8 September 2026
 
 Windows x64, Node v24.15.0, Git with `core.autocrlf=true`:
