@@ -1,5 +1,37 @@
 # NGNE verification
 
+## NGNE-19 — 8 September 2026
+
+Windows x64, Node v24.15.0, Git with `core.autocrlf=true`:
+
+- Added `.gitattributes` (`* text=auto eol=lf` plus binary entries for images,
+  audio and fonts), `.editorconfig` (4-space, LF, final newline, 2-space YAML),
+  Prettier **3.9.6** pinned as a dev dependency with `.prettierrc.json`
+  (`endOfLine: lf`, `tabWidth: 4`, `printWidth: 100`, `proseWrap: preserve`)
+  and `.prettierignore` (dist, node_modules, caches, package-lock, binary assets).
+- `git add --renormalize .` changed no index content: every tracked text file was
+  already LF in the index; only the Windows working copy carried CRLF/mixed endings.
+- `format` and `format:check` scripts target explicit paths (`src`, `demo`,
+  `examples`, `tests`, `docs`, `.agents`, `.github`, `.vscode` and root files)
+  rather than `.`: Prettier aborts directory expansion on an unreadable local
+  `.test-output` subfolder before `.prettierignore` applies.
+- CI runs `npm run format:check` before tests. RULES.md and README point at the
+  scripts instead of describing style.
+- Mechanical format: **45 files** rewritten in a separate commit with no other
+  change. `git diff -w --numstat` over that commit is 1,097 added / 761 removed
+  lines, all line wrapping at width 100, tests moving from 2 to 4 spaces, and
+  Prettier's default punctuation; no statement, expression or document content changed.
+- `npm run format:check`: passed. A deliberately misformatted temporary file
+  outside the repository failed the same check with exit code 1.
+- `npm test`: all **54 tests passed**. `npm run typecheck` and `npm run build`
+  passed. `git diff --check`: clean.
+- Fresh `git clone` of this checkout: `git status` clean and `git ls-files --eol`
+  reports LF for every text file; a following `npm run format` produced no diff.
+
+No engine, demo or example behaviour changed, so browser validation and
+benchmarks were not rerun. Architecture, capabilities, decisions and the
+implementation contract need no edit. No linter was added.
+
 ## NGNE-18 — 8 September 2026
 
 Windows x64, Node v24.15.0:
@@ -59,10 +91,10 @@ Windows x64, Node v24.15.0; Codex in-app Chromium 152, DPR 1.
 CPU comparison using `npm run bench`, 100 ECS warmups / 300 samples and 900 Chaos
 ticks (first 101 excluded), same Windows/Node environment:
 
-| Workload | Before median / p95 ms | After median / p95 ms |
-| --- | ---: | ---: |
-| 20,000-entity ECS | 0.233 / 0.264 | 0.259 / 0.510 |
-| Chaos simulation + preparation | 0.656 / 0.850 | 0.720 / 0.995 |
+| Workload                       | Before median / p95 ms | After median / p95 ms |
+| ------------------------------ | ---------------------: | --------------------: |
+| 20,000-entity ECS              |          0.233 / 0.264 |         0.259 / 0.510 |
+| Chaos simulation + preparation |          0.656 / 0.850 |         0.720 / 0.995 |
 
 Both runs peaked at 7,209 sprites and 6,986 entity slots. These single local runs
 include runtime noise (the later run had browser validation open), exclude GPU time,
@@ -166,8 +198,8 @@ Windows x64, Node v24.15.0, Chromium-based Codex browser:
   cases cover scene/Game compatibility, inferred commands, nested writes, transition
   inputs, async transitions and portable scenes without state requirements.
 - Separate browser-fixture typecheck passed with `npx tsc --noEmit --strict
-  --target ES2022 --module ESNext --moduleResolution Bundler
-  --lib ES2024,DOM,DOM.Iterable --skipLibCheck tests/browser-lifecycle-checks.ts`.
+--target ES2022 --module ESNext --moduleResolution Bundler
+--lib ES2024,DOM,DOM.Iterable --skipLibCheck tests/browser-lifecycle-checks.ts`.
 - `/validation.html`: all 27 checks passed; no console errors. The migrated
   browser lifecycle consumer retains committed state through stop/resume.
 - `npm run bench`: 20,000-entity ECS median/p95 0.356/0.409 ms;
@@ -204,7 +236,6 @@ checks the plain-data domain. Untyped consumers can still supply the wrong game
 schema. No save/restore format, physical-device or additional-browser compatibility,
 GPU timing or performance improvement is claimed.
 
-
 ## NGNE-2 — 8 September 2026
 
 Windows x64, Node v24.15.0, Chromium-based Codex browser:
@@ -216,7 +247,7 @@ Windows x64, Node v24.15.0, Chromium-based Codex browser:
   and the existing consumer API misuse fixture.
 - The new browser regression module also passed a separate strict TypeScript check
   with `--target ES2022 --module ESNext --moduleResolution Bundler
-  --lib ES2024,DOM,DOM.Iterable --skipLibCheck --noEmit`.
+--lib ES2024,DOM,DOM.Iterable --skipLibCheck --noEmit`.
 - `/validation.html`: all 27 checks passed, with no console errors. The 14 added
   checks cover overlap rejection, preserved scene/resource/RNG/freeze/state data,
   stale callbacks after restart, cold and resume rollback, terminal disposal across
@@ -327,22 +358,22 @@ Game UI: desktop and 390px mobile viewport inspected; no horizontal overflow in 
 
 CPU benchmark (`npm run bench`), 100 warmup iterations, then 300 ECS samples; chaos samples exclude the first 101 of 900 ticks:
 
-| Workload | Median | p95 |
-| --- | ---: | ---: |
+| Workload                                        |   Median |      p95 |
+| ----------------------------------------------- | -------: | -------: |
 | Update 20,000 entities with position + velocity | 0.240 ms | 0.503 ms |
-| Chaos simulation + frame preparation + sort | 0.656 ms | 0.917 ms |
+| Chaos simulation + frame preparation + sort     | 0.656 ms | 0.917 ms |
 
 The chaos benchmark reached 7,209 sprites and 6,986 entity slots. These CPU numbers exclude input polling, WebGL upload/submission, GPU execution, DOM presentation and display synchronization.
 
 Actual game: ten DOM telemetry samples, one second apart, while Chaos Lab was active:
 
-| Metric | Observed |
-| --- | --- |
-| Smoothed display FPS | 60 in all ten samples |
-| Sprites | 6,456–6,590 |
-| Draw calls | 2 |
-| Reported CPU frame work | 1.4–8.2 ms |
-| Additional dropped ticks during sampled interval | 0 |
+| Metric                                           | Observed              |
+| ------------------------------------------------ | --------------------- |
+| Smoothed display FPS                             | 60 in all ten samples |
+| Sprites                                          | 6,456–6,590           |
+| Draw calls                                       | 2                     |
+| Reported CPU frame work                          | 1.4–8.2 ms            |
+| Additional dropped ticks during sampled interval | 0                     |
 
 The cumulative dropped counter was already 9 at the start and remained 9. These observations do not prove zero stalls, GPU timings, or a p95 distribution; the UI reports individual CPU samples and smoothed FPS. The earlier counter includes activity before the sampled interval. Development hot reload, backgrounding, and browser tooling can affect frame timing.
 

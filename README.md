@@ -21,13 +21,13 @@ npm run dev
 
 Open the URL printed by Vite. Select **Start Flight** for a three-minute survival run. Open `/examples/hello/` for the minimal engine example.
 
-| Control | Action |
-| --- | --- |
-| WASD / arrows / gamepad left stick | Move |
-| Hold mouse / gamepad right stick | Aim manually; otherwise auto-target |
-| Space / gamepad A | Nova blast, 15-second recharge |
-| P / Escape / gamepad Start | Pause |
-| M | Toggle sound |
+| Control                            | Action                              |
+| ---------------------------------- | ----------------------------------- |
+| WASD / arrows / gamepad left stick | Move                                |
+| Hold mouse / gamepad right stick   | Aim manually; otherwise auto-target |
+| Space / gamepad A                  | Nova blast, 15-second recharge      |
+| P / Escape / gamepad Start         | Pause                               |
+| M                                  | Toggle sound                        |
 
 Small screens offer touch controls. **Chaos Lab** adds 6,000 persistent particles and invulnerability for stress testing. Scores persist across scenes within the running game and reset on reload.
 
@@ -46,9 +46,11 @@ const scene: SceneDefinition = {
         scene.world.spawn(Position.of());
         const points = scene.world.query(Position);
         scene.system(({ dt }) => {
-            points.each((_, p) => { p.x += 40 * dt; });
+            points.each((_, p) => {
+                p.x += 40 * dt;
+            });
         });
-        scene.render(frame => {
+        scene.render((frame) => {
             points.each((_, p) => frame.rect(p.x, p.y, 16, 16, 0x83e8e1));
         });
     },
@@ -102,27 +104,30 @@ Repeated disposal calls share the same completion, including cleanup failures.
 See the [lifecycle contract](docs/contracts/NGNE.md#platform-and-lifecycle).
 
 ```sh
+npm run format:check
 npm test
 npm run typecheck
 npm run build
 npm run preview
 ```
 
+`npm run format` applies Prettier; `.editorconfig` and `.gitattributes` keep 4-space indentation and LF line endings on every platform.
+
 During development, `/validation.html` exercises real WebGL pixels, batching, context loss/restoration and browser lifecycle. This page is excluded from the production build. `npm run bench` measures CPU workloads, not GPU time or universal frame-rate guarantees.
 
-GitHub Actions runs tests, typechecking and the build on pull requests and pushes to `main`. Successful main builds deploy the showcase to GitHub Pages. See [verification evidence and hardware limits](docs/verification.md).
+GitHub Actions runs the format check, tests, typechecking and the build on pull requests and pushes to `main`. Successful main builds deploy the showcase to GitHub Pages. See [verification evidence and hardware limits](docs/verification.md).
 
 ## Documentation
 
-| Document | Purpose |
-| --- | --- |
-| [Engine guide](docs/guide.md) | Authoring examples and lifecycle rules |
-| [Architecture](docs/architecture.md) | Authoritative ownership and runtime model |
-| [Capabilities](docs/capabilities.md) | Required and deferred engine behavior |
-| [Implementation contract](docs/contracts/NGNE.md) | Precise implemented semantics |
-| [Decisions](docs/decisions.md) | Design rationale |
-| [Roadmap](docs/roadmap.md) | Current scope and next validation |
-| [Showcase design](demo/DESIGN.md) | Starfall '89 art direction |
+| Document                                          | Purpose                                   |
+| ------------------------------------------------- | ----------------------------------------- |
+| [Engine guide](docs/guide.md)                     | Authoring examples and lifecycle rules    |
+| [Architecture](docs/architecture.md)              | Authoritative ownership and runtime model |
+| [Capabilities](docs/capabilities.md)              | Required and deferred engine behavior     |
+| [Implementation contract](docs/contracts/NGNE.md) | Precise implemented semantics             |
+| [Decisions](docs/decisions.md)                    | Design rationale                          |
+| [Roadmap](docs/roadmap.md)                        | Current scope and next validation         |
+| [Showcase design](demo/DESIGN.md)                 | Starfall '89 art direction                |
 
 Save/restore, replay controllers, networking, editors and local multiplayer are deferred. Enumeration supports inspection; it is not a serialization format. Physical mobile/gamepad controls and additional browsers still need validation.
 

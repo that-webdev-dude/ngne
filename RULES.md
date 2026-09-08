@@ -13,8 +13,10 @@ layout, and performance requirements.
   violations through focused stability work; avoid unrelated style rewrites.
 - Preserve public contracts unless the task intentionally changes them. Record
   API changes and migration guidance together.
-- Follow existing formatter and linter configuration, or the surrounding file
-  when none exists. Do not add formatting machinery for an unrelated change.
+- Formatting is automatic: run `npm run format` (Prettier) before committing;
+  `npm run format:check` runs in CI. `.editorconfig` and `.gitattributes` fix
+  4-space indentation and LF line endings. Do not hand-format or add other
+  formatting machinery for an unrelated change.
 
 ## General
 
@@ -30,13 +32,13 @@ layout, and performance requirements.
 
 ## Constructs and helpers
 
-| Need | Usual construct |
-| --- | --- |
-| Data without behavior | Plain object |
-| Stateless transformation | Function |
-| Small stateful capability | Factory function or class |
-| Identity, lifecycle, or many similar instances | Class when clearer |
-| Platform interoperability | Construct required by the boundary |
+| Need                                           | Usual construct                    |
+| ---------------------------------------------- | ---------------------------------- |
+| Data without behavior                          | Plain object                       |
+| Stateless transformation                       | Function                           |
+| Small stateful capability                      | Factory function or class          |
+| Identity, lifecycle, or many similar instances | Class when clearer                 |
+| Platform interoperability                      | Construct required by the boundary |
 
 - Name factories `createX`. Choose closures or fields for clarity, while keeping
   authoritative state inspectable wherever the contracts require it.
