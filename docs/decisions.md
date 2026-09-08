@@ -211,6 +211,21 @@ An entity receives its complete component set at spawn and keeps it until despaw
 - A composition change replaces the entity and creates a new identity.
 - Queued despawns remain visible unless gameplay first marks them inactive.
 
+## Interpolation through suspension
+
+**Status:** Accepted (NGNE-6)
+
+Suspended scenes and resumed scenes awaiting their first update prepare camera and
+sprites with alpha 1. A scene-local presentation flag records whether it has updated
+since mounting/resume or the last suspended tick. Current stack policy also applies
+on the frame a blocking scene mounts. The flag is not simulation state and is not
+enumerated. Freeze alone does not disable interpolation for continuing effects.
+
+Rewriting previous poses during suspension would change state that stop/resume must
+preserve, and ordinary reset callbacks do not cover all continuing effects. Reusing
+the host alpha instead replays stale motion as the accumulator cycles. Selecting
+alpha at frame preparation avoids both problems without adding an authoring API.
+
 ## Cross-scene transient messaging
 
 **Status:** Deferred

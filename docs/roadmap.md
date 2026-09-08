@@ -36,6 +36,12 @@ Starfall and hello state plus inspection limitations. Enumeration now includes f
 tick duration and empty/live archetype order. `tests/ownership.test.ts` covers allocator
 reuse and showcase render/stop/resume preservation; no snapshot registry was added.
 
+NGNE-6 interpolation discontinuity coverage lives in `tests/interpolation.test.ts`
+and the shared `tests/interpolation-scenario.ts`. `/validation.html` adds numeric/GPU
+checks and selectable frames through `tests/browser-interpolation-checks.ts`.
+`src/scene.ts` prevents stale movement replay during suspension and host resume;
+continuing hitstop effects retain interpolation. See verification for local evidence.
+
 ## Next validation
 
 - Exercise the authoring API in another small game before expanding it.

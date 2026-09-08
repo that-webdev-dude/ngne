@@ -151,6 +151,13 @@ Bind resources, RNG streams and systems synchronously during setup. Register cle
 
 A `blocksUpdateBelow` scene suspends lower updates while retaining their rendering. Hitstop freezes ordinary systems for whole ticks; interpolation reset callbacks prevent rendering a stale in-between pose. Render callbacks prepare presentation from committed state and must not drive gameplay, consume simulation RNG or enqueue sound.
 
+Suspension renders current poses with alpha 1, including the blocking push frame.
+Uncovering a scene or resuming the host keeps alpha 1 until its next update. Use the
+callback's alpha for both ordinary and continuing effects; keep effect poses outside
+ordinary freeze reset callbacks. For teleports, set previous/current together; camera
+cuts use `camera.cut()`. See the [authoring pattern](../README.md#build-a-game) and
+[boundary table](contracts/NGNE.md#interpolation-and-discontinuities).
+
 `Game` supports headless simulation; `BrowserGame` adds input, rendering, audio and frame scheduling. A failed simulation enters `Failed`, where only disposal is supported. See the [contract](contracts/NGNE.md) for the distinct rollback behavior of scene-command and startup failures.
 
 Await `app.start()` and `app.stop()` before issuing another start/stop call. Those

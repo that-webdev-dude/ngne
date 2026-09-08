@@ -1,5 +1,58 @@
 # NGNE verification
 
+## NGNE-6 — 8 September 2026
+
+Windows x64, Node v24.15.0; Codex in-app Chromium 152, DPR 1.
+
+- Reproduced stale interpolation on the blocking-scene publication frame with
+  `tsx --test tests/interpolation.test.ts` before the fix. Scene preparation now
+  uses alpha 1 during suspension and after host resume until the scene updates.
+  Camera/component state remains untouched; freeze alone retains effect interpolation.
+- `npm test`: **54 tests passed**, including three new interpolation tests and the
+  existing 11,000-tick Chaos run. `npm run typecheck` and `npm run build` passed,
+  including emitted public declarations and the API misuse fixture.
+- Vite dev/build initially failed because sandboxed parent-directory lookup was
+  denied. The same commands passed with approved execution outside that restriction.
+- `/validation.html`: **92 checks passed**, comprising 27 existing renderer/lifecycle
+  checks plus **65 numeric/GPU transition frames**. No skipped checks or console errors.
+  `tests/interpolation-scenario.ts` is shared by headless and browser validation;
+  `tests/browser-interpolation-checks.ts` checks sprite center-line pixel coverage
+  against the numerically validated frame positions, including offscreen clipping.
+- Thirteen stages cover mount, scrolling, teleport/cut, freeze activation, continuing
+  frozen effects, final frozen tick, first ordinary tick, blocking publication,
+  sustained suspension, uncovering, scene resume and host resume before/after a tick.
+  Each samples alpha **0, .25, .5, .75, 1** at fixed **1/60 s** simulation steps.
+- Visual fixture uses **128 × 96** logical/backing pixels, displayed at **384 × 288**
+  CSS pixels. Inspected the scrolling midpoint, hitstop endpoints (green actor fixed,
+  blue effect advances), and suspension endpoints (all poses fixed). Select a frame
+  using **Inspected frame** to repeat those views. These are deterministic sampled
+  frames, not a display-refresh-rate or continuous-motion measurement.
+- Numeric snapping coverage includes both axes, camera interpolation plus shake,
+  positive/negative half-pixels, snap on/off and screen-space sprites. Frozen authored
+  sprites and camera comparisons establish no write-back. Separate actor-only teleport
+  and camera-only cut tests verify independent reset responsibility. Inspection checks
+  prove rendering and stop/resume preserve simulation state.
+
+CPU comparison using `npm run bench`, 100 ECS warmups / 300 samples and 900 Chaos
+ticks (first 101 excluded), same Windows/Node environment:
+
+| Workload | Before median / p95 ms | After median / p95 ms |
+| --- | ---: | ---: |
+| 20,000-entity ECS | 0.233 / 0.264 | 0.259 / 0.510 |
+| Chaos simulation + preparation | 0.656 / 0.850 | 0.720 / 0.995 |
+
+Both runs peaked at 7,209 sprites and 6,986 entity slots. These single local runs
+include runtime noise (the later run had browser validation open), exclude GPU time,
+and do not establish a speed improvement or a statistically isolated regression.
+The added presentation state is one boolean per scene; no per-entity storage changed.
+
+Updated README, guide, rendering contract, architecture, decisions and roadmap.
+Capabilities need no edit: existing interpolation, freeze and ownership requirements
+remain intact. Starfall already separates ordinary/effect resets; no demo edit or
+new public helper was needed. Frozen `prototypes/ngne/v00` remains untouched.
+Additional browsers, DPRs and physical mobile/gamepad devices remain untested; no
+cross-device, GPU timing, replay, editor or save/restore claim is made.
+
 ## NGNE-5 — 8 September 2026
 
 Windows x64, Node v24.15.0:

@@ -205,6 +205,31 @@ Default step: 1/60 second; budget: five ticks per platform frame. Excess whole t
 
 Camera base and gameplay poses share interpolation; snapping happens after composing camera and pose, without simulation writes. Shake is a separate offset. Authors own previous/current component fields and register resets. Presentation systems that continue during freeze own separate particle values. Mounting initializes previous/current together.
 
+### Interpolation and discontinuities
+
+| Boundary | Responsibility and rendered result |
+| --- | --- |
+| Mount | Authors initialize all previous/current poses together, including effects and later spawns. After setup/world commit, NGNE cuts the camera and invokes ordinary reset callbacks before publication. |
+| Ordinary update | NGNE calls `camera.beginTick()` before the schedule. Authors copy ordinary previous poses before moving them. Camera and sprite preparation use the same scene alpha. |
+| Teleport / cut | Authors assign previous/current together for the affected actor and call `camera.cut(x, y)` for a camera cut. These are independent operations; cutting one does not reset the other. |
+| Freeze activation | After world commit and the full schedule, NGNE cuts the base camera and invokes ordinary reset callbacks. Ordinary poses are exact even at alpha 0. |
+| Frozen update / final countdown tick | Ordinary poses stay fixed. Separate continuing effects update previous/current and interpolate with the frame alpha, including the tick whose countdown reaches zero. Do not force the entire scene to alpha 1 for hitstop. |
+| First ordinary update after freeze | Previous poses start at the frozen current pose; movement and camera resume with the same alpha. |
+| Blocking scene publication / suspension | Lower scenes render with alpha 1 immediately, including on the push commit frame. All their systems and freeze countdown remain suspended. |
+| Uncovered scene / host resume | Use alpha 1 until that scene next updates, then use the shared frame alpha. Preserved component/camera values are not rewritten. Stopped games perform no render work. |
+
+`SceneInstance.canInterpolate` is presentation eligibility, excluded from simulation
+inspection. Stack selection and this flag choose the same alpha for `Frame.scene`
+and the authored render callback; it changes no simulation state. Frame preparation
+subtracts interpolated camera plus shake before `Math.round` when `pixelSnap` is true.
+Screen-space sprites bypass camera/shake but still snap. Packed coordinates are
+float32; JavaScript half-pixel rounding applies, including negative coordinates.
+
+Migration: no API signature changes. Use the alpha supplied to the render callback;
+do not substitute a host-captured alpha. Suspended/resumed frames now show current
+poses instead of replaying stale interpolation. Continuing effects remain separate
+from ordinary freeze reset callbacks, as demonstrated in Starfall and the fixture.
+
 WebGL 2 is required. Transparent straight-alpha sprites use nearest sampling, source-alpha blending, no depth and no MSAA. The renderer owns texture uploads and retains decoded sources for context restoration. Shared asset cache retains decoded data until disposal. Device loss skips submission and restoration recreates shaders, buffers, VAO and textures.
 
 ## Assets and audio

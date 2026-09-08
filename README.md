@@ -59,6 +59,23 @@ For durable state, declare `SceneDefinition<State, Command>` and obtain explicit
 
 Positions are sprite centers in logical pixels; `dt` is seconds. See the [runnable first scene](examples/hello/main.ts) for browser startup and smooth interpolation, then the [engine guide](docs/guide.md) for lifecycle, resources, state, assets and audio.
 
+For interpolated poses:
+
+- Spawn with previous/current coordinates equal. Before ordinary movement, copy
+  current to previous; render with `lerp(previous, current, alpha)` using the supplied
+  scene alpha. NGNE snapshots the camera before ordinary systems.
+- Teleport an actor by assigning both coordinates together, e.g. `p.px = p.x = x`;
+  use `camera.cut(x, y)` for a camera cut. Reset both axes when applicable.
+- Register `scene.resetInterpolation(() => ...)` to copy ordinary current poses to
+  previous. NGNE invokes it after mount commit and when freeze first activates.
+- Continuing effects own separate poses, copy them in a `runsDuringFreeze` system,
+  and stay outside the ordinary reset callback. Keep using the supplied alpha.
+- Suspended scenes and resumed scenes awaiting an update receive alpha 1. Snapping
+  rounds composed screen coordinates; it never writes back to poses.
+
+The [interpolation contract](docs/contracts/NGNE.md#interpolation-and-discontinuities)
+defines boundary ordering; `/validation.html` includes selectable transition frames.
+
 NGNE is not published to npm. Build this checkout to obtain ESM modules and declarations in `dist/engine/`; the entry point is `dist/engine/index.js`. The game build lives in `dist/`. The package remains private to prevent accidental npm publishing.
 
 The demo and hello example use the package entry point. Development resolves it to

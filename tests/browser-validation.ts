@@ -6,6 +6,7 @@ import {
   type FrameScheduler,
 } from "../src/index.js";
 import { checkBrowserLifecycle } from "./browser-lifecycle-checks.js";
+import { checkBrowserInterpolation } from "./browser-interpolation-checks.js";
 const results: string[] = [];
 const check = (condition: unknown, message: string) => {
   if (!condition) throw new Error(message);
@@ -146,6 +147,7 @@ async function main() {
     "browser teardown completes",
   );
   await checkBrowserLifecycle(check);
+  await checkBrowserInterpolation(check);
   document.getElementById("results")!.textContent =
     results.join("\n") + "\n\nALL CHECKS PASSED";
 }

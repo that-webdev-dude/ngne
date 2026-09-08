@@ -284,6 +284,12 @@ The renderer cannot reorder across scene boundaries and knows nothing about enti
 
 Each scene owns one camera with previous and current committed poses. Frame preparation interpolates the base camera and ordinary gameplay transforms with the same value. Mounting, teleporting, an authored cut, or freeze activation makes previous equal current for those poses. During freeze, continuing effects such as particles or camera shake own separate presentation values; camera shake is applied after the frozen base camera. Pixel snapping happens after interpolation and never changes simulation state.
 
+Suspended scenes render their current committed poses using alpha 1 for camera and
+frame preparation. After suspension or host resume, that value remains 1 until the
+scene next updates. This prevents replaying its last movement without rewriting
+preserved simulation poses. Selected frozen scenes still use the frame alpha so
+independent continuing effects can interpolate.
+
 ## Assets
 
 The asset service owns shared renderer-independent authored or decoded data and exposes stable handles. Scenes own leases. Worlds store stable asset handles, never GPU identities. The renderer owns device-local resources and may recreate them without changing simulation data.

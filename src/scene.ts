@@ -136,6 +136,8 @@ class SceneInstance<S, C> {
     prepare: (frame: Frame, alpha: number) => void = () => {};
     resets: (() => void)[] = [];
     published = false;
+    // Presentation eligibility only; suspension must preserve simulation poses.
+    canInterpolate = false;
     constructor(
         readonly id: number,
         readonly definition: SceneDefinition<S, C>,
@@ -436,6 +438,7 @@ export class Game<S = Record<string, never>, C = never> {
             }
             loopAttempted = true;
             loop?.start();
+            for (const scene of this.stack) scene.canInterpolate = false;
             this.initialized = true;
             this.#lifecycle = "Running";
         } catch (e) {
@@ -510,12 +513,9 @@ export class Game<S = Record<string, never>, C = never> {
         if (this.busy) throw new Error("Reentrant tick");
         this.busy = true;
         try {
-            let first = 0;
-            for (let i = this.stack.length - 1; i >= 0; i--)
-                if (this.stack[i].definition.blocksUpdateBelow) {
-                    first = i;
-                    break;
-                }
+            const first = this.findUpdateStart();
+            for (let i = 0; i < this.stack.length; i++)
+                this.stack[i].canInterpolate = i >= first;
             const selected = this.stack.slice(first),
                 ordinary = new Set<SceneInstance<S, C>>();
             const scenes: SceneCommands = {
@@ -640,10 +640,18 @@ export class Game<S = Record<string, never>, C = never> {
     }
     render(frame: Frame, alpha: number) {
         if (this.lifecycle !== "Running") return;
-        for (const scene of this.stack) {
-            frame.scene(scene.camera, alpha);
-            scene.prepare(frame, alpha);
+        const first = this.findUpdateStart();
+        for (let i = 0; i < this.stack.length; i++) {
+            const scene = this.stack[i];
+            const sceneAlpha = i >= first && scene.canInterpolate ? alpha : 1;
+            frame.scene(scene.camera, sceneAlpha);
+            scene.prepare(frame, sceneAlpha);
         }
+    }
+    private findUpdateStart() {
+        for (let i = this.stack.length - 1; i >= 0; i--)
+            if (this.stack[i].definition.blocksUpdateBelow) return i;
+        return 0;
     }
     /** Detached frozen diagnostics. Inspect after tick() returns for a completed commit. */
     enumerate(): GameInspection {
