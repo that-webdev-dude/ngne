@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jira Work Items"
+  short_description: "Create actionable tickets with documentation gates"
+  default_prompt: "Use $jira-work-items to draft and create the approved backlog with execution context, acceptance criteria, and documentation requirements."
