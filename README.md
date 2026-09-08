@@ -55,6 +55,8 @@ const scene: SceneDefinition = {
 };
 ```
 
+For durable state, declare `SceneDefinition<State, Command>` and obtain explicitly injected access with `scene.state()`. `Game.prepare()` checks that the scene matches its Game; snapshots and transition inputs are deeply read-only, and commands are copied when dispatched. See the [state contract and migration](docs/contracts/NGNE.md#committed-state-typing-and-ownership).
+
 Positions are sprite centers in logical pixels; `dt` is seconds. See the [runnable first scene](examples/hello/main.ts) for browser startup and smooth interpolation, then the [engine guide](docs/guide.md) for lifecycle, resources, state, assets and audio.
 
 NGNE is not published to npm. Build this checkout to obtain ESM modules and declarations in `dist/engine/`; the entry point is `dist/engine/index.js`. The game build lives in `dist/`. The package remains private to prevent accidental npm publishing.

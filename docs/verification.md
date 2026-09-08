@@ -1,5 +1,59 @@
 # NGNE verification
 
+## NGNE-3 — 8 September 2026
+
+Windows x64, Node v24.15.0, Chromium-based Codex browser:
+
+- `npm test`: all 40 headless tests passed, including nine new state regressions
+  in `tests/state.test.ts`. Coverage includes shallow-frozen nested objects/arrays,
+  detached initial and transition values, cycles/aliases, sparse arrays, null
+  prototypes, primitives, unsupported built-ins, accessors, command ownership and
+  order, shared tick snapshots across scenes, replacement setup, dispatch lifetime,
+  async transition rejection, partial command failure and event payload ownership.
+- `npm run typecheck` and `npm run build`: passed. The build also compiles
+  `tests/api-misuse.ts` against emitted package declarations. New positive/negative
+  cases cover scene/Game compatibility, inferred commands, nested writes, transition
+  inputs, async transitions and portable scenes without state requirements.
+- Separate browser-fixture typecheck passed with `npx tsc --noEmit --strict
+  --target ES2022 --module ESNext --moduleResolution Bundler
+  --lib ES2024,DOM,DOM.Iterable --skipLibCheck tests/browser-lifecycle-checks.ts`.
+- `/validation.html`: all 27 checks passed; no console errors. The migrated
+  browser lifecycle consumer retains committed state through stop/resume.
+- `npm run bench`: 20,000-entity ECS median/p95 0.356/0.409 ms;
+  Chaos simulation/preparation 0.642/0.836 ms, 7,209 peak sprites and 6,986 slots.
+  CPU only; this is workload evidence, not a before/after engine speed claim.
+- `git diff --check`: passed. Current documentation links checked; historical
+  `prototypes/ngne/v00` is untouched.
+
+A focused before/after data-boundary measurement compared `c5860b8`'s
+`immutable(structuredClone(value))` with the new `immutable(value)` on the same
+64 room records (numeric id, boolean opened, four numeric scores). Each version had
+500 warmups and 12 alternating batches of 200 copies. Median/p95 per copy:
+**0.052/0.055 ms before, 0.186/0.192 ms after**. Descriptor validation and copying
+cost more than the old incomplete validation. After 10,000 additional discarded
+copies and forced GC, heap deltas were -9,096 and +80 bytes respectively; these
+noisy local samples show no retained growth for this workload, not a leak guarantee.
+Reads do not copy; scene resources remain the home for high-frequency mutable data.
+
+The development server and final production build hit the existing parent-directory
+filesystem restriction; both approved retries passed. An exploratory standalone
+strict check of runtime test files is outside the repository configuration and
+failed on missing Node type declarations and existing inspection-misuse cases.
+Those files run through `tsx`; source and public type-contract checks above pass.
+No dependency or unrelated test-configuration change was introduced.
+
+Updated README, guide, implementation contract, roadmap, showcase and browser/test
+consumers together. Architecture, capabilities and decisions need no changes:
+this enforces their existing Game-owned state, explicit injection and tick ordering.
+The hello example uses no committed-state access and needs no migration.
+NGNE-1 was verified Done and its API restrictions remain intact.
+
+Limits: authored field schemas are checked by TypeScript, while runtime validation
+checks the plain-data domain. Untyped consumers can still supply the wrong game
+schema. No save/restore format, physical-device or additional-browser compatibility,
+GPU timing or performance improvement is claimed.
+
+
 ## NGNE-2 — 8 September 2026
 
 Windows x64, Node v24.15.0, Chromium-based Codex browser:

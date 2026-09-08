@@ -69,14 +69,14 @@ export interface ShowcaseOptions {
     reducedMotion?: boolean;
 }
 
-export function arena(options: ShowcaseOptions = {}): SceneDefinition {
+export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, ProgressCommand> {
     return {
         id: options.attract ? "attract" : "starfall-arena",
         assets: options.atlas ? [options.atlas] : [],
         setup(s) {
             const rng = s.random("waves"),
                 fx = s.random("effects");
-            const state = s.state<Progress, ProgressCommand>();
+            const state = s.state();
             const run = s.resource("run", {
                 phase: options.attract ? "attract" : "playing",
                 score: 0,

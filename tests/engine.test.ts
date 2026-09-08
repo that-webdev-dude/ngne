@@ -25,7 +25,7 @@ const game = (diagnostic?: (error: unknown) => void) =>
     transition: (s, c: number) => ({ score: s.score + c }),
     diagnostic,
   });
-async function boot(setup: (s: SceneSetup) => void, g = game()) {
+async function boot(setup: (s: SceneSetup<{ score: number }, number>) => void, g = game()) {
   await g.start(await g.prepare({ id: "test", setup }, { key: "test" }));
   return g;
 }
@@ -120,7 +120,7 @@ test("systems see immediate values and committed state stays stable for whole ti
   const seen: number[] = [];
   const g = await boot((s) => {
     const r = s.resource("r", { n: 0 });
-    const state = s.state<{ score: number }, number>();
+    const state = s.state();
     s.system(() => {
       r.n++;
       state.dispatch(2);
@@ -196,7 +196,7 @@ test("FIFO scene failure keeps earlier commands and commits state; later command
   const errors: unknown[] = [];
   const g = await boot(
     (s) => {
-      const state = s.state<{ score: number }, number>();
+      const state = s.state();
       s.system(() => state.dispatch(1));
     },
     game((e) => errors.push(e)),
@@ -257,7 +257,7 @@ test("scene setup cannot dispatch and saved setup capabilities cannot rebind", a
   let setup!: SceneSetup;
   const g = await boot((s) => {
     setup = s;
-    const state = s.state<{ score: number }, number>();
+    const state = s.state();
     assert.throws(() => state.dispatch(5));
   });
   assert.throws(() => setup.resource("late", {}));

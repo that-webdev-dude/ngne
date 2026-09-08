@@ -62,10 +62,14 @@ Rectangles and sprites use **center coordinates**. Distances are logical canvas 
 ## Scene authoring
 
 ```ts
-setup(scene) {
+type Progress = { best: number };
+type ProgressCommand = { type: 'score'; value: number };
+const arena: SceneDefinition<Progress, ProgressCommand> = {
+ id: 'arena',
+ setup(scene) {
   const board = scene.resource('board', new Uint8Array(20 * 12));
   const waves = scene.random('waves');
-  const score = scene.state<{ best: number }, { type: 'score'; value: number }>();
+  const score = scene.state();
 
   scene.system(ctx => {
     // All three are explicitly injected; there is no global resource registry.
@@ -79,10 +83,11 @@ setup(scene) {
   scene.system(ctx => {
     // Separate effects continue through hitstop.
   }, { runsDuringFreeze: true });
-}
+ }
+};
 ```
 
-Match `scene.state<S,C>()` to the `Game<S,C>` that mounts the definition. State transitions must be synchronous and return immutable-compatible plain data. Setup can read state; dispatch is allowed only during simulation. Resources and RNG streams bind once during setup. Register cleanup immediately with `scene.defer()` or a resource cleanup argument.
+Use the same state/command types on `SceneDefinition<S,C>` and `Game<S,C>`; `prepare()` checks compatibility and `scene.state()` infers access. Unparameterized definitions remain portable but cannot dispatch. State reads and transition inputs are deeply read-only. Initial state, dispatch payloads and transition results are copied and deeply frozen, so later changes to caller-owned data cannot change queued commands. Transitions must be synchronous and return plain data. Setup can read; only the owning scene's system update can dispatch. Plain objects, arrays, primitives and cycles are supported; built-ins, functions, accessors and symbol keys are rejected. See the [data contract](contracts/NGNE.md#committed-state-typing-and-ownership) for exact rules. Resources and RNG streams bind once during setup. Register cleanup immediately with `scene.defer()` or a resource cleanup argument.
 
 Prepare scene candidates asynchronously using `game.prepare(definition, { key, signal })`. Preparation acquires assets but does not create a world. Use `ctx.scenes.push(candidate)`, `.set(candidate)`, or `.pop()` to request a boundary transition. A candidate belongs to one Game, is single-use, and can be abandoned with `.release()`. `blocksUpdateBelow: true` makes a pause/menu scene suspend lower simulation while preserving its rendered world.
 

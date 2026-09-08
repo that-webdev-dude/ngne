@@ -21,6 +21,11 @@ overlap rejection, terminal disposal, run-specific callbacks and stopped prepara
 cancellation. Regression coverage lives in `tests/lifecycle.test.ts` and
 `tests/browser-lifecycle-checks.ts`, invoked by `/validation.html`.
 
+NGNE-3 committed-state hardening is implemented in `src/scene.ts` and
+`src/primitives.ts`: typed scene/Game compatibility, deeply read-only snapshots,
+validated plain-data graphs and dispatch-time command ownership. Regressions live in
+`tests/state.test.ts` and the public declaration fixture `tests/api-misuse.ts`.
+
 ## Next validation
 
 - Exercise the authoring API in another small game before expanding it.

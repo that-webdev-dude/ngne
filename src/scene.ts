@@ -1,6 +1,7 @@
 import { World, type WorldAccess } from "./ecs.js";
 import { Assets, type Asset, type Lease } from "./assets.js";
 import { Camera, Cleanup, immutable, Random, seedOf } from "./primitives.js";
+import type { DeepReadonly } from "./primitives.js";
 import { emptyInput, type InputSnapshot } from "./input.js";
 import type { Frame } from "./renderer.js";
 import { inspectValue, type InspectionValue } from "./inspection.js";
@@ -18,8 +19,9 @@ export interface SceneEvent {
     readonly [key: string]: unknown;
 }
 export interface StateAccess<S, C> {
-    read(): Readonly<S>;
-    dispatch(command: C): void;
+    read(): DeepReadonly<S>;
+    /** Copies plain data now; allowed only during the owning scene's system update. */
+    readonly dispatch: (command: C) => void;
 }
 export interface SceneCommands {
     set(candidate: PreparedScene): void;
@@ -37,13 +39,13 @@ export interface SystemContext {
     emit(event: SceneEvent): void;
     readonly scenes: SceneCommands;
 }
-export interface SceneDefinition {
+export interface SceneDefinition<S = unknown, C = never> {
     readonly id: string;
     readonly blocksUpdateBelow?: boolean;
     readonly assets?: readonly Asset<any>[];
-    setup(scene: SceneSetup): void;
+    readonly setup: (scene: SceneSetup<S, C>) => void;
 }
-export interface SceneSetup {
+export interface SceneSetup<S = unknown, C = never> {
     readonly world: WorldAccess;
     readonly camera: Camera;
     readonly assets: ReadonlyMap<string, unknown>;
@@ -55,19 +57,20 @@ export interface SceneSetup {
     ): void;
     render(prepare: (frame: Frame, alpha: number) => void): void;
     resetInterpolation(action: () => void): void;
-    state<S, C>(): StateAccess<S, C>;
+    /** Bind during setup, then inject into selected systems. Setup itself cannot dispatch. */
+    state(): StateAccess<S, C>;
     freeze(ticks: number): void;
     defer(cleanup: () => void): void;
 }
 export interface PreparedScene {
     release(): void;
 }
-class SceneCandidate {
+class SceneCandidate<S, C> {
     readonly handle: PreparedScene = Object.freeze({ release: () => this.release() });
     private status: "ready" | "used" | "released" = "ready";
     constructor(
         readonly owner: symbol,
-        readonly definition: SceneDefinition,
+        readonly definition: SceneDefinition<S, C>,
         readonly key: string,
         readonly seed: number | undefined,
         private leases: Lease[],
@@ -115,7 +118,7 @@ export interface GameInspection {
     readonly state: InspectionValue;
     readonly scenes: readonly SceneStateInspection[];
 }
-class SceneInstance {
+class SceneInstance<S, C> {
     readonly world = new World();
     readonly resources = new Map<string, unknown>();
     readonly randomStreams = new Map<string, Random>();
@@ -134,7 +137,7 @@ class SceneInstance {
     published = false;
     constructor(
         readonly id: number,
-        readonly definition: SceneDefinition,
+        readonly definition: SceneDefinition<S, C>,
         readonly key: string,
         readonly seed: number,
     ) {
@@ -183,7 +186,7 @@ export type Lifecycle =
 export interface GameOptions<S, C> {
     seed: number | string;
     state: S;
-    transition: (state: Readonly<S>, command: C) => S;
+    transition: (state: DeepReadonly<S>, command: DeepReadonly<C>) => S | DeepReadonly<S>;
     dt?: number;
     compatibility?: string;
     diagnostic?: (error: unknown) => void;
@@ -196,15 +199,16 @@ export class Game<S = Record<string, never>, C = never> {
     #simulationTick = 0;
     #lifecycle: Lifecycle = "Stopped";
     private owner = Symbol("game");
-    private stack: SceneInstance[] = [];
+    private stack: SceneInstance<S, C>[] = [];
     private nextId = 1;
-    private stateValue: Readonly<S>;
-    private stateCommands: C[] = [];
+    private stateValue: DeepReadonly<S>;
+    private stateCommands: DeepReadonly<C>[] = [];
+    private updatingScene: SceneInstance<S, C> | undefined;
     private commands: (
         | { type: "set" | "push"; candidate: PreparedScene }
         | { type: "pop" }
     )[] = [];
-    private candidates = new Map<PreparedScene, SceneCandidate>();
+    private candidates = new Map<PreparedScene, SceneCandidate<S, C>>();
     private preparations = new Set<AbortController>();
     private initialized = false;
     private busy = false;
@@ -212,12 +216,12 @@ export class Game<S = Record<string, never>, C = never> {
         if (typeof options.seed === "number" && !Number.isFinite(options.seed))
             throw new Error("Invalid root seed");
         this.rootSeed = seedOf(options.seed);
-        this.stateValue = immutable(structuredClone(options.state));
+        this.stateValue = immutable(options.state);
         this.dt = options.dt ?? 1 / 60;
         if (!(this.dt > 0 && Number.isFinite(this.dt)))
             throw new Error("Invalid tick duration");
     }
-    get state() {
+    get state(): DeepReadonly<S> {
         return this.stateValue;
     }
     get simulationTick(): number {
@@ -242,7 +246,7 @@ export class Game<S = Record<string, never>, C = never> {
         }
     }
     async prepare(
-        definition: SceneDefinition,
+        definition: SceneDefinition<S, C>,
         options: { key: string; seed?: number; signal?: AbortSignal },
     ): Promise<PreparedScene> {
         if (
@@ -276,7 +280,7 @@ export class Game<S = Record<string, never>, C = never> {
                 );
             if (controller.signal.aborted)
                 throw new Error("Scene preparation cancelled");
-            const candidate = new SceneCandidate(
+            const candidate: SceneCandidate<S, C> = new SceneCandidate(
                 this.owner,
                 definition,
                 options.key,
@@ -319,7 +323,7 @@ export class Game<S = Record<string, never>, C = never> {
             if (!mounting)
                 throw new Error("Scene bindings are fixed after setup");
         };
-        const setup: SceneSetup = {
+        const setup: SceneSetup<S, C> = {
             world: scene.world.access,
             camera: scene.camera,
             assets: new Map(leases.map((l) => [l.id, l.value])),
@@ -358,16 +362,16 @@ export class Game<S = Record<string, never>, C = never> {
                 setupOnly();
                 scene.resets.push(action);
             },
-            state: <T, D>() => {
+            state: () => {
                 setupOnly();
                 return {
-                    read: () => this.stateValue as unknown as Readonly<T>,
-                    dispatch: (command: D) => {
-                        if (mounting || !scene.published || !this.busy)
+                    read: () => this.stateValue,
+                    dispatch: (command: C) => {
+                        if (mounting || !scene.published || this.updatingScene !== scene)
                             throw new Error(
                                 "State dispatch requires an active system update",
                             );
-                        this.stateCommands.push(command as unknown as C);
+                        this.stateCommands.push(immutable(command));
                     },
                 };
             },
@@ -512,7 +516,7 @@ export class Game<S = Record<string, never>, C = never> {
                     break;
                 }
             const selected = this.stack.slice(first),
-                ordinary = new Set<SceneInstance>();
+                ordinary = new Set<SceneInstance<S, C>>();
             const scenes: SceneCommands = {
                 set: (c) => this.set(c),
                 push: (c) => this.push(c),
@@ -536,10 +540,11 @@ export class Game<S = Record<string, never>, C = never> {
                             throw new Error(
                                 "Gameplay events cannot emit during freeze",
                             );
-                        scene.outbox.push(immutable(structuredClone(event)));
+                        scene.outbox.push(immutable(event));
                     },
                     scenes,
                 });
+                this.updatingScene = scene;
                 for (const system of scene.schedule)
                     if (!scene.freezeRemaining || system.runsDuringFreeze) {
                         const result = system.update(ctx) as unknown;
@@ -554,6 +559,7 @@ export class Game<S = Record<string, never>, C = never> {
                         }
                     }
             }
+            this.updatingScene = undefined;
             for (const scene of selected) scene.world.commit();
             for (const scene of ordinary) {
                 scene.inbox = Object.freeze(scene.outbox);
@@ -571,10 +577,14 @@ export class Game<S = Record<string, never>, C = never> {
                 );
                 scene.freezePending = 0;
             }
-            for (const command of this.stateCommands)
-                this.stateValue = immutable(
-                    this.options.transition(this.stateValue, command),
-                );
+            for (const command of this.stateCommands) {
+                const result = this.options.transition(this.stateValue, command);
+                if (result instanceof Promise) {
+                    Promise.resolve(result).catch((error) => this.report(error));
+                    throw new Error("State transitions must be synchronous");
+                }
+                this.stateValue = immutable<S>(result);
+            }
             this.stateCommands.length = 0;
             const commands = this.commands.splice(0);
             for (let i = 0; i < commands.length; i++) {
@@ -624,6 +634,7 @@ export class Game<S = Record<string, never>, C = never> {
             throw e;
         } finally {
             this.busy = false;
+            this.updatingScene = undefined;
         }
     }
     render(frame: Frame, alpha: number) {
@@ -658,7 +669,7 @@ export class Game<S = Record<string, never>, C = never> {
         try {
             cleanup.dispose();
         } finally {
-            this.stateValue = undefined as S;
+            this.stateValue = undefined as DeepReadonly<S>;
             this.#lifecycle = "Disposed";
         }
     }

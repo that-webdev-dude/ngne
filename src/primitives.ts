@@ -99,21 +99,39 @@ export class FixedStep {
         return { ticks, dropped, alpha: this.accumulator / this.dt };
     }
 }
-export function immutable<T>(value: T): Readonly<T> {
-    if (value && typeof value === "object") {
-        const prototype = Object.getPrototypeOf(value);
-        if (
-            !Array.isArray(value) &&
-            prototype !== Object.prototype &&
-            prototype !== null
-        )
-            throw new Error(
-                "Committed state and events require plain objects, arrays and primitives",
-            );
-        Object.freeze(value);
-        for (const child of Object.values(value))
-            if (child && typeof child === "object" && !Object.isFrozen(child))
-                immutable(child);
+/** Recursive read-only view of supported plain data, including arrays and tuples. */
+export type DeepReadonly<T> = T extends object
+    ? { readonly [Key in keyof T]: DeepReadonly<T[Key]> }
+    : T;
+
+/** Validate and copy plain data before freezing; caller-owned values stay untouched. */
+export function immutable<T>(value: T | DeepReadonly<T>): DeepReadonly<T> {
+    // Traversal preserves supported fields and rejects values outside the data domain.
+    return copyImmutable(value, new Map()) as DeepReadonly<T>;
+}
+
+function copyImmutable(value: unknown, copies: Map<object, object>): unknown {
+    if (value === null || value === undefined || typeof value === "string" ||
+        typeof value === "boolean" || typeof value === "number" || typeof value === "bigint")
+        return value;
+    if (typeof value !== "object")
+        throw new Error("Committed state, commands and events require plain data");
+    const existing = copies.get(value);
+    if (existing) return existing;
+    const prototype = Object.getPrototypeOf(value);
+    if (prototype !== Object.prototype && prototype !== null &&
+        !(Array.isArray(value) && prototype === Array.prototype))
+        throw new Error("Committed state, commands and events require plain objects, arrays and primitives");
+    const copy: object = Array.isArray(value) ? new Array(value.length) : Object.create(prototype);
+    copies.set(value, copy);
+    for (const key of Reflect.ownKeys(value)) {
+        if (Array.isArray(value) && key === "length") continue;
+        const descriptor = Object.getOwnPropertyDescriptor(value, key);
+        if (typeof key !== "string" || !descriptor?.enumerable || !("value" in descriptor))
+            throw new Error("Plain data requires enumerable string-keyed data properties");
+        Object.defineProperty(copy, key, {
+            value: copyImmutable(descriptor.value, copies), enumerable: true,
+        });
     }
-    return value;
+    return Object.freeze(copy);
 }

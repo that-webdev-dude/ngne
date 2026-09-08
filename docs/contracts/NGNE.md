@@ -9,7 +9,7 @@ the package export map exposes no subpaths. The NGNE-1 consumer inventory is:
 
 | Category | Public symbols | Consumers and ownership |
 | --- | --- | --- |
-| Authoring | `component`; types `Component`, `ComponentValue`, `Entity`, `Query`, `WorldAccess`; `SceneDefinition`, `SceneSetup`, `SystemContext`, `SceneCommands`, `SceneEvent`, `StateAccess`, `PreparedScene` | Starfall, hello and authoring tests. Setup injects scene capabilities; systems cannot commit, enumerate, or change query membership. Candidates expose only idempotent `release()`; the owning Game validates handle identity and consumes them. |
+| Authoring | `component`; types `Component`, `ComponentValue`, `Entity`, `Query`, `WorldAccess`; `SceneDefinition`, `SceneSetup`, `SystemContext`, `SceneCommands`, `SceneEvent`, `StateAccess`, `DeepReadonly`, `PreparedScene` | Starfall, hello and authoring tests. Setup injects scene capabilities; systems cannot commit, enumerate, or change query membership. Candidates expose only idempotent `release()`; the owning Game validates handle identity and consumes them. |
 | Authoring and presentation | `Camera`, `Random`, `clamp`, `lerp`, `seedOf`, `down`, `pressed`, `imageAsset`, `audioAsset`; types `Asset`, `Lease`, `Sprite`, `Sound`, `Clip` | Scene authors use explicitly acquired/injected values. Constructors operate on caller-owned values; inspection never returns a live camera or RNG. |
 | Platform integration | `Game`, `BrowserGame`, `Assets`, `Input`, `Frame`, `Renderer`, `Audio`, `FixedStep`, `emptyInput`; types `GameOptions`, `BrowserOptions`, `FrameScheduler`, `DisplaySnapshot`, `InputSnapshot`, `Stats` | Browser host, headless runners, renderer/audio/asset tests and benchmarks. Host lifecycle, tick, render and service operations remain intentional integration APIs. |
 | Inspection | `Lifecycle`, `SceneInspection`, `SceneStateInspection`, `GameInspection`, `InspectionValue` | Tests, benchmark capacity reporting and diagnostics. No mutable foreign world or resource binding is returned. |
@@ -56,9 +56,53 @@ Private mounting owns a reverse cleanup stack before setup runs. Setup binds res
 
 Tick order is selected scene updates, world commits, ordinary event advances, freeze commits, authored state commands, then FIFO scene commands. A failing scene command preserves all preceding commits and successful commands, discards later commands and leaves the Game Running. Arbitrary system/transition faults enter Failed. Only disposal is then supported.
 
-State dispatch is update-only. All systems read the same frozen snapshot for a tick. Transitions apply in dispatch order. Scene setup after state commit sees the new snapshot. State must contain plain objects, arrays and primitive facts, never world objects or service handles. Match the explicit state access generic to the owning Game.
+### Committed state typing and ownership
 
-Events are cloned/frozen on emit, broadcast on the next ordinary update, and held through suspension/freeze. Frozen systems cannot emit gameplay events. Freeze requests use positive integer ticks and resolve to maximum duration at commit. Suspension pauses the countdown. Ordinary transform interpolation reset callbacks and camera cuts execute when freeze first activates.
+- Declare stateful scenes as `SceneDefinition<State, Command>` for the owning
+  `Game<State, Command>` (or `BrowserGame<State, Command>`). Its setup receives
+  `SceneSetup<State, Command>`; `scene.state()` infers that contract and accepts
+  no caller-selected generics. `Game.prepare()` rejects incompatible scene types.
+  An unparameterized scene uses unknown state and no commands, so scenes that do
+  not need durable state remain portable. Setup is a function property to preserve
+  strict parameter checking. No state capability is added to `SystemContext`.
+- `StateAccess.read()`, `Game.state`, transition state and transition commands
+  expose `DeepReadonly` values, including nested objects, arrays and tuples.
+  TypeScript checks the authored schema; runtime checks enforce the data domain,
+  not a game-specific field schema. JavaScript and unchecked casts remain untyped.
+- Initial state, each dispatch payload and each transition result are validated,
+  copied and recursively frozen. Caller-owned inputs are neither frozen nor retained.
+  Later caller mutation cannot alter committed facts or queued command meaning.
+  Reusing a command object captures its value separately at each dispatch.
+- Supported data: plain objects with Object.prototype or null prototype, ordinary
+  arrays (including holes), strings, numbers (including NaN and infinities), booleans,
+  bigint, null and undefined. Cycles and shared references are preserved within each
+  copied graph. Only enumerable own string-keyed data properties are supported;
+  the intrinsic array length is preserved. Symbols, functions, accessors,
+  non-enumerable authored properties, class instances, Date, Map, Set, typed arrays,
+  buffers and other built-ins are rejected, including inside already-frozen values.
+  Getters are not evaluated. This is a data contract, not a serialization format.
+- Dispatch is allowed only during the owning scene's system update. Setup may read
+  but cannot dispatch; rendering, transitions, cleanup, suspended scenes and retained
+  capabilities outside an update cannot enqueue commands. All selected systems read
+  the same committed snapshot for the whole tick. Commands transition in dispatch
+  order, each receiving the previous result; replacement setup sees the final result.
+- Transitions must synchronously return supported data. Invalid results fail the
+  Game without publishing that result; earlier successful commands remain committed.
+  Rejected native async transition promises are observed for diagnostics. Invalid
+  initial state rejects construction; invalid dispatch rejects before enqueueing.
+- Validation/copy cost is proportional to the reachable data graph at these
+  boundaries. Keep high-frequency mutable data scene-owned. Reads do not copy.
+
+Migration: replace `scene.state<S, C>()` with `scene.state()` and annotate the
+containing definition or factory return as `SceneDefinition<S, C>`. Type standalone
+setup functions as `SceneSetup<S, C>`. Transitions build new values or return the
+read-only input; never mutate nested state or commands. Replace unsupported durable
+values with plain facts; typed arrays and other mutable representations can remain
+scene resources.
+
+### Events, freeze and randomness
+
+Events use the same validated plain-data copy/freeze on emit, broadcast on the next ordinary update, and are held through suspension/freeze. Frozen systems cannot emit gameplay events. Freeze requests use positive integer ticks and resolve to maximum duration at commit. Suspension pauses the countdown. Ordinary transform interpolation reset callbacks and camera cuts execute when freeze first activates.
 
 RNG: FNV-1a over JSON-encoded seed parts, followed by Mulberry32 streams. Root input is hashed; scene seed derives from root/definition/key, and stream seed derives from scene seed/name. Explicit scene seed bypasses scene derivation. These algorithms have compatibility version 1. Rendering uses no simulation stream.
 

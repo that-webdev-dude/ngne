@@ -23,7 +23,7 @@ export async function checkBrowserLifecycle(check: (value: unknown, message: str
             setup(scene) {
                 const resource = scene.resource("counter", { value: 0 });
                 const random = scene.random("test");
-                const state = scene.state<{ score: number }, undefined>();
+                const state = scene.state();
                 scene.system(() => {
                     resource.value++;
                     random.next();
