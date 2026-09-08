@@ -38,6 +38,11 @@ One completed tick must expose a coherent simulation-state boundary.
 
 Capture, restoration, compatibility policy, storage formats, and rollback are not required yet. Mutable resources do not need a formal snapshot-registration scheme until a real consumer exists.
 
+The [current ownership inventory](contracts/NGNE.md#simulation-state-ownership-inventory-ngne-5)
+accounts for production owners and external inputs. Public enumeration is lossy,
+detached diagnostic data, not a complete capture of those owners. Host scene commands,
+candidate availability and display inputs must also match when comparing executions.
+
 ## Grid, tilemap, and non-entity scene state
 
 Scene-local data may use its natural representation instead of becoming ECS entities.

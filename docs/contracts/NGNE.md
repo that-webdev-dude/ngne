@@ -40,6 +40,63 @@ direct `World` construction in application code with a headless `Game` and scene
 the Game owns commits. Create components with `component()` and prepare candidates
 with `game.prepare()`. Never assign lifecycle or simulation tick.
 
+## Simulation-state ownership inventory (NGNE-5)
+
+Audited production `src/`, `demo/game.ts`, `demo/main.ts`, `demo/art.ts` and
+`examples/hello/main.ts`. This inventory describes the state determining the next
+tick **given the same authored code, input/display and host commands**. It is not
+a capture schema. No mutable authoritative gameplay value remains solely in a
+system closure in these consumers; closures retain injected owners and fixed code.
+
+| State / classification | Owner and inspection / reconstruction considerations |
+| --- | --- |
+| Global simulation state | `Game`: tick, root seed, committed state, next instance ID; `enumerate()` includes these plus fixed `dt` in seconds and engine/RNG/authored compatibility string. |
+| Mounted scene state | Stack order, instance ID, definition ID, key, resolved seed and blocking policy; scene summaries preserve these. Resources are keyed by unique nonempty names within each mount. |
+| ECS values and identity | World owns component columns and immutable index/generation/world handles. Component names identify composition; conflicting definition objects with the same name are rejected on spawn. Names are world-local, not a global schema registry. |
+| Allocator and iteration history | World owns slot generations, row positions, pending flags, free-stack order, archetype creation order and dense row order. Inspection includes `archetypes` with ordered component names and entity indices, **including empty archetypes**; `entities` retains values in archetype/row order. Empty archetypes cannot be reconstructed from live entities alone. |
+| Scene simulation state | Named RNG current uint32 states, resources, event inbox/outbox, pending/remaining freeze and camera fields. Suspension and stop/resume preserve mounted state; unmount releases it. Camera state must be treated as authoritative when gameplay reads it. |
+| Tick-local work | Game owns selected update plan, current updating scene, state/scene command queues and busy flag; worlds own pending births/deaths. Ordinary local variables such as aim search, collision iteration and spawn temporaries do not persist across updates. Queues normally drain at completed commit; suspended event inboxes intentionally persist. |
+| Starfall durable facts | Game state owns `best`, `runs`, `victories`, `lastScore`; finish commands capture score/win before transition. |
+| Starfall gameplay | `run` owns phase, score, wave, seconds/ticks, hp, bomb, combo/countdown, stress, spawn/shot timers, invulnerability, boss-wave and finished flag. `player` resource owns its handle. `position` and `body` own poses, velocity, radius, hp, active/kind, age and cooldown. `waves` RNG owns spawn/drop randomness. |
+| Starfall derived cache | `collision-grid` resource stores borrowed entity/position/body references. Every continuing ordinary gameplay update clears and rebuilds it before collision reads. At commit it can retain references to removed entities; it is not an additional authority or a list of current entities. Query match/column caches are likewise derived from definitions and archetypes, preserving their order. |
+| Starfall presentation within simulation | `visual`, previous poses, `particle` values, `effects` RNG, `run.shake/flash`, camera shake and `stars` are scene-owned and inspectable. Particle updates continue through freeze and share ECS allocation with gameplay: their lifetime cannot be omitted when reproducing allocator identity. Stars are generated once using `waves`, so mount-time draws are part of deterministic setup. |
+| Immutable authoring | Component factories/names, scene setup/ID/policy, ordered systems and freeze flags, reset/render callbacks, transition function, arena attract/stress/reduced-motion options, dimensions, sprite/atlas definitions and texture key `ships`. These are code/configuration, not serialized values. Treat supplied definitions/options as fixed; readonly typing does not deep-freeze arbitrary authored objects or callback captures. |
+| Host intent and preparation | Game owns candidate handles/status/leases, pending abort controllers and queued host scene commands. Demo host owns pause/result candidate references, preparation/ready guards and launch intent. These are external activation inputs, not hidden gameplay progression. Availability and authored activation tick/key must also match for repeatability; input snapshots alone do not record DOM launch/pause/visibility commands. |
+| Platform input / timing | `Input` owns held/edge/pointer/gamepad state pending consumption; BrowserGame owns display, scheduler/run token, lifecycle guards, clock, FixedStep accumulator/budget and telemetry. These control future environmental input and platform frames, outside simulation-state inspection. A game reading display data needs the same supplied display values too. |
+| Assets and presentation services | Assets owns definitions, loads, decoded cache and refcounts; scene cleanup owns leases. Renderer owns texture sources/GPU objects/context state; Frame owns reusable draw buffers and sorting. Audio owns requests, voices, scope identity/disposal, buses/mute/ducking and device. These are rebuilt or resumed through their services, not simulation capture. |
+| Demo UI and hello | DOM `view`/`presentation`, prior phase, metrics/times and UI readiness are host/presentation state. View copies do not grant gameplay mutation. Hello's moving/previous X values are components; its query/callbacks contain no mutable gameplay counters. Art generation has only call-local drawing work. |
+
+### Inspection boundary and limits
+
+- Inspect after successful `tick()` returns and before new host commands or authored
+  mutations for a completed commit; after initial `start()` mounting is also committed.
+  `enumerate()` is allowed elsewhere but is not an atomic snapshot API. During update,
+  setup, cleanup or failure it may expose intermediate/partial state; pending command
+  payloads and candidate preparation are not enumerated. Lifecycle is read separately.
+- Public `Game.enumerate()` is detached and frozen. Internal `World.enumerate()`
+  builds metadata but borrows live component values; it must remain runtime-internal.
+  Setup-injected world/resource/RNG/camera capabilities deliberately remain live.
+- Inspection copies each category separately: aliases within a copied graph survive,
+  but cross-category identity is not preserved. Entity owner symbols become the same
+  `"world"` description across worlds; use the enclosing scene identity to interpret
+  handles. An inspected handle cannot be passed back as an owned entity.
+- The public copy is lossy: enumerable getters may execute, custom iterators may run,
+  private fields and non-enumerable state are omitted, and built-ins lose their type
+  as described above. Keep authoritative resource data inspectable; opaque closure or
+  private-field-only resource state does not satisfy the ownership requirement.
+  Inspection of arbitrary authored accessors is not guaranteed side-effect-free.
+- Scene IDs, resource names, component names, mount keys and asset IDs are authored
+  identities, not reconstruction resolvers. Scene IDs are not globally uniqueness-
+  checked; authors must use compatible definitions for each ID. Default
+  `unversioned-game` is not compatibility validation. A future consumer must define
+  authored schema/version checks, graph/handle reconstruction, service reacquisition
+  and external activation recording. Capture, serialization, restoration, replay
+  control and a snapshot participant registry remain absent.
+
+Migration: inspection adds `dt` and `world.archetypes`; existing fields retain their
+meaning. Diagnostic readers should accept these additive fields and never rebuild
+iteration order from only `world.entities`.
+
 ## ECS
 
 `component(name, factory)` creates a stable typed definition; `.of(overrides)` creates a value. Names must be nonempty and unambiguous within a world. Complete component values are supplied to `spawn`. Queries are cached and match archetypes created later. Query membership does not change before commit. Value changes are immediate. `despawn` is idempotent; pending births can also be despawned at the same boundary.

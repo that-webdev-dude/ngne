@@ -31,6 +31,11 @@ multi-scene commit order, inbox retention through suspension and freeze,
 determinism across presentation/preparation timing, and first/middle/last FIFO
 mount failures. All nine added scenarios pass without runtime changes.
 
+NGNE-5 ownership audit is recorded in `docs/contracts/NGNE.md`, covering engine,
+Starfall and hello state plus inspection limitations. Enumeration now includes fixed
+tick duration and empty/live archetype order. `tests/ownership.test.ts` covers allocator
+reuse and showcase render/stop/resume preservation; no snapshot registry was added.
+
 ## Next validation
 
 - Exercise the authoring API in another small game before expanding it.

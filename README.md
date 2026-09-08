@@ -70,6 +70,13 @@ freeze ticks), never live scenes. `game.enumerate()` provides detached frozen di
 data. Lifecycle and simulation tick are read-only. Create scenes with `game.prepare()`
 and leave world commits to the engine. See the [API migration notes](docs/contracts/NGNE.md#public-api-and-inspection).
 
+Inspect after `game.tick()` returns for completed-commit diagnostics. Enumeration
+includes tick duration and allocator/archetype order, but omits pending host commands
+and preparation; mid-update inspection may show partial state. It cannot restore
+entities or preserve identity across all resource graphs. Keep mutable gameplay data
+in components or named scene resources, including handles and timers. See the
+[ownership inventory and inspection limits](docs/contracts/NGNE.md#simulation-state-ownership-inventory-ngne-5).
+
 ## Verify
 
 Await browser `start()` and `stop()` before another start/stop call; overlapping

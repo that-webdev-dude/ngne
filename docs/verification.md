@@ -1,5 +1,39 @@
 # NGNE verification
 
+## NGNE-5 — 8 September 2026
+
+Windows x64, Node v24.15.0:
+
+- Audited every production engine module, Starfall gameplay/browser/art entry
+  points and hello. The implementation contract now inventories simulation state,
+  derived caches, fixed authoring, host intent and presentation/service state.
+  No additional mutable closure-only gameplay value required relocation.
+- Found that inspection omitted fixed tick duration and empty archetype creation
+  order. Added `GameInspection.dt` and `world.archetypes` (ordered component names
+  and entity indices). Existing inspection fields and simulation behavior remain.
+- `npm test`: all **51 tests passed**. Two new `tests/ownership.test.ts` cases
+  cover empty archetype retention, free-stack/generation reuse, later query order,
+  frozen detached metadata, and equal-seed Starfall inspections after each of 90
+  ticks with rendering and a stop/resume interleaved in only one run. Existing
+  lifecycle, freeze/suspension, state, full Chaos run and determinism tests pass.
+- `npm run typecheck` and `npm run build`: passed, including emitted declarations,
+  public API misuse fixture and both production consumers.
+- `git diff --check` and changed-document local link/anchor checks: passed.
+
+NGNE-1 and NGNE-3 were verified Done in Jira and integrated in this checkout.
+Updated README, implementation contract, capabilities clarification and roadmap
+alongside this evidence. Architecture and decisions need no edit: explicit owners
+and deferred capture remain unchanged. Guide and examples need no migration:
+the API additions are diagnostic metadata only, with guidance in README/contract.
+Historical `prototypes/ngne/v00` remains untouched.
+
+Limits: inspection is lossy and may observe partial state outside completed
+commits; live internal enumeration, accessor effects, graph/handle identity loss,
+authored compatibility and host activation requirements are explicitly recorded.
+No browser-dependent behavior or simulation hot path changed, so browser/device
+checks and benchmarks were not rerun. No save/restore, replay controller, registry,
+performance improvement or additional device support is claimed.
+
 ## NGNE-4 — 8 September 2026
 
 Windows x64, Node v24.15.0:

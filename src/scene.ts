@@ -112,6 +112,7 @@ export interface SceneStateInspection extends SceneInspection {
 }
 export interface GameInspection {
     readonly compatibility: string;
+    readonly dt: number;
     readonly simulationTick: number;
     readonly rootSeed: number;
     readonly nextInstanceId: number;
@@ -644,13 +645,14 @@ export class Game<S = Record<string, never>, C = never> {
             scene.prepare(frame, alpha);
         }
     }
-    /** Detached frozen enumerable data; call on demand, not in the frame hot path. */
+    /** Detached frozen diagnostics. Inspect after tick() returns for a completed commit. */
     enumerate(): GameInspection {
         return Object.freeze({
             compatibility:
                 "NGNE/1;mulberry32/1;" +
                 (this.options.compatibility ?? "unversioned-game"),
             simulationTick: this.simulationTick,
+            dt: this.dt,
             rootSeed: this.rootSeed,
             nextInstanceId: this.nextId,
             state: inspectValue(this.stateValue),

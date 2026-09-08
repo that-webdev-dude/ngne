@@ -218,6 +218,11 @@ export class World implements WorldAccess {
     }
     enumerate() {
         return {
+            // Empty archetypes retain creation order and can affect later query order.
+            archetypes: this.archetypes.map((a) => ({
+                components: a.types.map((type) => type.name),
+                entities: a.entities.map((entity) => entity.index),
+            })),
             slots: this.slots.map((s) => ({
                 generation: s.generation,
                 row: s.row,
