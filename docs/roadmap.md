@@ -26,6 +26,11 @@ NGNE-3 committed-state hardening is implemented in `src/scene.ts` and
 validated plain-data graphs and dispatch-time command ownership. Regressions live in
 `tests/state.test.ts` and the public declaration fixture `tests/api-misuse.ts`.
 
+NGNE-4 combined simulation coverage lives in `tests/simulation.contract.test.ts`:
+multi-scene commit order, inbox retention through suspension and freeze,
+determinism across presentation/preparation timing, and first/middle/last FIFO
+mount failures. All nine added scenarios pass without runtime changes.
+
 ## Next validation
 
 - Exercise the authoring API in another small game before expanding it.

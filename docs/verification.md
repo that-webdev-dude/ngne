@@ -1,5 +1,46 @@
 # NGNE verification
 
+## NGNE-4 — 8 September 2026
+
+Windows x64, Node v24.15.0:
+
+- `npm test`: all 49 headless tests passed, including nine new regressions in
+  `tests/simulation.contract.test.ts`.
+- A three-scene scenario asserts bottom-to-top registration order, immediate
+  component/resource writes, buffered births/deaths, event publication before
+  freeze resets, longest freeze requests, ordered state dispatch and FIFO
+  push/pop/set application. Newly mounted scenes read the final state and do not
+  join the current update plan. Replacement cleanup runs top-to-bottom.
+- Suspension retains an entire lower-scene inspection unchanged, including its
+  freeze countdown and inbox. After suspension and freeze end, two ordinary
+  consumers receive the broadcast once each; subsequent updates do not repeat it.
+- Six failure cases cover both push and set mounts at the first, middle and last
+  positions in a three-command sequence. World/event/freeze/state commits and
+  preceding successful pushes survive; later pop/set commands are discarded,
+  discarded candidates are released, private cleanup unwinds in reverse order,
+  and the tick completes with the Game Running.
+- Three deterministic runs compare complete public enumeration after each of
+  24 ticks, including allocator state, resources, cameras, named RNG streams,
+  event buffers, freeze and committed state. They vary rendering frequency,
+  zero-tick/fractional/multi-tick frames and controlled asset completion order
+  while retaining identical tick input and authored activation ticks/keys.
+  Public enumeration already omits world-owner symbols; the comparison removes
+  no additional fields. Rendering is also checked for simulation-state mutation.
+- `npm run typecheck` and `npm run build`: passed, including emitted declarations
+  and the public API misuse fixture. Runtime tests execute through `tsx`, following
+  the existing test configuration.
+- `git diff --check` and current documentation link checks: passed.
+
+No production defect was found, so no runtime or API change was needed. Roadmap
+coverage and this verification record are updated. Architecture, capabilities,
+decisions, implementation contract, guide and examples need no changes: these
+tests exercise existing rules without clarifying or changing supported behavior.
+Historical `prototypes/ngne/v00` remains untouched.
+
+Limits: deterministic headless evidence only. No browser-dependent code changed,
+so browser/device validation was not rerun. No benchmark or performance claim is
+made; presentation checks cover CPU frame preparation, not GPU submission.
+
 ## NGNE-3 — 8 September 2026
 
 Windows x64, Node v24.15.0, Chromium-based Codex browser:
