@@ -1,5 +1,23 @@
 # NGNE verification
 
+## Release preparation — 8 September 2026
+
+Windows x64, Node v24.15.0, Chromium-based Codex browser:
+
+- Clean `npm ci` succeeded after stopping local servers that locked dependency files.
+- All 25 headless tests passed; strict TypeScript (including the new example) and the production build passed.
+- Built ESM engine imported independently; a spawn/commit/query/dispose smoke check passed.
+- All 12 `/validation.html` checks passed, including WebGL context restoration.
+- Production game launch, pause and resume passed. The first-scene production page loaded without console errors.
+- Desktop production layout inspected. Physical mobile testing remains outstanding.
+- Gameplay screenshot captured from Chaos Lab. No new universal FPS or GPU performance claim is made.
+
+Fresh CPU benchmark: 20,000-entity ECS median **0.239 ms**, p95 **0.444 ms**; Chaos simulation/preparation median **0.658 ms**, p95 **0.931 ms**. Peak: 7,209 sprites and 6,986 entity slots. These measurements exclude GPU submission, display and input polling.
+
+GitHub Actions repeats headless tests, typechecking and the build. Browser validation and benchmarks remain explicit local checks.
+
+## Original baseline — 7 September 2026
+
 Local verification on 7 September 2026, Windows x64, Node v24.15.0, Chromium-based Codex browser. These are local observations, not cross-device guarantees.
 
 ## Automated checks

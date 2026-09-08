@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 220" role="img" aria-labelledby="title desc">
+  <title id="title">NGNE</title>
+  <desc id="desc">TypeScript sprite engine. Cyan geometric wordmark on deep indigo.</desc>
+  <rect width="960" height="220" rx="8" fill="#111725"/>
+  <g transform="translate(48 42)" fill="none" stroke="#83e8e1" stroke-width="12" stroke-linejoin="miter">
+    <path d="M0 88V0h16l48 88h16V0 M184 8h-64v80h64V48h-32 M224 88V0h16l48 88h16V0 M408 0h-64v88h64 M344 44h52"/>
+  </g>
+  <path d="M536 48h2v122h-2z" fill="#394457"/>
+  <text x="576" y="87" fill="#efe8d5" font-family="monospace" font-size="21" letter-spacing="3">TYPESCRIPT</text>
+  <text x="576" y="122" fill="#efe8d5" font-family="monospace" font-size="21" letter-spacing="3">SPRITE ENGINE</text>
+  <text x="48" y="183" fill="#9ba9bc" font-family="monospace" font-size="13" letter-spacing="3">2D / FIXED STEP / WEBGL 2</text>
+</svg>
