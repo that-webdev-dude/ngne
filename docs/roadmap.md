@@ -12,23 +12,24 @@ NGNE 0.1 is an early engine baseline with a playable showcase. The public API ma
 - Scoped audio, synthesized effects and decoded clips.
 - Starfall '89 and its Chaos Lab stress mode.
 
-| Ticket | Outcome                                                                                   | Regression coverage                                                                   |
-| ------ | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| NGNE-1 | Restricted public runtime access, read-only lifecycle/tick, frozen summaries, enumeration | `tests/api-misuse.ts` compile-time fixture                                            |
-| NGNE-2 | Browser lifecycle overlap rejection, terminal disposal, run-specific callbacks            | `tests/lifecycle.test.ts`, `tests/browser-lifecycle-checks.ts` via `/validation.html` |
-| NGNE-3 | Typed, deeply read-only committed state with validated plain-data commands                | `tests/state.test.ts`, `tests/api-misuse.ts`                                          |
-| NGNE-4 | Combined multi-scene commit order, suspension retention and mount-failure isolation       | `tests/simulation.contract.test.ts`                                                   |
-| NGNE-5 | Simulation-state ownership inventory; enumeration adds `dt` and archetype order           | `tests/ownership.test.ts`                                                             |
-| NGNE-6 | Alpha 1 through suspension and host resume; continuing hitstop effects interpolate        | `tests/interpolation.test.ts`, `tests/browser-interpolation-checks.ts`                |
+| Ticket  | Outcome                                                                                                                            | Regression coverage                                                                   |
+| ------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| NGNE-1  | Restricted public runtime access, read-only lifecycle/tick, frozen summaries, enumeration                                          | `tests/api-misuse.ts` compile-time fixture                                            |
+| NGNE-2  | Browser lifecycle overlap rejection, terminal disposal, run-specific callbacks                                                     | `tests/lifecycle.test.ts`, `tests/browser-lifecycle-checks.ts` via `/validation.html` |
+| NGNE-3  | Typed, deeply read-only committed state with validated plain-data commands                                                         | `tests/state.test.ts`, `tests/api-misuse.ts`                                          |
+| NGNE-4  | Combined multi-scene commit order, suspension retention and mount-failure isolation                                                | `tests/simulation.contract.test.ts`                                                   |
+| NGNE-5  | Simulation-state ownership inventory; enumeration adds `dt` and archetype order                                                    | `tests/ownership.test.ts`                                                             |
+| NGNE-6  | Alpha 1 through suspension and host resume; continuing hitstop effects interpolate                                                 | `tests/interpolation.test.ts`, `tests/browser-interpolation-checks.ts`                |
+| NGNE-15 | Two-level platformer: tile collision, checkpoints, death remounts, pause and progression; deterministic authored-level walkthrough | `tests/platformer.test.ts`                                                            |
 
 ## Direction
 
-- A second game on the current engine (epic NGNE-17): the two-level platformer (NGNE-15) exercises the authoring API before it expands.
+- The [two-level platformer](../examples/platformer/README.md) (NGNE-15, epic NGNE-17) now exercises the current authoring API. Its [findings](../examples/platformer/FINDINGS.md) feed NGNE-7/9/10/23/16; platformer performance measurement remains separate NGNE-26 work.
 - Typed-array SoA component storage (NGNE-20), a WebGPU renderer (NGNE-21) and an owned simulation worker boundary (NGNE-22) are grouped under the SoA and WebGPU migration epic (NGNE-23). Their contracts are written when each lands; nothing about them is a requirement yet. The pre-migration baseline they are measured against (NGNE-26) is recorded in [verification](verification.md#ngne-26--9-september-2026); NGNE-12 repeats it after migration.
 
 ## Next validation
 
-- Exercise the authoring API in another small game before expanding it.
+- Complete browser playthrough validation of the platformer before expanding the authoring API.
 - Validate physical touch and gamepad controls and additional browsers.
 - Add focused regression tests when those checks reveal defects.
 

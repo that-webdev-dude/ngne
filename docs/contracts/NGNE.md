@@ -203,6 +203,12 @@ Default step: 1/60 second; budget: five ticks per platform frame. Excess whole t
 
 `Frame` packs 13 float32 values per sprite: centered XY/size, normalized UV rectangle, RGBA, rotation radians. Sorting uses scene, layer, depth and insertion. Contiguous texture runs batch safely without texture-driven reordering. One drawArraysInstanced call per run. Reusable CPU/GPU buffers grow geometrically. There is no per-entity GPU object. Renderer sees no ECS or scene runtime.
 
+### Camera coordinates
+
+`camera.x/y` is the world position of the viewport's top-left. No-argument `cut()` copies current coordinates to previous coordinates without moving the camera. `cut(x, y)` assigns both current and previous coordinates to the supplied position. The engine's post-mount cut is the no-argument form, so scene setup must position the camera before returning.
+
+Migration: no API change; documents existing behaviour.
+
 Camera base and gameplay poses share interpolation; snapping happens after composing camera and pose, without simulation writes. Shake is a separate offset. Authors own previous/current component fields and register resets. Presentation systems that continue during freeze own separate particle values. Mounting initializes previous/current together.
 
 ### Interpolation and discontinuities

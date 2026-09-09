@@ -155,6 +155,24 @@ Await `app.start()` and `app.stop()` before issuing another start/stop call; ove
 
 The [boundary table](contracts/NGNE.md#interpolation-and-discontinuities) defines what NGNE does at each discontinuity; `/validation.html` includes selectable transition frames.
 
+### Scrolling camera and tile scenes
+
+Keep authored tiles in a scene-owned `Uint8Array` copy. Inside `setup(scene)`, with authored `level` data and a scene-owned `player` position component, initialize the camera before the first render and register follow after movement:
+
+```ts
+import { clamp } from "ngne";
+
+// Inside setup; tile size 16, viewport width 480 logical pixels.
+const tiles = scene.resource("tiles", level.tiles.slice());
+const maxX = Math.max(0, level.widthTiles * 16 - 480);
+scene.camera.x = clamp(player.x - 240, 0, maxX);
+scene.system(() => {
+    scene.camera.x = clamp(player.x - 240, 0, maxX);
+});
+```
+
+The [camera coordinate contract](contracts/NGNE.md#camera-coordinates) defines the origin and mount cut. The [platformer](../examples/platformer/README.md) adds vertical clamping, a horizontal dead-zone, visible-tile rendering and game-owned collision.
+
 ## Audio example
 
 After unlocking audio from a click or other user gesture, register a scope inside the scene's setup:

@@ -19,7 +19,7 @@ npm ci
 npm run dev
 ```
 
-Open the URL printed by Vite. Select **Start Flight** for a three-minute survival run. Open `/examples/hello/` for the minimal engine example.
+Open the URL printed by Vite. Select **Start Flight** for a three-minute survival run. Open `/examples/hello/` for the minimal engine example or `/examples/platformer/` for the [two-level platformer](examples/platformer/README.md).
 
 | Control                            | Action                              |
 | ---------------------------------- | ----------------------------------- |
@@ -88,6 +88,7 @@ GitHub Actions runs the format check, tests, typechecking and the build on pull 
 | [Roadmap](docs/roadmap.md)                        | Status, direction and deferred work                              |
 | [Verification](docs/verification.md)              | Dated evidence and hardware limits                               |
 | [Showcase design](demo/DESIGN.md)                 | Starfall '89 art direction                                       |
+| [Platformer](examples/platformer/README.md)       | Controls, demonstrated capabilities and authoring findings       |
 
 ## Contribute
 

@@ -1407,3 +1407,84 @@ test("platformer exit beats a simultaneous checkpoint and ready pause request", 
         harness.dispose();
     }
 });
+
+function walkthroughInput(
+    harness: Harness,
+    data: LevelData,
+    control: { jumpTicks: number },
+): InputSnapshot {
+    const position = player(harness.game, "position");
+    const body = player(harness.game, "body");
+    const x = number(position.x);
+    const y = number(position.y);
+    const right = x + number(body.w);
+    const bottom = y + number(body.h);
+    const column = Math.floor((right + 6) / TILE);
+    const floorRow = Math.floor((bottom + 1) / TILE);
+    let gap = true;
+    for (let row = floorRow; row < data.heightTiles; row++) {
+        const support = data.tiles[row * data.widthTiles + column];
+        if (support === 1 || support === 2) gap = false;
+    }
+    let danger = false;
+    for (let tileX = Math.floor(right / TILE); tileX <= Math.floor((right + 22) / TILE); tileX++)
+        for (let tileY = Math.floor(y / TILE); tileY <= Math.floor((bottom - 1) / TILE); tileY++)
+            if (data.tiles[tileY * data.widthTiles + tileX] === 3) danger = true;
+    for (let index = 1; index <= data.patrols.length; index++) {
+        const patrol = player(harness.game, "position", index);
+        const distance = number(patrol.x) - right;
+        if (distance >= -12 && distance <= 36 && Math.abs(number(patrol.y) - y) < TILE)
+            danger = true;
+    }
+    const jump = body.grounded === true && control.jumpTicks === 0 && (gap || danger);
+    if (jump) control.jumpTicks = 24;
+    const hold = control.jumpTicks > 0;
+    if (hold) control.jumpTicks--;
+    return createInput(hold ? ["ArrowRight", "Space"] : ["ArrowRight"], jump ? ["Space"] : []);
+}
+
+async function runAuthoredWalkthrough() {
+    const levels = [LEVEL_ONE, LEVEL_TWO];
+    const script = new Map<number, ScheduledTick>();
+    const harness = await createHarness(levels, script);
+    const control = { jumpTicks: 0 };
+    try {
+        for (let tick = 0; tick < 4000 && harness.game.state.level < 2; tick++) {
+            const data = levels[harness.game.state.level];
+            script.set(harness.game.simulationTick, {
+                input: walkthroughInput(harness, data, control),
+            });
+            await harness.frame();
+            assert.equal(
+                harness.game.state.deaths,
+                0,
+                `Walkthrough death at tick ${tick + 1}, level ${harness.game.state.level + 1}`,
+            );
+        }
+        assert.equal(harness.game.state.level, 2, "Both authored exits reached within 4000 ticks");
+        assert.equal(harness.game.scenes[0].definition, "platformer-complete");
+        assert.deepEqual(harness.game.state.completed, [true, true]);
+        assert.deepEqual(
+            harness.commands.map((entry) => entry.command),
+            [
+                { type: "checkpoint", checkpoint: 1 },
+                { type: "exit" },
+                { type: "checkpoint", checkpoint: 1 },
+                { type: "checkpoint", checkpoint: 2 },
+                { type: "exit" },
+            ],
+        );
+        return harness.game.enumerate();
+    } finally {
+        harness.dispose();
+    }
+}
+
+test("platformer deterministic reference walkthrough completes both authored levels without deaths", async (context) => {
+    const first = await runAuthoredWalkthrough();
+    const second = await runAuthoredWalkthrough();
+    assert.deepEqual(second, first);
+    context.diagnostic(
+        `Authored walkthrough: ${first.simulationTick} ticks, 0 deaths, both exits, identical repeated enumeration`,
+    );
+});

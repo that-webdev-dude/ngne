@@ -170,3 +170,13 @@ Accepted. Notes:
 - Level 2 geometry (two 5-tile gaps, spikes, three patrols, one-way rows) is plausible on paper; completability is proven in B3 by a headless walkthrough and then checked in a browser.
 
 Committed as `[NGNE-15] Add level progression, pause and completion overlays`.
+
+## Build round B3 — completability evidence + Phase 6 docs (same Codex thread)
+
+Codex added a deterministic test-only auto-player that completes both authored levels (1,448 ticks, 0 deaths, identical repeated enumeration; no level or controller changes needed), `examples/platformer/README.md`, README links, roadmap row/direction, the camera-coordinates contract section, a guide subsection and FINDINGS finalisation (#3 resolved).
+
+### Claude's review
+
+Re-ran format:check, typecheck, `npm test` (89/89), build and `git diff --check`: all pass. Doc facts land in their owning documents (exact camera semantics in the contract, usage in the guide, status in the roadmap, evidence pending in verification). Accepted.
+
+Committed as `[NGNE-15] Add authored-level walkthrough and platformer documentation`. Next: Claude's browser session, then `docs/verification.md`.
