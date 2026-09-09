@@ -1,5 +1,101 @@
 # NGNE verification
 
+## NGNE-26 — 9 September 2026
+
+Pre-migration performance baseline for NGNE-12 to compare against after the SoA
+(NGNE-20) and WebGPU (NGNE-21) migrations. Revision **`6e14e2e`** (the NGNE-25
+documentation commit; the last engine change was NGNE-6). Windows 11 x64 10.0.26200,
+12th Gen Intel Core i7-12650H (16 logical cores), 16 GiB, Node v24.15.0. Only
+`tests/benchmark.ts` reporting changed and `tests/browser-baseline.ts` was added; no
+engine, demo or example code changed.
+
+### Harness (`npm run bench`)
+
+Same workloads and seeds as every earlier entry: a 20,000-entity position/velocity
+ECS pass with 100 warmup and 300 sampled iterations, then Chaos Lab (`arena({ stress:
+true })`, seed `bench`) for 900 ticks of `tick` + `render` + `sort` at alpha 0.5,
+sampling ticks 101–899 (799 samples). The harness now prints the full distribution
+(min/p50/p90/p95/p99/max/mean), the sampled tick count that exceeded one 60 Hz step
+(16.67 ms), the revision and the CPU. Two consecutive runs on an otherwise idle machine:
+
+| Workload, ms                   | Run |   min |   p50 |   p90 |   p95 |   p99 |   max |  mean |
+| ------------------------------ | --- | ----: | ----: | ----: | ----: | ----: | ----: | ----: |
+| 20,000-entity ECS pass         | 1   | 0.228 | 0.420 | 0.862 | 0.960 | 2.375 | 4.504 | 0.538 |
+| 20,000-entity ECS pass         | 2   | 0.229 | 0.421 | 0.476 | 0.525 | 0.644 | 2.907 | 0.383 |
+| Chaos simulation + preparation | 1   | 0.557 | 0.697 | 0.927 | 1.172 | 1.466 | 1.695 | 0.737 |
+| Chaos simulation + preparation | 2   | 0.550 | 0.694 | 0.950 | 1.125 | 1.443 | 1.958 | 0.742 |
+
+Both runs peaked at **7,209 sprites and 6,986 entity slots** with **0 ticks over
+budget**. The ECS tail differs between runs (p90 0.86 vs 0.48 ms) while medians agree
+to 1 µs; treat p50 as the stable comparison point and the tail as run noise on this
+machine. CPU only: no GPU submission, display or input polling. Dropped ticks are a
+host-loop measure and are reported by the browser run below.
+
+### Starfall sustained browser run (`npx tsx tests/browser-baseline.ts`)
+
+Production build served by `npm run preview` at `http://127.0.0.1:4173/`, loaded in a
+fresh-profile headful **Chrome 152.0.7977.83** launched with
+`--remote-debugging-port`, `--enable-precise-memory-info` and a 1280 × 900 window
+(1264 × 805 viewport, DPR 1). GPU: ANGLE Direct3D 11 on **Intel UHD Graphics
+(0x46A3)**, the integrated GPU. The driver injects a `requestAnimationFrame` wrapper
+before the page loads so every host frame callback (tick, frame preparation, WebGL
+submission and the showcase's DOM telemetry update) is timed, samples
+`performance.memory` every 250 ms, counts long tasks, clicks **Chaos Lab** through a
+DevTools input event (a real gesture, required by the audio unlock), waits 10 s, forces
+a garbage collection, then samples for 60 s and forces another collection.
+
+Two consecutive runs, each a fresh browser launch:
+
+| Metric                                    | Run 1                          | Run 2                          |
+| ----------------------------------------- | ------------------------------ | ------------------------------ |
+| Frames in the sampled 60.0 s              | 3,600                          | 3,601                          |
+| Frame interval, ms (min/p50/p99/max)      | 15.3 / 16.7 / 17.2 / 17.9      | 15.9 / 16.7 / 17.0 / 17.5      |
+| Frame intervals over 25 ms                | 0                              | 0                              |
+| Host frame callback, ms (p50/p90/p95/p99) | 4.40 / 6.10 / 6.70 / 7.80      | 2.70 / 5.30 / 6.10 / 7.70      |
+| Host frame callback, ms (min/max/mean)    | 1.0 / 10.5 / 4.31              | 1.0 / 12.9 / 3.03              |
+| Dropped ticks during the sample           | **0** (counter 5 before/after) | **0** (counter 6 before/after) |
+| Long tasks (> 50 ms) during the sample    | 2                              | 2                              |
+| Sprites at start / end                    | 6,982 / 6,628                  | 6,978 / 6,630                  |
+| Used JS heap, MiB (min/max)               | 4.50 / 17.42                   | 4.36 / 17.40                   |
+| Garbage collections (heap drops) in 60 s  | 151, reclaiming 430 MiB        | 149, reclaiming 400 MiB        |
+| Allocation churn, MiB/s (reclaimed/time)  | 7.2                            | 6.7                            |
+| Retained heap after forced GC, MiB        | 4.80 → 6.48                    | 5.62 → 6.06                    |
+
+The 5–6 cumulative dropped ticks occurred during the first seconds after launching
+Chaos Lab (scene publication and first-frame growth), before sampling started. Frame
+callback time includes the showcase's `updateUI` DOM writes, so it is an upper bound
+on engine host work. Display pacing, dropped ticks and allocation churn repeat closely; the frame-callback
+median differs by 1.7 ms between runs (4.40 vs 2.70 ms) on this laptop CPU, so p95/p99
+(within 0.6 ms) are the steadier comparison points. The ≈ 7 MiB/s allocation churn is
+the baseline characteristic
+NGNE-12 compares against; the two known per-frame allocation sources are
+`getUniformLocation` per frame and the two `subarray` views per sprite in
+`Renderer.render` (`src/renderer.ts`), recorded here as characteristics, not fixes.
+Retained heap after forced GC grew +1.7 MiB in run 1 and +0.4 MiB in run 2 over one
+minute: consistent with capacity growth following peak demand plus sampling noise, not
+evidence of a leak either way; NGNE-12 should repeat the forced-GC comparison over a
+longer window.
+
+Method notes: an earlier attempt inside the embedded Claude browser pane was
+discarded because the hidden pane throttled `requestAnimationFrame` (9 frames in
+14 s, 2,065 dropped ticks); the driver therefore uses a visible real browser window.
+Full JSON outputs for both harness runs and both browser runs were kept outside the
+repository; the tables above are copied from them without rounding beyond three
+decimals.
+
+### Platformer
+
+NGNE-15 is not started, so no platformer baseline exists. When the platformer is
+playable, run `tests/browser-baseline.ts` against it (point `NGNE_URL` at its page and
+adapt the launch click) on the last pre-migration revision and append the result to
+this section before NGNE-20 or NGNE-21 change hot paths.
+
+### Checks
+
+`npm run typecheck`, `npm test`, `npm run build` and `npm run format:check` after the
+harness change. `tests/browser-baseline.ts` is a Node script run through `tsx` like
+the benchmark; it is not part of `npm test`.
+
 ## NGNE-25 — 8 September 2026
 
 Windows x64, Node v24.15.0. Documentation-only change; no engine, demo or example

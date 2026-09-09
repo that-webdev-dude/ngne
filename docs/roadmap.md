@@ -24,7 +24,7 @@ NGNE 0.1 is an early engine baseline with a playable showcase. The public API ma
 ## Direction
 
 - A second game on the current engine (epic NGNE-17): the two-level platformer (NGNE-15) exercises the authoring API before it expands.
-- Typed-array SoA component storage (NGNE-20), a WebGPU renderer (NGNE-21) and an owned simulation worker boundary (NGNE-22) are grouped under the SoA and WebGPU migration epic (NGNE-23). Their contracts are written when each lands; nothing about them is a requirement yet.
+- Typed-array SoA component storage (NGNE-20), a WebGPU renderer (NGNE-21) and an owned simulation worker boundary (NGNE-22) are grouped under the SoA and WebGPU migration epic (NGNE-23). Their contracts are written when each lands; nothing about them is a requirement yet. The pre-migration baseline they are measured against (NGNE-26) is recorded in [verification](verification.md#ngne-26--9-september-2026); NGNE-12 repeats it after migration.
 
 ## Next validation
 
