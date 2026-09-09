@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>NGNE · Platformer</title>
+        <style>
+            :root {
+                color-scheme: dark;
+                font-family: system-ui, sans-serif;
+                color: #e7eee7;
+                background: #172720;
+            }
+            body {
+                margin: 0;
+                padding: 24px;
+            }
+            main {
+                max-width: 960px;
+                margin: 0 auto;
+            }
+            header,
+            .hud {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: baseline;
+                justify-content: space-between;
+                gap: 16px;
+            }
+            h1 {
+                font-size: 1.5rem;
+                margin: 0 0 24px;
+            }
+            a {
+                color: #b8d8cc;
+            }
+            .hud {
+                padding: 12px 0;
+                font-variant-numeric: tabular-nums;
+            }
+            canvas {
+                display: block;
+                width: 100%;
+                aspect-ratio: 16 / 9;
+                image-rendering: pixelated;
+                background: #20362d;
+            }
+            canvas:focus-visible,
+            button:focus-visible,
+            a:focus-visible {
+                outline: 3px solid #f5cf72;
+                outline-offset: 4px;
+            }
+            button {
+                padding: 12px 20px;
+                font: inherit;
+                color: #172720;
+                background: #f5cf72;
+                border: 0;
+                cursor: pointer;
+            }
+            button:hover {
+                background: #ffe3a0;
+            }
+            button:disabled {
+                cursor: default;
+                background: #849087;
+            }
+            .controls {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 16px;
+                margin-top: 20px;
+            }
+            p {
+                line-height: 1.6;
+                max-width: 70ch;
+            }
+            #error {
+                color: #ffb39e;
+            }
+            [hidden] {
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <header>
+                <h1>Platformer</h1>
+                <a href="../../">Starfall '89</a>
+            </header>
+            <div class="hud" aria-label="Run progress">
+                <span id="progress">Level 1 · Attempt 1 · Start</span
+                ><span id="status" role="status">Ready</span>
+            </div>
+            <canvas
+                id="game"
+                width="480"
+                height="270"
+                tabindex="0"
+                aria-label="Platformer game. Move with arrow keys or A and D; jump with Space."
+            ></canvas>
+            <div class="controls">
+                <button id="start" type="button">Start level 1</button
+                ><button
+                    id="pause"
+                    type="button"
+                    disabled
+                    title="Pause arrives with the next slice"
+                >
+                    Pause
+                </button>
+            </div>
+            <p>
+                Move: A / D or arrow keys. Jump: Space, W or up arrow. Hold to jump higher. Reach
+                the blue gate; yellow flags save your checkpoint.
+            </p>
+            <p>Playable slice: level 1. Pause and the second level are not available yet.</p>
+            <section id="overlay" hidden aria-label="Game message">
+                <h2 id="overlay-title"></h2>
+                <p id="overlay-copy"></p>
+            </section>
+            <p id="error" role="alert" hidden></p>
+            <a id="reload" href="./" hidden>Reload level</a>
+        </main>
+        <script type="module" src="./main.ts"></script>
+    </body>
+</html>

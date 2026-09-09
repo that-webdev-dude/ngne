@@ -16,6 +16,7 @@ export default defineConfig(({ command }) => ({
             input: {
                 game: "index.html",
                 hello: "examples/hello/index.html",
+                platformer: "examples/platformer/index.html",
             },
         },
     },

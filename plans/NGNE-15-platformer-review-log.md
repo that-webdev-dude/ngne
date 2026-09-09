@@ -132,3 +132,25 @@ VERDICT: APPROVED
 ## Outcome
 
 Converged: **APPROVED after 4 rounds** (3 REVISE, 1 APPROVED). 21 findings raised, 21 accepted, 0 rejected. Implementation not started; awaiting human gate #2.
+
+# Build Log: NGNE-15 — Codex builds, Claude reviews
+
+Human gate #2: user chose "Codex implements the plan, Claude reviews" (2026-09-09). Plan committed as `c6e693f`. NGNE-15 transitioned to In Progress. Codex runs with `-s workspace-write`, `approval_policy=never`, a fresh thread per build; each round covers one plan phase, then Claude reviews the diff and runs the checks before committing.
+
+## Build round B1 — Phase 1 (Codex thread 01a0878b-5d8f-78b0-94fd-244b2c6969ff)
+
+Codex delivered `examples/platformer/{index.html,levels.ts,collision.ts,game.ts,transitions.ts,main.ts,FINDINGS.md}`, `tests/platformer.test.ts` (12 tests) and the Vite entry. No `src/`, docs or git changes.
+
+### Claude's review
+
+Independently re-ran `npm run format:check`, `npm run typecheck`, `npm test` (66/66) and `npm run build` (platformer entry emitted): all pass. Read every file.
+
+Accepted. Observations carried into B2 (none blocking):
+- Scene definition id is `platformer-level` for both levels; use `platformer-level-${index}` so definition identity differs per authored level (contract: one compatible definition per ID).
+- FINDINGS #5 (nonempty `Uint8Array` cannot be frozen) accepted as a documented convention; scenes copy the bytes.
+- `exiting` on level 1 currently waits forever because no `next`/`complete` candidate exists yet — expected for the slice, closed by Phase 2.
+- `onView` allocates a frozen copy per render; acceptable for an example and consistent with Starfall.
+- Authority handles exit contact and candidate consumption in the same tick when the handle is already ready; consistent with the plan's "travel together" rule.
+- Browser playthrough deliberately deferred to Phase 5; jump reach (≈102 px at full speed vs 80 px widest gap) is plausible on paper.
+
+Committed as `[NGNE-15] Add playable platformer slice`.
