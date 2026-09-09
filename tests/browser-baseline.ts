@@ -4,8 +4,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 /**
- * Sustained Starfall Chaos Lab measurement in a real headful Chromium, driven over the
- * DevTools protocol so the same warmup, duration and sampling can be repeated later.
+ * Sustained browser measurement in a real headful Chromium, driven over the DevTools
+ * protocol so the same warmup, duration and sampling can be repeated later.
  *
  * Usage: `npx tsx tests/browser-baseline.ts` against a running `npm run preview`.
  * Environment: NGNE_BROWSER (Chromium executable), NGNE_URL (default preview origin),
@@ -18,6 +18,7 @@ const BROWSER =
     WARMUP_SECONDS = Number(process.env.NGNE_WARMUP_SECONDS ?? 10),
     DURATION_SECONDS = Number(process.env.NGNE_DURATION_SECONDS ?? 60),
     DEBUG_PORT = 9333;
+const IS_PLATFORMER = new URL(URL_UNDER_TEST).pathname.includes("/examples/platformer/");
 const HOOK = `(() => {
     const raw = window.requestAnimationFrame.bind(window);
     const b = (window.__ngneBaseline = { frames: [], heap: [], longTasks: 0, visibility: [] });
@@ -102,11 +103,11 @@ const SUMMARY = `((startMs, endMs) => {
     };
 })`;
 const READ_UI = `({
-    status: document.getElementById("engine-status").textContent,
-    flight: document.getElementById("flight-state").textContent,
-    sprites: document.getElementById("sprites").textContent,
-    fps: document.getElementById("fps").textContent,
-    error: document.getElementById("error").textContent,
+    status: document.getElementById("engine-status")?.textContent ?? document.getElementById("game")?.dataset.droppedTicks ?? "0",
+    flight: document.getElementById("flight-state")?.textContent ?? [document.getElementById("progress")?.textContent, document.getElementById("status")?.textContent].filter(Boolean).join(" · "),
+    sprites: document.getElementById("sprites")?.textContent ?? document.getElementById("game")?.dataset.sprites ?? "",
+    fps: document.getElementById("fps")?.textContent ?? document.getElementById("game")?.dataset.fps ?? "",
+    error: document.getElementById("error")?.textContent ?? "",
     now: performance.now(),
 })`;
 interface UiSnapshot {
@@ -142,9 +143,19 @@ try {
     await page.send("HeapProfiler.enable");
     await page.send("Page.addScriptToEvaluateOnNewDocument", { source: HOOK });
     await page.send("Page.navigate", { url: URL_UNDER_TEST });
-    await waitFor(page, `document.getElementById("play").textContent === "START FLIGHT"`);
-    await click(page, "chaos");
-    await waitFor(page, `document.getElementById("flight-state").textContent.includes("CHAOS")`);
+    await page.send("Page.bringToFront");
+    if (IS_PLATFORMER) {
+        await waitFor(page, `document.getElementById("start")?.textContent === "Start level 1"`);
+        await click(page, "start");
+        await waitFor(page, `document.getElementById("status")?.textContent !== "Ready"`);
+    } else {
+        await waitFor(page, `document.getElementById("play")?.textContent === "START FLIGHT"`);
+        await click(page, "chaos");
+        await waitFor(
+            page,
+            `document.getElementById("flight-state")?.textContent.includes("CHAOS")`,
+        );
+    }
     await sleep(WARMUP_SECONDS * 1000);
     await page.send("HeapProfiler.collectGarbage");
     const afterWarmup = await page.evaluate<number>("performance.memory.usedJSHeapSize");
@@ -161,7 +172,9 @@ try {
             {
                 revision: revision(),
                 url: URL_UNDER_TEST,
-                workload: "Starfall Chaos Lab (stress arena, seed STARFALL-1989)",
+                workload: IS_PLATFORMER
+                    ? "Platformer level 1 (idle player, active patrols, seed NGNE-15)"
+                    : "Starfall Chaos Lab (stress arena, seed STARFALL-1989)",
                 warmupSeconds: WARMUP_SECONDS,
                 sampledSeconds: (end.now - begin.now) / 1000,
                 ...summary,
@@ -252,17 +265,15 @@ async function waitFor(page: Page, condition: string): Promise<void> {
     const state = await page.evaluate<UiSnapshot>(READ_UI);
     throw new Error(`Timed out waiting for ${condition}; page state ${JSON.stringify(state)}`);
 }
-/** Real input events count as a user gesture, which the audio unlock needs. */
+/** Preserve the user-gesture boundary required by audio unlock. */
 async function click(page: Page, id: string): Promise<void> {
-    const [x, y] = await page.evaluate<[number, number]>(
-        `(() => { const r = document.getElementById(${JSON.stringify(id)}).getBoundingClientRect();
-            return [r.x + r.width / 2, r.y + r.height / 2]; })()`,
-    );
-    for (const type of ["mousePressed", "mouseReleased"])
-        await page.send("Input.dispatchMouseEvent", { type, x, y, button: "left", clickCount: 1 });
+    await page.send("Runtime.evaluate", {
+        expression: `document.getElementById(${JSON.stringify(id)}).click()`,
+        userGesture: true,
+    });
 }
 function droppedTicks(status: string): number {
-    return Number(/(\d+) TICKS DROPPED/.exec(status)?.[1] ?? 0);
+    return Number(/(\d+) TICKS DROPPED/.exec(status)?.[1] ?? (/^\d+$/.test(status) ? status : 0));
 }
 function revision(): string {
     try {

@@ -73,7 +73,7 @@ npm run preview
 
 `npm run format` applies Prettier; `.editorconfig` and `.gitattributes` keep 4-space indentation and LF line endings on every platform.
 
-During development, `/validation.html` exercises real WebGL pixels, batching, context loss/restoration and browser lifecycle. This page is excluded from the production build. `npm run bench` measures CPU workloads, not GPU time or universal frame-rate guarantees; `npx tsx tests/browser-baseline.ts` drives a sustained Chaos Lab run in a real Chromium against `npm run preview` and reports frame-time, dropped-tick and heap distributions. Recorded results live in [verification](docs/verification.md).
+During development, `/validation.html` exercises real WebGL pixels, batching, context loss/restoration and browser lifecycle. This page is excluded from the production build. `npm run bench` measures CPU workloads, not GPU time or universal frame-rate guarantees; `npx tsx tests/browser-baseline.ts` drives sustained Starfall or platformer runs in a real Chromium against `npm run preview` and reports frame-time, dropped-tick and heap distributions. Recorded results live in [verification](docs/verification.md).
 
 GitHub Actions runs the format check, tests, typechecking and the build on pull requests and pushes to `main`. Successful main builds deploy the showcase to GitHub Pages. See [verification evidence and hardware limits](docs/verification.md).
 

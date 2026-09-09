@@ -66,18 +66,19 @@ tuned; the 25 in-browser deaths are driver timing, not defects.
   hidden-tab test.
 - Human difficulty is not established; the reference walkthrough and the scripted
   browser runs show completability by the physics, not balance.
-- No performance measurement: NGNE-26 owns the platformer baseline.
+- Performance measurement was outside this ticket and is recorded under
+  [NGNE-26](#ngne-26--9-september-2026).
 - `/validation.html` was not re-run: no engine, renderer or browser-host code changed,
   and the NGNE-6 interpolation suite passes in `npm test`.
 
 ## NGNE-26 — 9 September 2026
 
 Pre-migration performance baseline for NGNE-12 to compare against after the SoA
-(NGNE-20) and WebGPU (NGNE-21) migrations. Revision **`6e14e2e`** (the NGNE-25
-documentation commit; the last engine change was NGNE-6). Windows 11 x64 10.0.26200,
-12th Gen Intel Core i7-12650H (16 logical cores), 16 GiB, Node v24.15.0. Only
-`tests/benchmark.ts` reporting changed and `tests/browser-baseline.ts` was added; no
-engine, demo or example code changed.
+(NGNE-20) and WebGPU (NGNE-21) migrations. The harness and Starfall baseline use
+revision **`6e14e2e`** (the NGNE-25 documentation commit; the last engine change was
+NGNE-6). The platformer append uses **`058c559`**, the completed NGNE-15 revision; no
+engine code changed between them. Windows 11 x64 10.0.26200, 12th Gen Intel Core
+i7-12650H (16 logical cores), 16 GiB, Node v24.15.0.
 
 ### Harness (`npm run bench`)
 
@@ -155,16 +156,45 @@ decimals.
 
 ### Platformer
 
-NGNE-15 is not started, so no platformer baseline exists. When the platformer is
-playable, run `tests/browser-baseline.ts` against it (point `NGNE_URL` at its page and
-adapt the launch click) on the last pre-migration revision and append the result to
-this section before NGNE-20 or NGNE-21 change hot paths.
+Production build at revision **`058c559`** served by the same preview server and run in
+the same Chrome, GPU, window, viewport and DPR as Starfall. The driver opened
+`/examples/platformer/?baseline`, used a DevTools user gesture to start level 1, then
+measured an idle player at the start while all level systems and patrols remained
+active. The `baseline` query enables app-host telemetry for dropped ticks, sprites and
+smoothed FPS; it does not change simulation or rendering. Warmup, sample duration,
+frame timing, heap sampling and forced-GC method match the Starfall run.
+
+Two consecutive runs, each a fresh browser launch:
+
+| Metric                                    | Run 1                     | Run 2                     |
+| ----------------------------------------- | ------------------------- | ------------------------- |
+| Frames in the sampled 60.0 s              | 3,601                     | 3,601                     |
+| Frame interval, ms (min/p50/p99/max)      | 15.7 / 16.7 / 16.9 / 17.7 | 15.5 / 16.7 / 17.0 / 17.8 |
+| Frame intervals over 25 ms                | 0                         | 0                         |
+| Host frame callback, ms (p50/p90/p95/p99) | 0.4 / 0.7 / 0.9 / 1.1     | 0.5 / 1.0 / 1.1 / 1.5     |
+| Host frame callback, ms (min/max/mean)    | 0.1 / 1.7 / 0.454         | 0.1 / 2.4 / 0.568         |
+| Dropped ticks during the sample           | **0** (counter 2)         | **0** (counter 2)         |
+| Long tasks (> 50 ms) during the sample    | 1                         | 1                         |
+| Sprites at start / end                    | 63 / 63                   | 63 / 63                   |
+| Used JS heap, MiB (min/max)               | 1.92 / 3.29               | 1.88 / 3.67               |
+| Garbage collections (heap drops) in 60 s  | 51, reclaiming 31.0 MiB   | 51, reclaiming 30.4 MiB   |
+| Allocation churn, MiB/s (reclaimed/time)  | 0.516                     | 0.506                     |
+| Retained heap after forced GC, MiB        | 1.77 → 1.97               | 1.77 → 1.97               |
+
+Both runs remained on level 1 at the start with no deaths or page error. The two
+cumulative dropped ticks occurred during launch before warmup and sampling. Retained
+heap grew about 0.20 MiB in each run; this one-minute local measurement is baseline
+evidence, not proof of leak absence. The idle level-one workload is intentionally
+reproducible and substantially lighter than Chaos Lab; it is not a worst-case
+platformer claim.
 
 ### Checks
 
-`npm run typecheck`, `npm test`, `npm run build` and `npm run format:check` after the
+`npm run typecheck`, `npm test`, `npm run build` and `npm run format:check` after each
 harness change. `tests/browser-baseline.ts` is a Node script run through `tsx` like
-the benchmark; it is not part of `npm test`.
+the benchmark; it is not part of `npm test`. The platformer append also ran two full
+driver samples after a one-second launch probe; the earlier failed launch attempts
+produced no measurements and exposed a synthetic-click issue fixed in the driver.
 
 ## NGNE-25 — 8 September 2026
 

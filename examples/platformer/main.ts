@@ -17,6 +17,7 @@ if (
 const gameCanvas = canvas;
 const startButton = start;
 const pauseButton = pause;
+const recordsBaseline = new URLSearchParams(location.search).has("baseline");
 // Presentation only. Scene resources and committed state own every gameplay decision.
 let presentation: Run["phase"] | "ready" | "paused" | "complete" | "error" = "ready";
 let errorMessage: string | undefined;
@@ -28,7 +29,12 @@ const app = new BrowserGame<Progress, ProgressCommand>({
     seed: "NGNE-15",
     state: createProgress(),
     transition,
-    afterFrame: () => {
+    afterFrame: (stats) => {
+        if (recordsBaseline) {
+            gameCanvas.dataset.droppedTicks = String(stats.droppedTicks);
+            gameCanvas.dataset.sprites = String(stats.sprites);
+            gameCanvas.dataset.fps = String(stats.fps);
+        }
         registry.reconcile(app.game);
         updateHud();
     },

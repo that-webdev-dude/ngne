@@ -21,10 +21,11 @@ NGNE 0.1 is an early engine baseline with a playable showcase. The public API ma
 | NGNE-5  | Simulation-state ownership inventory; enumeration adds `dt` and archetype order                                                    | `tests/ownership.test.ts`                                                             |
 | NGNE-6  | Alpha 1 through suspension and host resume; continuing hitstop effects interpolate                                                 | `tests/interpolation.test.ts`, `tests/browser-interpolation-checks.ts`                |
 | NGNE-15 | Two-level platformer: tile collision, checkpoints, death remounts, pause and progression; deterministic authored-level walkthrough | `tests/platformer.test.ts`                                                            |
+| NGNE-26 | Pre-migration harness, sustained Starfall and sustained platformer performance baselines                                           | `tests/benchmark.ts`, `tests/browser-baseline.ts`, `docs/verification.md`             |
 
 ## Direction
 
-- The [two-level platformer](../examples/platformer/README.md) (NGNE-15, epic NGNE-17) now exercises the current authoring API. Its [findings](../examples/platformer/FINDINGS.md) feed NGNE-7/9/10/23/16; platformer performance measurement remains separate NGNE-26 work.
+- The [two-level platformer](../examples/platformer/README.md) (NGNE-15, epic NGNE-17) now exercises the current authoring API. Its [findings](../examples/platformer/FINDINGS.md) feed NGNE-7/9/10/23/16; its pre-migration performance measurement is recorded under NGNE-26.
 - Typed-array SoA component storage (NGNE-20), a WebGPU renderer (NGNE-21) and an owned simulation worker boundary (NGNE-22) are grouped under the SoA and WebGPU migration epic (NGNE-23). Their contracts are written when each lands; nothing about them is a requirement yet. The pre-migration baseline they are measured against (NGNE-26) is recorded in [verification](verification.md#ngne-26--9-september-2026); NGNE-12 repeats it after migration.
 
 ## Next validation
