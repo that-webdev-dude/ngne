@@ -180,3 +180,13 @@ Codex added a deterministic test-only auto-player that completes both authored l
 Re-ran format:check, typecheck, `npm test` (89/89), build and `git diff --check`: all pass. Doc facts land in their owning documents (exact camera semantics in the contract, usage in the guide, status in the roadmap, evidence pending in verification). Accepted.
 
 Committed as `[NGNE-15] Add authored-level walkthrough and platformer documentation`. Next: Claude's browser session, then `docs/verification.md`.
+
+## Phase 5 — Claude's browser session and verification record
+
+Chrome 152.0.7977.83 against `npm run dev`, driven through the Claude in Chrome extension with page-world `KeyboardEvent`s on the canvas for held keys. Both authored levels were completed in the browser (level 2 after four failed timed runs: the first timelines mis-modelled the first patrol's direction and left a 4 px margin on the first spikes), plus death/remount, checkpoints, pause by P/Escape/button, resume by button, completion overlay and restart. Tab-hide pause could not be observed through the extension and is recorded as covered by the headless test only. No engine or example console errors. One new finding (#9): a `keydown` with no element target throws inside `Input.attach`'s listener; documented for NGNE-9, not a gameplay defect.
+
+`docs/verification.md` gained the dated NGNE-15 section; roadmap "Next validation" updated. Final checks: format, typecheck, 89/89 tests. Committed as `[NGNE-15] Record platformer verification and findings`.
+
+## Outcome
+
+Plan: 4 review rounds, 21/21 findings accepted. Build: 3 Codex rounds, all accepted by Claude after independent checks, zero engine changes, 23 tests added. Jira NGNE-15 left In Progress for the user's Done decision; NGNE-26 owns the platformer performance measurement.

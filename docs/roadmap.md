@@ -29,8 +29,7 @@ NGNE 0.1 is an early engine baseline with a playable showcase. The public API ma
 
 ## Next validation
 
-- Complete browser playthrough validation of the platformer before expanding the authoring API.
-- Validate physical touch and gamepad controls and additional browsers.
+- Validate physical touch and gamepad controls and additional browsers for both games; the platformer's Chrome session is recorded in [verification](verification.md#ngne-15--9-september-2026).
 - Add focused regression tests when those checks reveal defects.
 
 ## Deferred

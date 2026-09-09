@@ -1,5 +1,75 @@
 # NGNE verification
 
+## NGNE-15 — 9 September 2026
+
+Two-level platformer example (`examples/platformer/`) built on the current engine
+from the Codex-reviewed plan in `plans/NGNE-15-platformer.md`; the argument and
+build log are in `plans/NGNE-15-platformer-review-log.md`. Windows 11 x64 10.0.26200,
+Node v24.15.0. Commits `c6e693f` (plan), `5144c58`, `329a6c5`, `01d1dad` and this
+record. No `src/` change: no engine defect was reproduced. Authoring friction is
+recorded in [examples/platformer/FINDINGS.md](../examples/platformer/FINDINGS.md).
+
+### Automated checks
+
+- `npm run format:check`, `npm run typecheck`, `npm run build`, `git diff --check`:
+  passed. The build emits `dist/examples/platformer/index.html` alongside Starfall and
+  hello.
+- `npm test`: 89 tests passed (66 before this ticket, 23 added in
+  `tests/platformer.test.ts`). Coverage: tile collision (no tunnelling at the fall-speed
+  clamp, one-way platforms, side walls, open top, spikes, fall-out line), controller
+  (coyote 6 ticks, jump buffer 6 ticks, held-input jump cut), patrol turning and
+  lethality, transition authority precedence (fatal > exit > checkpoint > pause),
+  death remount from committed checkpoint, exit/complete/restart with each durable
+  command dispatched once, latched pause through candidate replenishment, candidate
+  registry release on replacement, completion, restart, stop, disposal and late
+  same-key delivery, failed-preparation retry, failed-mount terminal phase,
+  host-driven determinism at every tick, first-frame camera placement, alpha-1
+  rendering through pause and the pop frame, scoped audio cues, and a deterministic
+  reference walkthrough that completes both authored levels in 1,448 ticks with zero
+  deaths and identical repeated enumeration.
+- Existing suites (`interpolation`, `simulation.contract`, `lifecycle`, `state`,
+  `ownership`, `game`) unchanged and passing; Starfall code untouched.
+
+### Browser session
+
+`npm run dev` (Vite 7.3.6) at `http://127.0.0.1:5178/examples/platformer/` in
+**Chrome 152.0.7977.83**, viewport 958 × 854, DPR 1, GPU `ANGLE (Intel, Intel(R) UHD
+Graphics (0x000046A3) Direct3D11)`. Driven through the Claude in Chrome extension:
+real clicks and single key presses through the extension, held keys through
+`KeyboardEvent`s dispatched on the canvas from a page-world script (they bubble to the
+engine's `window` listener exactly like physical keys). Observed through the HUD text,
+which reads `game.state` every frame, and screenshots.
+
+| Check                                                               | Result                                                                                                              |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Page load, Start button (audio unlock gesture), first frame         | Passed; HUD `Level 1 · Attempt 1 · Start · Deaths 0 · Runs 0`                                                       |
+| Movement, jump, camera follow                                       | Passed; player crosses the level, camera scrolls with dead-zone                                                     |
+| Death by falling, remount at start                                  | Passed; `Attempt 2 · Deaths 1`, player at start, held key still applied                                             |
+| Level 1 completed (timed script: two gap jumps)                     | Passed; checkpoint 1 then exit, level 2 mounted with progress carried                                               |
+| Level 2 completed (timed script: patrol, spikes, gap, one-way rows) | Passed after four failed timelines (25 deaths total); checkpoints 1 and 2, exit, `Game complete` overlay            |
+| Completion overlay, Pause disabled, Play again shown                | Passed                                                                                                              |
+| Restart from completion                                             | Passed; `Level 1 · Attempt 1 · Start · Deaths 0 · Runs 1`                                                           |
+| Pause by P key, by Escape key, by DOM button                        | Passed; dimmed frame at alpha 1, HUD `Paused`, button reads `Resume`                                                |
+| Resume by DOM button                                                | Passed; simulation continues, no visible pose jump                                                                  |
+| Frozen frame during pause shows last committed poses                | Passed (screenshot mid-jump while paused)                                                                           |
+| Tab-hide pause                                                      | **Not verified**: switching tabs through the extension did not leave the page hidden long enough to observe a pause |
+| Console errors from the example or engine                           | None; the only exceptions came from the test driver before it targeted the canvas (see FINDINGS #9)                 |
+
+Death timing measured from the HUD matched the fixed-step model to within one frame
+(first patrol contact 2,350–2,370 ms after remount), which is how the timelines were
+tuned; the 25 in-browser deaths are driver timing, not defects.
+
+### Limits
+
+- Physical gamepad (`axes[0]`, `Pad0`, `Pad9`), touch, additional browsers and audible
+  output were not tested. The tab-hide pause path is covered only by the headless
+  hidden-tab test.
+- Human difficulty is not established; the reference walkthrough and the scripted
+  browser runs show completability by the physics, not balance.
+- No performance measurement: NGNE-26 owns the platformer baseline.
+- `/validation.html` was not re-run: no engine, renderer or browser-host code changed,
+  and the NGNE-6 interpolation suite passes in `npm test`.
+
 ## NGNE-26 — 9 September 2026
 
 Pre-migration performance baseline for NGNE-12 to compare against after the SoA
