@@ -1,7 +1,7 @@
-import type { Game, PreparedScene, SceneDefinition } from "ngne";
+import type { Audio, Game, PreparedScene, SceneDefinition } from "ngne";
 
 import { createLevel } from "./game.js";
-import type { Progress, ProgressCommand, Run } from "./game.js";
+import type { OverlayOptions, Progress, ProgressCommand, Run } from "./game.js";
 import type { LevelData } from "./levels.js";
 
 type Purpose = "respawn" | "next" | "complete" | "restart" | "pause";
@@ -18,15 +18,11 @@ interface CandidateRecord {
     retries: number;
 }
 
-export interface OverlayOptions {
-    readonly restart: () => PreparedScene | undefined;
-    readonly takeIntent: (intent: Intent) => boolean;
-}
-
 export interface RegistryOptions {
     readonly levels: readonly LevelData[];
+    readonly audio?: Pick<Audio, "scene">;
     readonly onView?: (view: Readonly<Run>) => void;
-    /** Omitted in the playable slice; Phase 2 supplies pause/completion scenes. */
+    readonly onOverlayView?: OverlayOptions["onView"];
     readonly overlay?: (kind: "pause" | "complete", options: OverlayOptions) => Definition;
     readonly prepare?: (
         game: Game<Progress, ProgressCommand>,
@@ -69,7 +65,9 @@ export function createTransitionRegistry(options: RegistryOptions): TransitionRe
         const data = options.levels[index];
         if (!data) throw new Error(`Missing level ${index}`);
         return createLevel({
+            index,
             data,
+            audio: options.audio,
             onView: options.onView,
             respawn: () => take("respawn"),
             next: () => take("next") ?? take("complete"),
@@ -77,7 +75,11 @@ export function createTransitionRegistry(options: RegistryOptions): TransitionRe
             takePauseIntent: () => takeIntent("pause"),
         });
     };
-    const overlayOptions: OverlayOptions = { restart: () => take("restart"), takeIntent };
+    const overlayOptions: OverlayOptions = {
+        restart: () => take("restart"),
+        takeIntent,
+        onView: options.onOverlayView,
+    };
     const prepare = async (
         game: Game<Progress, ProgressCommand>,
         record: CandidateRecord,

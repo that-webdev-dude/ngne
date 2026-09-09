@@ -1,5 +1,5 @@
 import { clamp, component, down, lerp, pressed } from "ngne";
-import type { DeepReadonly, PreparedScene, SceneDefinition } from "ngne";
+import type { Audio, DeepReadonly, PreparedScene, SceneDefinition } from "ngne";
 
 import { CONTACT, moveX, moveY, tileAt } from "./collision.js";
 import type { Box } from "./collision.js";
@@ -55,12 +55,20 @@ export interface Run {
 
 /** Host input and candidate delivery are environmental input, not scene state. */
 export interface LevelOptions {
+    readonly index: number;
     readonly data: LevelData;
+    readonly audio?: Pick<Audio, "scene">;
     readonly respawn?: () => PreparedScene | undefined;
     readonly next?: () => PreparedScene | undefined;
     readonly pause?: () => PreparedScene | undefined;
     readonly takePauseIntent?: () => boolean;
     readonly onView?: (view: Readonly<Run>) => void;
+}
+
+export interface OverlayOptions {
+    readonly restart: () => PreparedScene | undefined;
+    readonly takeIntent: (intent: "pause" | "resume" | "restart") => boolean;
+    readonly onView?: (phase: "paused" | "complete") => void;
 }
 
 export function createProgress(): Progress {
@@ -91,8 +99,10 @@ export function transition(
 
 export function createLevel(options: LevelOptions): SceneDefinition<Progress, ProgressCommand> {
     return {
-        id: "platformer-level",
+        id: `platformer-level-${options.index}`,
         setup(scene) {
+            const sound = options.audio?.scene("platformer");
+            if (sound) scene.defer(() => sound.dispose());
             const state = scene.state();
             const progress = state.read();
             const data = options.data;
@@ -188,7 +198,8 @@ export function createLevel(options: LevelOptions): SceneDefinition<Progress, Pr
                 const target = intent.move * SPEED;
                 const acceleration = (intent.move ? 1400 : 1800) * dt;
                 body.vx += clamp(target - body.vx, -acceleration, acceleration);
-                if (body.jumpBufferTicks > 0 && (body.grounded || body.coyoteTicks > 0)) jump(body);
+                if (body.jumpBufferTicks > 0 && (body.grounded || body.coyoteTicks > 0))
+                    jump(body, sound);
                 if (!intent.jumpDown && body.vy < -140) body.vy = -140;
                 body.vy = Math.min(FALL_SPEED, body.vy + GRAVITY * dt);
                 motion.box.x = position.x;
@@ -202,7 +213,7 @@ export function createLevel(options: LevelOptions): SceneDefinition<Progress, Pr
                 position.y = motion.box.y;
                 motion.contacts = horizontal | vertical;
                 // A buffered press is valid on the press tick and the next five ticks.
-                if (body.grounded && body.jumpBufferTicks > 0) jump(body);
+                if (body.grounded && body.jumpBufferTicks > 0) jump(body, sound);
                 if (!body.grounded && !wasGrounded)
                     body.coyoteTicks = Math.max(0, body.coyoteTicks - 1);
                 body.jumpBufferTicks = Math.max(0, body.jumpBufferTicks - 1);
@@ -258,6 +269,13 @@ export function createLevel(options: LevelOptions): SceneDefinition<Progress, Pr
                         run.deathTimer = 30;
                         run.pauseRequested = false;
                         state.dispatch({ type: "died" });
+                        sound?.play({
+                            frequency: 150,
+                            endFrequency: 45,
+                            duration: 0.2,
+                            type: "sawtooth",
+                            volume: 0.15,
+                        });
                         return;
                     }
                     if (exit) {
@@ -267,6 +285,12 @@ export function createLevel(options: LevelOptions): SceneDefinition<Progress, Pr
                         if (checkpoint > run.checkpoint) {
                             state.dispatch({ type: "checkpoint", checkpoint });
                             run.checkpoint = checkpoint;
+                            sound?.play({
+                                frequency: 520,
+                                endFrequency: 880,
+                                duration: 0.15,
+                                volume: 0.2,
+                            });
                         }
                         if (run.pauseRequested) {
                             const candidate = options.pause?.();
@@ -368,10 +392,67 @@ export function createLevel(options: LevelOptions): SceneDefinition<Progress, Pr
     };
 }
 
-function jump(body: ReturnType<typeof Body.create>): void {
+export function createOverlay(
+    kind: "pause" | "complete",
+    options: OverlayOptions,
+): SceneDefinition<Progress, ProgressCommand> {
+    return {
+        id: `platformer-${kind}`,
+        blocksUpdateBelow: kind === "pause",
+        setup(scene) {
+            const state = scene.state();
+            const run = scene.resource<{ phase: "idle" | "restarting" | "transitioning" }>(
+                "overlay",
+                { phase: "idle" },
+            );
+            scene.system(({ input, scenes }) => {
+                if (run.phase === "transitioning") return;
+                if (kind === "pause") {
+                    // Drain both flags even when a key edge wins; hidden-tab pause is already satisfied.
+                    options.takeIntent("pause");
+                    const resume = options.takeIntent("resume");
+                    if (
+                        resume ||
+                        pressed(input, "Escape") ||
+                        pressed(input, "KeyP") ||
+                        pressed(input, "Pad9")
+                    ) {
+                        run.phase = "transitioning";
+                        scenes.pop();
+                    }
+                } else {
+                    const restart = options.takeIntent("restart");
+                    if (restart || pressed(input, "Enter")) run.phase = "restarting";
+                    if (run.phase !== "restarting") return;
+                    const candidate = options.restart();
+                    if (!candidate) return;
+                    state.dispatch({ type: "restart" });
+                    scenes.set(candidate);
+                    run.phase = "transitioning";
+                }
+            });
+            scene.render((frame) => {
+                frame.rect(
+                    WIDTH / 2,
+                    HEIGHT / 2,
+                    WIDTH,
+                    HEIGHT,
+                    0x172720,
+                    kind === "pause" ? 0.55 : 1,
+                    10,
+                    true,
+                );
+                options.onView?.(kind === "pause" ? "paused" : "complete");
+            });
+        },
+    };
+}
+
+function jump(body: ReturnType<typeof Body.create>, sound?: ReturnType<Audio["scene"]>): void {
     body.vy = -JUMP_SPEED;
     body.grounded = false;
     body.coyoteTicks = body.jumpBufferTicks = 0;
+    sound?.play({ frequency: 280, endFrequency: 540, duration: 0.09, volume: 0.15 });
 }
 
 function touchesTile(box: Box, tile: Tile): boolean {

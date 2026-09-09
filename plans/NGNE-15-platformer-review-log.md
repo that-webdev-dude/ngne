@@ -154,3 +154,19 @@ Accepted. Observations carried into B2 (none blocking):
 - Browser playthrough deliberately deferred to Phase 5; jump reach (≈102 px at full speed vs 80 px widest gap) is plausible on paper.
 
 Committed as `[NGNE-15] Add playable platformer slice`.
+
+## Build round B2 — Phase 2 + remaining Phase 4 tests (same Codex thread)
+
+Codex delivered level 2, `createOverlay` (pause + completion with latched restart), host intents/HUD in `main.ts`/`index.html`, scoped synth audio, per-level definition ids, and 22 more tests (88 total). No `src/`, docs or git changes.
+
+### Claude's review
+
+Re-ran format:check, typecheck, `npm test` (88/88, 2.7 s) and build: all pass. Read the full diff and every new test.
+
+Accepted. Notes:
+- Authority precedence, same-tick coalescing (DOM resume + key edge → one pop), latched pause through candidate replenishment, key-derived owner during a 5-tick catch-up frame, failed-mount terminal phase, registry release paths (completion, restart, stop, dispose, late same-key result) and determinism B are all covered exactly as the plan specified.
+- Tests probe release through the public boundary (`game.set(handle)` on a released handle must be rejected and reported) rather than private state — good.
+- FINDINGS gained #6–#8 (suspended input, failed replacement recovery, candidate replenishment), all classified with evidence.
+- Level 2 geometry (two 5-tile gaps, spikes, three patrols, one-way rows) is plausible on paper; completability is proven in B3 by a headless walkthrough and then checked in a browser.
+
+Committed as `[NGNE-15] Add level progression, pause and completion overlays`.
