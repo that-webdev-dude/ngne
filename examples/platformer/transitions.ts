@@ -1,4 +1,4 @@
-import type { Audio, Game, PreparedScene, SceneDefinition } from "ngne";
+import type { Audio, Game, SceneDefinition } from "ngne";
 
 import { createLevel } from "./game.js";
 import type { OverlayOptions, Progress, ProgressCommand, Run } from "./game.js";
@@ -7,15 +7,10 @@ import type { LevelData } from "./levels.js";
 type Purpose = "respawn" | "next" | "complete" | "restart" | "pause";
 type Intent = "pause" | "resume" | "restart";
 type Definition = SceneDefinition<Progress, ProgressCommand>;
-
-interface CandidateRecord {
+interface CandidateSpec {
     readonly purpose: Purpose;
-    readonly ownerId: number;
     readonly key: string;
     readonly definition: Definition;
-    handle: PreparedScene | undefined;
-    status: "preparing" | "ready" | "consumed" | "released" | "failed";
-    retries: number;
 }
 
 export interface RegistryOptions {
@@ -24,12 +19,6 @@ export interface RegistryOptions {
     readonly onView?: (view: Readonly<Run>) => void;
     readonly onOverlayView?: OverlayOptions["onView"];
     readonly overlay?: (kind: "pause" | "complete", options: OverlayOptions) => Definition;
-    readonly prepare?: (
-        game: Game<Progress, ProgressCommand>,
-        definition: Definition,
-        key: string,
-    ) => Promise<PreparedScene>;
-    readonly onError: (error: unknown) => void;
 }
 
 export interface TransitionRegistry {
@@ -44,8 +33,9 @@ export function levelKey(level: number, attempt: number): string {
 }
 
 export function createTransitionRegistry(options: RegistryOptions): TransitionRegistry {
-    const records = new Map<Purpose, CandidateRecord>();
     const intents = { pause: false, resume: false, restart: false };
+    const specs = new Map<Purpose, CandidateSpec>();
+    let game: Game<Progress, ProgressCommand> | undefined;
     let ownerId: number | undefined;
     let disposed = false;
     const takeIntent = (intent: Intent): boolean => {
@@ -53,13 +43,9 @@ export function createTransitionRegistry(options: RegistryOptions): TransitionRe
         intents[intent] = false;
         return requested;
     };
-    const take = (purpose: Purpose): PreparedScene | undefined => {
-        const record = records.get(purpose);
-        if (disposed || record?.ownerId !== ownerId || record?.status !== "ready") return;
-        record.status = "consumed";
-        const handle = record.handle;
-        record.handle = undefined;
-        return handle;
+    const take = (purpose: Purpose) => {
+        if (disposed || !game || ownerId === undefined) return;
+        return game.candidates.take(ownerId, purpose);
     };
     const createLevelDefinition = (index: number): Definition => {
         const data = options.levels[index];
@@ -80,75 +66,40 @@ export function createTransitionRegistry(options: RegistryOptions): TransitionRe
         takeIntent,
         onView: options.onOverlayView,
     };
-    const prepare = async (
-        game: Game<Progress, ProgressCommand>,
-        record: CandidateRecord,
-    ): Promise<void> => {
-        try {
-            const handle = await (options.prepare
-                ? options.prepare(game, record.definition, record.key)
-                : game.prepare(record.definition, { key: record.key }));
-            if (disposed || ownerId !== record.ownerId || record.status === "released") {
-                handle.release();
-                record.status = "released";
-            } else {
-                record.handle = handle;
-                record.status = "ready";
-            }
-        } catch (error) {
-            if (disposed || ownerId !== record.ownerId || record.status === "released") return;
-            record.status = "failed";
-            if (record.retries === 1) options.onError(error);
-        }
-    };
-    const ensure = (
-        game: Game<Progress, ProgressCommand>,
-        purpose: Purpose,
-        key: string,
-        create: () => Definition,
-    ): void => {
-        if (ownerId === undefined) return;
-        const previous = records.get(purpose);
-        if (previous) {
-            if (previous.status === "preparing" || previous.status === "ready") return;
-            if (previous.status === "failed") {
-                if (previous.retries === 1) return;
-                previous.retries++;
-                previous.status = "preparing";
-                void prepare(game, previous);
-                return;
-            }
-            if (purpose !== "pause") return;
-        }
-        const record: CandidateRecord = {
-            purpose,
-            ownerId,
-            key,
-            definition: create(),
-            handle: undefined,
-            status: "preparing",
-            retries: 0,
-        };
-        records.set(purpose, record);
-        void prepare(game, record);
+    const add = (purpose: Purpose, key: string, create: () => Definition): void => {
+        specs.set(purpose, { purpose, key, definition: create() });
     };
     const clear = (): void => {
-        for (const record of records.values()) {
-            record.handle?.release();
-            record.handle = undefined;
-            if (record.status !== "consumed" && record.status !== "failed")
-                record.status = "released";
-        }
-        records.clear();
+        if (game && ownerId !== undefined) game.candidates.release(ownerId);
+        specs.clear();
         intents.pause = intents.resume = intents.restart = false;
+    };
+    const configure = (ownerKey: string): void => {
+        if (ownerKey === "complete") {
+            add("restart", levelKey(0, 0), () => createLevelDefinition(0));
+            return;
+        }
+        const match = /^level-(\d+)-attempt-(\d+)$/.exec(ownerKey);
+        if (!match) throw new Error(`Invalid platformer mount key ${ownerKey}`);
+        const level = Number(match[1]);
+        const attempt = Number(match[2]);
+        add("respawn", levelKey(level, attempt + 1), () => createLevelDefinition(level));
+        if (level + 1 < 2 && options.levels[level + 1])
+            add("next", levelKey(level + 1, 0), () => createLevelDefinition(level + 1));
+        const overlay = options.overlay;
+        if (!overlay) return;
+        if (level + 1 === 2) add("complete", "complete", () => overlay("complete", overlayOptions));
+        add("pause", "pause", () => overlay("pause", overlayOptions));
     };
     return {
         createLevelDefinition,
         request(intent) {
             if (!disposed) intents[intent] = true;
         },
-        reconcile(game) {
+        reconcile(nextGame) {
             if (disposed) return;
+            if (game && game !== nextGame) clear();
+            game = nextGame;
             if (game.lifecycle !== "Running") {
                 clear();
                 ownerId = undefined;
@@ -158,34 +109,20 @@ export function createTransitionRegistry(options: RegistryOptions): TransitionRe
             if (owner?.id !== ownerId) {
                 clear();
                 ownerId = owner?.id;
+                if (owner) configure(owner.key);
             }
             if (!owner) return;
-            if (owner.key === "complete") {
-                ensure(game, "restart", levelKey(0, 0), () => createLevelDefinition(0));
-                return;
-            }
-            const match = /^level-(\d+)-attempt-(\d+)$/.exec(owner.key);
-            if (!match) throw new Error(`Invalid platformer mount key ${owner.key}`);
-            const level = Number(match[1]);
-            const attempt = Number(match[2]);
-            ensure(game, "respawn", levelKey(level, attempt + 1), () =>
-                createLevelDefinition(level),
-            );
-            if (level + 1 < 2 && options.levels[level + 1])
-                ensure(game, "next", levelKey(level + 1, 0), () =>
-                    createLevelDefinition(level + 1),
-                );
-            const overlay = options.overlay;
-            if (overlay) {
-                if (level + 1 === 2)
-                    ensure(game, "complete", "complete", () => overlay("complete", overlayOptions));
-                ensure(game, "pause", "pause", () => overlay("pause", overlayOptions));
-            }
+            for (const spec of specs.values())
+                game.candidates.ensure(owner.id, spec.purpose, spec.definition, {
+                    key: spec.key,
+                    retries: 1,
+                });
         },
         dispose() {
             disposed = true;
             clear();
             ownerId = undefined;
+            game = undefined;
         },
     };
 }

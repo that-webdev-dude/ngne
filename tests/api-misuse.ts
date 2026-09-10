@@ -88,6 +88,11 @@ function committedStateBoundary(game: Game<Progress, Command>): void {
         },
     };
     void game.prepare(scene, { key: "valid" });
+    game.candidates.ensure(1, "next", scene, { key: "next", retries: 1 });
+    game.candidates.take(1, "next")?.release();
+    game.candidates.release(1);
+    // @ts-expect-error Retry count is numeric.
+    game.candidates.ensure(1, "next", scene, { key: "next", retries: "one" });
     const portable: engine.SceneDefinition = { id: "portable", setup() {} };
     void game.prepare(portable, { key: "portable" });
     const wrongState: engine.SceneDefinition<{ best: string }, Command> = {

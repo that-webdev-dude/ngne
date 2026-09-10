@@ -11,6 +11,8 @@ export type {
     GameOptions,
     Lifecycle,
     PreparedScene,
+    SceneCandidateOptions,
+    SceneCandidates,
     SceneCommands,
     SceneDefinition,
     SceneEvent,

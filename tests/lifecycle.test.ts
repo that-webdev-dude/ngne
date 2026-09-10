@@ -126,3 +126,99 @@ test("cold rollback attempts scene cleanup despite loop cleanup failure and reta
     assert.equal(game.scenes.length, 0);
     game.dispose();
 });
+
+test("owned candidate slots deduplicate, refill after take and stop refilling after release", async () => {
+    const game = new Game({ seed: 1, state: {}, transition: (state) => state });
+    await game.start(await game.prepare({ id: "owner", setup() {} }, { key: "owner" }));
+    const ownerId = game.scenes[0].id;
+    const definition: SceneDefinition = { id: "pause", setup() {} };
+    const basePrepare = game.prepare.bind(game);
+    let preparations = 0;
+    game.prepare = (candidateDefinition, options) => {
+        preparations++;
+        return basePrepare(candidateDefinition, options);
+    };
+
+    game.candidates.ensure(ownerId, "pause", definition, { key: "pause" });
+    game.candidates.ensure(ownerId, "pause", definition, { key: "pause" });
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    assert.equal(preparations, 1);
+    const first = game.candidates.take(ownerId, "pause");
+    assert.ok(first);
+    first.release();
+
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    assert.equal(preparations, 2);
+    const second = game.candidates.take(ownerId, "pause");
+    assert.ok(second);
+    second.release();
+    game.candidates.release(ownerId);
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    assert.equal(preparations, 2);
+    game.dispose();
+});
+
+test("owned candidate slots retry failures and cancel stale owner preparation", async () => {
+    const errors: unknown[] = [];
+    const game = new Game({
+        seed: 1,
+        state: {},
+        transition: (state) => state,
+        diagnostic: (error) => errors.push(error),
+    });
+    await game.start(await game.prepare({ id: "owner", setup() {} }, { key: "owner" }));
+    const ownerId = game.scenes[0].id;
+    let attempts = 0;
+    game.candidates.ensure(
+        ownerId,
+        "failed",
+        {
+            id: "failed",
+            assets: [
+                {
+                    id: "failed",
+                    async load() {
+                        attempts++;
+                        throw new Error("Injected preparation failure");
+                    },
+                },
+            ],
+            setup() {},
+        },
+        { key: "failed", retries: 1 },
+    );
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    assert.equal(attempts, 2);
+    assert.equal(errors.length, 1);
+    assert.equal(game.candidates.take(ownerId, "failed"), undefined);
+
+    const entered = Promise.withResolvers<AbortSignal>();
+    const loading = Promise.withResolvers<object>();
+    const replacement = await game.prepare({ id: "replacement", setup() {} }, { key: "next" });
+    game.candidates.ensure(
+        ownerId,
+        "slow",
+        {
+            id: "slow-owned",
+            assets: [
+                {
+                    id: "slow-owned",
+                    load(signal) {
+                        entered.resolve(signal);
+                        return loading.promise;
+                    },
+                },
+            ],
+            setup() {},
+        },
+        { key: "slow" },
+    );
+    const signal = await entered.promise;
+    game.set(replacement);
+    game.tick();
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    assert.equal(signal.aborted, true);
+    assert.equal(game.candidates.take(ownerId, "slow"), undefined);
+    loading.resolve({});
+    game.dispose();
+});

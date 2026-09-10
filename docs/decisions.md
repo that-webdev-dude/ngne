@@ -226,6 +226,40 @@ preserve, and ordinary reset callbacks do not cover all continuing effects. Reus
 the host alpha instead replays stale motion as the accumulator cycles. Selecting
 alpha at frame preparation avoids both problems without adding an authoring API.
 
+## Owner-scoped candidate slots
+
+**Status:** Accepted (NGNE-7)
+
+### Decision
+
+Each `Game` owns named speculative candidate slots scoped to a mounted scene
+instance. Hosts declare the candidate definition, authored mount key and bounded
+retry count. Taking a ready handle is explicit and single-use; the slot replenishes
+while its owner remains mounted. Owner removal, release, stop and disposal cancel
+pending work and release ready handles.
+
+### Rationale
+
+- Starfall and the platformer both need repeated pause and replacement candidates.
+- Scene-instance ownership makes late completion harmless without a global registry.
+- Slots remove duplicated readiness and lease bookkeeping while preserving explicit
+  activation and tick-boundary commit order.
+
+### Alternatives not selected
+
+| Alternative                         | Reason                                                               |
+| ----------------------------------- | -------------------------------------------------------------------- |
+| Automatically activate on readiness | Makes asset timing control simulation and bypasses scene commands.   |
+| Reusable prepared handles           | Conflicts with single-use lease transfer into one mounted instance.  |
+| General scene router                | Adds addressing and message lifetime rules without another consumer. |
+
+### Consequences
+
+- Candidate readiness remains environmental input and is absent from simulation
+  inspection.
+- Retry count is explicit; final failure is reported through the Game diagnostic.
+- Initial and one-off host transitions continue to use `Game.prepare()` directly.
+
 ## Cross-scene transient messaging
 
 **Status:** Deferred

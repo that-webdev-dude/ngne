@@ -15,6 +15,6 @@ The two levels demonstrate:
 
 - Game-owned tile resources, collision, one-way platforms, hazards and patrols.
 - Committed checkpoint/level progress; death remounts entities from durable facts, resetting patrols.
-- A host-owned candidate registry with scene-owned transition authority and a blocking pause overlay.
+- Engine-owned, scene-scoped candidate slots with game-owned transition intent and a blocking pause overlay.
 
 The deterministic reference walkthrough in [the tests](../../tests/platformer.test.ts) completes both authored levels with zero deaths. See [findings and validation limits](FINDINGS.md); browser playthrough remains separate evidence.

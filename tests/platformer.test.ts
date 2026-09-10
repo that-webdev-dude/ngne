@@ -59,6 +59,14 @@ interface ScheduledTick {
     readonly input?: InputSnapshot;
     readonly intent?: "pause" | "resume" | "restart";
 }
+type Definition = SceneDefinition<Progress, ProgressCommand>;
+type BasePrepare = (definition: Definition, key: string) => Promise<PreparedScene>;
+type PrepareOverride = (
+    game: Game<Progress, ProgressCommand>,
+    definition: Definition,
+    key: string,
+    prepare: BasePrepare,
+) => Promise<PreparedScene>;
 
 function createInput(
     held: readonly string[] = [],
@@ -77,7 +85,7 @@ async function createHarness(
     fixtureLevels: readonly LevelData[],
     script: ReadonlyMap<number, ScheduledTick> = new Map(),
     progress = createProgress(),
-    prepare?: RegistryOptions["prepare"],
+    prepare?: PrepareOverride,
     config: { allowErrors?: boolean; capture?: boolean; audio?: RegistryOptions["audio"] } = {},
 ) {
     const errors: unknown[] = [];
@@ -105,6 +113,13 @@ async function createHarness(
             key: levelKey(progress.level, progress.attempt),
         }),
     );
+    if (prepare) {
+        const basePrepare = game.prepare.bind(game);
+        game.prepare = (definition, prepareOptions) =>
+            prepare(game, definition, prepareOptions.key, (target, key) =>
+                basePrepare(target, { ...prepareOptions, key }),
+            );
+    }
     return {
         game,
         registry,
@@ -439,9 +454,9 @@ test("platformer delayed respawn activates on the first tick after the delivery 
         [LEDGE],
         script,
         createProgress(),
-        async (game, definition, key) => {
+        async (_game, definition, key, prepare) => {
             preparedKeys.push(key);
-            const handle = await game.prepare(definition, { key });
+            const handle = await prepare(definition, key);
             await gate.promise;
             return handle;
         },
@@ -532,7 +547,7 @@ function createPreparationAudit(
     ) => SceneDefinition<Progress, ProgressCommand>,
 ) {
     const entries: Preparation[] = [];
-    const prepare: NonNullable<RegistryOptions["prepare"]> = async (game, definition, key) => {
+    const prepare: PrepareOverride = async (game, definition, key, basePrepare) => {
         const entry: Preparation = {
             ownerId: game.scenes[0].id,
             key,
@@ -542,7 +557,7 @@ function createPreparationAudit(
         entries.push(entry);
         const target = transform?.(definition, entry) ?? definition;
         try {
-            entry.handle = await game.prepare(
+            entry.handle = await basePrepare(
                 {
                     ...target,
                     setup(scene) {
@@ -550,7 +565,7 @@ function createPreparationAudit(
                         target.setup(scene);
                     },
                 },
-                { key },
+                key,
             );
             await deliver?.(entry);
             return entry.handle;
@@ -1111,19 +1126,16 @@ test("platformer failed preparations retry once, surface the second error and st
         [FLOOR],
         new Map(),
         createProgress(),
-        async (game, definition, key) => {
+        async (_game, definition, key, prepare) => {
             if (key === "pause") {
                 attempts++;
                 throw fault;
             }
-            return game.prepare(definition, { key });
+            return prepare(definition, key);
         },
         { allowErrors: true },
     );
     try {
-        await harness.frame(0);
-        assert.equal(attempts, 1);
-        assert.deepEqual(harness.errors, []);
         await harness.frame(0);
         assert.equal(attempts, 2);
         assert.deepEqual(harness.errors, [fault]);
@@ -1142,9 +1154,9 @@ test("platformer first preparation failure recovers on the one allowed retry", a
         [FLOOR],
         script,
         createProgress(),
-        (game, definition, key) => {
+        (_game, definition, key, prepare) => {
             if (key === "pause" && ++attempts === 1) return Promise.reject(new Error("Retry me"));
-            return game.prepare(definition, { key });
+            return prepare(definition, key);
         },
     );
     try {

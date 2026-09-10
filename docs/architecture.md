@@ -51,6 +51,7 @@ Cross-world transient messaging is deferred and local multiplayer input is out o
 | Simulation-state snapshot | A future capture of authoritative simulation state at a completed commit; it excludes future environmental input. |
 | Frame preparation         | Conversion of committed scene data into renderer input.                                                           |
 | Asset lease               | A scene's claim on a shared engine asset.                                                                         |
+| Candidate slot            | One named speculative prepared scene owned by a mounted scene instance.                                           |
 
 ## Ownership and state lifetimes
 
@@ -63,6 +64,7 @@ flowchart TD
     Game --> Assets["Asset service"]
     Game --> State["Committed game-state host"]
     Game --> Scenes["Scene manager"]
+    Game --> Candidates["Owner-scoped candidate slots"]
     Game --> Renderer["Renderer"]
 
     Scenes --> Stack["Active scene stack"]
@@ -82,12 +84,13 @@ flowchart TD
 
 State belongs to the narrowest lifetime that needs it.
 
-| State                                         | Owner          | Survives                          | Ends with                                |
-| --------------------------------------------- | -------------- | --------------------------------- | ---------------------------------------- |
-| Root seed and committed game state            | `Game`         | Scene replacement and stop/resume | `dispose()`                              |
-| World, resources, RNG, freeze, events, camera | Scene instance | Suspension and stop/resume        | Scene unmount                            |
-| Shared authored or decoded assets             | Asset service  | Scene replacement                 | Asset-service disposal or cache eviction |
-| GPU resources                                 | Renderer       | Scene replacement when shared     | Renderer disposal or device replacement  |
+| State                                         | Owner                  | Survives                          | Ends with                                |
+| --------------------------------------------- | ---------------------- | --------------------------------- | ---------------------------------------- |
+| Root seed and committed game state            | `Game`                 | Scene replacement and stop/resume | `dispose()`                              |
+| World, resources, RNG, freeze, events, camera | Scene instance         | Suspension and stop/resume        | Scene unmount                            |
+| Named speculative candidate and pending load  | Mounted scene instance | Suspension                        | Take, release, unmount, stop or disposal |
+| Shared authored or decoded assets             | Asset service          | Scene replacement                 | Asset-service disposal or cache eviction |
+| GPU resources                                 | Renderer               | Scene replacement when shared     | Renderer disposal or device replacement  |
 
 The `Game` owns order and lifetime, not gameplay rules, ECS layout, or renderer batching.
 
@@ -320,7 +323,7 @@ Mutable per-scene derivatives belong in scene resources. Releasing a lease does 
 
 Preparation is asynchronous and outside simulation. It acquires leases and prepares immutable data but creates no world or active scene. Cancellation and stale completion cannot activate a scene.
 
-A game may prepare a likely next scene before requesting a transition. This speculative preparation has no simulation effect until a later scene command consumes it.
+A game may prepare a likely next scene before requesting a transition. This speculative preparation has no simulation effect until a later scene command consumes it. Host coordination uses per-Game candidate slots keyed by mounted scene instance and authored purpose. A slot deduplicates preparation, may retry an authored number of times, returns its ready handle once, and refills after take while the owner remains mounted. Owner removal, explicit release, stop and disposal cancel pending work and release ready handles; a late result can never activate itself.
 
 Mounting is synchronous at a tick boundary:
 

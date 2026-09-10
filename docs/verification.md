@@ -1,5 +1,45 @@
 # NGNE verification
 
+## NGNE-7 — 10 September 2026
+
+Owner-scoped scene candidate slots replaced duplicated readiness, retry, refill and
+release bookkeeping in Starfall and the platformer. Local Windows 11 x64 10.0.26200,
+Node v24.15.0, Vite 7.3.6 and the Chromium 152 Codex in-app browser.
+
+### Automated checks
+
+- `npm test`: all **91** tests passed. New lifecycle checks cover same-purpose
+  deduplication, refill after single-use take, explicit release, one bounded retry,
+  final diagnostic reporting, stale-owner cancellation and prevention of late take.
+  Existing platformer coverage repeats pause cycles across readiness gaps, delayed
+  respawn, level replacement, completion/restart, failed preparation, failed mount,
+  stop/resume, disposal and late delivery. Its deterministic 1,448-tick two-level
+  walkthrough still completed twice with identical enumeration.
+- `npm run typecheck`, `npm run format:check`, `git diff --check`: passed.
+- `npm run build`: passed, including emitted library declarations, the public API
+  misuse fixture and all three browser entries. Vite required approved execution
+  outside the normal filesystem sandbox for its config lookup.
+
+### Browser checks
+
+- `/validation.html`: all **92** checks passed with no console errors. This includes
+  renderer/context restoration, browser-host lifecycle races and 65 sampled
+  interpolation/discontinuity frames.
+- Starfall: Start Flight succeeded, then three Pause/Resume button cycles returned
+  `FLIGHT PAUSED` / `FLIGHT IN PROGRESS` with the correct button label every time.
+- Platformer: Start level 1 succeeded at `Level 1 · Attempt 1 · Start · Deaths 0 ·
+Runs 0`, then three Pause/Resume button cycles returned `Paused` / `Reach the blue
+gate` with the correct button label every time.
+- Neither game displayed its error UI or emitted a browser console error.
+
+### Limits
+
+The browser session exercised repeated pause transitions in both games. Full level
+replacement, completion/restart, controlled preparation failure, stale completion,
+stop/resume and disposal use deterministic headless coverage rather than injected
+faults in the visible games. Physical gamepad, touch, audible output, Firefox, Safari
+and mobile hardware were not tested. No performance claim is made by this ticket.
+
 ## NGNE-15 — 9 September 2026
 
 Two-level platformer example (`examples/platformer/`) built on the current engine

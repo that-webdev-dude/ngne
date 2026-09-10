@@ -53,7 +53,6 @@ const registry = createTransitionRegistry({
     onOverlayView: (phase) => {
         presentation = phase;
     },
-    onError: showError,
 });
 
 startButton.addEventListener("click", () => {

@@ -81,7 +81,7 @@ const arena: SceneDefinition<Progress, ProgressCommand> = {
 
 Use the same state/command types on `SceneDefinition<S,C>` and `Game<S,C>`; `prepare()` checks compatibility and `scene.state()` infers access. Unparameterized definitions remain portable but cannot dispatch. Treat state reads and transition inputs as read-only, keep transitions synchronous, and dispatch only from the owning scene's system update; the [data contract](contracts/NGNE.md#committed-state-typing-and-ownership) defines which values are accepted and how they are copied. Resources and RNG streams bind once during setup. Register cleanup immediately with `scene.defer()` or a resource cleanup argument.
 
-Prepare scene candidates asynchronously using `game.prepare(definition, { key, signal })`. Preparation acquires assets but does not create a world. Use `ctx.scenes.push(candidate)`, `.set(candidate)`, or `.pop()` to request a boundary transition. A candidate belongs to one Game, is single-use, and can be abandoned with `.release()`. `blocksUpdateBelow: true` makes a pause/menu scene suspend lower simulation while preserving its rendered world.
+Prepare initial and one-off scene candidates asynchronously using `game.prepare(definition, { key, signal })`. For a repeated transition, let the host call `game.candidates.ensure(owner.id, "pause", pauseDefinition, { key: "pause", retries: 1 })`, where `owner` is the mounted scene summary from `game.scenes`. A scene callback takes the ready handle with `game.candidates.take(owner.id, "pause")` and explicitly passes it to `ctx.scenes.push()` or `.set()`. The slot refills after take and automatically releases on owner removal, stop or disposal. Preparation acquires assets but does not create or activate a world. Raw candidates remain single-use and can be abandoned with `.release()`. `blocksUpdateBelow: true` makes a pause/menu scene suspend lower simulation while preserving its rendered world.
 
 ## Assets, sprites and audio
 
@@ -127,15 +127,18 @@ Commit order is fixed by the [architecture](architecture.md#platform-frame-and-t
 
 ## Lifecycle and ownership
 
-| Operation                                   | Meaning                                                       |
-| ------------------------------------------- | ------------------------------------------------------------- |
-| `game.prepare(definition, { key, signal })` | Acquire scene assets asynchronously; does not publish a world |
-| `app.start(candidate)`                      | Start the browser host with its initial scene                 |
-| `ctx.scenes.set(candidate)`                 | Replace the entire scene stack at a tick boundary             |
-| `ctx.scenes.push(candidate)` / `.pop()`     | Change the scene stack at a tick boundary                     |
-| `candidate.release()`                       | Abandon an unused prepared candidate                          |
-| `app.stop()` / `app.start()`                | Suspend and resume while preserving the mounted scene         |
-| `app.dispose()`                             | Terminal cleanup of owned services and scenes                 |
+| Operation                                                     | Meaning                                                         |
+| ------------------------------------------------------------- | --------------------------------------------------------------- |
+| `game.prepare(definition, { key, signal })`                   | Acquire scene assets asynchronously; does not publish a world   |
+| `game.candidates.ensure(owner, purpose, definition, options)` | Keep one owner-scoped candidate ready for a repeated transition |
+| `game.candidates.take(owner, purpose)`                        | Take once; refill while that owner remains mounted              |
+| `game.candidates.release(owner, purpose?)`                    | Cancel/release one slot or every slot for that owner            |
+| `app.start(candidate)`                                        | Start the browser host with its initial scene                   |
+| `ctx.scenes.set(candidate)`                                   | Replace the entire scene stack at a tick boundary               |
+| `ctx.scenes.push(candidate)` / `.pop()`                       | Change the scene stack at a tick boundary                       |
+| `candidate.release()`                                         | Abandon an unused prepared candidate                            |
+| `app.stop()` / `app.start()`                                  | Suspend and resume while preserving the mounted scene           |
+| `app.dispose()`                                               | Terminal cleanup of owned services and scenes                   |
 
 Bind resources, RNG streams and systems synchronously during setup. Register cleanup immediately with `scene.defer(() => service.dispose())`; the private mount owns rollback when setup fails. Do not add an alternative mount path or manually commit a scene world. Prepared candidates are single-use and belong to their preparing Game; stop invalidates unused candidates.
 

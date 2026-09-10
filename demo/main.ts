@@ -1,5 +1,5 @@
 import "./style.css";
-import { BrowserGame, type PreparedScene, type Asset, type Stats } from "ngne";
+import { BrowserGame, type Asset, type Stats } from "ngne";
 import { arena, overlay, W, H, type Progress, type ProgressCommand, type RunView } from "./game.js";
 import { makeAtlas, titleArt } from "./art.js";
 const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -22,11 +22,8 @@ let view: RunView = {
     combo: 1,
     stress: false,
 };
-let presentation: "paused" | "result" | undefined,
-    pauseCandidate: PreparedScene | undefined,
-    resultCandidate: PreparedScene | undefined;
-let preparingPause = false,
-    ready = false,
+let presentation: "paused" | "result" | undefined;
+let ready = false,
     previousPhase = "",
     metricTime = 0;
 const times: number[] = [];
@@ -50,7 +47,10 @@ const app = new BrowserGame<Progress, ProgressCommand>({
             console.error(error);
         }
     },
-    afterFrame: (stats) => updateUI(stats),
+    afterFrame: (stats) => {
+        reconcileCandidates();
+        updateUI(stats);
+    },
 });
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const pauseDefinition = overlay("pause", (phase) => {
@@ -72,25 +72,20 @@ function options(attract = false, stress = false) {
         },
         pause: () => {
             if (attract) return;
-            const c = pauseCandidate;
-            pauseCandidate = undefined;
-            return c;
+            return takeCandidate("pause");
         },
-        result: () => {
-            const c = resultCandidate;
-            resultCandidate = undefined;
-            return c;
-        },
+        result: () => takeCandidate("result"),
     };
 }
-async function preparePause() {
-    if (preparingPause || pauseCandidate) return;
-    preparingPause = true;
-    try {
-        pauseCandidate = await app.game.prepare(pauseDefinition, { key: "pause" });
-    } finally {
-        preparingPause = false;
-    }
+function takeCandidate(purpose: "pause" | "result") {
+    const owner = app.game.scenes[0];
+    return owner ? app.game.candidates.take(owner.id, purpose) : undefined;
+}
+function reconcileCandidates() {
+    const owner = app.game.scenes[0];
+    if (app.game.lifecycle !== "Running" || owner?.definition !== "starfall-arena") return;
+    app.game.candidates.ensure(owner.id, "pause", pauseDefinition, { key: "pause", retries: 1 });
+    app.game.candidates.ensure(owner.id, "result", resultDefinition, { key: "result", retries: 1 });
 }
 async function launch(stress = false) {
     if (!ready) return;
@@ -102,11 +97,6 @@ async function launch(stress = false) {
         const candidate = await app.game.prepare(arena(options(false, stress)), {
             key: `run-${app.game.state.runs}-${stress ? "chaos" : "normal"}`,
         });
-        if (!resultCandidate)
-            resultCandidate = await app.game.prepare(resultDefinition, {
-                key: "result",
-            });
-        await preparePause();
         app.game.set(candidate);
         canvas.focus();
     } catch (error) {
@@ -186,7 +176,6 @@ function updateUI(stats: Readonly<Stats>) {
         }
         previousPhase = phase;
     }
-    if (presentation === "paused" && !pauseCandidate) void preparePause();
     if (performance.now() - metricTime > 200) {
         metricTime = performance.now();
         el("fps").textContent = String(Math.round(stats.fps));
@@ -212,9 +201,9 @@ play.addEventListener("click", () => {
 });
 pause.addEventListener("click", () => {
     if (presentation === "paused") app.game.pop();
-    else if (pauseCandidate) {
-        app.game.push(pauseCandidate);
-        pauseCandidate = undefined;
+    else {
+        const candidate = takeCandidate("pause");
+        if (candidate) app.game.push(candidate);
     }
     canvas.focus();
 });
@@ -245,9 +234,9 @@ window.addEventListener("keydown", (event) => {
     if (event.code === "KeyM") el("sound").click();
 });
 document.addEventListener("visibilitychange", () => {
-    if (document.hidden && view.phase === "playing" && !presentation && pauseCandidate) {
-        app.game.push(pauseCandidate);
-        pauseCandidate = undefined;
+    if (document.hidden && view.phase === "playing" && !presentation) {
+        const candidate = takeCandidate("pause");
+        if (candidate) app.game.push(candidate);
     }
 });
 async function boot() {
@@ -263,10 +252,6 @@ async function boot() {
             lease.release();
         }
         app.audio.muted = true;
-        await preparePause();
-        resultCandidate = await app.game.prepare(resultDefinition, {
-            key: "result",
-        });
         ready = true;
         play.disabled = chaos.disabled = false;
         play.textContent = "START FLIGHT";

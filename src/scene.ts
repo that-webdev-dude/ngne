@@ -42,7 +42,7 @@ export interface SystemContext {
 export interface SceneDefinition<S = unknown, C = never> {
     readonly id: string;
     readonly blocksUpdateBelow?: boolean;
-    readonly assets?: readonly Asset<any>[];
+    readonly assets?: readonly Asset<unknown>[];
     readonly setup: (scene: SceneSetup<S, C>) => void;
 }
 export interface SceneSetup<S = unknown, C = never> {
@@ -64,6 +64,25 @@ export interface SceneSetup<S = unknown, C = never> {
 }
 export interface PreparedScene {
     release(): void;
+}
+export interface SceneCandidateOptions {
+    readonly key: string;
+    readonly seed?: number;
+    /** Additional attempts after the first failure. */
+    readonly retries?: number;
+}
+export interface SceneCandidates<S, C> {
+    /** Keep one prepared candidate for this mounted scene and purpose, refilling after take. */
+    ensure(
+        ownerId: number,
+        purpose: string,
+        definition: SceneDefinition<S, C>,
+        options: SceneCandidateOptions,
+    ): void;
+    /** Remove and return a ready candidate once. */
+    take(ownerId: number, purpose: string): PreparedScene | undefined;
+    /** Cancel and release one purpose, or every purpose owned by the scene. */
+    release(ownerId: number, purpose?: string): void;
 }
 class SceneCandidate<S, C> {
     readonly handle: PreparedScene = Object.freeze({ release: () => this.release() });
@@ -87,9 +106,18 @@ class SceneCandidate<S, C> {
         this.status = "released";
         this.onRelease();
         const cleanup = new Cleanup();
-        this.leases.splice(0).forEach((l) => cleanup.defer(() => l.release()));
+        for (const lease of this.leases.splice(0)) cleanup.defer(() => lease.release());
         cleanup.dispose();
     }
+}
+interface CandidateSlot<S, C> {
+    readonly ownerId: number;
+    readonly purpose: string;
+    readonly definition: SceneDefinition<S, C>;
+    readonly options: SceneCandidateOptions;
+    readonly controller: AbortController;
+    status: "preparing" | "ready" | "failed" | "consumed" | "released";
+    handle?: PreparedScene;
 }
 export interface SceneInspection {
     readonly id: number;
@@ -168,7 +196,9 @@ class SceneInstance<S, C> {
             world: inspectValue(this.world.enumerate()),
             resources: inspectValue(Object.fromEntries(this.resources)),
             random: inspectValue(
-                Object.fromEntries([...this.randomStreams].map(([k, r]) => [k, r.state])),
+                Object.fromEntries(
+                    [...this.randomStreams].map(([name, random]) => [name, random.state]),
+                ),
             ),
             camera: inspectValue(this.camera),
             freezeRemaining: this.freezeRemaining,
@@ -193,6 +223,7 @@ export class Game<S = Record<string, never>, C = never> {
     readonly rootSeed: number;
     readonly assets = new Assets();
     readonly dt: number;
+    readonly candidates: SceneCandidates<S, C>;
     #simulationTick = 0;
     #lifecycle: Lifecycle = "Stopped";
     private owner = Symbol("game");
@@ -202,7 +233,8 @@ export class Game<S = Record<string, never>, C = never> {
     private stateCommands: DeepReadonly<C>[] = [];
     private updatingScene: SceneInstance<S, C> | undefined;
     private commands: ({ type: "set" | "push"; candidate: PreparedScene } | { type: "pop" })[] = [];
-    private candidates = new Map<PreparedScene, SceneCandidate<S, C>>();
+    private preparedScenes = new Map<PreparedScene, SceneCandidate<S, C>>();
+    private candidateSlots = new Map<number, Map<string, CandidateSlot<S, C>>>();
     private preparations = new Set<AbortController>();
     private initialized = false;
     private busy = false;
@@ -213,6 +245,17 @@ export class Game<S = Record<string, never>, C = never> {
         this.stateValue = immutable(options.state);
         this.dt = options.dt ?? 1 / 60;
         if (!(this.dt > 0 && Number.isFinite(this.dt))) throw new Error("Invalid tick duration");
+        this.candidates = Object.freeze({
+            ensure: (
+                ownerId: number,
+                purpose: string,
+                definition: SceneDefinition<S, C>,
+                candidateOptions: SceneCandidateOptions,
+            ) => this.ensureCandidate(ownerId, purpose, definition, candidateOptions),
+            take: (ownerId: number, purpose: string) => this.takeCandidate(ownerId, purpose),
+            release: (ownerId: number, purpose?: string) =>
+                this.releaseCandidateSlots(ownerId, purpose),
+        });
     }
     get state(): DeepReadonly<S> {
         return this.stateValue;
@@ -268,17 +311,17 @@ export class Game<S = Record<string, never>, C = never> {
                 options.key,
                 options.seed,
                 leases,
-                () => this.candidates.delete(candidate.handle),
+                () => this.preparedScenes.delete(candidate.handle),
             );
-            this.candidates.set(candidate.handle, candidate);
+            this.preparedScenes.set(candidate.handle, candidate);
             return candidate.handle;
-        } catch (e) {
-            const errors: unknown[] = [e];
-            for (const l of leases.reverse()) {
+        } catch (error) {
+            const errors: unknown[] = [error];
+            for (const lease of leases.reverse()) {
                 try {
-                    l.release();
-                } catch (error) {
-                    errors.push(error);
+                    lease.release();
+                } catch (releaseError) {
+                    errors.push(releaseError);
                 }
             }
             throw new AggregateError(errors, "Scene preparation failed");
@@ -287,26 +330,165 @@ export class Game<S = Record<string, never>, C = never> {
             options.signal?.removeEventListener("abort", cancel);
         }
     }
-    private mount(handle: PreparedScene) {
-        const candidate = this.candidates.get(handle);
+    private ensureCandidate(
+        ownerId: number,
+        purpose: string,
+        definition: SceneDefinition<S, C>,
+        options: SceneCandidateOptions,
+    ): void {
+        if (this.lifecycle !== "Running") throw new Error("Scene candidates require Running");
+        if (!this.stack.some((scene) => scene.id === ownerId))
+            throw new Error("Scene candidate owner is not mounted");
+        if (!purpose) throw new Error("Scene candidate purpose is required");
+        const retries = options.retries ?? 0;
+        if (!Number.isSafeInteger(retries) || retries < 0)
+            throw new Error("Scene candidate retries must be a non-negative integer");
+        let slots = this.candidateSlots.get(ownerId);
+        if (!slots) {
+            slots = new Map();
+            this.candidateSlots.set(ownerId, slots);
+        }
+        const previous = slots.get(purpose);
+        if (
+            previous?.definition === definition &&
+            previous.options.key === options.key &&
+            previous.options.seed === options.seed &&
+            previous.options.retries === options.retries
+        )
+            return;
+        if (previous) this.releaseCandidateSlot(previous);
+        const slot: CandidateSlot<S, C> = {
+            ownerId,
+            purpose,
+            definition,
+            options: Object.freeze({ ...options }),
+            controller: new AbortController(),
+            status: "preparing",
+        };
+        slots.set(purpose, slot);
+        void this.prepareCandidateSlot(slot, retries);
+    }
+    private async prepareCandidateSlot(slot: CandidateSlot<S, C>, retries: number): Promise<void> {
+        for (let attempt = 0; attempt <= retries; attempt++) {
+            try {
+                const handle = await this.prepare(slot.definition, {
+                    key: slot.options.key,
+                    seed: slot.options.seed,
+                    signal: slot.controller.signal,
+                });
+                if (
+                    slot.status !== "preparing" ||
+                    !this.stack.some((scene) => scene.id === slot.ownerId)
+                ) {
+                    try {
+                        handle.release();
+                    } catch (error) {
+                        this.report(error);
+                    }
+                    return;
+                }
+                slot.handle = handle;
+                slot.status = "ready";
+                return;
+            } catch (error) {
+                if (slot.status === "released" || slot.controller.signal.aborted) return;
+                if (attempt === retries) {
+                    slot.status = "failed";
+                    this.report(error);
+                }
+            }
+        }
+    }
+    private takeCandidate(ownerId: number, purpose: string): PreparedScene | undefined {
+        const slots = this.candidateSlots.get(ownerId);
+        const slot = slots?.get(purpose);
+        if (slot?.status !== "ready") return;
+        slot.status = "consumed";
+        const handle = slot.handle;
+        slot.handle = undefined;
+        queueMicrotask(() => {
+            const currentSlots = this.candidateSlots.get(ownerId);
+            if (currentSlots?.get(purpose) !== slot) return;
+            currentSlots.delete(purpose);
+            if (!currentSlots.size) this.candidateSlots.delete(ownerId);
+            if (
+                slot.status === "consumed" &&
+                this.lifecycle === "Running" &&
+                this.stack.some((scene) => scene.id === ownerId)
+            )
+                this.ensureCandidate(ownerId, purpose, slot.definition, slot.options);
+        });
+        return handle;
+    }
+    private releaseCandidateSlots(ownerId: number, purpose?: string): void {
+        const slots = this.candidateSlots.get(ownerId);
+        if (!slots) return;
+        const selected = purpose ? [slots.get(purpose)] : [...slots.values()];
+        const cleanup = new Cleanup();
+        for (const slot of selected) {
+            if (!slot) continue;
+            slots.delete(slot.purpose);
+            cleanup.defer(() => this.releaseCandidateSlot(slot));
+        }
+        if (!slots.size) this.candidateSlots.delete(ownerId);
+        cleanup.dispose();
+    }
+    private releaseCandidateSlot(slot: CandidateSlot<S, C>): void {
+        if (slot.status === "released") return;
+        slot.status = "released";
+        slot.controller.abort();
+        const handle = slot.handle;
+        slot.handle = undefined;
+        handle?.release();
+    }
+    private mount(handle: PreparedScene): SceneInstance<S, C> {
+        const candidate = this.preparedScenes.get(handle);
         if (!candidate) throw new Error("Scene candidate is stale, consumed, or foreign");
         const leases = candidate.consume(this.owner);
-        this.candidates.delete(handle);
+        this.preparedScenes.delete(handle);
         const scene = new SceneInstance(
             this.nextId++,
             candidate.definition,
             candidate.key,
             candidate.seed ?? seedOf(this.rootSeed, candidate.definition.id, candidate.key),
         );
-        leases.forEach((l) => scene.cleanup.defer(() => l.release()));
+        for (const lease of leases) scene.cleanup.defer(() => lease.release());
         let mounting = true;
+        const setup = this.createSceneSetup(scene, leases, () => mounting);
+        try {
+            const result = scene.definition.setup(setup) as unknown;
+            if (result && typeof (result as Promise<void>).then === "function") {
+                Promise.resolve(result).catch((error) => this.report(error));
+                throw new Error("Scene setup must be synchronous");
+            }
+            mounting = false;
+            this.publishScene(scene);
+            return scene;
+        } catch (error) {
+            mounting = false;
+            try {
+                scene.dispose();
+            } catch (cleanupError) {
+                throw new AggregateError(
+                    [error, cleanupError],
+                    "Private scene mount and cleanup failed",
+                );
+            }
+            throw error;
+        }
+    }
+    private createSceneSetup(
+        scene: SceneInstance<S, C>,
+        leases: readonly Lease[],
+        isMounting: () => boolean,
+    ): SceneSetup<S, C> {
         const setupOnly = () => {
-            if (!mounting) throw new Error("Scene bindings are fixed after setup");
+            if (!isMounting()) throw new Error("Scene bindings are fixed after setup");
         };
-        const setup: SceneSetup<S, C> = {
+        return {
             world: scene.world.access,
             camera: scene.camera,
-            assets: new Map(leases.map((l) => [l.id, l.value])),
+            assets: new Map(leases.map((lease) => [lease.id, lease.value])),
             resource: <T>(name: string, value: T, cleanup?: (value: T) => void) => {
                 setupOnly();
                 if (!name || scene.resources.has(name))
@@ -319,9 +501,9 @@ export class Game<S = Record<string, never>, C = never> {
                 setupOnly();
                 if (!name || scene.randomStreams.has(name))
                     throw new Error("Invalid or duplicate RNG stream: " + name);
-                const rng = new Random(seedOf(scene.seed, name));
-                scene.randomStreams.set(name, rng);
-                return rng;
+                const random = new Random(seedOf(scene.seed, name));
+                scene.randomStreams.set(name, random);
+                return random;
             },
             system: (update, options) => {
                 setupOnly();
@@ -343,7 +525,7 @@ export class Game<S = Record<string, never>, C = never> {
                 return {
                     read: () => this.stateValue,
                     dispatch: (command: C) => {
-                        if (mounting || !scene.published || this.updatingScene !== scene)
+                        if (isMounting() || !scene.published || this.updatingScene !== scene)
                             throw new Error("State dispatch requires an active system update");
                         this.stateCommands.push(immutable(command));
                     },
@@ -352,7 +534,7 @@ export class Game<S = Record<string, never>, C = never> {
             freeze: (ticks) => {
                 if (!Number.isSafeInteger(ticks) || ticks <= 0)
                     throw new Error("Freeze requires positive integer ticks");
-                if (!mounting && (!scene.published || !this.busy))
+                if (!isMounting() && (!scene.published || !this.busy))
                     throw new Error("Freeze requires active update");
                 scene.freezePending = Math.max(scene.freezePending, ticks);
             },
@@ -361,33 +543,15 @@ export class Game<S = Record<string, never>, C = never> {
                 scene.cleanup.defer(action);
             },
         };
-        try {
-            const result = scene.definition.setup(setup) as unknown;
-            if (result && typeof (result as Promise<void>).then === "function") {
-                Promise.resolve(result).catch((e) => this.report(e));
-                throw new Error("Scene setup must be synchronous");
-            }
-            mounting = false;
-            scene.world.commit();
-            scene.camera.cut();
-            scene.resets.forEach((f) => f());
-            scene.freezeRemaining = scene.freezePending;
-            scene.freezePending = 0;
-            Object.freeze(scene.schedule);
-            scene.published = true;
-            return scene;
-        } catch (error) {
-            mounting = false;
-            try {
-                scene.dispose();
-            } catch (cleanupError) {
-                throw new AggregateError(
-                    [error, cleanupError],
-                    "Private scene mount and cleanup failed",
-                );
-            }
-            throw error;
-        }
+    }
+    private publishScene(scene: SceneInstance<S, C>): void {
+        scene.world.commit();
+        scene.camera.cut();
+        for (const reset of scene.resets) reset();
+        scene.freezeRemaining = scene.freezePending;
+        scene.freezePending = 0;
+        Object.freeze(scene.schedule);
+        scene.published = true;
     }
     async start(initial?: PreparedScene, loop?: { start(): void; stop(): void }) {
         if (this.lifecycle !== "Stopped") throw new Error("Cannot start in " + this.lifecycle);
@@ -404,8 +568,8 @@ export class Game<S = Record<string, never>, C = never> {
             for (const scene of this.stack) scene.canInterpolate = false;
             this.initialized = true;
             this.#lifecycle = "Running";
-        } catch (e) {
-            const errors: unknown[] = [e];
+        } catch (error) {
+            const errors: unknown[] = [error];
             if (loopAttempted) {
                 try {
                     loop?.stop();
@@ -423,16 +587,21 @@ export class Game<S = Record<string, never>, C = never> {
                 }
             }
             this.#lifecycle =
-                !cold || errors.length > 1 || e instanceof AggregateError ? "Failed" : "Stopped";
+                !cold || errors.length > 1 || error instanceof AggregateError
+                    ? "Failed"
+                    : "Stopped";
             if (errors.length > 1) throw new AggregateError(errors, "Startup rollback failed");
-            throw e;
+            throw error;
         }
     }
     private cancelPending() {
         const cleanup = new Cleanup();
+        for (const ownerId of [...this.candidateSlots.keys()])
+            cleanup.defer(() => this.releaseCandidateSlots(ownerId));
         for (const controller of this.preparations) cleanup.defer(() => controller.abort());
-        for (const candidate of this.candidates.values()) cleanup.defer(() => candidate.release());
-        this.candidates.clear();
+        for (const candidate of [...this.preparedScenes.values()])
+            cleanup.defer(() => candidate.release());
+        this.preparedScenes.clear();
         this.commands.length = 0;
         cleanup.dispose();
     }
@@ -443,9 +612,9 @@ export class Game<S = Record<string, never>, C = never> {
         try {
             this.cancelPending();
             this.#lifecycle = "Stopped";
-        } catch (e) {
+        } catch (error) {
             this.#lifecycle = "Failed";
-            throw e;
+            throw error;
         }
     }
     /** Queue an already prepared candidate. It publishes only at a tick boundary. */
@@ -465,122 +634,146 @@ export class Game<S = Record<string, never>, C = never> {
     tick(
         input: InputSnapshot = emptyInput(),
         display: DisplaySnapshot = { width: 640, height: 360, pixelRatio: 1 },
-    ) {
+    ): void {
         if (this.lifecycle !== "Running") return;
         if (this.busy) throw new Error("Reentrant tick");
         this.busy = true;
         try {
-            const first = this.findUpdateStart();
-            for (let i = 0; i < this.stack.length; i++) this.stack[i].canInterpolate = i >= first;
-            const selected = this.stack.slice(first),
-                ordinary = new Set<SceneInstance<S, C>>();
-            const scenes: SceneCommands = {
-                set: (c) => this.set(c),
-                push: (c) => this.push(c),
+            const updateStart = this.findUpdateStart();
+            for (let index = 0; index < this.stack.length; index++)
+                this.stack[index].canInterpolate = index >= updateStart;
+            const selectedScenes = this.stack.slice(updateStart);
+            const sceneCommands: SceneCommands = {
+                set: (candidate) => this.set(candidate),
+                push: (candidate) => this.push(candidate),
                 pop: () => this.pop(),
             };
-            for (const scene of selected) {
-                if (!scene.freezeRemaining) {
-                    ordinary.add(scene);
-                    scene.camera.beginTick();
-                }
-                const ctx: SystemContext = Object.freeze({
-                    dt: this.dt,
-                    simulationTick: this.simulationTick,
-                    input,
-                    display,
-                    world: scene.world.access,
-                    camera: scene.camera,
-                    events: scene.inbox,
-                    emit: (event: SceneEvent) => {
-                        if (scene.freezeRemaining)
-                            throw new Error("Gameplay events cannot emit during freeze");
-                        scene.outbox.push(immutable(event));
-                    },
-                    scenes,
-                });
-                this.updatingScene = scene;
-                for (const system of scene.schedule)
-                    if (!scene.freezeRemaining || system.runsDuringFreeze) {
-                        const result = system.update(ctx) as unknown;
-                        if (result && typeof (result as Promise<void>).then === "function") {
-                            Promise.resolve(result).catch((e) => this.report(e));
-                            throw new Error("Systems must be synchronous");
-                        }
-                    }
-            }
+            const ordinaryScenes = this.updateScenes(selectedScenes, input, display, sceneCommands);
             this.updatingScene = undefined;
-            for (const scene of selected) scene.world.commit();
-            for (const scene of ordinary) {
-                scene.inbox = Object.freeze(scene.outbox);
-                scene.outbox = [];
-            }
-            for (const scene of selected) {
-                if (scene.freezePending && !scene.freezeRemaining) {
-                    scene.camera.cut();
-                    scene.resets.forEach((f) => f());
-                }
-                scene.freezeRemaining = Math.max(0, scene.freezeRemaining - 1, scene.freezePending);
-                scene.freezePending = 0;
-            }
-            for (const command of this.stateCommands) {
-                const result = this.options.transition(this.stateValue, command);
-                if (result instanceof Promise) {
-                    Promise.resolve(result).catch((error) => this.report(error));
-                    throw new Error("State transitions must be synchronous");
-                }
-                this.stateValue = immutable<S>(result);
-            }
-            this.stateCommands.length = 0;
-            const commands = this.commands.splice(0);
-            for (let i = 0; i < commands.length; i++) {
-                const command = commands[i];
-                try {
-                    if (command.type === "pop") {
-                        const old = this.stack.pop();
-                        if (old) {
-                            try {
-                                old.dispose();
-                            } catch (e) {
-                                this.report(e);
-                            }
-                        }
-                    } else {
-                        const fresh = this.mount(command.candidate);
-                        if (command.type === "set") {
-                            const old = this.stack;
-                            this.stack = [fresh];
-                            for (const s of old.reverse()) {
-                                try {
-                                    s.dispose();
-                                } catch (e) {
-                                    this.report(e);
-                                }
-                            }
-                        } else this.stack.push(fresh);
-                    }
-                } catch (e) {
-                    this.report(e);
-                    for (const later of commands.slice(i + 1))
-                        if (later.type !== "pop") {
-                            try {
-                                later.candidate.release();
-                                this.candidates.delete(later.candidate);
-                            } catch (error) {
-                                this.report(error);
-                            }
-                        }
-                    break;
-                }
-            }
+            this.commitSceneSimulation(selectedScenes, ordinaryScenes);
+            this.commitStateCommands();
+            this.applySceneCommands();
             this.#simulationTick++;
-        } catch (e) {
+        } catch (error) {
             this.#lifecycle = "Failed";
-            this.report(e);
-            throw e;
+            this.report(error);
+            throw error;
         } finally {
             this.busy = false;
             this.updatingScene = undefined;
+        }
+    }
+    private updateScenes(
+        scenes: readonly SceneInstance<S, C>[],
+        input: InputSnapshot,
+        display: DisplaySnapshot,
+        sceneCommands: SceneCommands,
+    ): Set<SceneInstance<S, C>> {
+        const ordinaryScenes = new Set<SceneInstance<S, C>>();
+        for (const scene of scenes) {
+            if (!scene.freezeRemaining) {
+                ordinaryScenes.add(scene);
+                scene.camera.beginTick();
+            }
+            const context: SystemContext = Object.freeze({
+                dt: this.dt,
+                simulationTick: this.simulationTick,
+                input,
+                display,
+                world: scene.world.access,
+                camera: scene.camera,
+                events: scene.inbox,
+                emit: (event: SceneEvent) => {
+                    if (scene.freezeRemaining)
+                        throw new Error("Gameplay events cannot emit during freeze");
+                    scene.outbox.push(immutable(event));
+                },
+                scenes: sceneCommands,
+            });
+            this.updatingScene = scene;
+            for (const system of scene.schedule) {
+                if (scene.freezeRemaining && !system.runsDuringFreeze) continue;
+                const result = system.update(context) as unknown;
+                if (result && typeof (result as Promise<void>).then === "function") {
+                    Promise.resolve(result).catch((error) => this.report(error));
+                    throw new Error("Systems must be synchronous");
+                }
+            }
+        }
+        return ordinaryScenes;
+    }
+    private commitSceneSimulation(
+        selectedScenes: readonly SceneInstance<S, C>[],
+        ordinaryScenes: ReadonlySet<SceneInstance<S, C>>,
+    ): void {
+        for (const scene of selectedScenes) scene.world.commit();
+        for (const scene of ordinaryScenes) {
+            scene.inbox = Object.freeze(scene.outbox);
+            scene.outbox = [];
+        }
+        for (const scene of selectedScenes) {
+            if (scene.freezePending && !scene.freezeRemaining) {
+                scene.camera.cut();
+                for (const reset of scene.resets) reset();
+            }
+            scene.freezeRemaining = Math.max(0, scene.freezeRemaining - 1, scene.freezePending);
+            scene.freezePending = 0;
+        }
+    }
+    private commitStateCommands(): void {
+        for (const command of this.stateCommands) {
+            const result = this.options.transition(this.stateValue, command);
+            if (result instanceof Promise) {
+                Promise.resolve(result).catch((error) => this.report(error));
+                throw new Error("State transitions must be synchronous");
+            }
+            this.stateValue = immutable<S>(result);
+        }
+        this.stateCommands.length = 0;
+    }
+    private applySceneCommands(): void {
+        const commands = this.commands.splice(0);
+        for (let index = 0; index < commands.length; index++) {
+            const command = commands[index];
+            try {
+                if (command.type === "pop") {
+                    const oldScene = this.stack.pop();
+                    if (oldScene) this.disposeMountedScene(oldScene);
+                    continue;
+                }
+                const newScene = this.mount(command.candidate);
+                if (command.type === "push") {
+                    this.stack.push(newScene);
+                    continue;
+                }
+                const oldScenes = this.stack;
+                this.stack = [newScene];
+                for (const oldScene of oldScenes.reverse()) this.disposeMountedScene(oldScene);
+            } catch (error) {
+                this.report(error);
+                for (const laterCommand of commands.slice(index + 1)) {
+                    if (laterCommand.type === "pop") continue;
+                    try {
+                        laterCommand.candidate.release();
+                        this.preparedScenes.delete(laterCommand.candidate);
+                    } catch (releaseError) {
+                        this.report(releaseError);
+                    }
+                }
+                break;
+            }
+        }
+    }
+    private disposeMountedScene(scene: SceneInstance<S, C>): void {
+        try {
+            this.releaseCandidateSlots(scene.id);
+        } catch (error) {
+            this.report(error);
+        }
+        try {
+            scene.dispose();
+        } catch (error) {
+            this.report(error);
         }
     }
     render(frame: Frame, alpha: number) {
@@ -608,7 +801,7 @@ export class Game<S = Record<string, never>, C = never> {
             rootSeed: this.rootSeed,
             nextInstanceId: this.nextId,
             state: inspectValue(this.stateValue),
-            scenes: Object.freeze(this.stack.map((s) => s.enumerate())),
+            scenes: Object.freeze(this.stack.map((scene) => scene.enumerate())),
         });
     }
     dispose() {
@@ -616,7 +809,7 @@ export class Game<S = Record<string, never>, C = never> {
         this.#lifecycle = "Disposing";
         const cleanup = new Cleanup();
         cleanup.defer(() => this.assets.dispose());
-        for (const s of this.stack) cleanup.defer(() => s.dispose());
+        for (const scene of this.stack) cleanup.defer(() => scene.dispose());
         this.stack = [];
         cleanup.defer(() => this.cancelPending());
         this.stateCommands.length = 0;
