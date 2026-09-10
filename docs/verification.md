@@ -1,5 +1,69 @@
 # NGNE verification
 
+## NGNE-9 — 10 September 2026
+
+Input focus and cancellation were validated and hardened in the shared `Input` service
+used by Starfall and the platformer. Local Windows 11 x64 10.0.26200, Node v24.15.0,
+Vite 7.3.6 and the Chromium 152 Codex in-app browser, DPR 1.25.
+
+### Repeatable case list
+
+Run `npm run dev`, open `/validation.html`, and require `ALL CHECKS PASSED`. The input
+portion runs these cases in order:
+
+1. Focus the canvas; deliver an arrow key; require one press plus held state and default
+   scrolling prevention.
+2. Focus a button; deliver Space; require native button behavior, no game press and a
+   release for the key held before focus left the canvas. Deliver a key directly to
+   `window`; require it to be ignored without an exception.
+3. Deliver a pointer at 75%/25% of a 200 × 100 CSS canvas mapped to 100 × 50 logical
+   pixels; require `(75, 12.5)`. Resize CSS to 400 × 200, deliver at 25%/75%, and require
+   `(25, 37.5)`.
+4. Hold `Pointer0`, lose pointer capture, and require its release plus inactive pointer
+   state. Repeat with `Pointer2` and `pointercancel`.
+5. Simulate pad 0 with button 0 and axis 0 held; require `Pad0` and axis `0.5`. Disconnect
+   it; require a release. Reconnect pad 1 with button 9 held; require a fresh `Pad9` press.
+6. Blur while pad 1 remains held; consume the release while unfocused, refocus and require
+   no reacquisition. Return it to neutral, press again, and require a fresh edge.
+7. Queue a key before a zero-tick frame; require no consumption. Advance a two-tick
+   catch-up frame; require the edge only on tick one and held state on both ticks.
+8. Stop while that key is held, release it while stopped, resume, and require the first
+   tick to contain its release with no held action.
+
+For each visible game, start through its button, confirm the canvas has focus, press P,
+require its paused UI, then resume through the page button and require active gameplay.
+Starfall must show `FLIGHT PAUSED` then `FLIGHT IN PROGRESS`; the platformer must show
+`Paused` then `Reach the blue gate`. Neither page may show its error UI or emit a console
+error.
+
+### Results
+
+- `npm test`: all **91** tests passed, including input edge retention and explicit clear
+  release coverage plus the existing complete Starfall and platformer suites.
+- `npm run typecheck`, `npm run build` and `npm run format:check`: passed. The build
+  includes emitted declarations, the public API misuse fixture and all browser entries.
+- The new browser input module also passed a separate strict TypeScript check with
+  ES2024 DOM libraries.
+- `/validation.html`: all **107** checks passed with no console errors. Fifteen input
+  checks cover the case list above; existing renderer, lifecycle and 65 interpolation
+  checks also passed.
+- Starfall and the platformer passed the focused P-key pause and button-resume flows
+  above. No console errors were recorded on either page.
+
+### Device limits
+
+| Input source        | Device / method                                                        | Result                                                                  |
+| ------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Keyboard            | Browser-generated key delivery on Windows, Chromium 152 in-app browser | Passed canvas focus, cancellation and both-game pause/resume flows      |
+| Pointer / mouse     | Browser clicks plus deterministic `PointerEvent` cancellation cases    | Passed button preservation, resize mapping, cancel and capture loss     |
+| Physical keyboard   | No manually operated device                                            | Untested                                                                |
+| Physical touch      | No touch-screen device available                                       | Untested; synthetic pointer coverage is not a physical-touch claim      |
+| Physical controller | No controller available                                                | Untested; simulated Gamepad API hot-plug coverage is not a device claim |
+
+No Firefox, Safari, mobile hardware, multi-controller ownership or local multiplayer
+claim is made. This ticket changes input ownership/cancellation only; it makes no
+performance claim.
+
 ## NGNE-7 — 10 September 2026
 
 Owner-scoped scene candidate slots replaced duplicated readiness, retry, refill and

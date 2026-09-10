@@ -203,15 +203,23 @@ An invoked system receives a scene-scoped context with fixed duration, global si
 
 The input service collects platform events and produces one stable logical-player snapshot per simulation tick:
 
+- The attached canvas owns keyboard and gamepad input only while it has focus. Ordinary
+  page controls retain their native keyboard behavior.
+- Pointer input belongs to the attached canvas. Blur, pointer cancellation, capture loss
+  and host stop release held actions rather than leaving them latched.
 - Held state appears on every tick.
 - Press, release, pointer, and wheel edges appear on one consuming tick.
 - If a platform frame runs several ticks, its edges appear only on the first tick.
 - If it runs no ticks, pending edges wait for the next tick.
 - Every updating scene receives the same snapshot.
 
-Keyboard, pointer, and gamepad input may all contribute to that one logical-player snapshot.
+Keyboard, pointer, and the lowest-index connected gamepad may all contribute to that
+one logical-player snapshot. A disconnected or replaced gamepad releases its buttons.
+After focus or host cancellation, the same connected gamepad must return to neutral
+before it can be acquired again.
 
-Local multiplayer input and controller ownership are out of scope. An input-buffering system that must run during hitstop opts into `runsDuringFreeze`.
+Local multiplayer and explicit controller assignment are out of scope. An
+input-buffering system that must run during hitstop opts into `runsDuringFreeze`.
 
 ## Mutation and scene events
 

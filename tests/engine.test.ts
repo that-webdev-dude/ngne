@@ -102,6 +102,12 @@ test("input holds edges until consumption and never repeats them on catch-up", (
     assert.deepEqual(b.held, ["KeyW"]);
     i.set("KeyW", false);
     assert.deepEqual(i.consume().released, ["KeyW"]);
+    i.set("KeyD", true);
+    i.consume();
+    i.clear();
+    const cleared = i.consume();
+    assert.deepEqual(cleared.held, []);
+    assert.deepEqual(cleared.released, ["KeyD"]);
     assert.throws(() => {
         (a.held as string[]).push("evil");
     });

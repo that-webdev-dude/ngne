@@ -48,6 +48,19 @@ await app.start(await app.game.prepare(scene, { key: "first-room" }));
 
 Rectangles and sprites use **center coordinates**. Distances are logical canvas pixels; `dt` is seconds. Composition is fixed when an entity spawns. A query callback receives its entity and correctly inferred component values, with no casts or component lookups in the hot loop.
 
+## Browser input
+
+Give the game canvas `tabindex="0"` and focus it after the player starts or resumes the
+game. `BrowserGame` then owns keyboard and gamepad input only while that canvas is
+focused; ordinary buttons and form controls keep their normal keyboard behavior. Pointer
+input is canvas-scoped and uses current CSS-to-logical scaling.
+
+Blur, pointer cancellation or capture loss, host stop and disposal clear held actions.
+The first connected gamepad supplies the one logical player; after cancellation it must
+return to neutral before being read again. Local multiplayer and explicit pad assignment
+remain outside the engine contract. The exact edge and hot-plug rules are in the
+[platform contract](contracts/NGNE.md#platform-and-lifecycle).
+
 ## Scene authoring
 
 ```ts

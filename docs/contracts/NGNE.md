@@ -199,7 +199,23 @@ it settles, without retaining permission to activate a scene.
 
 `Game` is headless. `BrowserGame` owns its input, renderer, audio and host frame scheduler. The injected scheduler must follow requestAnimationFrame semantics: asynchronous callbacks, cancellable IDs and monotonic millisecond timestamps. Late callbacks do no work after disabling. Cold loop failure rolls back the initial mounted world. Resume loop failure preserves it for terminal disposal. All independent teardown actions are attempted.
 
-Default step: 1/60 second; budget: five ticks per platform frame. Excess whole ticks are dropped and reported, fractional remainder retained. No variable simulation delta. Display dimensions are fixed logical pixels; the backing canvas matches them and CSS scales presentation. Each frame latches display once. Each consuming tick receives one frozen input snapshot shared by every selected scene; pending edges survive frames without ticks. Native key codes, `Pointer0`, `Pad0` etc. identify inputs; a snapshot exposes held/pressed/released arrays, normalized gamepad axes, logical pointer coordinates/deltas and wheel delta. Hot-plug ownership/local multiplayer are not implemented.
+Default step: 1/60 second; budget: five ticks per platform frame. Excess whole ticks are dropped and reported, fractional remainder retained. No variable simulation delta. Display dimensions are fixed logical pixels; the backing canvas matches them and CSS scales presentation. Each frame latches display once. Each consuming tick receives one frozen input snapshot shared by every selected scene; pending edges survive frames without ticks and appear only on the first tick of a multi-tick frame.
+
+The attached canvas is the focused input surface. Keyboard presses are accepted only
+when their event targets that focused canvas; key releases remain window-observed so a
+focus change cannot latch a key. Buttons, inputs, text areas and selects keep normal
+keyboard behavior. Pointer coordinates are recomputed from the canvas's current client
+rectangle for every event and mapped to fixed logical display pixels. Pointer cancellation
+or capture loss releases every held `PointerN` action and clears pointer activity.
+
+The lowest-index connected gamepad contributes to the same logical player only while
+the canvas is focused. Disconnecting or switching pads releases the previous pad's held
+buttons. Blur, `Input.clear()`, `BrowserGame.stop()` and disposal cancel held keyboard,
+pointer and pad input; the same connected pad must return to neutral before it can be
+acquired again. A later reconnect is a fresh pad input source. Native key codes,
+`Pointer0`, `Pad0` etc. identify inputs; snapshots expose held/pressed/released arrays,
+dead-zone-normalized gamepad axes, logical pointer coordinates/deltas and wheel delta.
+Local multiplayer and explicit controller assignment are not implemented.
 
 ## Renderer
 

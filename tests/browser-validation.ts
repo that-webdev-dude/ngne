@@ -1,5 +1,6 @@
 import { Renderer, Frame, Camera, BrowserGame, type FrameScheduler } from "../src/index.js";
 import { checkBrowserLifecycle } from "./browser-lifecycle-checks.js";
+import { checkBrowserInput } from "./browser-input-checks.js";
 import { checkBrowserInterpolation } from "./browser-interpolation-checks.js";
 const results: string[] = [];
 const check = (condition: unknown, message: string) => {
@@ -134,6 +135,7 @@ async function main() {
     await app.dispose();
     check(app.game.lifecycle === "Disposed" && cancelled >= 2, "browser teardown completes");
     await checkBrowserLifecycle(check);
+    await checkBrowserInput(check);
     await checkBrowserInterpolation(check);
     document.getElementById("results")!.textContent = results.join("\n") + "\n\nALL CHECKS PASSED";
 }

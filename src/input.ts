@@ -35,27 +35,44 @@ export class Input {
     private wheel = 0;
     private cleanups: (() => void)[] = [];
     private padHeld = new Set<string>();
-    set(key: string, value: boolean) {
+    private padIndex?: number;
+    private blockedPadIndex?: number;
+    private focused = false;
+    set(key: string, value: boolean): void {
         if (value && !this.held.has(key)) {
             this.held.add(key);
             this.presses.add(key);
         }
         if (!value && this.held.delete(key)) this.releases.add(key);
     }
-    attach(canvas: HTMLCanvasElement, width: number, height: number) {
+    attach(canvas: HTMLCanvasElement, width: number, height: number): void {
+        this.focused = document.activeElement === canvas;
         const on = (target: EventTarget, name: string, fn: EventListener) => {
             target.addEventListener(name, fn, { passive: false });
             this.cleanups.push(() => target.removeEventListener(name, fn));
         };
         on(window, "keydown", (e) => {
             const k = e as KeyboardEvent;
-            if ((k.target as HTMLElement)?.matches("input,textarea,select")) return;
+            if (!this.focused || k.target !== canvas) return;
             if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(k.code))
                 k.preventDefault();
             this.set(k.code, true);
         });
         on(window, "keyup", (e) => this.set((e as KeyboardEvent).code, false));
-        on(window, "blur", () => this.clear());
+        on(window, "focus", () => {
+            this.focused = document.activeElement === canvas;
+        });
+        on(window, "blur", () => {
+            this.focused = false;
+            this.clear();
+        });
+        on(canvas, "focus", () => {
+            this.focused = true;
+        });
+        on(canvas, "blur", () => {
+            this.focused = false;
+            this.clear();
+        });
         const pointer = (e: PointerEvent) => {
             const r = canvas.getBoundingClientRect();
             const x = ((e.clientX - r.left) * width) / r.width,
@@ -75,11 +92,17 @@ export class Input {
             canvas.setPointerCapture(p.pointerId);
             this.set("Pointer" + p.button, true);
         });
-        on(canvas, "pointerup", (e) => this.set("Pointer" + (e as PointerEvent).button, false));
-        on(canvas, "pointercancel", () => {
-            this.set("Pointer0", false);
-            this.set("Pointer2", false);
+        on(canvas, "pointerup", (e) => {
+            const p = e as PointerEvent;
+            pointer(p);
+            this.set("Pointer" + p.button, false);
         });
+        const cancelPointer = () => {
+            for (const key of this.held) if (key.startsWith("Pointer")) this.set(key, false);
+            this.active = false;
+        };
+        on(canvas, "pointercancel", cancelPointer);
+        on(canvas, "lostpointercapture", cancelPointer);
         on(canvas, "contextmenu", (e) => e.preventDefault());
         on(canvas, "wheel", (e) => {
             e.preventDefault();
@@ -89,15 +112,30 @@ export class Input {
     consume(): InputSnapshot {
         let axes = [0, 0, 0, 0];
         const pad =
-            typeof navigator !== "undefined"
+            this.focused && typeof navigator !== "undefined"
                 ? navigator.getGamepads?.().find((p) => p?.connected)
                 : undefined;
         const current = new Set<string>();
         if (pad) {
-            axes = axes.map((_, i) => (Math.abs(pad.axes[i] ?? 0) > 0.15 ? pad.axes[i] : 0));
-            pad.buttons.forEach((b, i) => {
-                if (b.pressed) current.add("Pad" + i);
-            });
+            if (this.padIndex !== undefined && this.padIndex !== pad.index) {
+                for (const key of this.padHeld) this.releases.add(key);
+                this.padHeld.clear();
+            }
+            this.padIndex = pad.index;
+            const blocked = this.blockedPadIndex === pad.index;
+            const hasInput =
+                pad.axes.some((value) => Math.abs(value) > 0.15) ||
+                pad.buttons.some((button) => button.pressed);
+            if (blocked && !hasInput) this.blockedPadIndex = undefined;
+            if (!blocked) {
+                axes = axes.map((_, i) => (Math.abs(pad.axes[i] ?? 0) > 0.15 ? pad.axes[i] : 0));
+                pad.buttons.forEach((button, i) => {
+                    if (button.pressed) current.add("Pad" + i);
+                });
+            }
+        } else if (this.focused) {
+            this.padIndex = undefined;
+            this.blockedPadIndex = undefined;
         }
         for (const key of current) if (!this.padHeld.has(key)) this.presses.add(key);
         for (const key of this.padHeld) if (!current.has(key)) this.releases.add(key);
@@ -121,17 +159,22 @@ export class Input {
         this.dx = this.dy = this.wheel = 0;
         return result;
     }
-    clear() {
+    clear(): void {
         for (const key of this.held) this.releases.add(key);
+        for (const key of this.padHeld) this.releases.add(key);
         this.held.clear();
         this.presses.clear();
         this.padHeld.clear();
+        this.blockedPadIndex = this.padIndex;
+        this.active = false;
+        this.dx = this.dy = this.wheel = 0;
     }
-    dispose() {
+    dispose(): void {
         this.cleanups
             .splice(0)
             .reverse()
             .forEach((f) => f());
         this.clear();
+        this.focused = false;
     }
 }
