@@ -1,4 +1,4 @@
-﻿import { BrowserGame } from "ngne";
+﻿import { audioAsset, BrowserGame } from "ngne";
 
 import { createOverlay, createProgress, HEIGHT, transition, WIDTH } from "./game.js";
 import type { Progress, ProgressCommand, Run } from "./game.js";
@@ -18,6 +18,10 @@ const gameCanvas = canvas;
 const startButton = start;
 const pauseButton = pause;
 const recordsBaseline = new URLSearchParams(location.search).has("baseline");
+const music = audioAsset(
+    "platformer-music",
+    "data:audio/wav;base64,UklGRmQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUAAAACAhYuQlJeam5ybmpeUkIuFgHt1cGxpZmVkZWZpbHB1e4CFi5CUl5qbnJual5SQi4WAe3VwbGlmZWRlZmlscHV7",
+);
 // Presentation only. Scene resources and committed state own every gameplay decision.
 let presentation: Run["phase"] | "ready" | "paused" | "complete" | "error" = "ready";
 let errorMessage: string | undefined;
@@ -46,6 +50,7 @@ app.audio.muted = true;
 const registry = createTransitionRegistry({
     levels: [LEVEL_ONE, LEVEL_TWO],
     audio: app.audio,
+    music,
     overlay: createOverlay,
     onView: (view) => {
         presentation = view.phase;

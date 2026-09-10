@@ -120,7 +120,7 @@ frame.sprite({
 });
 ```
 
-Call `await app.audio.unlock()` from a user gesture. Create an audio scope during scene setup with `app.audio.scene('room')`, immediately register its `.dispose`, and enqueue `scope.play({ frequency: 440, duration: .15 })` or `scope.play({ buffer, loop: true, volume: .2 })` from systems. Requests flush after commit, never from render callbacks. Scopes have independent volume controls; `audio.duck(.25)` lowers the overall mix and `audio.duck(1)` restores it. Voice count and pending requests are bounded. The showcase includes synthesized effects and a tick-driven bass sequence.
+Call `await app.audio.unlock()` from a user gesture. Create an audio scope during scene setup with `app.audio.scene('room')`, immediately register its `.dispose`, and enqueue `scope.play({ frequency: 440, duration: .15 })` or `scope.play({ buffer, loop: true, volume: .2 })` from systems. Requests flush after commit, never from render callbacks. Scopes have independent volume controls; `audio.duck(.25)` lowers the overall mix and `audio.duck(1)` restores it. Voice count and pending requests are bounded. Starfall and the platformer lease decoded looping music per gameplay scene alongside synthesized cues.
 
 ## Entity lifetime and update order
 
@@ -191,16 +191,23 @@ The [camera coordinate contract](contracts/NGNE.md#camera-coordinates) defines t
 
 ## Audio example
 
-After unlocking audio from a click or other user gesture, register a scope inside the scene's setup:
+After unlocking audio from a click or other user gesture, list decoded clips as scene assets and register a scope inside setup:
 
 ```ts
-const sound = app.audio.scene("room");
-scene.defer(() => sound.dispose());
-scene.system(({ input }) => {
-    if (input.pressed.includes("Space")) {
-        sound.play({ frequency: 440, duration: 0.15 });
-    }
-});
+const music = audioAsset("room-music", new URL("./music.wav", import.meta.url).href);
+
+const room: SceneDefinition = {
+    id: "room",
+    assets: [music],
+    setup(scene) {
+        const sound = app.audio.scene("room");
+        scene.defer(() => sound.dispose());
+        sound.play({ buffer: scene.assets.get(music.id) as AudioBuffer, loop: true });
+        scene.system(({ input }) => {
+            if (input.pressed.includes("Space")) sound.play({ frequency: 440, duration: 0.15 });
+        });
+    },
+};
 ```
 
-The browser host flushes requests after simulation commit. Disposing the scene removes its queued and active voices. For a complete asset-free game using these APIs, read [Starfall](../demo/game.ts) and its [browser entry](../demo/main.ts).
+The browser host flushes requests after simulation commit. Disposing the scene removes its queued and active voices before its asset leases release. Cleanup failures are aggregated and leave the scope terminal. For complete consumers, read [Starfall](../demo/game.ts), its [browser entry](../demo/main.ts), and the [platformer](../examples/platformer/README.md).

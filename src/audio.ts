@@ -161,16 +161,20 @@ export class Audio {
     }
     private release(scope: string) {
         this.queue = this.queue.filter((s) => s.scope !== scope);
+        const errors: unknown[] = [];
         for (const [o, v] of this.voices)
             if (v.scope === scope) {
-                o.stop();
-                o.disconnect();
-                v.gain.disconnect();
+                this.stopVoice(o, v.gain, errors);
                 this.voices.delete(o);
             }
-        this.buses.get(scope)?.disconnect();
+        try {
+            this.buses.get(scope)?.disconnect();
+        } catch (error) {
+            errors.push(error);
+        }
         this.buses.delete(scope);
         this.volumes.delete(scope);
+        if (errors.length) throw new AggregateError(errors, "Audio scope disposal failed");
     }
     suspend() {
         this.queue.length = 0;
@@ -184,18 +188,7 @@ export class Audio {
         this.disposed = true;
         this.queue.length = 0;
         const errors: unknown[] = [];
-        for (const [o, v] of this.voices)
-            for (const action of [
-                () => o.stop(),
-                () => o.disconnect(),
-                () => v.gain.disconnect(),
-            ]) {
-                try {
-                    action();
-                } catch (e) {
-                    errors.push(e);
-                }
-            }
+        for (const [o, v] of this.voices) this.stopVoice(o, v.gain, errors);
         this.voices.clear();
         this.volumes.clear();
         for (const b of this.buses.values()) {
@@ -207,6 +200,11 @@ export class Audio {
         }
         this.buses.clear();
         try {
+            this.master?.disconnect();
+        } catch (e) {
+            errors.push(e);
+        }
+        try {
             await this.context?.close();
         } catch (e) {
             errors.push(e);
@@ -214,5 +212,23 @@ export class Audio {
         this.context = undefined;
         this.master = undefined;
         if (errors.length) throw new AggregateError(errors, "Audio disposal failed");
+    }
+    private stopVoice(
+        source: OscillatorNode | AudioBufferSourceNode,
+        gain: GainNode,
+        errors: unknown[],
+    ): void {
+        source.onended = null;
+        for (const action of [
+            () => source.stop(),
+            () => source.disconnect(),
+            () => gain.disconnect(),
+        ]) {
+            try {
+                action();
+            } catch (error) {
+                errors.push(error);
+            }
+        }
     }
 }

@@ -1,5 +1,5 @@
 import "./style.css";
-import { BrowserGame, type Asset, type Stats } from "ngne";
+import { audioAsset, BrowserGame, type Asset, type Stats } from "ngne";
 import { arena, overlay, W, H, type Progress, type ProgressCommand, type RunView } from "./game.js";
 import { makeAtlas, titleArt } from "./art.js";
 const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -12,6 +12,10 @@ const atlas: Asset<HTMLCanvasElement> = {
     id: "ships",
     load: async () => makeAtlas(),
 };
+const music = audioAsset(
+    "starfall-music",
+    "data:audio/wav;base64,UklGRmQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUAAAACAhYuQlJeam5ybmpeUkIuFgHt1cGxpZmVkZWZpbHB1e4CFi5CUl5qbnJual5SQi4WAe3VwbGlmZWRlZmlscHV7",
+);
 let view: RunView = {
     phase: "attract",
     score: 0,
@@ -65,6 +69,7 @@ function options(attract = false, stress = false) {
         stress,
         audio: app.audio,
         atlas,
+        music,
         reducedMotion,
         onView: (next: RunView) => {
             view = next;

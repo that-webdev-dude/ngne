@@ -61,8 +61,9 @@ export interface RunView {
 export interface ShowcaseOptions {
     attract?: boolean;
     stress?: boolean;
-    audio?: Audio;
+    audio?: Pick<Audio, "scene">;
     atlas?: Asset<any>;
+    music?: Asset<AudioBuffer>;
     onView?: (view: RunView) => void;
     pause?: () => PreparedScene | undefined;
     result?: () => PreparedScene | undefined;
@@ -72,7 +73,10 @@ export interface ShowcaseOptions {
 export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, ProgressCommand> {
     return {
         id: options.attract ? "attract" : "starfall-arena",
-        assets: options.atlas ? [options.atlas] : [],
+        assets: [
+            ...(options.atlas ? [options.atlas] : []),
+            ...(options.music ? [options.music] : []),
+        ],
         setup(s) {
             const rng = s.random("waves"),
                 fx = s.random("effects");
@@ -107,7 +111,14 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                 finished: boolean;
             });
             const sound = options.audio?.scene(options.attract ? "attract" : "arena");
-            if (sound) s.defer(() => sound.dispose());
+            if (sound) {
+                s.defer(() => sound.dispose());
+                const music = options.music
+                    ? (s.assets.get(options.music.id) as AudioBuffer)
+                    : undefined;
+                if (music && !options.attract)
+                    sound.play({ buffer: music, loop: true, volume: 0.035 });
+            }
             const stars = s.resource(
                 "stars",
                 Array.from({ length: 180 }, () => ({

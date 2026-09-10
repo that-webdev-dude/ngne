@@ -16,6 +16,7 @@ import { createTransitionRegistry, levelKey } from "../examples/platformer/trans
 import type { RegistryOptions } from "../examples/platformer/transitions.js";
 import { emptyInput, Frame, Game } from "../src/index.js";
 import type {
+    Asset,
     GameInspection,
     InputSnapshot,
     InspectionValue,
@@ -86,7 +87,12 @@ async function createHarness(
     script: ReadonlyMap<number, ScheduledTick> = new Map(),
     progress = createProgress(),
     prepare?: PrepareOverride,
-    config: { allowErrors?: boolean; capture?: boolean; audio?: RegistryOptions["audio"] } = {},
+    config: {
+        allowErrors?: boolean;
+        capture?: boolean;
+        audio?: RegistryOptions["audio"];
+        music?: RegistryOptions["music"];
+    } = {},
 ) {
     const errors: unknown[] = [];
     const commands: { tick: number; command: ProgressCommand }[] = [];
@@ -105,6 +111,7 @@ async function createHarness(
         prepare,
         overlay: createOverlay,
         audio: config.audio,
+        music: config.music,
         onError: (error) => errors.push(error),
     });
     const output = new Frame();
@@ -1349,14 +1356,39 @@ test("platformer host-driven determinism B matches every tick through checkpoint
 });
 
 test("platformer audio cues are scene scoped, optional and disposed on death remount", async () => {
-    const scopes: { id: string; frequencies: number[]; disposed: boolean }[] = [];
+    const musicBuffer = {} as AudioBuffer;
+    let loads = 0;
+    let musicDisposals = 0;
+    const music: Asset<AudioBuffer> = {
+        id: "platformer-music",
+        async load() {
+            loads++;
+            return musicBuffer;
+        },
+        dispose(buffer) {
+            assert.equal(buffer, musicBuffer);
+            musicDisposals++;
+        },
+    };
+    const scopes: {
+        id: string;
+        frequencies: number[];
+        clips: { buffer: AudioBuffer; loop?: boolean }[];
+        disposed: boolean;
+    }[] = [];
     const audio: NonNullable<RegistryOptions["audio"]> = {
         scene(id) {
-            const scope = { id, frequencies: [] as number[], disposed: false };
+            const scope = {
+                id,
+                frequencies: [] as number[],
+                clips: [] as { buffer: AudioBuffer; loop?: boolean }[],
+                disposed: false,
+            };
             scopes.push(scope);
             return {
                 play(sound) {
                     if ("frequency" in sound) scope.frequencies.push(sound.frequency);
+                    else scope.clips.push({ buffer: sound.buffer, loop: sound.loop });
                 },
                 volume() {},
                 dispose() {
@@ -1368,6 +1400,7 @@ test("platformer audio cues are scene scoped, optional and disposed on death rem
     const script = new Map<number, ScheduledTick>();
     const harness = await createHarness([PROGRESSION], script, createProgress(), undefined, {
         audio,
+        music,
     });
     try {
         await drive(
@@ -1387,14 +1420,18 @@ test("platformer audio cues are scene scoped, optional and disposed on death rem
         await drive(harness, script, emptyInput(), () => harness.game.scenes[0].id !== owner);
         assert.equal(scopes[0].disposed, true);
         assert.equal(scopes.length, 2);
+        assert.deepEqual(scopes[0].clips, [{ buffer: musicBuffer, loop: true }]);
         script.set(harness.game.simulationTick, { input: createInput(["Space"], ["Space"]) });
         await harness.frame();
         assert.deepEqual(scopes[1].frequencies, [280]);
+        assert.deepEqual(scopes[1].clips, [{ buffer: musicBuffer, loop: true }]);
         assert.ok(scopes.every((scope) => scope.id === "platformer"));
+        assert.equal(loads, 1);
     } finally {
         harness.dispose();
     }
     assert.ok(scopes.every((scope) => scope.disposed));
+    assert.equal(musicDisposals, 1);
 });
 
 test("platformer exit beats a simultaneous checkpoint and ready pause request", async () => {

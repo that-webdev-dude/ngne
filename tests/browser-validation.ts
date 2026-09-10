@@ -1,4 +1,5 @@
 import { Renderer, Frame, Camera, BrowserGame, type FrameScheduler } from "../src/index.js";
+import { checkBrowserAudio } from "./browser-audio-checks.js";
 import { checkBrowserLifecycle } from "./browser-lifecycle-checks.js";
 import { checkBrowserInput } from "./browser-input-checks.js";
 import { checkBrowserInterpolation } from "./browser-interpolation-checks.js";
@@ -9,6 +10,7 @@ const check = (condition: unknown, message: string) => {
     document.getElementById("results")!.textContent = results.join("\n");
 };
 async function main() {
+    await checkBrowserAudio(check);
     const canvas = document.getElementById("synthetic") as HTMLCanvasElement;
     const renderer = new Renderer(canvas, 64, 64),
         frame = new Frame(),
@@ -139,7 +141,15 @@ async function main() {
     await checkBrowserInterpolation(check);
     document.getElementById("results")!.textContent = results.join("\n") + "\n\nALL CHECKS PASSED";
 }
-main().catch((error) => {
-    document.getElementById("results")!.textContent = results.join("\n") + "\nFAIL " + error.stack;
-    console.error(error);
-});
+document.getElementById("start-validation")!.addEventListener(
+    "click",
+    () => {
+        document.getElementById("results")!.textContent = "Running…";
+        void main().catch((error) => {
+            document.getElementById("results")!.textContent =
+                results.join("\n") + "\nFAIL " + error.stack;
+            console.error(error);
+        });
+    },
+    { once: true },
+);

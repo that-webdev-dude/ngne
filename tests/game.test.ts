@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { Game, Frame, emptyInput } from "../src/index.js";
+import type { Asset, Audio } from "../src/index.js";
 import { arena, type Progress, type ProgressCommand } from "../demo/game.js";
 const create = () =>
     new Game<Progress, ProgressCommand>({
@@ -40,4 +41,65 @@ test("chaos survives a full run, commits victory and high score, uses bounded li
     assert.ok(g.state.best > 0);
     assert.ok(g.scenes[0].entityCapacity < 20000);
     g.dispose();
+});
+
+test("showcase looping music reuses decoded data and releases every replaced scope", async () => {
+    const buffer = {} as AudioBuffer;
+    let loads = 0;
+    let assetDisposals = 0;
+    const music: Asset<AudioBuffer> = {
+        id: "starfall-music",
+        async load() {
+            loads++;
+            return buffer;
+        },
+        dispose(value) {
+            assert.equal(value, buffer);
+            assetDisposals++;
+        },
+    };
+    const scopes: { clips: { buffer: AudioBuffer; loop?: boolean }[]; disposed: boolean }[] = [];
+    const audio: Pick<Audio, "scene"> = {
+        scene() {
+            const scope = {
+                clips: [] as { buffer: AudioBuffer; loop?: boolean }[],
+                disposed: false,
+            };
+            scopes.push(scope);
+            return {
+                play(sound) {
+                    if ("buffer" in sound)
+                        scope.clips.push({ buffer: sound.buffer, loop: sound.loop });
+                },
+                volume() {},
+                dispose() {
+                    scope.disposed = true;
+                },
+            };
+        },
+    };
+    const game = create();
+    await game.start(
+        await game.prepare(arena({ audio, music }), {
+            key: "run-0",
+        }),
+    );
+    for (let run = 1; run <= 3; run++) {
+        game.set(await game.prepare(arena({ audio, music }), { key: `run-${run}` }));
+        game.tick();
+        assert.ok(scopes.slice(0, -1).every((scope) => scope.disposed));
+    }
+    assert.equal(loads, 1);
+    assert.equal(scopes.length, 4);
+    assert.ok(
+        scopes.every(
+            (scope) =>
+                scope.clips.length === 1 &&
+                scope.clips[0].buffer === buffer &&
+                scope.clips[0].loop === true,
+        ),
+    );
+    game.dispose();
+    assert.ok(scopes.every((scope) => scope.disposed));
+    assert.equal(assetDisposals, 1);
 });

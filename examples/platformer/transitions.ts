@@ -1,4 +1,4 @@
-import type { Audio, Game, SceneDefinition } from "ngne";
+import type { Asset, Audio, Game, SceneDefinition } from "ngne";
 
 import { createLevel } from "./game.js";
 import type { OverlayOptions, Progress, ProgressCommand, Run } from "./game.js";
@@ -16,6 +16,7 @@ interface CandidateSpec {
 export interface RegistryOptions {
     readonly levels: readonly LevelData[];
     readonly audio?: Pick<Audio, "scene">;
+    readonly music?: Asset<AudioBuffer>;
     readonly onView?: (view: Readonly<Run>) => void;
     readonly onOverlayView?: OverlayOptions["onView"];
     readonly overlay?: (kind: "pause" | "complete", options: OverlayOptions) => Definition;
@@ -54,6 +55,7 @@ export function createTransitionRegistry(options: RegistryOptions): TransitionRe
             index,
             data,
             audio: options.audio,
+            music: options.music,
             onView: options.onView,
             respawn: () => take("respawn"),
             next: () => take("next") ?? take("complete"),

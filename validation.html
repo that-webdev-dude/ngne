@@ -8,8 +8,10 @@
         <p>
             Automated real-browser checks. Input cancellation and hot-plug cases use deterministic
             simulated events; physical-device evidence is recorded separately. This page
-            intentionally loses and restores its own WebGL context.
+            intentionally loses and restores its own WebGL context. Start it with a user gesture so
+            the audio checks can unlock a real playback device.
         </p>
+        <button id="start-validation" type="button">Run checks</button>
         <canvas
             id="synthetic"
             width="64"
@@ -28,7 +30,7 @@
             height="96"
             style="width: 384px; height: 288px; max-width: 100%; image-rendering: pixelated"
         ></canvas>
-        <pre id="results">Running…</pre>
+        <pre id="results">Choose Run checks.</pre>
         <script type="module" src="/tests/browser-validation.ts"></script>
     </body>
 </html>

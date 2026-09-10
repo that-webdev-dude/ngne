@@ -1,6 +1,6 @@
 # Platformer
 
-Run `npm run dev` from the repository root, open `/examples/platformer/`, then choose **Start level 1**. Requires WebGL 2; the Start gesture unlocks synthesized audio.
+Run `npm run dev` from the repository root, open `/examples/platformer/`, then choose **Start level 1**. Requires WebGL 2; the Start gesture unlocks synthesized cues and scene-leased looping music.
 
 | Action                           | Keyboard / button            | Gamepad input read by the example |
 | -------------------------------- | ---------------------------- | --------------------------------- |

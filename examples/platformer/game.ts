@@ -1,5 +1,5 @@
 import { clamp, component, down, lerp, pressed } from "ngne";
-import type { Audio, DeepReadonly, PreparedScene, SceneDefinition } from "ngne";
+import type { Asset, Audio, DeepReadonly, PreparedScene, SceneDefinition } from "ngne";
 
 import { CONTACT, moveX, moveY, tileAt } from "./collision.js";
 import type { Box } from "./collision.js";
@@ -58,6 +58,7 @@ export interface LevelOptions {
     readonly index: number;
     readonly data: LevelData;
     readonly audio?: Pick<Audio, "scene">;
+    readonly music?: Asset<AudioBuffer>;
     readonly respawn?: () => PreparedScene | undefined;
     readonly next?: () => PreparedScene | undefined;
     readonly pause?: () => PreparedScene | undefined;
@@ -100,9 +101,16 @@ export function transition(
 export function createLevel(options: LevelOptions): SceneDefinition<Progress, ProgressCommand> {
     return {
         id: `platformer-level-${options.index}`,
+        assets: options.music ? [options.music] : [],
         setup(scene) {
             const sound = options.audio?.scene("platformer");
-            if (sound) scene.defer(() => sound.dispose());
+            if (sound) {
+                scene.defer(() => sound.dispose());
+                const music = options.music
+                    ? (scene.assets.get(options.music.id) as AudioBuffer)
+                    : undefined;
+                if (music) sound.play({ buffer: music, loop: true, volume: 0.025 });
+            }
             const state = scene.state();
             const progress = state.read();
             const data = options.data;

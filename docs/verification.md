@@ -1,5 +1,57 @@
 # NGNE verification
 
+## NGNE-10 — 10 September 2026
+
+Audio lifecycle was exercised through the shared service and both games on Windows
+11 x64 10.0.26200.9445, Node v24.15.0, Vite 7.3.6 and the Chromium 152 Codex
+in-app browser, DPR 1.
+
+### Repeatable case list
+
+1. Run `npm test`. Require the audio service cases to prove commit-time queue flush,
+   stale queued-request removal, independent equal-named scopes, the 128-request and
+   32-voice limits, mute/ducking, suspend/resume, unlock rejection, best-effort scope
+   cleanup with all failures aggregated, and terminal disposal after a close failure.
+2. In the same suite, require Starfall to reuse one decoded buffer through three scene
+   replacements, release every replaced scope and dispose the cached asset once. Require
+   the platformer death/remount case to start one looping clip per scene, release the old
+   scope and dispose the cached asset once at Game disposal.
+3. Run `npm run dev`, open `/validation.html`, choose **Run checks**, and require the five
+   audio lines plus `ALL CHECKS PASSED`. They use a real `AudioContext` to unlock from the
+   click, decode and share a WAV buffer, start a loop and oscillator in independent
+   equal-named scopes, change scope/master gain, suspend/resume, release scopes and reject
+   unlock after terminal disposal.
+4. Open Starfall, choose **Sound off** so it reads **Sound on**, then **Start Flight**.
+   Pause and resume once, choose **Chaos Lab** three times and require `CHAOS LAB /
+INVULNERABLE`, no error UI and no console warning/error.
+5. Open `/examples/platformer/`, choose **Start level 1**, then pause/resume three times.
+   Require `Level 1 · Attempt 1 · Start · Deaths 0 · Runs 0`, `Reach the blue gate`, no
+   error UI and no console warning/error.
+6. Run `npm run typecheck`, `npm run format:check`, `npm run build` and
+   `git diff --check`.
+
+### Results
+
+- `npm test`: all **95** tests passed. The new deterministic cases cover both game
+  consumers, decoded-buffer lease reuse, repeated replacement/remount, stale requests,
+  limits, unlock/close rejection and four independent failures during one scope cleanup.
+- `npm run typecheck`, `npm run format:check`, `npm run build` and `git diff --check`:
+  passed. The production build includes both games and the browser audio checks.
+- `/validation.html`: all **112** checks passed, including the five real-browser audio
+  checks, with no console warnings or errors.
+- Starfall passed sound enable, start, pause/resume and three consecutive Chaos Lab
+  replacements. The platformer passed start and three pause/resume cycles. Both decoded
+  their scene music during preparation, stayed in active gameplay and showed no error UI
+  or console warning/error.
+
+### Limits
+
+The browser checks prove decoding, Web Audio graph operations, lifecycle promises and
+failure-free game integration in Chromium. This agent cannot hear the host's physical
+speaker output, so subjective audibility, balance and sound quality are not claimed.
+Firefox, Safari, mobile hardware and background-tab audio policy were not tested. No
+performance claim is made.
+
 ## NGNE-9 — 10 September 2026
 
 Input focus and cancellation were validated and hardened in the shared `Input` service
