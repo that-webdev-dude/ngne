@@ -1,5 +1,123 @@
 # NGNE verification
 
+## NGNE-20 — 10–11 September 2026
+
+Local uncommitted implementation at baseline revision **`a906f3a`** on Windows 11 x64,
+Node v24.15.0, 12th Gen Intel Core i7-12650H (16 logical cores), 16 GiB. The change
+adds schema-defined typed-array SoA storage and keeps Starfall/platformer on the legacy
+object bridge for NGNE-27.
+
+### Automated checks
+
+- `npm.cmd test`: **108 passed, 0 failed**, including focused schema
+  field/chunk/lifetime/order/borrow/inspection/resource assertions, opaque query/facade
+  boundaries, legacy-query compatibility, and a headless mount/render regression for the
+  actual hello scene, plus all unchanged game suites.
+- `npm.cmd run typecheck`: passed. `tests/api-misuse.ts` covers inferred schema columns,
+  sparse field values, the zero-query distinction, immutable definitions, mixed-mode
+  rejection, schema `get()` rejection, private RNG state, and absent runtime constructors.
+- `npm.cmd run build`: passed; emitted declarations/API misuse compilation and production
+  Starfall, hello, and platformer bundles succeeded.
+- `npm.cmd run format:check` and `git diff --check`: passed.
+
+### CPU benchmark
+
+Two consecutive otherwise-idle `npm.cmd run bench` executions used 100 warmups and 300
+samples for the 20,000-entity typed ECS pass. The unchanged Chaos control used seed
+`bench`, 900 ticks, and 799 samples after tick 100. Times are milliseconds.
+
+| Workload             | Run |    min |    p50 |    p90 |    p95 |    p99 |    max |   mean |
+| -------------------- | --: | -----: | -----: | -----: | -----: | -----: | -----: | -----: |
+| Typed ECS            |   1 | 0.1786 | 0.1888 | 0.2204 | 0.2314 | 0.3305 | 0.6947 | 0.1984 |
+| Typed ECS            |   2 | 0.1760 | 0.1893 | 0.2126 | 0.2481 | 0.3209 | 0.5380 | 0.1970 |
+| Legacy Chaos control |   1 | 0.6483 | 0.7496 | 0.9202 | 1.0118 | 1.2166 | 1.4005 | 0.7840 |
+| Legacy Chaos control |   2 | 0.6760 | 0.7684 | 0.9049 | 1.0207 | 1.2517 | 1.6631 | 0.7990 |
+
+Both runs reached 7,209 sprites and 6,986 entity slots with zero sampled Chaos ticks
+over 16.67 ms. The NGNE-26 object ECS medians were 0.420/0.421 ms under the same
+20,000-entity workload; the typed medians here are 53–55% lower on this machine. Chaos
+is an unchanged legacy-game control, not an SoA result, and its medians were higher than
+NGNE-26's 0.697/0.694 ms. These local CPU measurements are not universal throughput or
+whole-game improvement claims.
+
+The NGNE-26-comparable ECS section commits once before warmup and does not include the
+per-commit-epoch descriptor reconstruction a game pays on its first typed query after a
+tick commit. The collision-grid section below includes index rebuild and query traversal
+cost, but also remains within one commit epoch per arm.
+
+The final harness section compared fixed equivalent synthetic collision-grid arms: 260
+cells, 256 targets, 512 probes, 64 build/probe batches per sample, 100 warmups, 300
+samples, and 32,512 candidate checks per sample. Each timed batch clears and rebuilds
+through the supported legacy `each()` or schema `eachChunk()` query path before probing.
+Measured timer resolution was 0.0001 ms; both arms' medians exceeded the required 0.01
+ms validity floor. Values below are nanoseconds per candidate check.
+
+| Arm             | Run |    min |    p50 |    p90 |    p95 |    p99 |    max |   mean |
+| --------------- | --: | -----: | -----: | -----: | -----: | -----: | -----: | -----: |
+| Legacy object   |   1 | 27.996 | 30.349 | 36.122 | 39.847 | 52.574 | 62.445 | 31.628 |
+| Schema view/row |   1 | 30.595 | 33.800 | 40.034 | 42.298 | 49.222 | 56.124 | 34.804 |
+| Legacy object   |   2 | 29.448 | 30.807 | 36.851 | 39.272 | 44.018 | 59.907 | 32.233 |
+| Schema view/row |   2 | 30.899 | 34.200 | 41.837 | 44.122 | 58.800 | 64.195 | 35.723 |
+
+Schema/legacy median ratios were 1.114 and 1.110. Neither run exceeded the 1.20
+threshold, so the plan's material-regression stop condition was not met. This synthetic
+result proves the view/row shape is expressible; it does not establish cost neutrality
+for Starfall. NGNE-27 must measure the migrated real collision loop against the NGNE-26
+baseline.
+
+### Browser evidence and limits
+
+The production build was served with `npm.cmd run preview`, and the real
+`http://127.0.0.1:4173/examples/hello/` page was observed in the visible Codex In-app
+Browser. Its embedded Chromium version and GPU/renderer strings were not exposed by the
+available inspection surface. The default viewport was 364 × 694 CSS pixels at DPR 1.25;
+the 640 × 240 canvas rendered at 300 × 113 CSS pixels.
+
+Over 9 seconds, ten one-second visible samples showed the cyan sprite advance across the
+dark canvas, reach the 640 edge, wrap to 0, and continue from the left. Six additional
+samples over 500 ms showed small, even intermediate advances, consistent with smooth
+interpolation rather than simulation-step jumps. The canvas remained visible and the
+page ended with zero captured console errors or warnings; no page error or unhandled
+exception was reported. This closes the required production hello proof.
+
+The headless regression remains complementary coverage for exact midpoint interpolation
+from 40 to 80 and the 640-to-0 pose reset. The two 60-second visible Starfall/platformer
+control runs were not repeated: those consumers remain unchanged on the legacy ECS, so
+their existing NGNE-26 results remain the comparison baseline until NGNE-12/27 measures
+the migrated games. No whole-game SoA or cross-browser/device performance claim is made.
+
+### Independent inspection
+
+Claude Code 2.1.267 inspected two fresh snapshots with its CLI default model (requested
+model unresolved). Round 1 returned `REVISE`; fixes moved schema validation ahead of
+slot allocation, restored cached legacy query columns, rejected duplicate queries at
+entry, added the headless hello regression, and pinned deliberate per-epoch descriptor
+allocation and disposed-world behavior. Round 2 also returned `REVISE`; its high-severity
+finding identified an enumerable TypeScript-private `WorldAccessRuntime.world` escape to
+the full runtime. The final local fixes use a true `#world` field, time both grid rebuild
+paths through their supported query APIs, add the missing boundary/order/inspection
+coverage, reject float32 overflow and malformed references, and align the public-symbol
+inventory and benchmark limits.
+
+An explicitly authorized third fresh inspection returned `REVISE`. Its three medium
+findings identified query-runtime access to the full `World`, unequal collision-grid
+benchmark work, and the missing visible-browser proof. Six low findings covered an
+entity-reference edge, facade binding, legacy-query compatibility, entity-reference
+defaults, explicit `undefined`, and weak test assertions. The code and tests now use true
+private query state, bound opaque facade methods, equivalent benchmark reads, null-only
+reference defaults, complete reference validation, preserved legacy-query behavior, and
+the requested focused assertions. Visible-browser proof remains open; the final fresh
+inspection carries that as an explicit delivery limit.
+
+The previous final fresh inspection returned `REVISE` with no storage, identity, ordering,
+or ownership defect. Its medium finding was the then-missing visible-browser hello proof;
+the evidence above closes it. Two low findings identified forged descriptor defaults and
+removal of the shipped legacy ECS from the roadmap. Descriptor construction now normalizes
+forged numeric defaults and rejects every non-null entity-reference default, with
+regression coverage; the roadmap retains the implemented legacy bridge and restores the
+NGNE-20 outcome. The complete post-closure snapshot, including both low fixes and this
+browser evidence, is the scope of the final explicitly authorized fresh inspection.
+
 ## NGNE-10 — 10 September 2026
 
 Audio lifecycle was exercised through the shared service and both games on Windows

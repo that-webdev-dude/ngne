@@ -5,16 +5,23 @@ export function seedOf(...parts: (string | number)[]) {
     for (const char of JSON.stringify(parts)) h = Math.imul(h ^ char.charCodeAt(0), 16777619);
     return h >>> 0;
 }
-/** Mulberry32, version 1. State is owned and enumerable by the mounted scene. */
+/** Mulberry32, version 1. State is owned by the mounted scene. */
 export class Random {
-    constructor(public state: number) {
-        this.state >>>= 0;
+    #state: number;
+    constructor(state: number) {
+        this.#state = state >>> 0;
     }
     next() {
-        let t = (this.state = (this.state + 0x6d2b79f5) >>> 0);
+        let t = (this.#state = (this.#state + 0x6d2b79f5) >>> 0);
         t = Math.imul(t ^ (t >>> 15), t | 1);
         t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
         return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    }
+    snapshot(): number {
+        return this.#state;
+    }
+    restore(state: number): void {
+        this.#state = state >>> 0;
     }
     range(min: number, max: number) {
         return min + this.next() * (max - min);

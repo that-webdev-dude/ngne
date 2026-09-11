@@ -36,9 +36,9 @@ Small screens offer touch controls. **Chaos Lab** adds 6,000 persistent particle
 Create components, spawn entities during scene setup, register update systems and prepare draw commands. NGNE owns the fixed-step loop and scene cleanup.
 
 ```ts
-import { component, type SceneDefinition } from "ngne";
+import { component, f64, type SceneDefinition } from "ngne";
 
-const Position = component("position", () => ({ x: 40, y: 100 }));
+const Position = component("position", { x: f64(40), y: f64(100) });
 
 const scene: SceneDefinition = {
     id: "hello",
@@ -46,12 +46,17 @@ const scene: SceneDefinition = {
         scene.world.spawn(Position.of());
         const points = scene.world.query(Position);
         scene.system(({ dt }) => {
-            points.each((_, p) => {
-                p.x += 40 * dt;
+            points.eachChunk((chunk) => {
+                const position = chunk.views.position;
+                for (let row = 0; row < chunk.count; row++) position.x[row] += 40 * dt;
             });
         });
         scene.render((frame) => {
-            points.each((_, p) => frame.rect(p.x, p.y, 16, 16, 0x83e8e1));
+            points.eachChunk((chunk) => {
+                const position = chunk.views.position;
+                for (let row = 0; row < chunk.count; row++)
+                    frame.rect(position.x[row], position.y[row], 16, 16, 0x83e8e1);
+            });
         });
     },
 };

@@ -5,9 +5,9 @@ Examples assume a TypeScript browser app with a canvas. Use the runnable [first 
 ## Your first scene
 
 ```ts
-import { BrowserGame, component, lerp, type SceneDefinition } from "ngne";
+import { BrowserGame, component, f64, lerp, type SceneDefinition } from "ngne";
 
-const Position = component("position", () => ({ x: 40, previousX: 40 }));
+const Position = component("position", { x: f64(40), previousX: f64(40) });
 const scene: SceneDefinition = {
     id: "hello",
     setup(scene) {
@@ -15,19 +15,32 @@ const scene: SceneDefinition = {
         const points = scene.world.query(Position);
 
         scene.system(({ dt }) => {
-            points.each((entity, position) => {
-                position.previousX = position.x;
-                position.x += 40 * dt;
+            points.eachChunk((chunk) => {
+                const position = chunk.views.position;
+                for (let row = 0; row < chunk.count; row++) {
+                    position.previousX[row] = position.x[row];
+                    position.x[row] += 40 * dt;
+                }
             });
         });
         scene.resetInterpolation(() => {
-            points.each((_, p) => {
-                p.previousX = p.x;
+            points.eachChunk((chunk) => {
+                const position = chunk.views.position;
+                for (let row = 0; row < chunk.count; row++)
+                    position.previousX[row] = position.x[row];
             });
         });
         scene.render((frame, alpha) => {
-            points.each((_, p) => {
-                frame.rect(lerp(p.previousX, p.x, alpha), 100, 16, 16, 0x83e8e1);
+            points.eachChunk((chunk) => {
+                const position = chunk.views.position;
+                for (let row = 0; row < chunk.count; row++)
+                    frame.rect(
+                        lerp(position.previousX[row], position.x[row], alpha),
+                        100,
+                        16,
+                        16,
+                        0x83e8e1,
+                    );
             });
         });
     },
@@ -46,7 +59,7 @@ await app.start(await app.game.prepare(scene, { key: "first-room" }));
 // await app.dispose();                 // terminal; releases all owned services
 ```
 
-Rectangles and sprites use **center coordinates**. Distances are logical canvas pixels; `dt` is seconds. Composition is fixed when an entity spawns. A query callback receives its entity and correctly inferred component values, with no casts or component lookups in the hot loop.
+Rectangles and sprites use **center coordinates**. Distances are logical canvas pixels; `dt` is seconds. Composition is fixed when an entity spawns. Schema queries invoke one callback per nonempty 512-row chunk; hoist the inferred typed columns and loop only to `chunk.count`.
 
 ## Browser input
 
@@ -124,11 +137,16 @@ Call `await app.audio.unlock()` from a user gesture. Create an audio scope durin
 
 ## Entity lifetime and update order
 
-Create queries once in setup and reuse them. Query callbacks receive the entity followed by component values in the requested order. Mutating a component value is immediate. Spawning and despawning are buffered: query membership changes only at the engine-owned commit after scheduled systems return. Entity composition is fixed at spawn; stale or foreign handles cannot address a different entity.
+Create schema components with `f32`, `f64`, `i32`, `u32`, `u8`, `bool`, and `entityRef` fields. Use `eachChunk()` for bulk work and `world.read()`/`write()` for sparse access. Numeric query views are writable typed arrays; boolean fields use `Uint8Array`, and entity references expose paired encoded index/generation arrays. Direct column writes follow typed-array coercion, while spawn and sparse writes validate values. Spawning and despawning are buffered: query membership changes only at the engine-owned commit after scheduled systems return. Entity composition is fixed at spawn; stale or foreign handles cannot address a different entity.
+
+Chunk descriptors and component views are borrowed until the next world commit. A component view plus row may be retained across later queries in the same update, which supports spatial indexes. Clear and rebuild that derived cache before probing in the next update. Retained raw typed arrays cannot be revoked at runtime and must not be used after commit. `entityAt(row)` returns the canonical handle and accepts only live rows below `chunk.count`.
 
 Systems receive `WorldAccess`, not commit or enumeration authority. For headless use,
 create a `Game`, prepare/start a scene, then call `game.tick()`; the runtime owns world
-commits. Direct `World` construction is internal. Queries expose only `size` and `each`.
+commits. Direct `World` construction is internal. Schema queries expose `size` and
+`eachChunk`; the temporary object-component bridge exposes `each` until Starfall and
+the platformer migrate under NGNE-27. `query()` with no components remains an
+entity-only compatibility traversal.
 
 For diagnostics, read `game.scenes` and `game.enumerate()` after `game.tick()` returns;
 both return detached read-only data, never live worlds or resources. Use explicitly

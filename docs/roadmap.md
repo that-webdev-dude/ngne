@@ -4,7 +4,10 @@ NGNE 0.1 is an early engine baseline with a playable showcase. The public API ma
 
 ## Implemented
 
-- Dense archetype ECS with buffered entity lifetime.
+- Dense legacy object-component ECS with buffered entity lifetime, retained temporarily
+  until NGNE-27 migrates both games.
+- Typed-array SoA schema storage with chunk queries, sparse field access and
+  deterministic inspection.
 - Per-scene worlds, resources, seeded RNG, events, hitstop and scene stacks.
 - Committed game state, asynchronous asset preparation and owned cleanup.
 - Fixed-step browser host, input, cameras and interpolation.
@@ -21,12 +24,13 @@ NGNE 0.1 is an early engine baseline with a playable showcase. The public API ma
 | NGNE-5  | Simulation-state ownership inventory; enumeration adds `dt` and archetype order                                                    | `tests/ownership.test.ts`                                                             |
 | NGNE-6  | Alpha 1 through suspension and host resume; continuing hitstop effects interpolate                                                 | `tests/interpolation.test.ts`, `tests/browser-interpolation-checks.ts`                |
 | NGNE-15 | Two-level platformer: tile collision, checkpoints, death remounts, pause and progression; deterministic authored-level walkthrough | `tests/platformer.test.ts`                                                            |
+| NGNE-20 | Schema-defined typed-array SoA ECS with a temporary legacy bridge through NGNE-27                                                  | `tests/ecs-soa.test.ts`, `tests/api-misuse.ts`, `tests/benchmark.ts`, visible hello   |
 | NGNE-26 | Pre-migration harness, sustained Starfall and sustained platformer performance baselines                                           | `tests/benchmark.ts`, `tests/browser-baseline.ts`, `docs/verification.md`             |
 
 ## Direction
 
 - The [two-level platformer](../examples/platformer/README.md) (NGNE-15, epic NGNE-17) exercises the current authoring API. NGNE-7 resolved its candidate-readiness, lifetime and replenishment findings with owner-scoped candidate slots; the remaining [findings](../examples/platformer/FINDINGS.md) feed NGNE-9/10/23/16. Its pre-migration performance measurement is recorded under NGNE-26.
-- Typed-array SoA component storage (NGNE-20), a WebGPU renderer (NGNE-21) and an owned simulation worker boundary (NGNE-22) are grouped under the SoA and WebGPU migration epic (NGNE-23). Their contracts are written when each lands; nothing about them is a requirement yet. The pre-migration baseline they are measured against (NGNE-26) is recorded in [verification](verification.md#ngne-26--9-september-2026); NGNE-12 repeats it after migration.
+- Typed-array SoA component storage (NGNE-20), a WebGPU renderer (NGNE-21) and an owned simulation worker boundary (NGNE-22) are grouped under the SoA and WebGPU migration epic (NGNE-23). NGNE-20 establishes the schema API while Starfall and the platformer remain on an isolated legacy bridge. NGNE-27 owns migrating both games and deleting that bridge. The pre-migration baseline (NGNE-26) is recorded in [verification](verification.md#ngne-26--9-september-2026); NGNE-12 repeats it after the real-game migration.
 
 ## Next validation
 

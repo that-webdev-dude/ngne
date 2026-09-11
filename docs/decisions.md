@@ -226,6 +226,49 @@ preserve, and ordinary reset callbacks do not cover all continuing effects. Reus
 the host alpha instead replays stale motion as the accumulator cycles. Selecting
 alpha at frame preparation avoids both problems without adding an authoring API.
 
+## Schema-defined chunked SoA storage
+
+**Status:** Accepted (NGNE-20)
+
+### Decision
+
+Supported components declare fixed numeric, boolean, or same-world entity-reference
+fields. Worlds store those fields in 512-row typed-array chunks and expose bulk
+`eachChunk()` traversal. Sparse access is field-level. Starfall and the platformer keep
+an isolated object-component bridge until NGNE-27 migrates them and deletes it.
+
+### Rationale
+
+- Typed columns make representation and numeric precision explicit.
+- Chunk callbacks remove per-row callback and object reconstruction from hot queries.
+- Fixed composition, slot generations, buffered lifetime, and creation order remain
+  unchanged engine rules rather than storage side effects.
+- Commit-epoch component-view/row borrows let a game-owned spatial index build and
+  probe without recreating objects per candidate.
+
+### Alternatives not selected
+
+| Alternative                        | Reason                                                              |
+| ---------------------------------- | ------------------------------------------------------------------- |
+| Migrate both games in NGNE-20      | NGNE-27 owns consumer migration and real-game performance evidence. |
+| Mixed object and schema archetypes | Creates two layouts and weakens the typed query contract.           |
+| Per-row cursors or proxy views     | Add allocation or access overhead to the hot path.                  |
+| Revocable copied query values      | Break immediate writes and the spatial-index borrow pattern.        |
+| Variable chunk sizing and trimming | Add allocator policy without a demonstrated consumer.               |
+
+### Consequences
+
+- Borrowed descriptors expire at commit; already-hoisted typed arrays cannot be
+  revoked and are prohibited after that boundary.
+- A query reconstructs its guarded descriptors once per commit epoch. Reusing one
+  descriptor object across epochs would make a retained expired alias valid again;
+  per-epoch chunk allocation is accepted to preserve detectable expiry.
+- Generic inspection treats runtime component views as opaque, while a raw typed array
+  retained in an authored resource remains enumerable and unsupported.
+- Float32 rounding is observable. Interpolation-critical hello positions use `f64`.
+- NGNE-27 must compare the migrated Starfall collision loop with the NGNE-26 baseline;
+  the NGNE-20 synthetic fixture is not a claim about whole-game performance.
+
 ## Owner-scoped candidate slots
 
 **Status:** Accepted (NGNE-7)

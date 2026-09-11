@@ -7,13 +7,13 @@ These contracts pin the previously deferred API and storage choices. The high-le
 The package entry point is the supported boundary. Runtime modules are internal;
 the package export map exposes no subpaths. The NGNE-1 consumer inventory is:
 
-| Category                   | Public symbols                                                                                                                                                                                                                                      | Consumers and ownership                                                                                                                                                                                                                         |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Authoring                  | `component`; types `Component`, `ComponentValue`, `Entity`, `Query`, `WorldAccess`; `SceneDefinition`, `SceneSetup`, `SystemContext`, `SceneCommands`, `SceneEvent`, `StateAccess`, `DeepReadonly`, `PreparedScene`                                 | Starfall, hello and authoring tests. Setup injects scene capabilities; systems cannot commit, enumerate, or change query membership. Prepared handles expose only idempotent `release()`; the owning Game validates identity and consumes them. |
-| Authoring and presentation | `Camera`, `Random`, `clamp`, `lerp`, `seedOf`, `down`, `pressed`, `imageAsset`, `audioAsset`; types `Asset`, `Lease`, `Sprite`, `Sound`, `Clip`                                                                                                     | Scene authors use explicitly acquired/injected values. Constructors operate on caller-owned values; inspection never returns a live camera or RNG.                                                                                              |
-| Platform integration       | `Game`, `BrowserGame`, `Assets`, `Input`, `Frame`, `Renderer`, `Audio`, `FixedStep`, `emptyInput`; types `GameOptions`, `SceneCandidates`, `SceneCandidateOptions`, `BrowserOptions`, `FrameScheduler`, `DisplaySnapshot`, `InputSnapshot`, `Stats` | Browser host, headless runners, renderer/audio/asset tests and benchmarks. Host lifecycle, candidate coordination, tick, render and service operations remain intentional integration APIs.                                                     |
-| Inspection                 | `Lifecycle`, `SceneInspection`, `SceneStateInspection`, `GameInspection`, `InspectionValue`                                                                                                                                                         | Tests, benchmark capacity reporting and diagnostics. No mutable foreign world or resource binding is returned.                                                                                                                                  |
-| Internal only              | `World`, query runtime, `SceneInstance`, candidate runtime, `Cleanup`, `immutable`, browser failure capability                                                                                                                                      | Runtime modules; direct ECS tests and benchmark import their internal modules deliberately. No public runtime constructor for scenes, queries or prepared candidates.                                                                           |
+| Category                   | Public symbols                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Consumers and ownership                                                                                                                                                                                                                                                                   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Authoring                  | `component`, `f32`, `f64`, `i32`, `u32`, `u8`, `bool`, `entityRef`; types `Component`, `ComponentValue`, `SchemaComponent`, `SchemaComponentValue`, `SchemaFields`, `SchemaValues`, `SchemaQuery`, `SchemaChunk`, `SchemaComponentView`, `SchemaQueryViews`, `FieldDescriptor`, `FieldKind`, `EntityReferenceView`, `Entity`, `Query`, `AllQuery`, `WorldAccess`; `SceneDefinition`, `SceneSetup`, `SystemContext`, `SceneCommands`, `SceneEvent`, `StateAccess`, `DeepReadonly`, `PreparedScene` | Hello, authoring tests and, temporarily, legacy Starfall/platformer consumers. Setup injects scene capabilities; systems cannot commit, enumerate, or change query membership. Prepared handles expose only idempotent `release()`; the owning Game validates identity and consumes them. |
+| Authoring and presentation | `Camera`, `Random`, `clamp`, `lerp`, `seedOf`, `down`, `pressed`, `imageAsset`, `audioAsset`; types `Asset`, `Lease`, `Sprite`, `Sound`, `Clip`                                                                                                                                                                                                                                                                                                                                                   | Scene authors use explicitly acquired/injected values. Constructors operate on caller-owned values; inspection never returns a live camera or RNG.                                                                                                                                        |
+| Platform integration       | `Game`, `BrowserGame`, `Assets`, `Input`, `Frame`, `Renderer`, `Audio`, `FixedStep`, `emptyInput`; types `GameOptions`, `SceneCandidates`, `SceneCandidateOptions`, `BrowserOptions`, `FrameScheduler`, `DisplaySnapshot`, `InputSnapshot`, `Stats`                                                                                                                                                                                                                                               | Browser host, headless runners, renderer/audio/asset tests and benchmarks. Host lifecycle, candidate coordination, tick, render and service operations remain intentional integration APIs.                                                                                               |
+| Inspection                 | `Lifecycle`, `SceneInspection`, `SceneStateInspection`, `GameInspection`, `InspectionValue`                                                                                                                                                                                                                                                                                                                                                                                                       | Tests, benchmark capacity reporting and diagnostics. No mutable foreign world or resource binding is returned.                                                                                                                                                                            |
+| Internal only              | `World`, query runtime, `SceneInstance`, candidate runtime, `Cleanup`, `immutable`, browser failure capability                                                                                                                                                                                                                                                                                                                                                                                    | Runtime modules; direct ECS tests and benchmark import their internal modules deliberately. No public runtime constructor for scenes, queries or prepared candidates.                                                                                                                     |
 
 - `Game.lifecycle` and `simulationTick` are getter-only values backed by private
   fields. Browser faults use an internal capability, not a writable public field.
@@ -32,7 +32,14 @@ the package export map exposes no subpaths. The NGNE-1 consumer inventory is:
   no enumerable data inspect as empty records. This is neither a lossless snapshot nor
   a save/restore format, and it never grants entity ownership.
 
-Migration: replace `scene.definition.id` with `scene.definition`,
+Migration: new code uses `component(name, schema)`, `SchemaQuery.eachChunk()`, and sparse
+`WorldAccess.read()`/`write()`. The factory overload, object-valued `get()`, and
+`Query.each()` are a deprecated bridge only for Starfall and the platformer; NGNE-27
+migrates those consumers and removes the bridge. Schema and legacy components cannot
+be mixed in one spawn or query. `query()` with no arguments remains an entity-only
+compatibility query across both storage modes.
+
+For earlier API migrations, replace `scene.definition.id` with `scene.definition`,
 `scene.world.capacity` with `scene.entityCapacity`, and retained scene object comparisons
 with `scene.id` comparisons. Use `game.enumerate()` for detached diagnostic values;
 keep gameplay mutation in setup-injected resources and world capabilities. Replace
@@ -93,17 +100,102 @@ system closure in these consumers; closures retain injected owners and fixed cod
   and external activation recording. Capture, serialization, restoration, replay
   control and a snapshot participant registry remain absent.
 
-Migration: inspection adds `dt` and `world.archetypes`; existing fields retain their
-meaning. Diagnostic readers should accept these additive fields and never rebuild
-iteration order from only `world.entities`.
+Migration: inspection includes `dt` and `world.archetypes`; existing legacy fields
+retain their meaning. Schema archetypes additionally contain `fields` and `chunks`,
+live schema slots contain `chunk`, and their `row` is chunk-relative. Legacy slot rows
+remain archetype-relative. Diagnostic readers should accept these conditional additive
+fields and never rebuild iteration order from only `world.entities`.
 
 ## ECS
 
-`component(name, factory)` creates a stable typed definition; `.of(overrides)` creates a value. Names must be nonempty and unambiguous within a world. Complete component values are supplied to `spawn`. Queries are cached and match archetypes created later. Query membership does not change before commit. Value changes are immediate. `despawn` is idempotent; pending births can also be despawned at the same boundary.
+### Schema definitions and fields
 
-Storage: dense entity/column arrays per fixed composition, a generation-bearing slot allocator, a free stack, and swap removal. Storage follows peak demand. Handles contain world identity, slot and generation. Systems receive `WorldAccess`, which excludes commit/enumeration. The private scene runtime commits after all selected schedules finish. No runtime component changes or public pools exist.
+`component(name, schema)` creates an immutable schema definition. Each world registers
+schema identities independently, and the schema plus cloned field descriptors retain
+their literal component/field names. `.of(partial)` supplies a complete fixed composition
+to `spawn`; omitted or explicitly `undefined` fields use their declared defaults. Names
+are nonempty and one schema definition identity owns each schema name inside a world.
+Conflicting schema identities, mixed schema/legacy compositions, duplicate schema
+components, unknown fields, and invalid authored values fail at the authoring boundary.
 
-Query callbacks may enqueue lifetime changes, but cannot commit during iteration. Disposal empties existing query storage. Component definitions, query plans and callbacks are code; authoritative values and allocator state are inspectable through `Game.enumerate()`. The internal world enumeration is runtime-owned.
+| Helper        | Logical value                 | Physical column                               | Valid authored or sparse value                                      |
+| ------------- | ----------------------------- | --------------------------------------------- | ------------------------------------------------------------------- |
+| `f32()`       | number                        | `Float32Array`                                | finite; storage rounds to float32                                   |
+| `f64()`       | number                        | `Float64Array`                                | finite                                                              |
+| `i32()`       | number                        | `Int32Array`                                  | integer from -2147483648 through 2147483647                         |
+| `u32()`       | number                        | `Uint32Array`                                 | integer from 0 through 4294967295                                   |
+| `u8()`        | number                        | `Uint8Array`                                  | integer from 0 through 255                                          |
+| `bool()`      | boolean                       | `Uint8Array`                                  | boolean; stored as 0 or 1                                           |
+| `entityRef()` | same-world `Entity` or `null` | paired `Uint32Array` index/generation columns | live, pending, or stale same-world handle; default is always `null` |
+
+Entity-reference indices store `index + 1`; zero means null. Query views expose the
+encoded arrays directly. Sparse `read()` reconstructs a frozen same-world handle,
+including stale references, and returns `null` for the null encoding. `has()` determines
+whether that handle is live. Sparse `read()` returns `undefined`, and `write()` does
+nothing, when the subject is stale, pending, foreign, or lacks the component. Unknown
+fields, invalid logical values, and foreign referenced entities throw. Direct numeric
+column writes deliberately use native typed-array coercion; trusted hot loops own range
+correctness.
+
+### Storage, lifetime, and order
+
+Each schema archetype owns fixed-capacity 512-row chunks, one typed array per field,
+and a dense canonical-handle array. Allocation reuses the lowest-created chunk with
+capacity. Swap removal repairs the moved slot and clears the vacated handle and column
+cells. Empty archetypes and allocated chunks remain until disposal; rows at or above
+`count` are never live.
+
+The world retains generation-bearing slots, a LIFO free stack, buffered FIFO-equivalent
+birth/death publication, and fixed entity composition. Iteration order is archetype
+creation, then chunk creation, then dense row order. `World.size` counts every live
+legacy and schema row; `capacity` is the slot-array length. A schema query's `size`
+counts all matching live rows. Query match lists refresh lazily after archetype or chunk
+creation, so commit cost is independent of retained query count. Immediate field writes
+are visible to later systems and queries. `despawn()` is idempotent; pending births may
+be despawned at the same commit. Systems receive `WorldAccess`, which excludes commit
+and enumeration; the private scene runtime commits after selected schedules finish.
+The facade exposes bound, non-enumerable methods, so retaining a method does not widen
+authority or require its receiver. Runtime query state is non-enumerable and inaccessible.
+
+### Chunk traversal and borrowing
+
+`SchemaQuery.eachChunk()` invokes one callback per nonempty matching chunk and performs
+no per-row object reconstruction or callback. `chunk.count` is the live bound;
+`capacity` reports allocation only. `entityAt(row)` returns the world's canonical
+current handle and rejects non-integer or out-of-range rows. Nested same-query and
+cross-query traversal is supported. A visitor exception releases its read scope, while
+commit during any active query callback fails.
+
+Descriptors, `views`, component lookups, and row meanings are borrowed for the current
+world commit epoch. A component view plus row may be retained across later traversals
+in the same update, allowing a spatial index to build then probe. The descriptor guards
+expire when the next allowed commit begins or the world is disposed. Hoisted component
+views and raw typed arrays cannot be revoked without proxies or buffer detachment; using
+them after expiry is prohibited even though runtime detection is narrower.
+
+Runtime-owned descriptors, component views, and entity-reference subviews expose their
+data through non-enumerable properties and therefore inspect as opaque empty records.
+This prevents a resource-held derived view/row cache from expanding whole columns during
+`Game.enumerate()`. Retaining a raw field array in a resource bypasses that container and
+is unsupported; generic inspection will enumerate its indexed values. Derived borrows
+do not satisfy ownership for authoritative resource state.
+
+### Inspection and legacy bridge
+
+Enumeration reconstructs detached schema row records only on demand. It records ordered
+schema fields/kinds/defaults, chunk capacity/count/order, chunk-relative row plus chunk
+index for live schema slots, JSON-safe entity references, and allocator/free-stack facts.
+Legacy archetype, slot, and row records keep their previous shapes; legacy slot rows are
+archetype-relative. Enumeration is diagnostic, not a hot query or restore format. The
+engine compatibility prefix is `NGNE/2;mulberry32/1`.
+
+The deprecated `component(name, factory)` bridge retains object columns, `get()`, and
+`Query.each()` for Starfall and the platformer until NGNE-27. Empty `spawn()` remains a
+legacy empty-archetype entity. Zero-argument `query()` traverses empty, legacy, and
+schema entities in the same deterministic creation/chunk/row order and exposes no
+component values or chunk views. Legacy queries retain exact-identity matching, including
+same-name definitions and repeated query arguments. No runtime component changes or public pools exist.
+`spawn()`, `query()`, and `commit()` reject a disposed world; `dispose()` is idempotent.
 
 ## Scenes and state
 
@@ -163,7 +255,7 @@ scene resources.
 
 Events use the same validated plain-data copy/freeze on emit, broadcast on the next ordinary update, and are held through suspension/freeze. Frozen systems cannot emit gameplay events. Freeze requests use positive integer ticks and resolve to maximum duration at commit. Suspension pauses the countdown. Ordinary transform interpolation reset callbacks and camera cuts execute when freeze first activates.
 
-RNG: FNV-1a over JSON-encoded seed parts, followed by Mulberry32 streams. Root input is hashed; scene seed derives from root/definition/key, and stream seed derives from scene seed/name. Explicit scene seed bypasses scene derivation. These algorithms have compatibility version 1. Rendering uses no simulation stream.
+RNG: FNV-1a over JSON-encoded seed parts, followed by Mulberry32 streams. Root input is hashed; scene seed derives from root/definition/key, and stream seed derives from scene seed/name. Explicit scene seed bypasses scene derivation. These algorithms have compatibility version 1. Rendering uses no simulation stream. `Random.snapshot()` returns the current uint32 state; `restore(state)` applies the same `>>> 0` normalization as construction. State is not directly writable, and scene enumeration uses `snapshot()`.
 
 ## Platform and lifecycle
 

@@ -1,4 +1,17 @@
-import { component, Game, type PreparedScene, type SceneSetup, type SystemContext } from "ngne";
+import {
+    bool,
+    component,
+    entityRef,
+    f32,
+    f64,
+    Game,
+    i32,
+    u32,
+    u8,
+    type PreparedScene,
+    type SceneSetup,
+    type SystemContext,
+} from "ngne";
 import * as engine from "ngne";
 
 // Compiled against source during typecheck and emitted declarations during build.
@@ -9,16 +22,43 @@ function authoringBoundary(
     candidate: PreparedScene,
 ): void {
     const Position = component("position", () => ({ x: 0 }));
+    const SchemaPosition = component("schema-position", {
+        x: f64(),
+        speed: f32(1),
+        score: i32(),
+        mask: u32(),
+        team: u8(),
+        active: bool(true),
+        target: entityRef(),
+    });
+    // @ts-expect-error Entity-reference defaults are always null and take no argument.
+    entityRef(null);
     const entity = ctx.world.spawn(Position.of());
+    const schemaEntity = ctx.world.spawn(SchemaPosition.of({ x: 2, target: entity }));
     ctx.world.get(entity, Position);
+    const x: number | undefined = ctx.world.read(schemaEntity, SchemaPosition, "x");
+    ctx.world.write(schemaEntity, SchemaPosition, "x", x ?? 0);
+    ctx.world.query(SchemaPosition).eachChunk((chunk) => {
+        const position = chunk.views["schema-position"];
+        position.x[0] += position.speed[0];
+        const targetIndex: number = position.target.index[0];
+        const targetGeneration: number = position.target.generation[0];
+        void [targetIndex, targetGeneration, chunk.entityAt(0)];
+    });
     ctx.world.query(Position).each((_, position) => {
         position.x++;
     });
+    ctx.world.query().each(() => {});
     ctx.world.despawn(entity);
     setup.resource("counter", { value: 0 });
     candidate.release();
     game.scenes.map((scene) => scene.id);
     game.enumerate();
+    const random = new engine.Random(1);
+    random.snapshot();
+    random.restore(2);
+    // @ts-expect-error RNG state is private; use snapshot and restore.
+    random.state = 3;
 
     // @ts-expect-error Lifecycle is runtime-owned.
     game.lifecycle = "Running";
@@ -42,6 +82,24 @@ function authoringBoundary(
     ctx.world.enumerate();
     // @ts-expect-error Query membership is runtime-owned.
     ctx.world.query(Position).add({});
+    // @ts-expect-error Zero-argument queries do not expose schema chunks.
+    ctx.world.query().eachChunk(() => {});
+    // @ts-expect-error Schema queries do not reconstruct legacy row objects.
+    ctx.world.query(SchemaPosition).each(() => {});
+    // @ts-expect-error Schema components use field-level sparse reads.
+    ctx.world.get(schemaEntity, SchemaPosition);
+    // @ts-expect-error Unknown schema field.
+    ctx.world.read(schemaEntity, SchemaPosition, "missing");
+    // @ts-expect-error Schema field values retain their logical types.
+    ctx.world.write(schemaEntity, SchemaPosition, "active", 1);
+    // @ts-expect-error Schema values reject unknown fields.
+    SchemaPosition.of({ missing: 1 });
+    // @ts-expect-error Schema component definitions are read-only.
+    SchemaPosition.fields.x = f64();
+    // @ts-expect-error Schema and legacy components cannot share a query.
+    ctx.world.query(Position, SchemaPosition);
+    // @ts-expect-error Schema and legacy component values cannot share a spawn.
+    ctx.world.spawn(Position.of(), SchemaPosition.of());
     // @ts-expect-error Candidates cannot be consumed by authors.
     candidate.consume(Symbol());
     // @ts-expect-error Candidate ownership is hidden.
@@ -54,6 +112,8 @@ function authoringBoundary(
     new engine.World();
     // @ts-expect-error Query runtime is internal.
     new engine.Query();
+    // @ts-expect-error Schema component runtime is internal.
+    new engine.SchemaComponent();
     // @ts-expect-error Cleanup is internal.
     new engine.Cleanup();
     // @ts-expect-error Platform failure capability is internal.

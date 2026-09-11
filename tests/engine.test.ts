@@ -120,7 +120,13 @@ test("RNG stream seeds are order independent and state is repeatable", () => {
         fx.next();
         assert.equal(a.next(), b.next());
     }
-    assert.notEqual(a.state, fx.state);
+    assert.notEqual(a.snapshot(), fx.snapshot());
+    const snapshot = a.snapshot();
+    const expected = [a.next(), a.next(), a.next()];
+    a.restore(snapshot);
+    assert.deepEqual([a.next(), a.next(), a.next()], expected);
+    a.restore(-1);
+    assert.equal(a.snapshot(), new Random(-1).snapshot());
 });
 test("systems see immediate values and committed state stays stable for whole tick", async () => {
     const seen: number[] = [];

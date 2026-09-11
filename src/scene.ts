@@ -197,7 +197,7 @@ class SceneInstance<S, C> {
             resources: inspectValue(Object.fromEntries(this.resources)),
             random: inspectValue(
                 Object.fromEntries(
-                    [...this.randomStreams].map(([name, random]) => [name, random.state]),
+                    [...this.randomStreams].map(([name, random]) => [name, random.snapshot()]),
                 ),
             ),
             camera: inspectValue(this.camera),
@@ -795,7 +795,7 @@ export class Game<S = Record<string, never>, C = never> {
     enumerate(): GameInspection {
         return Object.freeze({
             compatibility:
-                "NGNE/1;mulberry32/1;" + (this.options.compatibility ?? "unversioned-game"),
+                "NGNE/2;mulberry32/1;" + (this.options.compatibility ?? "unversioned-game"),
             simulationTick: this.simulationTick,
             dt: this.dt,
             rootSeed: this.rootSeed,
