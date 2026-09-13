@@ -1,3 +1,5 @@
+import { centerX, centerY } from "./frame-values.js";
+import { QUAD_STRIDE } from "../src/quad-layout.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
@@ -436,12 +438,14 @@ test("platformer first frame shows start and distant checkpoint at both interpol
             for (const alpha of [0, 1]) {
                 harness.output.reset();
                 harness.game.render(harness.output, alpha);
-                const offset = (harness.output.count - 1) * 13;
-                const x = harness.output.data[offset];
-                const y = harness.output.data[offset + 1];
+                const offset = (harness.output.count - 1) * QUAD_STRIDE;
+                const x = centerX(harness.output, harness.output.count - 1);
+                const y = centerY(harness.output, harness.output.count - 1);
                 assert.ok(x >= 6 && x <= WIDTH - 6);
                 assert.ok(y >= 7 && y <= HEIGHT - 7);
-                outputs.push(Array.from(harness.output.data.slice(0, harness.output.count * 13)));
+                outputs.push(
+                    Array.from(harness.output.data.slice(0, harness.output.count * QUAD_STRIDE)),
+                );
             }
             assert.deepEqual(outputs[0], outputs[1]);
             assert.deepEqual(harness.game.enumerate(), before);
@@ -535,7 +539,7 @@ async function drive(
 function rendered(harness: Harness, alpha: number, sprites?: number): number[] {
     const frame = new Frame();
     harness.game.render(frame, alpha);
-    return Array.from(frame.data.slice(0, (sprites ?? frame.count) * 13));
+    return Array.from(frame.data.slice(0, (sprites ?? frame.count) * QUAD_STRIDE));
 }
 
 interface Preparation {

@@ -2,6 +2,48 @@
 
 This document keeps alternatives and reasoning that would distract from the current rules in `architecture.md`.
 
+## WebGPU renderer adaptation
+
+**Status:** Implemented NGNE-21; dated evidence and inspection coverage are recorded in [verification](verification.md#ngne-21--12-september-2026).
+
+The GPU core is adapted from `C:/Users/jfabi/Documents/Projects/cluster-renderer/.versions/v03/`
+at `34458a987f03b00894e98a40d39fc0ae666194f6`. Source repository remains read only.
+`QuadRenderer`, `quadShader`, `QuadBufferLayout`, `GpuContext`, the resource registry,
+selected `TextureAssets` rollback logic and `QuadFrame` constants supply the core.
+NGNE keeps its Frame ordering, camera conversion and browser-owned canvas size.
+
+The adaptation retains indexed unit quads, 56-byte affine instances, 48-byte
+uniforms, explicit layouts and adjacent texture runs. One alpha pipeline and one
+nearest sampler replace source blend/format/sample permutations. Bindings are
+prepared before drawing; camera uniforms are identity. Straight inputs are
+premultiplied once in WGSL. No FrameArena, manager, authored scissor, MSAA or source
+ECS is imported. GPU growth respects the actual device limit; synchronous submission
+removes the source's arbitrary two-frame buffer retirement lag. Handles are local
+to one device generation and checked against the safe-integer limit.
+
+WebGL and object-component bridges remain until NGNE-27 migrates both games.
+
+Renderer-owned source leases/snapshots survive device generations. Only GPU identities
+are replaced. One recovery attempt bounds failure; failed recovery requires a new host.
+Cold preparation and complete rollback retain a ready renderer so unconsumed candidates
+keep valid image registrations. Disposal reverses this dependency before Assets close.
+Pipeline binding preparation is asynchronous but publication is synchronous and
+transactional; cancelled replacements never change the old live binding.
+
+The public facade holds its internal runtime in an ECMAScript private field so emitted
+public declarations remain usable without ambient WebGPU types. Internal GPU modules
+remain intentional renderer/platform boundaries, not package subpaths.
+
+Allocation profiling found that clearing Frame metadata arrays on every reset discarded
+their backing capacity. Reset now retains that capacity while packing and sort trims
+the active prefix. This is an evidence-driven packing correction within NGNE-21;
+legacy per-sprite upload subviews remain owned by NGNE-27.
+
+The affine write lives in a module-scope `packAffine` helper and buffer growth in
+`Frame.grow()`. Inlined, the new `Frame.add` exceeded V8's default inlining bytecode
+budget and the Chaos CPU median rose 22.5%. Keep `add` small when changing packing;
+re-measure with `npm run bench`.
+
 ## Game-owned committed state
 
 **Status:** Accepted

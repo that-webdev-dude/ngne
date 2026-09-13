@@ -1,4 +1,5 @@
 import { Camera } from "./primitives.js";
+import { QUAD_STRIDE as STRIDE } from "./quad-layout.js";
 export interface Sprite {
     x: number;
     y: number;
@@ -16,7 +17,6 @@ export interface Sprite {
     depth?: number;
     screen?: boolean;
 }
-const STRIDE = 13;
 /** Renderer input contains no entities. Ordering is scene -> layer -> depth -> insertion. */
 export class Frame {
     data = new Float32Array(STRIDE * 2048);
@@ -32,8 +32,7 @@ export class Frame {
     reset() {
         this.count = 0;
         this.sceneIndex = -1;
-        this.order.length = 0;
-        this.textures.length = 0;
+        // Keep backing arrays warm while packing. sort() trims the active prefix.
     }
     scene(camera: Camera, alpha: number) {
         this.sceneIndex++;
@@ -90,11 +89,7 @@ export class Frame {
     ) {
         const i = this.count++,
             o = i * STRIDE;
-        if (o + STRIDE > this.data.length) {
-            const grown = new Float32Array(this.data.length * 2);
-            grown.set(this.data);
-            this.data = grown;
-        }
+        if (o + STRIDE > this.data.length) this.grow();
         if (!screen) {
             x -= this.camera.x;
             y -= this.camera.y;
@@ -104,26 +99,29 @@ export class Frame {
             y = Math.round(y);
         }
         const d = this.data;
-        d[o] = x;
-        d[o + 1] = y;
-        d[o + 2] = w;
-        d[o + 3] = h;
-        d[o + 4] = u;
-        d[o + 5] = v;
-        d[o + 6] = uw;
-        d[o + 7] = vh;
-        d[o + 8] = ((color >>> 16) & 255) / 255;
-        d[o + 9] = ((color >>> 8) & 255) / 255;
-        d[o + 10] = (color & 255) / 255;
-        d[o + 11] = alpha;
-        d[o + 12] = angle;
+        packAffine(d, o, x, y, w, h, angle);
+        d[o + 6] = u;
+        d[o + 7] = v;
+        d[o + 8] = uw;
+        d[o + 9] = vh;
+        d[o + 10] = ((color >>> 16) & 255) / 255;
+        d[o + 11] = ((color >>> 8) & 255) / 255;
+        d[o + 12] = (color & 255) / 255;
+        d[o + 13] = alpha;
         this.textures[i] = texture;
         this.scenes[i] = this.sceneIndex;
         this.layers[i] = layer;
         this.depths[i] = depth;
         this.order[i] = i;
     }
+    private grow() {
+        const grown = new Float32Array(this.data.length * 2);
+        grown.set(this.data);
+        this.data = grown;
+    }
     sort() {
+        this.order.length = this.count;
+        this.textures.length = this.count;
         this.order.sort(
             (a, b) =>
                 this.scenes[a] - this.scenes[b] ||
@@ -133,17 +131,43 @@ export class Frame {
         );
     }
 }
+/**
+ * Writes a centered rectangle as translation plus column vectors. Kept separate so
+ * Frame.add stays within V8's default inlining budget in hot authoring loops.
+ */
+function packAffine(
+    d: Float32Array,
+    o: number,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    angle: number,
+): void {
+    const c = Math.cos(angle),
+        s = Math.sin(angle);
+    const ix = c * w,
+        iy = s * w,
+        jx = -s * h,
+        jy = c * h;
+    d[o] = x - (ix + jx) / 2;
+    d[o + 1] = y - (iy + jy) / 2;
+    d[o + 2] = ix;
+    d[o + 3] = iy;
+    d[o + 4] = jx;
+    d[o + 5] = jy;
+}
 const vertex = `#version 300 es
 precision highp float;
-layout(location=0) in vec4 rect;
-layout(location=1) in vec4 uvRect;
-layout(location=2) in vec4 color;
-layout(location=3) in float angle;
+layout(location=0) in vec2 translation;
+layout(location=1) in vec4 linear;
+layout(location=2) in vec4 uvRect;
+layout(location=3) in vec4 color;
 uniform vec2 resolution;
 out vec2 uv; out vec4 tint;
 const vec2 corners[6]=vec2[6](vec2(0,0),vec2(1,0),vec2(0,1),vec2(0,1),vec2(1,0),vec2(1,1));
-void main(){ vec2 c=corners[gl_VertexID]; vec2 p=(c-.5)*rect.zw;
- p=mat2(cos(angle),sin(angle),-sin(angle),cos(angle))*p+rect.xy;
+void main(){ vec2 c=corners[gl_VertexID];
+ vec2 p=translation+mat2(linear.xy,linear.zw)*c;
  gl_Position=vec4(p/resolution*vec2(2,-2)+vec2(-1,1),0,1); uv=uvRect.xy+c*uvRect.zw; tint=color; }`;
 const fragment = `#version 300 es
 precision mediump float;
@@ -233,7 +257,14 @@ export class Renderer {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
         for (let i = 0; i < 4; i++) {
             gl.enableVertexAttribArray(i);
-            gl.vertexAttribPointer(i, i === 3 ? 1 : 4, gl.FLOAT, false, STRIDE * 4, i * 16);
+            gl.vertexAttribPointer(
+                i,
+                i === 0 ? 2 : 4,
+                gl.FLOAT,
+                false,
+                STRIDE * 4,
+                i === 0 ? 0 : 8 + (i - 1) * 16,
+            );
             gl.vertexAttribDivisor(i, 1);
         }
         const white = gl.createTexture()!;
@@ -324,11 +355,11 @@ export class Renderer {
             for (let i = 0; i < 4; i++)
                 gl.vertexAttribPointer(
                     i,
-                    i === 3 ? 1 : 4,
+                    i === 0 ? 2 : 4,
                     gl.FLOAT,
                     false,
                     STRIDE * 4,
-                    start * STRIDE * 4 + i * 16,
+                    start * STRIDE * 4 + (i === 0 ? 0 : 8 + (i - 1) * 16),
                 );
             gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, end - start);
             this.drawCalls++;

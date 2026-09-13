@@ -1,6 +1,7 @@
 import {
     Game,
     FAIL_GAME,
+    PREPARE_ASSET,
     type GameOptions,
     type PreparedScene,
     type DisplaySnapshot,
@@ -9,6 +10,9 @@ import { Frame, Renderer } from "./renderer.js";
 import { FixedStep } from "./primitives.js";
 import { Input } from "./input.js";
 import { Audio } from "./audio.js";
+import type { Asset, ImageAsset } from "./assets.js";
+import { ACQUIRE_IMAGE, CREATE_RENDERER, RENDERER_READY } from "./renderer-host.js";
+import { WebGPURenderer } from "./webgpu-renderer.js";
 export interface FrameScheduler {
     request(callback: FrameRequestCallback): number;
     cancel(id: number): void;
@@ -21,6 +25,8 @@ export interface BrowserOptions<S, C> extends GameOptions<S, C> {
     clear?: number;
     scheduler?: FrameScheduler;
     afterFrame?: (stats: Readonly<Stats>) => void;
+    /** Temporary opt-in; NGNE-27 removes the legacy default after both-game migration. */
+    renderer?: "webgpu";
 }
 export interface Stats {
     fps: number;
@@ -45,7 +51,10 @@ export class BrowserGame<S, C> {
         drawCalls: 0,
         droppedTicks: 0,
     };
-    renderer?: Renderer;
+    renderer?: Renderer | WebGPURenderer;
+    private rendererPromise?: Promise<WebGPURenderer>;
+    private acquisitionAbort?: AbortController;
+    private acquisition = 0;
     private loop: FixedStep;
     private raf = 0;
     private last = 0;
@@ -74,6 +83,82 @@ export class BrowserGame<S, C> {
             request: (callback) => requestAnimationFrame(callback),
             cancel: (id) => cancelAnimationFrame(id),
         };
+        if (options.renderer === "webgpu")
+            this.game[PREPARE_ASSET] = async (asset, signal) => {
+                if (!isImageAsset(asset)) return;
+                const source = await this.game.assets.acquire(asset, signal);
+                let renderer: WebGPURenderer;
+                try {
+                    renderer = await this.ensureRenderer();
+                    signal.throwIfAborted();
+                } catch (error) {
+                    source.release();
+                    throw error;
+                }
+                // The renderer owns the source lease from here, including on failure.
+                return renderer[ACQUIRE_IMAGE](asset, source, signal);
+            };
+    }
+    private reportRenderer = (error: unknown): void => {
+        this.game.report(error);
+        if (!this.options.diagnostic) {
+            try {
+                console.error(error);
+            } catch {
+                /* Logging cannot alter the host loop. */
+            }
+        }
+    };
+    private ensureRenderer(): Promise<WebGPURenderer> {
+        if (this.disposed || this.game.lifecycle === "Failed")
+            return Promise.reject(new Error("Browser renderer ownership has ended"));
+        if (this.renderer instanceof WebGPURenderer) return Promise.resolve(this.renderer);
+        if (this.rendererPromise) return this.rendererPromise;
+        const acquisition = ++this.acquisition;
+        const abort = new AbortController();
+        this.acquisitionAbort = abort;
+        this.restoreBackingSize();
+        const promise = WebGPURenderer[CREATE_RENDERER](
+            this.options.canvas,
+            this.width,
+            this.height,
+            this.reportRenderer,
+            abort.signal,
+        )
+            .then((renderer) => {
+                if (this.disposed || acquisition !== this.acquisition) {
+                    renderer.dispose();
+                    throw new Error("Renderer acquisition cancelled");
+                }
+                this.renderer = renderer;
+                return renderer;
+            })
+            .catch((error: unknown) => {
+                if (acquisition === this.acquisition) this.rendererPromise = undefined;
+                throw error;
+            });
+        this.rendererPromise = promise;
+        return promise;
+    }
+    private restoreBackingSize(): void {
+        if (this.options.canvas.width !== this.width) this.options.canvas.width = this.width;
+        if (this.options.canvas.height !== this.height) this.options.canvas.height = this.height;
+    }
+    private endRenderer(): void {
+        this.acquisition++;
+        const errors: unknown[] = [];
+        try {
+            this.renderer?.dispose();
+        } catch (error) {
+            errors.push(error);
+        }
+        try {
+            this.acquisitionAbort?.abort(new Error("Renderer acquisition cancelled by disposal"));
+        } catch (error) {
+            errors.push(error);
+        }
+        this.rendererPromise = undefined;
+        if (errors.length) throw new AggregateError(errors, "Renderer teardown failed");
     }
     private frameCallback = (now: number, run: number, callback: FrameRequestCallback) => {
         if (!this.enabled || run !== this.run) return;
@@ -93,14 +178,17 @@ export class BrowserGame<S, C> {
             const updated = performance.now();
             this.frame.reset();
             this.game.render(this.frame, result.alpha);
-            this.renderer!.render(this.frame, this.options.clear);
+            const renderer = this.renderer;
+            if (!renderer) throw new Error("Browser renderer missing");
+            this.restoreBackingSize();
+            renderer.render(this.frame, this.options.clear);
             const end = performance.now();
             this.stats.fps += ((elapsed ? 1 / elapsed : 60) - this.stats.fps) * 0.05;
             this.stats.frameMs = end - begin;
             this.stats.updateMs = updated - begin;
             this.stats.renderMs = end - updated;
-            this.stats.sprites = this.renderer!.sprites;
-            this.stats.drawCalls = this.renderer!.drawCalls;
+            this.stats.sprites = renderer.sprites;
+            this.stats.drawCalls = renderer.drawCalls;
             this.stats.droppedTicks += result.dropped;
             if (result.dropped)
                 this.game.report({
@@ -112,6 +200,15 @@ export class BrowserGame<S, C> {
         } catch (e) {
             this.enabled = false;
             this.game[FAIL_GAME]();
+            if (this.options.renderer === "webgpu")
+                try {
+                    this.endRenderer();
+                } catch (cleanup) {
+                    this.game.report(
+                        new AggregateError([e, cleanup], "Browser frame teardown failed"),
+                    );
+                    return;
+                }
             this.game.report(e);
         }
     };
@@ -124,12 +221,23 @@ export class BrowserGame<S, C> {
         const callback: FrameRequestCallback = (time) => this.frameCallback(time, run, callback);
         const cold = !this.attached;
         try {
+            if (!cold) await this.audio.resume();
+            if (this.disposed) throw new Error("Start cancelled by disposal");
+            if (this.options.renderer === "webgpu") {
+                const renderer = await this.ensureRenderer();
+                await renderer[RENDERER_READY]();
+                if (this.disposed) throw new Error("Start cancelled by disposal");
+            }
             if (cold) {
-                this.renderer = new Renderer(this.options.canvas, this.width, this.height, (e) =>
-                    this.game.report(e),
-                );
+                if (this.options.renderer !== "webgpu")
+                    this.renderer = new Renderer(
+                        this.options.canvas,
+                        this.width,
+                        this.height,
+                        (e) => this.game.report(e),
+                    );
                 this.input.attach(this.options.canvas, this.width, this.height);
-            } else await this.audio.resume();
+            }
             if (this.disposed) throw new Error("Start cancelled by disposal");
             this.loop.reset();
             this.last = 0;
@@ -153,15 +261,31 @@ export class BrowserGame<S, C> {
                     errors.push(error);
                 }
                 try {
-                    this.renderer?.dispose();
+                    if (this.options.renderer !== "webgpu") this.renderer?.dispose();
                 } catch (error) {
                     errors.push(error);
                 }
-                if (errors.length > 1) {
+                // WebGPU ownership also ends when Game.start could not roll itself back.
+                const failed = (this.game.lifecycle as string) === "Failed";
+                if (errors.length > 1 || (this.options.renderer === "webgpu" && failed)) {
                     this.game[FAIL_GAME]();
+                    if (this.options.renderer === "webgpu")
+                        try {
+                            this.endRenderer();
+                        } catch (cleanup) {
+                            errors.push(cleanup);
+                        }
                     throw new AggregateError(errors, "Browser startup rollback failed");
                 }
-            } else this.game[FAIL_GAME]();
+            } else {
+                this.game[FAIL_GAME]();
+                if (this.options.renderer === "webgpu")
+                    try {
+                        this.endRenderer();
+                    } catch (cleanup) {
+                        throw new AggregateError([e, cleanup], "Browser resume teardown failed");
+                    }
+            }
             throw e;
         } finally {
             this.operation = undefined;
@@ -186,6 +310,11 @@ export class BrowserGame<S, C> {
             } catch (e) {
                 errors.push(e);
             }
+            if (!this.renderer && this.rendererPromise) {
+                this.acquisition++;
+                this.acquisitionAbort?.abort();
+                this.rendererPromise = undefined;
+            }
             try {
                 this.input.clear();
             } catch (e) {
@@ -198,6 +327,12 @@ export class BrowserGame<S, C> {
             }
             if (errors.length) {
                 if (!this.disposed) this.game[FAIL_GAME]();
+                if (this.options.renderer === "webgpu")
+                    try {
+                        this.endRenderer();
+                    } catch (cleanup) {
+                        errors.push(cleanup);
+                    }
                 throw new AggregateError(errors, "Stop failed");
             }
         } finally {
@@ -214,9 +349,9 @@ export class BrowserGame<S, C> {
         this.disposal = Promise.allSettled(
             [
                 () => this.scheduler.cancel(this.raf),
+                () => this.endRenderer(),
                 () => this.game.dispose(),
                 () => this.audio.dispose(),
-                () => this.renderer?.dispose(),
                 () => this.input.dispose(),
             ].map(async (action) => {
                 await action();
@@ -234,4 +369,8 @@ export class BrowserGame<S, C> {
         if (this.operation)
             throw new Error("Lifecycle operation already pending: " + this.operation);
     }
+}
+
+function isImageAsset(asset: Asset): asset is ImageAsset {
+    return "kind" in asset && asset.kind === "image";
 }

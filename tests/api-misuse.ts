@@ -200,3 +200,26 @@ function committedStateBoundary(game: Game<Progress, Command>): void {
     );
 }
 void committedStateBoundary;
+
+async function webgpuBoundary(canvas: HTMLCanvasElement, bitmap: ImageBitmap): Promise<void> {
+    const renderer = await engine.WebGPURenderer.create(canvas, 640, 360);
+    const image: engine.ImageAsset = engine.imageAsset("image", "./image.png");
+    const upload: Promise<void> = renderer.texture(image.id, bitmap);
+    await upload;
+    const submitted: void = renderer.render(new engine.Frame());
+    const status: engine.RendererStatus = renderer.status;
+    void submitted;
+    void status;
+    // @ts-expect-error Presentation status cannot be overwritten by consumers.
+    renderer.status = "ready";
+    // @ts-expect-error GPU construction is asynchronous through create().
+    new engine.WebGPURenderer(canvas, 640, 360);
+    // @ts-expect-error Internal runtime is not a package export.
+    engine.WebGpuRuntime;
+    // @ts-expect-error Preparation hooks are host-only capabilities.
+    engine.PREPARE_ASSET;
+    // @ts-expect-error Internal renderer acquisition is not a package export.
+    engine.CREATE_RENDERER;
+    renderer.dispose();
+}
+void webgpuBoundary;

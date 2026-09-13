@@ -370,7 +370,12 @@ stateDiagram-v2
 
 ### First start
 
-The first `start()` initializes display, input, assets, renderer, and scene management; prepares and mounts the initial scene; then starts the loop last. Each successful step registers rollback. A failure unwinds that attempt in reverse order. Complete rollback returns to `Stopped`; incomplete rollback enters `Failed`.
+The first `start()` publishes ready platform services and mounts the prepared initial
+scene, then starts the loop last. WebGPU image preparation can initialize presentation
+before start; it never activates scenes or starts input/audio/ticks. Complete rollback
+returns to `Stopped`; incomplete rollback enters `Failed`. Successfully initialized
+WebGPU presentation remains owned across complete cold-start rollback, as specified
+by the [renderer contract](contracts/NGNE.md#renderer).
 
 ### Stop and resume
 
@@ -389,7 +394,10 @@ If loop startup fails during resume, work stays disabled, the engine makes a bes
 
 ### Dispose
 
-`dispose()` is terminal. It disables work, stops the loop, cancels loading, unmounts scenes, and releases game state, renderer, assets, input, and display in reverse dependency order. Every cleanup is attempted. Failures are reported together and the final state is always `Disposed`.
+`dispose()` is terminal. It disables work, stops the loop, invalidates renderer work
+before decoded sources close, cancels loading, unmounts scenes and releases all owned
+services. Every cleanup is attempted. Independent cleanup does not wait for audio close.
+Failures are reported together and the final state is always `Disposed`.
 
 ## Deferred work
 

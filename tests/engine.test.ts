@@ -1,3 +1,5 @@
+import { centerX, centerY } from "./frame-values.js";
+import { QUAD_STRIDE } from "../src/quad-layout.js";
 import { World } from "../src/ecs.js";
 import { Cleanup } from "../src/primitives.js";
 import { test } from "node:test";
@@ -392,7 +394,7 @@ test("camera interpolation, snapping and frame sorting do not mutate simulation"
     f.rect(0, 0, 2, 2, 0xffffff, 1, -100);
     f.sort();
     assert.deepEqual(f.order, [1, 0, 2]);
-    assert.equal(f.data[0], 15);
+    assert.equal(centerX(f), 15);
     assert.equal(camera.x, 10);
     camera.cut();
     assert.equal(camera.previousX, 10);

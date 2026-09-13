@@ -8,13 +8,20 @@ export interface Lease<T = unknown> {
     readonly value: T;
     release(): void;
 }
-export function imageAsset(id: string, url: string): Asset<ImageBitmap> {
+export interface ImageAsset extends Asset<ImageBitmap> {
+    readonly kind: "image";
+}
+export function imageAsset(id: string, url: string): ImageAsset {
     return {
         id,
+        kind: "image",
         async load(signal) {
             const response = await fetch(url, { signal });
             if (!response.ok) throw new Error(`Image load failed: ${response.status}`);
-            return createImageBitmap(await response.blob());
+            return createImageBitmap(await response.blob(), {
+                premultiplyAlpha: "none",
+                colorSpaceConversion: "none",
+            });
         },
         dispose: (bitmap) => bitmap.close(),
     };
@@ -46,15 +53,21 @@ export class Assets {
                 promise: Promise.resolve().then(() => definition.load(controller.signal)),
             };
             const owned = entry;
-            entry.promise = entry.promise.then((value) => {
-                if (controller.signal.aborted || this.disposed) {
-                    definition.dispose?.(value);
-                    throw new Error("Asset load cancelled");
-                }
-                owned.value = value;
-                owned.loaded = true;
-                return value;
-            });
+            entry.promise = entry.promise
+                .then((value) => {
+                    if (controller.signal.aborted || this.disposed) {
+                        definition.dispose?.(value);
+                        throw new Error("Asset load cancelled");
+                    }
+                    owned.value = value;
+                    owned.loaded = true;
+                    return value;
+                })
+                .catch((error: unknown) => {
+                    if (this.entries.get(definition.id) === owned)
+                        this.entries.delete(definition.id);
+                    throw error;
+                });
             this.entries.set(definition.id, entry);
         }
         entry.refs++;

@@ -1,5 +1,189 @@
 # NGNE verification
 
+## NGNE-21 — 12 September 2026
+
+Local, uncommitted WebGPU implementation against pre-build HEAD
+`94a70a0393060707908a226c9e2d2107bdbae01c`. The initial working tree contained only
+the three NGNE-21 planning records. The approved plan remains byte-identical at
+SHA256 `1434e02d24371c1501357a59b7b667b494f8d6afb8fa4d2987ac8afd271f2c5f`.
+Only the pinned cluster-renderer `.versions/v03` source at
+`34458a987f03b00894e98a40d39fc0ae666194f6` was adapted; that repository remains clean
+and unchanged. [Decisions](decisions.md#webgpu-renderer-adaptation) identifies the adaptations.
+No commit, push, publication or Jira update belongs to this run.
+
+### Proof and environment
+
+Phase-by-phase evidence and the complete independent inspection results belong to
+[the review log](../plans/NGNE-21-review-log.md). Codex built phases 1–4 and most of
+phase 5, then stopped at its usage limit before final inspection. Claude Code (Opus 5)
+continued as builder. It fixed the Frame inlining regression below and the inspection
+findings. Inspection used a fresh read-only Claude Opus subagent instead of the claudex
+runner, which requires Codex as host. Round results are in the review log.
+
+Post-fix proofs on 12 September 2026: `npm.cmd test` 134/134, typecheck, build,
+`format:check` and `git diff --check` passed. `validation.html` in the in-app Chromium
+152.0.7977.76 (same Intel `gen-12lp` adapter, secure localhost) finished 182 PASS,
+0 FAIL, 0 SKIP and `ALL CHECKS PASSED` with no console errors. This includes persistent
+hello unsupported/recovery messages rechecked after 500 ms. Hello rendered through
+WebGPU; the platformer and Starfall started on WebGL.
+
+Raw machine-local diagnostics are outside the checkout:
+`C:/Users/jfabi/AppData/Local/Temp/ngne-21-build-diagnostics-20260912/`.
+They are evidence for this local run, not portable checked-in test results.
+
+Hardware validation uses secure localhost, Windows 11 Home x64 (10.0.26200), Chromium 152, DPR 1 and
+preferred `bgra8unorm`. The actual WebGPU adapter reports vendor `intel`, architecture
+`gen-12lp`, `isFallbackAdapter: false`; device/description are empty. Backend and driver
+are not exposed by this API and are not inferred from WebGL. Acquired device limits
+are maxBufferSize 268435456 and maxTextureDimension2D 8192; no optional features or
+raised limits are requested. Headful benchmark Chrome reports **152.0.7977.84**,
+V8 **15.2.124.21**, window 1280×900 (inner viewport 1264×805), fixed 640×360 canvas.
+CPU: 12th Gen Intel Core i7-12650H, 16 logical cores, 16 GiB; Node v24.15.0.
+
+Real GPU checks exercise the production encoder, preferred-format targets, 256-byte
+aligned readback and explicit BGRA-to-RGBA conversion. Nonsymmetric pixels are exactly
+RGBA **224,64,32,255** and **32,64,224,255**. Alpha/decoded image comparisons allow two
+8-bit channel values of rounding; reconstructed Float32 centers allow 1e-4 pixels.
+Coverage includes centered/signed/rotated geometry, UV quadrants, transparent ordering,
+empty clear, A/B/A adjacent runs, 10,000 sprites, active uploads and buffer reuse, plus
+65 interpolation samples through each renderer.
+
+Image/lifecycle checks cover shared cold preparation without activation, same-candidate
+retry after input rollback, fresh preparation after setup rollback with another live
+candidate, stop/resume, fixed backing restoration, GPU-before-Assets disposal, exact
+visible hello capability/recovery messages, and balanced scopes after a synchronously
+throwing copy on a real device. Controlled `GPUDevice.destroy()` restores both leased
+and snapshotted source pixels exactly to **192,64,128,255** on a fresh device. This is
+real hardware rendering with controlled loss, not physical driver fault evidence.
+Mocks separately cover denied/lost/reupload-failed replacements, membership churn,
+stale callbacks, disposal during asynchronous stages, missing textures and frame faults.
+
+### Measurement method
+
+The fixed fixture reuses one authoring sprite for 10,000 quads, with one-texture and
+alternating-two-texture arms. Each backend/arm receives two sequential launches in the
+same visible Chrome/window, 10 s warmup and 60 s sampling. Preparation and submission
+timings measure CPU work only; neither waits for per-frame GPU completion. The one
+texture arm submits one draw; alternating textures submit 10,000 draws to preserve
+order. WebGPU uploads 560,000 active instance bytes plus 48 uniform bytes; legacy
+uploads 560,000 instance bytes. Both retain three bindings (white plus two images).
+WebGPU grows its instance capacity once to 10,000; legacy grows once to 16,384.
+
+The harness forces GC after warmup and sampling, records visibility changes, frame
+distributions, heap samples and a DevTools allocation profile. Sampling interval is
+32,768 bytes with collected objects included for both minor and major GC. Source-site
+summaries and complete allocation call trees are retained with each result. Sampling
+is statistical; source inspection also checks numeric packing/repacking loops for
+object wrappers and typed-array subviews. Per-frame GPU encoder/view descriptors and
+sorting/runtime allocations are permitted. Heap growth also includes the harness's
+frame and heap records, so it does not isolate renderer retention.
+
+An initial smoke profile found repeated Frame metadata-array growth. The implementation
+now retains arrays while packing and trims the active prefix at sort. A subsequent
+10 s warmup/3 s diagnostic probe found no sampled Frame packing or WebGPU repacking
+allocation sites. The first sustained sample was rejected because its window became
+hidden; its raw file is preserved with `.hidden-rejected`. Accepted samples must remain
+visible throughout. The probe durations are not substituted for the required sustained runs.
+
+Reproduce against `npm.cmd run dev -- --port 5173`:
+
+```powershell
+$env:NGNE_URL='http://127.0.0.1:5173/validation.html?rendererBenchmark=webgpu&alternating=0'
+$env:NGNE_WARMUP_SECONDS='10'
+$env:NGNE_DURATION_SECONDS='60'
+node --import tsx tests/browser-baseline.ts
+# Repeat twice for webgpu/webgl and alternating=0/1; keep Chrome visible.
+```
+
+The existing Chaos CPU harness compares the actual pre-build and changed Frame
+preparation with identical seed `bench`, 900 ticks and 799 post-warmup samples.
+This separates NGNE-21 from earlier NGNE-20 ECS effects. NGNE-26's historical
+~6.7–7.2 MiB/s Starfall churn is context only; it is not workload-equivalent to the
+fixed renderer fixture. Unchanged Starfall WebGL remains a regression check;
+NGNE-27/NGNE-12 own the complete real-game WebGPU migration/comparison.
+
+### Sustained renderer results
+
+All eight accepted samples lasted 60.00–60.02 seconds with no visibility changes,
+no fixture diagnostics and no page errors. Names below are backend–alternating–repeat:
+`0` is one texture, `1` alternates two textures. Each percentile cell is p50 / p95 / p99
+in milliseconds; retained heap is MiB after forced GC, warmup → end.
+Raw files are `renderer-{name}.json` in the diagnostics directory; each includes the
+absolute path to its full allocation profile under `ngne-baseline-*/allocation-profile.json`.
+
+| Run        | Frames | CPU preparation    | CPU submission        | CPU total             | Retained heap |
+| ---------- | -----: | ------------------ | --------------------- | --------------------- | ------------- |
+| webgl-0-1  |   3601 | 2.30 / 3.20 / 3.80 | 3.10 / 4.60 / 5.20    | 5.40 / 7.30 / 8.10    | 6.657 → 6.164 |
+| webgl-0-2  |   3601 | 2.50 / 3.30 / 3.80 | 2.60 / 4.40 / 5.10    | 5.10 / 7.30 / 8.00    | 6.657 → 6.164 |
+| webgl-1-1  |   2626 | 0.40 / 0.50 / 0.70 | 22.00 / 24.90 / 26.40 | 22.40 / 25.20 / 26.80 | 6.695 → 6.781 |
+| webgl-1-2  |   2628 | 0.40 / 0.50 / 0.80 | 22.10 / 24.70 / 26.10 | 22.50 / 25.10 / 26.50 | 6.650 → 6.736 |
+| webgpu-0-1 |   3601 | 2.30 / 3.30 / 3.90 | 3.10 / 4.40 / 4.90    | 5.40 / 7.10 / 8.00    | 5.727 → 5.960 |
+| webgpu-0-2 |   3600 | 2.20 / 3.20 / 3.80 | 2.90 / 4.20 / 4.80    | 5.10 / 6.80 / 7.60    | 5.677 → 5.911 |
+| webgpu-1-1 |   3601 | 0.60 / 2.00 / 2.70 | 3.50 / 6.00 / 7.80    | 4.30 / 7.40 / 9.20    | 5.726 → 5.960 |
+| webgpu-1-2 |   3601 | 1.10 / 2.80 / 3.30 | 4.70 / 7.70 / 9.40    | 6.10 / 9.30 / 10.90   | 5.723 → 5.998 |
+
+One-texture medians were effectively equal between backends in each repeat. Alternating
+texture submission was lower with WebGPU, but WebGPU's second alternating run was
+noticeably slower than its first. These differences include JIT/profiler/system noise;
+they are not GPU execution measurements. No warmed sample reported an allocation site
+in Frame.add/sprite or WebGPU prepare/repacking. Recorded WebGPU sites were encode and
+sort; legacy sites were render. The retained-heap movement includes harness data and
+GC variation; buffer growth stayed at one and bindings at three in every arm.
+
+### CPU regression comparison
+
+The same unchanged `npm.cmd run bench` harness ran before implementation and after the
+final production build. Both runs report HEAD `94a70a0`: the latter includes this
+uncommitted diff. Raw files are `baseline-bench.txt`, `final-bench.txt` and
+`final-bench-inlining-fix.txt`.
+
+| Chaos simulation + Frame preparation | p50 ms | p95 ms | p99 ms | Mean ms |
+| ------------------------------------ | -----: | -----: | -----: | ------: |
+| Pre-build                            | 0.7519 | 1.0679 | 1.3579 |  0.7963 |
+| First affine Frame                   | 0.9209 | 1.1585 | 1.4613 |  0.9414 |
+| Final (`packAffine` extracted)       | 0.7685 | 1.0515 | 1.2900 |  0.8029 |
+
+The first affine `Frame.add` median was **22.5% higher**. Cause: its bytecode grew from
+423 to 514 bytes, above V8's default 460-byte inlining limit (Node 24
+`--print-bytecode`). The same code with `--max-inlined-bytecode-size=2000` measured
+0.746–0.749 ms, and the old 13-field code with a 14-float stride measured 0.746–0.756 ms.
+So the packing arithmetic and stride are not the cost; lost inlining is. Moving the affine
+write into module-scope `packAffine` and buffer growth into `grow()` reduces `add` to
+363 bytes. It writes identical values. Same-session triples: pre-build Frame
+0.747–0.766 ms, first affine 0.834–0.879 ms, final 0.737–0.749 ms. The recorded final
+run above is 2.2% above the pre-build median, within run-to-run noise. All runs reached
+7,209 sprites and 6,986 entity slots with zero sampled ticks over 16.67 ms. Final typed
+ECS median was 0.1953 ms (pre-build 0.1959 ms); collision-grid schema/legacy ratio 1.063
+(pre-build 1.168). The browser renderer and Starfall samples in this section predate
+the inlining fix; that fix changes CPU cost, not output. No universal performance
+threshold was added to the approved plan.
+
+Production Starfall Chaos Lab (`starfall-regression.json`, seed `STARFALL-1989`)
+ran 10 s warmup plus 60.018 s visible sampling: 3,601 callbacks, CPU callback
+p50/p95/p99 **5.60/8.60/10.20 ms**, no intervals above 25 ms and no dropped ticks
+during sampling (15 accumulated during startup/warmup). No page error or visibility
+change occurred. Heap after forced GC moved 4.829 → 6.651 MiB, including harness
+records; coarse sampled reclamation was 2.874 MiB/s. This checks the retained WebGL
+game path and is not a same-session pre-change browser comparison.
+
+### Limits
+
+Only one Intel adapter and Windows Chromium were exercised. No physical driver reset,
+additional vendor/OS/browser, physical touch/gamepad, or WebGPU CI acceptance is claimed.
+Controlled/mock failures are identified above. Local timings have sampling, profiling,
+browser and system-load noise and imply no universal speedup or frame-rate guarantee.
+WebGL and object ECS bridges remain until NGNE-27; NGNE-13 CI and NGNE-14 portability
+are separate work. The public declaration fixture disables ambient GPU types and checks
+library declarations; headless Game does not initialize browser/GPU services.
+
+Primary API references refreshed during implementation: [WGSL layout](https://www.w3.org/TR/WGSL/#alignment-and-size),
+[writeBuffer element units](https://gpuweb.github.io/types/interfaces/GPUQueue.html#writeBuffer),
+[image-copy alpha and usage](https://developer.mozilla.org/en-US/docs/Web/API/GPUQueue/copyExternalImageToTexture),
+[device loss](https://developer.mozilla.org/en-US/docs/Web/API/GPUDevice/lost),
+[canvas configuration](https://developer.mozilla.org/en-US/docs/Web/API/GPUCanvasContext/configure),
+[bitmap options](https://developer.mozilla.org/en-US/docs/Web/API/Window/createImageBitmap),
+and [allocation sampling](https://chromedevtools.github.io/devtools-protocol/tot/HeapProfiler/#method-startSampling).
+
 ## NGNE-20 — 10–11 September 2026
 
 Local uncommitted implementation at baseline revision **`a906f3a`** on Windows 11 x64,

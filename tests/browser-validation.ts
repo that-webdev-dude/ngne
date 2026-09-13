@@ -3,6 +3,18 @@ import { checkBrowserAudio } from "./browser-audio-checks.js";
 import { checkBrowserLifecycle } from "./browser-lifecycle-checks.js";
 import { checkBrowserInput } from "./browser-input-checks.js";
 import { checkBrowserInterpolation } from "./browser-interpolation-checks.js";
+import { checkBrowserImages } from "./browser-image-checks.js";
+import { checkBrowserRecovery } from "./browser-recovery-checks.js";
+import { checkBrowserGpuHost } from "./browser-gpu-host-checks.js";
+import { startRendererBenchmark } from "./browser-renderer-benchmark.js";
+import { checkWebGPUEnvironment, checkWebGPUCore } from "./browser-webgpu-checks.js";
+const rendererBenchmark = new URLSearchParams(location.search).get("rendererBenchmark");
+void (
+    rendererBenchmark ? startRendererBenchmark(rendererBenchmark) : checkWebGPUEnvironment()
+).catch((error: unknown) => {
+    const output = document.getElementById("webgpu-environment");
+    if (output) output.textContent = String(error);
+});
 const results: string[] = [];
 const check = (condition: unknown, message: string) => {
     if (!condition) throw new Error(message);
@@ -11,6 +23,7 @@ const check = (condition: unknown, message: string) => {
 };
 async function main() {
     await checkBrowserAudio(check);
+    await checkWebGPUCore(check);
     const canvas = document.getElementById("synthetic") as HTMLCanvasElement;
     const renderer = new Renderer(canvas, 64, 64),
         frame = new Frame(),
@@ -137,7 +150,18 @@ async function main() {
     await app.dispose();
     check(app.game.lifecycle === "Disposed" && cancelled >= 2, "browser teardown completes");
     await checkBrowserLifecycle(check);
+    await checkBrowserLifecycle(
+        (condition, message) => check(condition, "WebGPU " + message),
+        "webgpu",
+    );
+    await checkBrowserImages(check);
+    await checkBrowserRecovery(check);
+    await checkBrowserGpuHost(check);
     await checkBrowserInput(check);
+    await checkBrowserInput(
+        (condition, message) => check(condition, "WebGPU " + message),
+        "webgpu",
+    );
     await checkBrowserInterpolation(check);
     document.getElementById("results")!.textContent = results.join("\n") + "\n\nALL CHECKS PASSED";
 }

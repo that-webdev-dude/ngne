@@ -8,6 +8,8 @@ import { inspectValue, type InspectionValue } from "./inspection.js";
 
 /** Internal browser-host capability; deliberately absent from the package entry point. */
 export const FAIL_GAME = Symbol("fail game");
+/** Host-only image readiness; no browser or GPU types cross this capability. */
+export const PREPARE_ASSET = Symbol("prepare asset");
 
 export interface DisplaySnapshot {
     readonly width: number;
@@ -220,6 +222,7 @@ export interface GameOptions<S, C> {
 }
 /** Headless orchestrator. BrowserGame owns platform services and delegates simulation here. */
 export class Game<S = Record<string, never>, C = never> {
+    [PREPARE_ASSET]?: (asset: Asset, signal: AbortSignal) => Promise<(() => void) | undefined>;
     readonly rootSeed: number;
     readonly assets = new Assets();
     readonly dt: number;
@@ -302,8 +305,34 @@ export class Game<S = Record<string, never>, C = never> {
         const leases: Lease[] = [];
         try {
             // Each acquired lease is owned before the next await; rollback is deterministic.
-            for (const asset of definition.assets ?? [])
-                leases.push(await this.assets.acquire(asset, controller.signal));
+            for (const asset of definition.assets ?? []) {
+                const lease = await this.assets.acquire(asset, controller.signal);
+                let cleanup: (() => void) | undefined;
+                let released = false;
+                leases.push({
+                    id: lease.id,
+                    value: lease.value,
+                    release() {
+                        if (released) return;
+                        released = true;
+                        const errors: unknown[] = [];
+                        try {
+                            cleanup?.();
+                        } catch (error) {
+                            errors.push(error);
+                        }
+                        try {
+                            lease.release();
+                        } catch (error) {
+                            errors.push(error);
+                        }
+                        if (errors.length)
+                            throw new AggregateError(errors, "Prepared asset release failed");
+                    },
+                });
+                cleanup = await this[PREPARE_ASSET]?.(asset, controller.signal);
+                if (controller.signal.aborted) throw new Error("Scene preparation cancelled");
+            }
             if (controller.signal.aborted) throw new Error("Scene preparation cancelled");
             const candidate: SceneCandidate<S, C> = new SceneCandidate(
                 this.owner,

@@ -12,6 +12,9 @@ NGNE 0.1 is an early engine baseline with a playable showcase. The public API ma
 - Committed game state, asynchronous asset preparation and owned cleanup.
 - Fixed-step browser host, input, cameras and interpolation.
 - Instanced WebGL 2 sprites, texture batching and context restoration.
+- Opt-in WebGPU affine sprites, preparation-time image readiness and bounded device
+  recovery; hello uses the new path. [NGNE-21 evidence](verification.md#ngne-21--12-september-2026)
+  separates hardware, simulated faults and local performance results.
 - Scoped audio, synthesized effects and decoded clips.
 - Starfall '89 and its Chaos Lab stress mode.
 
@@ -33,6 +36,12 @@ NGNE 0.1 is an early engine baseline with a playable showcase. The public API ma
 - Typed-array SoA component storage (NGNE-20), a WebGPU renderer (NGNE-21) and an owned simulation worker boundary (NGNE-22) are grouped under the SoA and WebGPU migration epic (NGNE-23). NGNE-20 establishes the schema API while Starfall and the platformer remain on an isolated legacy bridge. NGNE-27 owns migrating both games and deleting that bridge. The pre-migration baseline (NGNE-26) is recorded in [verification](verification.md#ngne-26--9-september-2026); NGNE-12 repeats it after the real-game migration.
 
 ## Next validation
+
+- NGNE-27 migrates Starfall and the platformer to schema ECS and WebGPU, removes the
+  object-component bridge, legacy `Renderer` and temporary renderer selection, and
+  repeats both-game browser/performance evidence. NGNE-12 owns the broader comparison.
+- NGNE-13 CI expansion and NGNE-14 portability remain separate; one tested Intel GPU
+  and controlled device destruction do not establish cross-device or driver-fault coverage.
 
 - Validate physical touch and gamepad controls and additional browsers for both games; the platformer's Chrome session is recorded in [verification](verification.md#ngne-15--9-september-2026).
 - Add focused regression tests when those checks reveal defects.

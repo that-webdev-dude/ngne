@@ -42,5 +42,7 @@ export type {
 } from "./scene.js";
 export type { InspectionValue } from "./inspection.js";
 export * from "./renderer.js";
+export { WebGPURenderer } from "./webgpu-renderer.js";
+export type { RendererStatus } from "./webgpu-renderer.js";
 export * from "./audio.js";
 export * from "./browser.js";

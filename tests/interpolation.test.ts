@@ -1,3 +1,5 @@
+import { centerX, centerY } from "./frame-values.js";
+import { QUAD_STRIDE } from "../src/quad-layout.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
@@ -27,8 +29,8 @@ test("snapping follows camera and shake composition and preserves authored input
                     frame.scene(camera, alpha);
                     frame.sprite(sprite);
                     const composed = x - (screen ? 0 : 0.5 + 0.5 * alpha);
-                    assert.ok(frame.data[0] === (snap ? Math.round(composed) : composed));
-                    assert.ok(frame.data[1] === (snap ? Math.round(-composed) : -composed));
+                    assert.ok(centerX(frame) === (snap ? Math.round(composed) : composed));
+                    assert.ok(centerY(frame) === (snap ? Math.round(-composed) : -composed));
                 }
             }
         }
@@ -47,7 +49,7 @@ test("actor teleport and camera cut reset independently at both interpolation en
         const frame = new Frame();
         frame.scene(camera, alpha);
         frame.rect(lerp(actor.previousX, actor.x, alpha), 40, 2, 2, 0xffffff);
-        assert.equal(frame.data[0], 90 - 8 * alpha);
+        assert.equal(centerX(frame), 90 - 8 * alpha);
     }
     camera.cut(50, -20);
     actor.previousX = 100;
@@ -56,7 +58,7 @@ test("actor teleport and camera cut reset independently at both interpolation en
         const frame = new Frame();
         frame.scene(camera, alpha);
         frame.rect(lerp(actor.previousX, actor.x, alpha), 40, 2, 2, 0xffffff);
-        assert.equal(frame.data[0], 50 + 8 * alpha);
-        assert.equal(frame.data[1], 60);
+        assert.equal(centerX(frame), 50 + 8 * alpha);
+        assert.equal(centerY(frame), 60);
     }
 });

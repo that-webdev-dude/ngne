@@ -48,18 +48,73 @@ const scene: SceneDefinition = {
 
 const app = new BrowserGame({
     canvas: document.querySelector("canvas")!,
+    renderer: "webgpu",
+    diagnostic: showError,
     width: 640,
     height: 400,
     seed: "my-game",
     state: {},
     transition: (state) => state,
 });
-await app.start(await app.game.prepare(scene, { key: "first-room" }));
+// Provide a persistent <pre role="alert"> in the page. Diagnostics also report
+// non-error notices (dropped-tick overload); append errors so none hides another.
+function showError(error: unknown): void {
+    const output = document.querySelector('[role="alert"]');
+    if (!output || !(error instanceof Error)) return;
+    const message = describeError(error);
+    if (!output.textContent?.includes(message))
+        output.textContent += (output.textContent ? "\n" : "") + message;
+}
+function describeError(error: unknown): string {
+    if (error instanceof AggregateError)
+        return [error.message, ...error.errors.map(describeError)].join("\n");
+    if (error instanceof Error)
+        return error.message + (error.cause ? "\n" + describeError(error.cause) : "");
+    return String(error);
+}
+try {
+    await app.start(await app.game.prepare(scene, { key: "first-room" }));
+} catch (error) {
+    showError(error);
+}
 // await app.stop(); await app.start(); // preserve the mounted scene
 // await app.dispose();                 // terminal; releases all owned services
 ```
 
 Rectangles and sprites use **center coordinates**. Distances are logical canvas pixels; `dt` is seconds. Composition is fixed when an entity spawns. Schema queries invoke one callback per nonempty 512-row chunk; hoist the inferred typed columns and loop only to `chunk.count`.
+
+Use a secure origin (localhost or HTTPS) and a WebGPU-capable browser with hardware
+acceleration. The initial tested target is desktop Chromium; [verification](verification.md#ngne-21--12-september-2026)
+names the actual hardware. Unsupported startup and failed device recovery remain visible
+in the alert above. The temporary `renderer: "webgpu"` selection is explicit; omitting
+it retains legacy WebGL until NGNE-27 migrates both games.
+
+CSS can resize the canvas on screen. BrowserGame preserves its fixed logical backing
+resolution and converts input through the current bounding rectangle. Stop/resume
+retains the scene and renderer; use `app.dispose()` for terminal browser teardown.
+See the [renderer contract](contracts/NGNE.md#renderer) for exact recovery and ownership rules.
+
+## Image sprites
+
+```ts
+import { imageAsset, type SceneDefinition } from "ngne";
+
+const spark = imageAsset("spark", new URL("./spark.png", import.meta.url).href);
+const room: SceneDefinition = {
+    id: "spark-room",
+    assets: [spark],
+    setup(scene) {
+        const sprite = { x: 80, y: 100, width: 32, height: 32, texture: spark.id };
+        scene.render((frame) => frame.sprite(sprite));
+    },
+};
+```
+
+With the WebGPU host, `app.game.prepare(room, { key: "room" })` waits for decoding
+and validated GPU upload, even before the first start. Preparation does not mount or
+tick the room. Reuse the same ImageAsset definition for shared consumers; setup assets
+remain CPU values. The host releases GPU registrations with their scene/candidate.
+The [hello example](../examples/hello/main.ts) combines an image sprite and a solid quad.
 
 ## Browser input
 

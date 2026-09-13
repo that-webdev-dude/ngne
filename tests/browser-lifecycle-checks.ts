@@ -2,6 +2,7 @@ import { BrowserGame, type FrameScheduler } from "../src/index.js";
 
 export async function checkBrowserLifecycle(
     check: (value: unknown, message: string) => void,
+    renderer?: "webgpu",
 ): Promise<void> {
     const create = () => {
         const callbacks: FrameRequestCallback[] = [];
@@ -23,6 +24,7 @@ export async function checkBrowserLifecycle(
             state: { score: 0 },
             transition: (state) => ({ score: state.score + 1 }),
             scheduler,
+            renderer,
         });
         const prepare = () =>
             app.game.prepare(
@@ -134,9 +136,9 @@ export async function checkBrowserLifecycle(
         const rejected = rejects(starting, "cancelled");
         await app.dispose();
         await rejected;
-        callbacks[0](100);
+        callbacks[0]?.(100);
         check(
-            app.game.lifecycle === "Disposed" && callbacks.length === 1,
+            app.game.lifecycle === "Disposed" && callbacks.length === (renderer ? 0 : 1),
             "dispose during cold startup completion never enables frames",
         );
     }
@@ -229,7 +231,8 @@ export async function checkBrowserLifecycle(
             check(
                 error instanceof AggregateError &&
                     error.errors.length === 4 &&
-                    attempted.join() === "audio,renderer,input" &&
+                    attempted.length === 3 &&
+                    ["audio", "renderer", "input"].every((name) => attempted.includes(name)) &&
                     fixture.app.game.lifecycle === "Disposed",
                 "all independent teardown actions run and aggregate original failures",
             );

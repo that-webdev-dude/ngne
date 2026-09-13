@@ -1,3 +1,5 @@
+import { centerX, centerY } from "./frame-values.js";
+import { QUAD_STRIDE } from "../src/quad-layout.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
@@ -411,15 +413,15 @@ test("the migrated hello scene interpolates and resets both poses when wrapping"
     await game.start(await game.prepare(helloScene, { key: "hello-test" }));
     const frame = new Frame();
     game.render(frame, 0.5);
-    assert.equal(frame.data[0], 40);
+    assert.equal(centerX(frame), 40);
     game.tick();
     frame.reset();
     game.render(frame, 0.5);
-    assert.equal(frame.data[0], 60);
+    assert.equal(centerX(frame), 60);
     for (let tick = 1; tick < 16; tick++) game.tick();
     frame.reset();
     game.render(frame, 0.5);
-    assert.equal(frame.data[0], 0);
+    assert.equal(centerX(frame), 0);
 });
 
 test("mixed storage modes reject unchecked callers and disposal invalidates queries", () => {

@@ -1,5 +1,5 @@
 import { execSync, spawn } from "node:child_process";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -19,6 +19,7 @@ const BROWSER =
     DURATION_SECONDS = Number(process.env.NGNE_DURATION_SECONDS ?? 60),
     DEBUG_PORT = 9333;
 const IS_PLATFORMER = new URL(URL_UNDER_TEST).pathname.includes("/examples/platformer/");
+const IS_RENDERER = new URL(URL_UNDER_TEST).searchParams.has("rendererBenchmark");
 const HOOK = `(() => {
     const raw = window.requestAnimationFrame.bind(window);
     const b = (window.__ngneBaseline = { frames: [], heap: [], longTasks: 0, visibility: [] });
@@ -144,7 +145,10 @@ try {
     await page.send("Page.addScriptToEvaluateOnNewDocument", { source: HOOK });
     await page.send("Page.navigate", { url: URL_UNDER_TEST });
     await page.send("Page.bringToFront");
-    if (IS_PLATFORMER) {
+    const observedBrowser = await page.send("Browser.getVersion");
+    if (IS_RENDERER) {
+        await waitFor(page, `document.body?.dataset.rendererBenchmarkReady === "true"`);
+    } else if (IS_PLATFORMER) {
         await waitFor(page, `document.getElementById("start")?.textContent === "Start level 1"`);
         await click(page, "start");
         await waitFor(page, `document.getElementById("status")?.textContent !== "Ready"`);
@@ -159,25 +163,66 @@ try {
     await sleep(WARMUP_SECONDS * 1000);
     await page.send("HeapProfiler.collectGarbage");
     const afterWarmup = await page.evaluate<number>("performance.memory.usedJSHeapSize");
+    if (IS_RENDERER)
+        await page.send("HeapProfiler.startSampling", {
+            samplingInterval: 32768,
+            includeObjectsCollectedByMajorGC: true,
+            includeObjectsCollectedByMinorGC: true,
+        });
     const begin = await page.evaluate<UiSnapshot>(READ_UI);
     await sleep(DURATION_SECONDS * 1000);
     const end = await page.evaluate<UiSnapshot>(READ_UI);
     const summary = await page.evaluate<Record<string, unknown>>(
         `${SUMMARY}(${begin.now}, ${end.now})`,
     );
+    let rendererEvidence: unknown;
+    if (IS_RENDERER) {
+        const allocation = (await page.send("HeapProfiler.stopSampling")) as {
+            profile: SamplingProfile;
+        };
+        const allocationPath = join(profile, "allocation-profile.json");
+        writeFileSync(allocationPath, JSON.stringify(allocation));
+        const renderer = await page.evaluate<Record<string, unknown>>(`(() => {
+            const b = window.__ngneRendererBenchmark;
+            const prepare = [], submit = [], total = [];
+            for (let i = 0; i < b.count; i++) {
+                const offset = i * 3, time = b.samples[offset];
+                if (time < ${begin.now} || time >= ${end.now}) continue;
+                prepare.push(b.samples[offset + 1]); submit.push(b.samples[offset + 2]);
+                total.push(b.samples[offset + 1] + b.samples[offset + 2]);
+            }
+            const summarize = values => {
+                values.sort((a,b) => a-b);
+                return { count: values.length, p50: values[Math.floor(values.length*.5)],
+                    p95: values[Math.floor(values.length*.95)], p99: values[Math.floor(values.length*.99)] };
+            };
+            return { metadata:b.metadata, metrics:b.metrics, error:b.error,
+                cpuPreparationMs:summarize(prepare),cpuSubmissionMs:summarize(submit),cpuTotalMs:summarize(total) };
+        })()`);
+        rendererEvidence = {
+            ...renderer,
+            allocationPath,
+            sampledAllocationSites: allocationSites(allocation.profile.head),
+            timingBoundary: "CPU preparation and submission only; no per-frame GPU completion wait",
+        };
+    }
     await page.send("HeapProfiler.collectGarbage");
     const afterRun = await page.evaluate<number>("performance.memory.usedJSHeapSize");
     console.log(
         JSON.stringify(
             {
                 revision: revision(),
+                observedBrowser,
                 url: URL_UNDER_TEST,
-                workload: IS_PLATFORMER
-                    ? "Platformer level 1 (idle player, active patrols, seed NGNE-15)"
-                    : "Starfall Chaos Lab (stress arena, seed STARFALL-1989)",
+                workload: IS_RENDERER
+                    ? "Fixed 10,000-sprite renderer fixture; reused authoring inputs"
+                    : IS_PLATFORMER
+                      ? "Platformer level 1 (idle player, active patrols, seed NGNE-15)"
+                      : "Starfall Chaos Lab (stress arena, seed STARFALL-1989)",
                 warmupSeconds: WARMUP_SECONDS,
                 sampledSeconds: (end.now - begin.now) / 1000,
                 ...summary,
+                rendererEvidence,
                 droppedTicks: {
                     atStart: droppedTicks(begin.status),
                     atEnd: droppedTicks(end.status),
@@ -198,6 +243,37 @@ try {
     );
 } finally {
     spawn("taskkill", ["/pid", String(browser.pid), "/T", "/F"], { stdio: "ignore" });
+}
+interface SamplingProfile {
+    head: SamplingNode;
+}
+interface SamplingNode {
+    callFrame: { functionName: string; url: string; lineNumber: number };
+    selfSize: number;
+    children: SamplingNode[];
+}
+function allocationSites(
+    root: SamplingNode,
+): { functionName: string; url: string; lineNumber: number; sampledBytes: number }[] {
+    const sites = new Map<
+        string,
+        { functionName: string; url: string; lineNumber: number; sampledBytes: number }
+    >();
+    const visit = (node: SamplingNode) => {
+        if (
+            node.selfSize &&
+            /\/src\/(renderer|quad-renderer|webgpu-runtime)\.ts/.test(node.callFrame.url)
+        ) {
+            const { functionName, url, lineNumber } = node.callFrame;
+            const key = `${url}:${lineNumber}:${functionName}`;
+            const site = sites.get(key) ?? { functionName, url, lineNumber, sampledBytes: 0 };
+            site.sampledBytes += node.selfSize;
+            sites.set(key, site);
+        }
+        for (const child of node.children) visit(child);
+    };
+    visit(root);
+    return [...sites.values()].sort((a, b) => b.sampledBytes - a.sampledBytes);
 }
 async function connect(): Promise<Page> {
     let targets: { type: string; webSocketDebuggerUrl: string }[] = [];

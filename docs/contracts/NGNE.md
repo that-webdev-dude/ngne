@@ -10,10 +10,10 @@ the package export map exposes no subpaths. The NGNE-1 consumer inventory is:
 | Category                   | Public symbols                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Consumers and ownership                                                                                                                                                                                                                                                                   |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Authoring                  | `component`, `f32`, `f64`, `i32`, `u32`, `u8`, `bool`, `entityRef`; types `Component`, `ComponentValue`, `SchemaComponent`, `SchemaComponentValue`, `SchemaFields`, `SchemaValues`, `SchemaQuery`, `SchemaChunk`, `SchemaComponentView`, `SchemaQueryViews`, `FieldDescriptor`, `FieldKind`, `EntityReferenceView`, `Entity`, `Query`, `AllQuery`, `WorldAccess`; `SceneDefinition`, `SceneSetup`, `SystemContext`, `SceneCommands`, `SceneEvent`, `StateAccess`, `DeepReadonly`, `PreparedScene` | Hello, authoring tests and, temporarily, legacy Starfall/platformer consumers. Setup injects scene capabilities; systems cannot commit, enumerate, or change query membership. Prepared handles expose only idempotent `release()`; the owning Game validates identity and consumes them. |
-| Authoring and presentation | `Camera`, `Random`, `clamp`, `lerp`, `seedOf`, `down`, `pressed`, `imageAsset`, `audioAsset`; types `Asset`, `Lease`, `Sprite`, `Sound`, `Clip`                                                                                                                                                                                                                                                                                                                                                   | Scene authors use explicitly acquired/injected values. Constructors operate on caller-owned values; inspection never returns a live camera or RNG.                                                                                                                                        |
-| Platform integration       | `Game`, `BrowserGame`, `Assets`, `Input`, `Frame`, `Renderer`, `Audio`, `FixedStep`, `emptyInput`; types `GameOptions`, `SceneCandidates`, `SceneCandidateOptions`, `BrowserOptions`, `FrameScheduler`, `DisplaySnapshot`, `InputSnapshot`, `Stats`                                                                                                                                                                                                                                               | Browser host, headless runners, renderer/audio/asset tests and benchmarks. Host lifecycle, candidate coordination, tick, render and service operations remain intentional integration APIs.                                                                                               |
+| Authoring and presentation | `Camera`, `Random`, `clamp`, `lerp`, `seedOf`, `down`, `pressed`, `imageAsset`, `audioAsset`; types `Asset`, `ImageAsset`, `Lease`, `Sprite`, `Sound`, `Clip`                                                                                                                                                                                                                                                                                                                                     | Scene authors use explicitly acquired/injected values. Constructors operate on caller-owned values; inspection never returns a live camera or RNG.                                                                                                                                        |
+| Platform integration       | `Game`, `BrowserGame`, `Assets`, `Input`, `Frame`, `Renderer`, `WebGPURenderer`, `Audio`, `FixedStep`, `emptyInput`; types `GameOptions`, `SceneCandidates`, `SceneCandidateOptions`, `BrowserOptions`, `FrameScheduler`, `DisplaySnapshot`, `InputSnapshot`, `Stats`, `RendererStatus`                                                                                                                                                                                                           | Browser host, headless runners, renderer/audio/asset tests and benchmarks. Host lifecycle, candidate coordination, tick, render and service operations remain intentional integration APIs.                                                                                               |
 | Inspection                 | `Lifecycle`, `SceneInspection`, `SceneStateInspection`, `GameInspection`, `InspectionValue`                                                                                                                                                                                                                                                                                                                                                                                                       | Tests, benchmark capacity reporting and diagnostics. No mutable foreign world or resource binding is returned.                                                                                                                                                                            |
-| Internal only              | `World`, query runtime, `SceneInstance`, candidate runtime, `Cleanup`, `immutable`, browser failure capability                                                                                                                                                                                                                                                                                                                                                                                    | Runtime modules; direct ECS tests and benchmark import their internal modules deliberately. No public runtime constructor for scenes, queries or prepared candidates.                                                                                                                     |
+| Internal only              | `World`, query runtime, `SceneInstance`, candidate runtime, `Cleanup`, `immutable`, browser failure and preparation capabilities, GPU runtime/context/quad/registry modules                                                                                                                                                                                                                                                                                                                       | Runtime modules; direct ECS tests and benchmark import their internal modules deliberately. No public runtime constructor for scenes, queries or prepared candidates.                                                                                                                     |
 
 - `Game.lifecycle` and `simulationTick` are getter-only values backed by private
   fields. Browser faults use an internal capability, not a writable public field.
@@ -311,7 +311,74 @@ Local multiplayer and explicit controller assignment are not implemented.
 
 ## Renderer
 
-`Frame` packs 13 float32 values per sprite: centered XY/size, normalized UV rectangle, RGBA, rotation radians. Sorting uses scene, layer, depth and insertion. Contiguous texture runs batch safely without texture-driven reordering. One drawArraysInstanced call per run. Reusable CPU/GPU buffers grow geometrically. There is no per-entity GPU object. Renderer sees no ECS or scene runtime.
+`WebGPURenderer.create(canvas, width, height, onError?)` asynchronously publishes a
+complete renderer. Its synchronous `render(frame, clear?)`, `drawCalls`, `sprites`,
+idempotent `dispose()` and readonly presentation `status` are separate from Game
+lifecycle. Public-reachable declarations require no ambient WebGPU types; internal
+device, encoder, registry and upload modules are not package subpaths.
+
+`BrowserOptions.renderer: "webgpu"` is a temporary explicit opt-in. Omission keeps
+the existing WebGL `Renderer`; `BrowserGame.renderer` is their union. Unsupported
+WebGPU rejects with an actionable message and never silently falls back. Hello opts
+in; Starfall and the platformer retain WebGL through NGNE-27.
+
+Cold image preparation may initialize the renderer, without attaching input, mounting,
+starting audio or scheduling ticks. Startup shares that acquisition. A fully initialized
+WebGPU renderer belongs to BrowserGame through stop and complete cold-start rollback;
+retrying an unconsumed candidate reuses it. Failed initialization clears the rejected
+acquisition for retry. Incomplete rollback/terminal host failure tears down presentation.
+Stop invalidates a still-pending acquisition without mounted consumers. A later prepare
+can acquire again. Disposal invalidates renderer ownership before Game/Assets close
+decoded sources, attempts every independent teardown and aggregates failures.
+
+BrowserGame alone restores its fixed logical backing dimensions before rendering;
+CSS resize scales presentation only. Direct renderer callers own canvas dimensions.
+Invalid dimensions/count/limits, unavailable image IDs and synchronous frame faults
+skip the entire submission and report once per consecutive fault episode. A successful
+frame resets suppression. Diagnostics cannot throw into simulation. Uncaptured device
+errors report once per message per device. Instance-buffer growth failure is detected
+asynchronously: later frames reallocate below the failed capacity, and frames that
+still exceed it skip under the same episode suppression. That lowered cap lasts for
+the device generation and resets only after device replacement. The temporary legacy path
+still throws a missing-texture error into Game Failed, and keeps its previous
+frame-failure, stop-failure and cold-rollback teardown.
+
+Presentation transitions `ready → recovering → ready`, or `failed`; disposal is
+terminal from every state. Each live-device loss starts one replacement attempt.
+Replacement rebuilds the white texture, pipeline, buffers, bindings and all live image
+sources on a fresh adapter/device, reconciling consumer changes before publication.
+Old device callbacks and released/cancelled uploads cannot publish into the replacement.
+Failed replacement (including a replacement lost before readiness) reports
+`WebGPU recovery failed. Reload to create a new renderer` once and requires a new
+BrowserGame. A subsequent loss after successful recovery may start another attempt.
+
+Synchronous render skips during recovery. Running simulation may continue unchanged;
+no scene, tick, accumulator, RNG, camera or prepared-key mutation follows GPU completion.
+Resume waits for readiness before scheduling ticks. Stop never schedules a frame when
+recovery completes. Browser diagnostics go to Game.report, with a contained console
+fallback when no callback was supplied. Diagnostics also receive non-error notices
+such as dropped-tick overload records. Hello appends flattened `Error` reports only,
+so later notices or errors cannot hide startup or terminal failures. Use BrowserGame.dispose for a browser-owned Game.
+
+`Frame` packs 14 float32 values (56 bytes) per sprite: `tx, ty, ix, iy, jx, jy,
+u0, v0, du, dv, r, g, b, a`. The first six values transform unit-square corners:
+`position = translation + corner.x * (ix, iy) + corner.y * (jx, jy)`.
+Authoring still uses centered XY, signed size and rotation radians. Camera/shake
+subtraction and optional center rounding happen before affine conversion. Sorting
+remains scene, layer, depth and insertion. Adjacent texture runs batch without
+texture-driven reordering. CPU/GPU buffers grow geometrically; there is no
+per-entity GPU object or ECS access from rendering.
+
+Raw-data migration: replace 13-float strides with 14 and reconstruct the center as
+`(tx + (ix + jx)/2, ty + (iy + jy)/2)`. Float32 reconstruction can round differently
+from the former center storage; bounded interpolation fixtures allow 1e-4 pixels.
+The temporary WebGL renderer consumes this same affine format. Its removal and
+both-game migration belong to NGNE-27.
+
+`Frame.count` defines the active prefix while packing. `reset()` resets logical
+contents and retains metadata array capacity; raw readers must not traverse stale
+tails. `sort()` trims `order` and `textures` to the active count before ordering.
+This avoids repeated backing-array growth for a steady workload.
 
 ### Camera coordinates
 
@@ -346,9 +413,36 @@ do not substitute a host-captured alpha. Suspended/resumed frames now show curre
 poses instead of replaying stale interpolation. Continuing effects remain separate
 from ordinary freeze reset callbacks, as demonstrated in Starfall and the fixture.
 
-WebGL 2 is required. Transparent straight-alpha sprites use nearest sampling, source-alpha blending, no depth and no MSAA. The renderer owns texture uploads and retains decoded sources for context restoration. Shared asset cache retains decoded data until disposal. Device loss skips submission and restoration recreates shaders, buffers, VAO and textures.
+The temporary legacy `Renderer` requires WebGL 2. Its straight-alpha sprites use nearest sampling, source-alpha blending, no depth and no MSAA. It retains caller-owned decoded sources for context restoration and recreates shaders, buffers, VAO and textures after context loss. WebGPU uses the premultiplied pipeline and retained source ownership described above. The shared asset cache retains decoded data until disposal.
 
 ## Assets and audio
+
+`ImageAsset extends Asset<ImageBitmap>` carries readonly `kind: "image"`.
+`imageAsset()` uses explicit non-premultiplied, unconverted bitmap decoding; image
+bytes are authored as sRGB. Custom image loaders must follow the same convention.
+The WebGPU browser host waits for validated texture upload during preparation.
+Setup still receives decoded values; no GPU handles enter components, assets,
+prepared handles, Game state or enumeration. Headless preparation has no GPU hook.
+
+The internal `PREPARE_ASSET` symbol returns a Promise of an optional synchronous,
+idempotent cleanup callback. Game owns the CPU lease before awaiting that hook,
+combines cleanup in GPU-before-CPU order and releases late results after cancellation.
+All candidate-slot paths use this preparation function. Rejected decoded loads are
+identity-evicted immediately, so a retry can begin while older consumers unwind.
+
+WebGPU image entries are keyed by string ID and definition identity. Overlapping
+consumers share one upload and one additional retained source lease. Cancellation
+releases only its consumer; the final release unregisters bindings before destroying
+the texture and releasing that lease. The decoded cache closes sources only on Assets
+disposal. Conflicting/manual/leased IDs reject; empty ID is reserved for white.
+Validation and out-of-memory scopes finish before readiness is published, including
+when the copy throws synchronously. Failed uploads permit explicit retry.
+
+`WebGPURenderer.texture(id, bitmapOrCanvas, signal?)` snapshots the caller's image
+and retains its own bitmap until replacement/disposal. The caller can close or change
+its original after resolution. Replacement is transactional; cancellation/failure
+preserves the old ready binding. Already-premultiplied inputs may have lost precision
+before snapshotting; the renderer cannot reconstruct those original bytes.
 
 Asset identity must map to one definition object per service. Leases release once; loaded cache entries remain until disposal. Cancelling one consumer does not abort a load still needed by another. The last cancelled pending consumer aborts the loader. Late completion after cancellation disposes its returned value and cannot activate a scene.
 

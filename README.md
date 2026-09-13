@@ -1,12 +1,12 @@
 ![NGNE — TypeScript sprite engine](docs/assets/ngne.svg)
 
-A TypeScript engine for 2D sprite games. Fixed-step simulation, scene-owned ECS worlds and instanced WebGL 2 rendering. **Zero runtime dependencies.**
+A TypeScript engine for 2D sprite games. Fixed-step simulation, scene-owned ECS worlds and instanced WebGPU rendering, with a temporary WebGL 2 bridge. **Zero runtime dependencies.**
 
 [Play Starfall '89](https://that-webdev-dude.github.io/ngne/) · [Engine guide](docs/guide.md) · [First scene](https://that-webdev-dude.github.io/ngne/examples/hello/) · [MIT license](LICENSE)
 
 ![Starfall '89 gameplay](docs/assets/starfall.png)
 
-**Early release · 0.1.0.** The engine exports independently from the showcase. Its API may change as more games exercise it. WebGL 2 is required; no editor, accounts or external game assets are needed.
+**Early release · 0.1.0.** The engine exports independently from the showcase. Its API may change as more games exercise it. Hello uses WebGPU; Starfall and the platformer still require WebGL 2. The initial WebGPU target is desktop Chromium with hardware acceleration on a secure origin (localhost or HTTPS); see the [tested hardware and limits](docs/verification.md#ngne-21--12-september-2026).
 
 ## Run locally
 
@@ -78,7 +78,7 @@ npm run preview
 
 `npm run format` applies Prettier; `.editorconfig` and `.gitattributes` keep 4-space indentation and LF line endings on every platform.
 
-During development, `/validation.html` exercises real WebGL pixels, batching, context loss/restoration and browser lifecycle. This page is excluded from the production build. `npm run bench` measures CPU workloads, not GPU time or universal frame-rate guarantees; `npx tsx tests/browser-baseline.ts` drives sustained Starfall or platformer runs in a real Chromium against `npm run preview` and reports frame-time, dropped-tick and heap distributions. Recorded results live in [verification](docs/verification.md).
+During development, `/validation.html` exercises real WebGPU and WebGL pixels, batching, controlled device/context loss, image readiness and browser lifecycle. This page is excluded from the production build. `npm run bench` measures CPU workloads, not GPU time or universal frame-rate guarantees; `npx tsx tests/browser-baseline.ts` drives sustained game runs or the fixed renderer fixture in a visible Chromium. Recorded results and reproduction commands live in [verification](docs/verification.md).
 
 GitHub Actions runs the format check, tests, typechecking and the build on pull requests and pushes to `main`. Successful main builds deploy the showcase to GitHub Pages. See [verification evidence and hardware limits](docs/verification.md).
 

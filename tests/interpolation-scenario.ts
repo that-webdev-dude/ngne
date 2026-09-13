@@ -1,3 +1,5 @@
+import { centerX, centerY } from "./frame-values.js";
+import { QUAD_STRIDE } from "../src/quad-layout.js";
 import { emptyInput, Frame, Game, lerp, pressed } from "../src/index.js";
 import type { SceneDefinition } from "../src/index.js";
 
@@ -58,9 +60,9 @@ export async function checkInterpolation(
             const frame = new Frame();
             game.render(frame, alpha);
             check(
-                frame.data[0] === actorX &&
-                    frame.data[13] === lerp(effectStart, effectEnd, alpha) &&
-                    frame.data[26] === 100 - lerp(cameraStart, cameraEnd, alpha),
+                centerX(frame) === actorX &&
+                    centerX(frame, 1) === lerp(effectStart, effectEnd, alpha) &&
+                    centerX(frame, 2) === 100 - lerp(cameraStart, cameraEnd, alpha),
                 `${label}: actor, effect and camera at alpha ${alpha}`,
             );
             inspectFrame?.(frame, label, alpha);
