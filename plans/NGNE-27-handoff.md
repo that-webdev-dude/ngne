@@ -17,6 +17,27 @@ platformer to SoA and WebGPU".
 Before phase 0: verify the plan SHA256 matches, HEAD matches (or report the actual HEAD and stop),
 and re-read Jira NGNE-27. If Jira changed materially, stop and report.
 
+## User decisions after plan approval (13 September 2026)
+
+These resolve how the approved plan applies; they do not change its hash.
+
+- **Plan committed and pushed** by the user as `cdf6b37a61c92403930ac32fa60354d39c4a12ee`
+  (`[NGNE-27] Add Codex-reviewed migration plan and handoff`), parent `12b727e`, in sync with
+  `origin/main`. It adds only `plans/NGNE-27-*`. The plan's phase 0 entry and gate therefore read:
+  HEAD is `cdf6b37` (or a later commit that only touches `plans/NGNE-27-*`), `git diff 12b727e HEAD`
+  lists only `plans/NGNE-27-*`, and `git status --porcelain` is empty at entry and shows only
+  `docs/verification.md` at the phase 0 gate. All code baselines, exports and A/B comparisons still
+  use `12b727e`, which is code-identical.
+- **Builder:** Claude Opus. **Phase 5 and phase 6 inspector:** Codex `gpt-5.6-sol`, read-only
+  (`codex exec -m gpt-5.6-sol -s read-only`; resumes use `-c sandbox_mode="read-only"`), a fresh
+  session that did not build. Do not use `gpt-6-astra`. If Codex is unavailable, stop and tell the user.
+- **Commits:** the executor is authorized to create the phase 6 commits C1 and C2 using the one-line
+  `[NGNE-27] <message>` format. Push authorization was not stated separately. At phase 6 entry, ask
+  the user once to confirm pushing C1 and C2 to `main` before pushing.
+- **Devices:** the user has no gamepad and no touch screen. Every gamepad and touch `MANUAL (user)`
+  item is recorded as "untested (no device)" without asking; synthetic browser coverage is not
+  claimed as physical-device evidence. Keyboard, mouse, visual and audio checks remain required.
+
 ## Execution protocol
 
 > Execute ONE phase at a time. Never run multiple phases in one go. At the end of each

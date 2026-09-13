@@ -308,3 +308,12 @@ VERDICT: APPROVED
   `git status` showed only the three untracked `plans/NGNE-27-*` files after each round.
 - Codex had no Jira access; Claude read Jira live. No production code, tests, owning docs, commits,
   push or Jira writes. Implementation is not authorized by this planning session.
+
+## User decisions after approval — 13 September 2026
+
+- The user committed and pushed the plan records as `cdf6b37` (plan SHA256 unchanged).
+- Executor authorized to commit (phase 6 C1/C2); push to be confirmed once at phase 6 entry.
+- No gamepad or touch screen: those manual items are recorded "untested (no device)".
+- Builder Claude Opus; phase 5/6 inspector Codex `gpt-5.6-sol` read-only, fresh session.
+- Recorded in `plans/NGNE-27-handoff.md` ("User decisions after plan approval"), including the phase 0
+  entry-condition reading for HEAD `cdf6b37`. The approved plan file was not modified.
