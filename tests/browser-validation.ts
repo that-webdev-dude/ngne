@@ -1,5 +1,6 @@
 import { Renderer, Frame, Camera, BrowserGame, type FrameScheduler } from "../src/index.js";
 import { checkBrowserAudio } from "./browser-audio-checks.js";
+import { checkBrowserGames } from "./browser-game-checks.js";
 import { checkBrowserLifecycle } from "./browser-lifecycle-checks.js";
 import { checkBrowserInput } from "./browser-input-checks.js";
 import { checkBrowserInterpolation } from "./browser-interpolation-checks.js";
@@ -155,6 +156,7 @@ async function main() {
         "webgpu",
     );
     await checkBrowserImages(check);
+    await checkBrowserGames(check);
     await checkBrowserRecovery(check);
     await checkBrowserGpuHost(check);
     await checkBrowserInput(check);

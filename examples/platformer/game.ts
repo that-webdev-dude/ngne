@@ -1,5 +1,14 @@
-import { clamp, component, down, lerp, pressed } from "ngne";
-import type { Asset, Audio, DeepReadonly, PreparedScene, SceneDefinition } from "ngne";
+import { bool, clamp, component, down, f64, lerp, pressed, u8 } from "ngne";
+import type {
+    Asset,
+    Audio,
+    DeepReadonly,
+    Entity,
+    PreparedScene,
+    SceneDefinition,
+    SchemaComponentView,
+    SchemaQuery,
+} from "ngne";
 
 import { CONTACT, moveX, moveY, tileAt } from "./collision.js";
 import type { Box } from "./collision.js";
@@ -14,18 +23,29 @@ const FALL_SPEED = 600;
 const JUMP_SPEED = 340;
 const COYOTE_TICKS = 6;
 const BUFFER_TICKS = 6;
-const Position = component("position", () => ({ x: 0, y: 0, px: 0, py: 0 }));
-const Body = component("body", () => ({
-    vx: 0,
-    vy: 0,
-    w: 12,
-    h: 14,
-    grounded: false,
-    coyoteTicks: 0,
-    jumpBufferTicks: 0,
-    previousBottom: 0,
-}));
-const Actor = component("actor", () => ({ kind: 0 as 0 | 1, facing: 1 }));
+const PLAYER_WIDTH = 12;
+const PLAYER_HEIGHT = 14;
+const Position = component("position", { x: f64(), y: f64(), px: f64(), py: f64() });
+const Body = component("body", {
+    vx: f64(),
+    vy: f64(),
+    w: f64(PLAYER_WIDTH),
+    h: f64(PLAYER_HEIGHT),
+    grounded: bool(),
+    coyoteTicks: f64(),
+    jumpBufferTicks: f64(),
+    previousBottom: f64(),
+});
+/** `kind` 0 is the player, 1 a patrol; `facing` is -1 or 1. */
+const Actor = component("actor", { kind: u8(), facing: f64(1) });
+type Actors = SchemaQuery<[typeof Position, typeof Body, typeof Actor]>;
+type BodyView = SchemaComponentView<typeof Body.fields>;
+/** Player views and row, borrowed for the current world commit epoch only. */
+interface PlayerRow {
+    readonly position: SchemaComponentView<typeof Position.fields>;
+    readonly body: BodyView;
+    readonly row: number;
+}
 
 export interface Progress {
     level: number;
@@ -141,28 +161,31 @@ export function createLevel(options: LevelOptions): SceneDefinition<Progress, Pr
                 box: { x: 0, y: 0, w: 12, h: 14 },
                 contacts: 0,
             });
-            const playerPosition = Position.of({
-                x: spawn.x * TILE + 2,
-                y: (spawn.y + 1) * TILE - 14,
-            });
-            const playerBody = Body.of({ grounded: true, previousBottom: (spawn.y + 1) * TILE });
-            scene.resource("player", scene.world.spawn(playerPosition, playerBody, Actor.of()));
-            const position = playerPosition.value;
-            const body = playerBody.value;
+            const startX = spawn.x * TILE + 2;
+            const startY = (spawn.y + 1) * TILE - PLAYER_HEIGHT;
+            const player = scene.resource(
+                "player",
+                scene.world.spawn(
+                    Position.of({ x: startX, y: startY }),
+                    Body.of({ grounded: true, previousBottom: (spawn.y + 1) * TILE }),
+                    Actor.of(),
+                ),
+            );
             const actors = scene.world.query(Position, Body, Actor);
             for (const tile of data.patrols)
                 scene.world.spawn(
-                    Position.of({ x: tile.x * TILE + 2, y: (tile.y + 1) * TILE - 14 }),
+                    Position.of({ x: tile.x * TILE + 2, y: (tile.y + 1) * TILE - PLAYER_HEIGHT }),
                     Body.of(),
                     Actor.of({ kind: 1 }),
                 );
+            // The spawn is pending until mount commits, so setup uses its authored values.
             scene.camera.x = clamp(
-                position.x + body.w / 2 - WIDTH / 2,
+                startX + PLAYER_WIDTH / 2 - WIDTH / 2,
                 0,
                 Math.max(0, data.widthTiles * TILE - WIDTH),
             );
             scene.camera.y = clamp(
-                position.y + body.h / 2 - HEIGHT / 2,
+                startY + PLAYER_HEIGHT / 2 - HEIGHT / 2,
                 0,
                 Math.max(0, data.heightTiles * TILE - HEIGHT),
             );
@@ -197,70 +220,94 @@ export function createLevel(options: LevelOptions): SceneDefinition<Progress, Pr
             });
             scene.system(({ dt }) => {
                 if (run.phase !== "playing") return;
-                position.px = position.x;
-                position.py = position.y;
-                body.previousBottom = position.y + body.h;
-                const wasGrounded = body.grounded;
-                if (body.grounded) body.coyoteTicks = COYOTE_TICKS;
-                if (intent.jumpPressed) body.jumpBufferTicks = BUFFER_TICKS;
+                const { position, body, row } = findPlayer(actors, player);
+                position.px[row] = position.x[row];
+                position.py[row] = position.y[row];
+                body.previousBottom[row] = position.y[row] + body.h[row];
+                const wasGrounded = body.grounded[row] !== 0;
+                if (body.grounded[row]) body.coyoteTicks[row] = COYOTE_TICKS;
+                if (intent.jumpPressed) body.jumpBufferTicks[row] = BUFFER_TICKS;
                 const target = intent.move * SPEED;
                 const acceleration = (intent.move ? 1400 : 1800) * dt;
-                body.vx += clamp(target - body.vx, -acceleration, acceleration);
-                if (body.jumpBufferTicks > 0 && (body.grounded || body.coyoteTicks > 0))
-                    jump(body, sound);
-                if (!intent.jumpDown && body.vy < -140) body.vy = -140;
-                body.vy = Math.min(FALL_SPEED, body.vy + GRAVITY * dt);
-                motion.box.x = position.x;
-                motion.box.y = position.y;
-                const horizontal = moveX(grid, motion.box, body.vx * dt);
-                if (horizontal & CONTACT.wall) body.vx = 0;
-                const vertical = moveY(grid, motion.box, body.vy * dt, body.previousBottom);
-                body.grounded = !!(vertical & CONTACT.floor);
-                if (vertical & (CONTACT.floor | CONTACT.ceiling)) body.vy = 0;
-                position.x = motion.box.x;
-                position.y = motion.box.y;
+                body.vx[row] += clamp(target - body.vx[row], -acceleration, acceleration);
+                if (
+                    body.jumpBufferTicks[row] > 0 &&
+                    (body.grounded[row] || body.coyoteTicks[row] > 0)
+                )
+                    jump(body, row, sound);
+                if (!intent.jumpDown && body.vy[row] < -140) body.vy[row] = -140;
+                body.vy[row] = Math.min(FALL_SPEED, body.vy[row] + GRAVITY * dt);
+                motion.box.x = position.x[row];
+                motion.box.y = position.y[row];
+                const horizontal = moveX(grid, motion.box, body.vx[row] * dt);
+                if (horizontal & CONTACT.wall) body.vx[row] = 0;
+                const vertical = moveY(
+                    grid,
+                    motion.box,
+                    body.vy[row] * dt,
+                    body.previousBottom[row],
+                );
+                body.grounded[row] = vertical & CONTACT.floor ? 1 : 0;
+                if (vertical & (CONTACT.floor | CONTACT.ceiling)) body.vy[row] = 0;
+                position.x[row] = motion.box.x;
+                position.y[row] = motion.box.y;
                 motion.contacts = horizontal | vertical;
                 // A buffered press is valid on the press tick and the next five ticks.
-                if (body.grounded && body.jumpBufferTicks > 0) jump(body, sound);
-                if (!body.grounded && !wasGrounded)
-                    body.coyoteTicks = Math.max(0, body.coyoteTicks - 1);
-                body.jumpBufferTicks = Math.max(0, body.jumpBufferTicks - 1);
+                if (body.grounded[row] && body.jumpBufferTicks[row] > 0) jump(body, row, sound);
+                if (!body.grounded[row] && !wasGrounded)
+                    body.coyoteTicks[row] = Math.max(0, body.coyoteTicks[row] - 1);
+                body.jumpBufferTicks[row] = Math.max(0, body.jumpBufferTicks[row] - 1);
             });
             scene.system(({ dt }) => {
-                actors.each((_, p, b, actor) => {
-                    if (actor.kind !== 1) {
-                        if (b.vx) actor.facing = Math.sign(b.vx);
-                        return;
+                actors.eachChunk((chunk) => {
+                    const { position: p, body: b, actor } = chunk.views;
+                    for (let row = 0; row < chunk.count; row++) {
+                        if (actor.kind[row] !== 1) {
+                            if (b.vx[row]) actor.facing[row] = Math.sign(b.vx[row]);
+                            continue;
+                        }
+                        p.px[row] = p.x[row];
+                        p.py[row] = p.y[row];
+                        const ahead = Math.floor(
+                            (actor.facing[row] > 0 ? p.x[row] + b.w[row] + 1 : p.x[row] - 1) / TILE,
+                        );
+                        const support = tileAt(
+                            grid,
+                            ahead,
+                            Math.floor((p.y[row] + b.h[row] + 1) / TILE),
+                        );
+                        if (support !== 1 && support !== 2) actor.facing[row] *= -1;
+                        motion.box.x = p.x[row];
+                        motion.box.y = p.y[row];
+                        b.vx[row] = actor.facing[row] * 45;
+                        if (moveX(grid, motion.box, b.vx[row] * dt) & CONTACT.wall)
+                            actor.facing[row] *= -1;
+                        p.x[row] = motion.box.x;
                     }
-                    p.px = p.x;
-                    p.py = p.y;
-                    const ahead = Math.floor((actor.facing > 0 ? p.x + b.w + 1 : p.x - 1) / TILE);
-                    const support = tileAt(grid, ahead, Math.floor((p.y + b.h + 1) / TILE));
-                    if (support !== 1 && support !== 2) actor.facing *= -1;
-                    motion.box.x = p.x;
-                    motion.box.y = p.y;
-                    b.vx = actor.facing * 45;
-                    if (moveX(grid, motion.box, b.vx * dt) & CONTACT.wall) actor.facing *= -1;
-                    p.x = motion.box.x;
                 });
             });
             scene.system(() => {
                 if (run.phase !== "playing") return;
-                motion.box.x = position.x;
-                motion.box.y = position.y;
+                const { position, body, row: playerRow } = findPlayer(actors, player);
+                const x = position.x[playerRow];
+                const y = position.y[playerRow];
+                motion.box.x = x;
+                motion.box.y = y;
                 run.contacts.fatal = !!(motion.contacts & (CONTACT.hazard | CONTACT.fell));
                 run.contacts.exit = touchesTile(motion.box, data.exit);
                 for (const [index, tile] of data.checkpoints.entries())
                     if (touchesTile(motion.box, tile)) run.contacts.checkpoint = index + 1;
-                actors.each((_, p, b, actor) => {
-                    if (
-                        actor.kind === 1 &&
-                        position.x < p.x + b.w &&
-                        position.x + body.w > p.x &&
-                        position.y < p.y + b.h &&
-                        position.y + body.h > p.y
-                    )
-                        run.contacts.fatal = true;
+                actors.eachChunk((chunk) => {
+                    const { position: p, body: b, actor } = chunk.views;
+                    for (let row = 0; row < chunk.count; row++)
+                        if (
+                            actor.kind[row] === 1 &&
+                            x < p.x[row] + b.w[row] &&
+                            x + body.w[playerRow] > p.x[row] &&
+                            y < p.y[row] + b.h[row] &&
+                            y + body.h[playerRow] > p.y[row]
+                        )
+                            run.contacts.fatal = true;
                 });
             });
             scene.system(({ scenes }) => {
@@ -329,7 +376,8 @@ export function createLevel(options: LevelOptions): SceneDefinition<Progress, Pr
                 }
             });
             scene.system(() => {
-                const center = position.x + body.w / 2;
+                const { position, body, row } = findPlayer(actors, player);
+                const center = position.x[row] + body.w[row] / 2;
                 const offset = center - scene.camera.x;
                 if (offset < WIDTH * 0.4) scene.camera.x = center - WIDTH * 0.4;
                 else if (offset > WIDTH * 0.6) scene.camera.x = center - WIDTH * 0.6;
@@ -339,15 +387,18 @@ export function createLevel(options: LevelOptions): SceneDefinition<Progress, Pr
                     Math.max(0, data.widthTiles * TILE - WIDTH),
                 );
                 scene.camera.y = clamp(
-                    lerp(scene.camera.y, position.y + body.h / 2 - HEIGHT / 2, 0.1),
+                    lerp(scene.camera.y, position.y[row] + body.h[row] / 2 - HEIGHT / 2, 0.1),
                     0,
                     Math.max(0, data.heightTiles * TILE - HEIGHT),
                 );
             });
             scene.resetInterpolation(() =>
-                actors.each((_, p) => {
-                    p.px = p.x;
-                    p.py = p.y;
+                actors.eachChunk((chunk) => {
+                    const p = chunk.views.position;
+                    for (let row = 0; row < chunk.count; row++) {
+                        p.px[row] = p.x[row];
+                        p.py[row] = p.y[row];
+                    }
                 }),
             );
             scene.render((frame, alpha) => {
@@ -382,15 +433,18 @@ export function createLevel(options: LevelOptions): SceneDefinition<Progress, Pr
                         index < run.checkpoint ? 0xf5cf72 : 0x829387,
                     );
                 frame.rect(data.exit.x * TILE + 8, data.exit.y * TILE + 8, 12, 16, 0x91c6cb);
-                actors.each((_, p, b, actor) => {
-                    if (actor.kind === 0 && run.phase === "dying") return;
-                    frame.rect(
-                        lerp(p.px, p.x, alpha) + b.w / 2,
-                        lerp(p.py, p.y, alpha) + b.h / 2,
-                        b.w,
-                        b.h,
-                        actor.kind === 0 ? 0xf5cf72 : 0xe87760,
-                    );
+                actors.eachChunk((chunk) => {
+                    const { position: p, body: b, actor } = chunk.views;
+                    for (let row = 0; row < chunk.count; row++) {
+                        if (actor.kind[row] === 0 && run.phase === "dying") continue;
+                        frame.rect(
+                            lerp(p.px[row], p.x[row], alpha) + b.w[row] / 2,
+                            lerp(p.py[row], p.y[row], alpha) + b.h[row] / 2,
+                            b.w[row],
+                            b.h[row],
+                            actor.kind[row] === 0 ? 0xf5cf72 : 0xe87760,
+                        );
+                    }
                 });
                 options.onView?.(
                     Object.freeze({ ...run, contacts: Object.freeze({ ...run.contacts }) }),
@@ -456,10 +510,22 @@ export function createOverlay(
     };
 }
 
-function jump(body: ReturnType<typeof Body.create>, sound?: ReturnType<Audio["scene"]>): void {
-    body.vy = -JUMP_SPEED;
-    body.grounded = false;
-    body.coyoteTicks = body.jumpBufferTicks = 0;
+function findPlayer(actors: Actors, player: Entity): PlayerRow {
+    // Assigned inside the visitor; the assertion keeps TypeScript from narrowing it to undefined.
+    let found = undefined as PlayerRow | undefined;
+    actors.eachChunk((chunk) => {
+        for (let row = 0; row < chunk.count && !found; row++)
+            if (chunk.entityAt(row) === player)
+                found = { position: chunk.views.position, body: chunk.views.body, row };
+    });
+    if (!found) throw new Error("Platformer player is not mounted");
+    return found;
+}
+
+function jump(body: BodyView, row: number, sound?: ReturnType<Audio["scene"]>): void {
+    body.vy[row] = -JUMP_SPEED;
+    body.grounded[row] = 0;
+    body.coyoteTicks[row] = body.jumpBufferTicks[row] = 0;
     sound?.play({ frequency: 280, endFrequency: 540, duration: 0.09, volume: 0.15 });
 }
 

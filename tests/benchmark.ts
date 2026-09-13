@@ -67,6 +67,7 @@ for (let i = 0; i < CHAOS_TICKS; i++) {
     peak = Math.max(peak, frame.count);
 }
 const grid = runCollisionGridBenchmark();
+const epoch = runEpochTraversalBenchmark();
 console.log(
     JSON.stringify(
         {
@@ -97,6 +98,7 @@ console.log(
                 ticksOverBudget: full.filter((time) => time > TICK_BUDGET_MS).length,
             },
             collisionGrid: grid.result,
+            epochTraversal: epoch,
             note: "CPU only. Excludes GPU submission, browser display, and input polling. Dropped ticks are a browser host-loop measure; ticksOverBudget counts sampled ticks whose CPU time exceeded one 60 Hz step.",
         },
         null,
@@ -215,6 +217,56 @@ function runCollisionGridBenchmark() {
             legacyWorld.dispose();
             schemaWorld.dispose();
         },
+    };
+}
+
+/**
+ * Pairs the first typed traversal after a commit, which rebuilds borrowed chunk descriptors
+ * for the new epoch, with an identical second traversal in the same epoch. The preceding commit
+ * changes no membership but still advances the epoch; it is timed separately from both
+ * traversals. Runs after the other sections so it cannot change their warm state.
+ */
+function runEpochTraversalBenchmark() {
+    const traverse = () =>
+        q.eachChunk((chunk) => {
+            const position = chunk.views.position;
+            const velocity = chunk.views.velocity;
+            for (let row = 0; row < chunk.count; row++) {
+                position.x[row] += velocity.x[row];
+                position.y[row] += velocity.y[row];
+            }
+        });
+    const sample = (record?: { commit: number[]; first: number[]; second: number[] }) => {
+        const epochBefore = world.commitEpoch;
+        let start = performance.now();
+        world.commit();
+        const commit = performance.now() - start;
+        if (world.commitEpoch === epochBefore)
+            throw new Error("No-op commit did not advance the query borrow epoch");
+        start = performance.now();
+        traverse();
+        const first = performance.now() - start;
+        start = performance.now();
+        traverse();
+        const second = performance.now() - start;
+        record?.commit.push(commit);
+        record?.first.push(first);
+        record?.second.push(second);
+    };
+    for (let i = 0; i < ECS_WARMUP; i++) sample();
+    const samples = { commit: [] as number[], first: [] as number[], second: [] as number[] };
+    for (let i = 0; i < ECS_SAMPLES; i++) sample(samples);
+    let chunks = 0;
+    q.eachChunk(() => chunks++);
+    return {
+        entities: world.size,
+        chunks,
+        warmupIterations: ECS_WARMUP,
+        sampledIterations: ECS_SAMPLES,
+        noOpCommitMs: summarize(samples.commit),
+        firstTraversalAfterCommitMs: summarize(samples.first),
+        secondTraversalSameEpochMs: summarize(samples.second),
+        pairedDeltaMs: summarize(samples.first.map((first, i) => first - samples.second[i])),
     };
 }
 

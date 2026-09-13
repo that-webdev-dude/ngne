@@ -1,5 +1,5 @@
 import "./style.css";
-import { audioAsset, BrowserGame, type Asset, type Stats } from "ngne";
+import { audioAsset, BrowserGame, type ImageAsset, type Stats } from "ngne";
 import { arena, overlay, W, H, type Progress, type ProgressCommand, type RunView } from "./game.js";
 import { makeAtlas, titleArt } from "./art.js";
 const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -8,9 +8,13 @@ const canvas = el<HTMLCanvasElement>("game"),
     play = el<HTMLButtonElement>("play"),
     pause = el<HTMLButtonElement>("pause"),
     chaos = el<HTMLButtonElement>("chaos");
-const atlas: Asset<HTMLCanvasElement> = {
+// Preparation decodes the generated atlas; the WebGPU renderer uploads it before the scene mounts.
+const atlas: ImageAsset = {
     id: "ships",
-    load: async () => makeAtlas(),
+    kind: "image",
+    load: () =>
+        createImageBitmap(makeAtlas(), { premultiplyAlpha: "none", colorSpaceConversion: "none" }),
+    dispose: (bitmap) => bitmap.close(),
 };
 const music = audioAsset(
     "starfall-music",
@@ -33,6 +37,7 @@ let ready = false,
 const times: number[] = [];
 const app = new BrowserGame<Progress, ProgressCommand>({
     canvas,
+    renderer: "webgpu",
     width: W,
     height: H,
     seed: "STARFALL-1989",
@@ -44,13 +49,7 @@ const app = new BrowserGame<Progress, ProgressCommand>({
         runs: state.runs + 1,
         victories: state.victories + (command.won ? 1 : 0),
     }),
-    diagnostic: (error) => {
-        if (error instanceof Error) {
-            el("error").hidden = false;
-            el("error").textContent = `Flight interrupted: ${error.message}. Reload to try again.`;
-            console.error(error);
-        }
-    },
+    diagnostic: showError,
     afterFrame: (stats) => {
         reconcileCandidates();
         updateUI(stats);
@@ -105,8 +104,7 @@ async function launch(stress = false) {
         app.game.set(candidate);
         canvas.focus();
     } catch (error) {
-        el("error").hidden = false;
-        el("error").textContent = String(error);
+        showError(error instanceof Error ? error : new Error(String(error)));
     } finally {
         ready = true;
         play.disabled = chaos.disabled = false;
@@ -220,8 +218,7 @@ el("sound").addEventListener("click", async () => {
         el("sound").setAttribute("aria-pressed", String(!app.audio.muted));
         el("sound").textContent = app.audio.muted ? "Sound off" : "Sound on";
     } catch (error) {
-        el("error").hidden = false;
-        el("error").textContent = `Audio unavailable: ${String(error)}`;
+        showError(new Error("Audio unavailable", { cause: error }));
     }
 });
 document.querySelectorAll<HTMLButtonElement>("[data-key]").forEach((button) => {
@@ -244,27 +241,48 @@ document.addEventListener("visibilitychange", () => {
         if (candidate) app.game.push(candidate);
     }
 });
+// Errors accumulate so a later report cannot hide a terminal failure. Game diagnostics also carry
+// non-error notices, such as dropped-tick overload records; skip them.
+function showError(error: unknown): void {
+    if (!(error instanceof Error)) return;
+    const output = el("error");
+    const message = describeError(error);
+    if (!output.textContent.includes(message))
+        output.textContent += (output.textContent ? "\n" : "") + message;
+    output.hidden = false;
+}
+function describeError(error: unknown): string {
+    if (error instanceof AggregateError)
+        return [error.message, ...error.errors.map(describeError)].join("\n");
+    if (error instanceof Error)
+        return error.message + (error.cause ? "\n" + describeError(error.cause) : "");
+    return String(error);
+}
 async function boot() {
     try {
+        // Image preparation creates the WebGPU renderer, so an unsupported browser fails here.
         const initial = await app.game.prepare(arena(options(true)), {
             key: "attract",
         });
-        const lease = await app.game.assets.acquire(atlas);
-        try {
-            await app.start(initial);
-            app.renderer!.texture(lease.id, lease.value);
-        } finally {
-            lease.release();
-        }
+        await app.start(initial);
         app.audio.muted = true;
         ready = true;
         play.disabled = chaos.disabled = false;
         play.textContent = "START FLIGHT";
     } catch (error) {
-        el("error").hidden = false;
-        el("error").textContent =
-            `Unable to start NGNE: ${String(error)}. Try a browser with WebGL 2 hardware acceleration.`;
+        showError(
+            new Error("Unable to start Starfall. It requires WebGPU with hardware acceleration", {
+                cause: error,
+            }),
+        );
         play.textContent = "UNABLE TO START";
     }
 }
+window.addEventListener(
+    "pagehide",
+    () => {
+        void app.dispose().catch(showError);
+    },
+    { once: true },
+);
 void boot();

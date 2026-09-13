@@ -24,9 +24,10 @@ const music = audioAsset(
 );
 // Presentation only. Scene resources and committed state own every gameplay decision.
 let presentation: Run["phase"] | "ready" | "paused" | "complete" | "error" = "ready";
-let errorMessage: string | undefined;
+let failed = false;
 const app = new BrowserGame<Progress, ProgressCommand>({
     canvas: gameCanvas,
+    renderer: "webgpu",
     width: WIDTH,
     height: HEIGHT,
     clear: 0x20362d,
@@ -42,9 +43,7 @@ const app = new BrowserGame<Progress, ProgressCommand>({
         registry.reconcile(app.game);
         updateHud();
     },
-    diagnostic: (error) => {
-        if (error instanceof Error) showError(error);
-    },
+    diagnostic: showError,
 });
 app.audio.muted = true;
 const registry = createTransitionRegistry({
@@ -104,12 +103,12 @@ async function launch(): Promise<void> {
         );
         gameCanvas.focus();
     } catch (error) {
-        showError(error);
+        showError(error instanceof Error ? error : new Error(String(error)));
     }
 }
 
 function updateHud(): void {
-    if (errorMessage) presentation = "error";
+    if (failed) presentation = "error";
     const state = app.game.state;
     element("progress").textContent =
         `Level ${Math.min(2, state.level + 1)} · Attempt ${state.attempt + 1} · ${state.checkpoint ? `Checkpoint ${state.checkpoint}` : "Start"} · Deaths ${state.deaths} · Runs ${state.runs}`;
@@ -127,7 +126,7 @@ function updateHud(): void {
             "Game complete",
             `Both gates reached. ${state.deaths} deaths · ${state.runs} restarted runs. Press Enter or Play again.`,
         ],
-        error: ["Unable to continue", errorMessage ?? "Reload to try again."],
+        error: ["Unable to continue", "Reload to try again."],
     };
     const message = messages[presentation];
     element("overlay").hidden = !message;
@@ -138,13 +137,28 @@ function updateHud(): void {
         (presentation === "dying" ? "Returning to checkpoint…" : "Reach the blue gate");
 }
 
+// Errors accumulate so a later report cannot hide a terminal failure, such as a missing WebGPU
+// adapter at start. Game diagnostics also carry non-error notices, such as dropped-tick overload
+// records; skip them.
 function showError(error: unknown): void {
-    errorMessage = `${error instanceof Error ? error.message : String(error)}. Reload to try again.`;
-    element("error").hidden = false;
-    element("error").textContent = errorMessage;
+    if (!(error instanceof Error)) return;
+    const output = element("error");
+    const message = describeError(error);
+    if (!output.textContent.includes(message))
+        output.textContent += (output.textContent ? "\n" : "") + message;
+    output.hidden = false;
     element("reload").hidden = false;
+    failed = true;
     presentation = "error";
     if (app.game.lifecycle !== "Disposed") updateHud();
+}
+
+function describeError(error: unknown): string {
+    if (error instanceof AggregateError)
+        return [error.message, ...error.errors.map(describeError)].join("\n");
+    if (error instanceof Error)
+        return error.message + (error.cause ? "\n" + describeError(error.cause) : "");
+    return String(error);
 }
 
 function element(id: string): HTMLElement {

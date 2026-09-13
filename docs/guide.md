@@ -199,8 +199,8 @@ Chunk descriptors and component views are borrowed until the next world commit. 
 Systems receive `WorldAccess`, not commit or enumeration authority. For headless use,
 create a `Game`, prepare/start a scene, then call `game.tick()`; the runtime owns world
 commits. Direct `World` construction is internal. Schema queries expose `size` and
-`eachChunk`; the temporary object-component bridge exposes `each` until Starfall and
-the platformer migrate under NGNE-27. `query()` with no components remains an
+`eachChunk`; the temporary object-component bridge still exposes `each` until NGNE-27 removes it.
+[Starfall](../demo/game.ts) and the [platformer](../examples/platformer/game.ts) use schema components. `query()` with no components remains an
 entity-only compatibility traversal.
 
 For diagnostics, read `game.scenes` and `game.enumerate()` after `game.tick()` returns;

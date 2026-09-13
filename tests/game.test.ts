@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { Game, Frame, emptyInput } from "../src/index.js";
-import type { Asset, Audio } from "../src/index.js";
+import type { Asset, Audio, ImageAsset } from "../src/index.js";
 import { arena, type Progress, type ProgressCommand } from "../demo/game.js";
 const create = () =>
     new Game<Progress, ProgressCommand>({
@@ -41,6 +41,56 @@ test("chaos survives a full run, commits victory and high score, uses bounded li
     assert.ok(g.state.best > 0);
     assert.ok(g.scenes[0].entityCapacity < 20000);
     g.dispose();
+});
+
+test("arena setup receives the decoded atlas unchanged and no component field or resource holds it", async () => {
+    const decoded = { decoded: "atlas" } as unknown as ImageBitmap;
+    const counts = { loads: 0, disposals: 0 };
+    const atlas: ImageAsset = {
+        id: "ships",
+        kind: "image",
+        async load() {
+            counts.loads++;
+            return decoded;
+        },
+        dispose(value) {
+            assert.equal(value, decoded);
+            counts.disposals++;
+        },
+    };
+    const definition = arena({ atlas });
+    const received: unknown[] = [];
+    const game = create();
+    await game.start(
+        await game.prepare(
+            {
+                ...definition,
+                setup(scene) {
+                    received.push(scene.assets.get(atlas.id));
+                    definition.setup(scene);
+                },
+            },
+            { key: "atlas" },
+        ),
+    );
+    for (let tick = 0; tick < 120; tick++) game.tick();
+    assert.deepEqual(received, [decoded]);
+    assert.equal(received[0], decoded);
+    const scene = game.enumerate().scenes[0];
+    // Resource names are audited in the contract inventory; none is an asset holder.
+    assert.deepEqual(Object.keys(scene.resources), ["run", "stars", "collision-grid", "player"]);
+    const world = scene.world as unknown as {
+        archetypes: { fields?: { fields: { kind: string }[] }[] }[];
+    };
+    const kinds = world.archetypes.flatMap((archetype) => {
+        assert.ok(archetype.fields, "Starfall archetypes use schema storage");
+        return archetype.fields.flatMap((component) => component.fields.map((field) => field.kind));
+    });
+    assert.ok(kinds.length > 0);
+    assert.ok(kinds.every((kind) => ["f64", "u8", "u32", "bool"].includes(kind)));
+    assert.equal(counts.loads, 1);
+    game.dispose();
+    assert.equal(counts.disposals, 1);
 });
 
 test("showcase looping music reuses decoded data and releases every replaced scope", async () => {

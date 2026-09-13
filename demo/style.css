@@ -471,6 +471,7 @@ footer {
     pointer-events: none;
 }
 #error {
+    white-space: pre-line;
     padding: 18px;
     border: 1px solid #ff6d82;
     color: #ffd4dc;

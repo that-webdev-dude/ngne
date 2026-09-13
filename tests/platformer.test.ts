@@ -1,6 +1,7 @@
 import { centerX, centerY } from "./frame-values.js";
 import { QUAD_STRIDE } from "../src/quad-layout.js";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { test } from "node:test";
 
 import { CONTACT, moveX, moveY } from "../examples/platformer/collision.js";
@@ -92,6 +93,7 @@ async function createHarness(
     config: {
         allowErrors?: boolean;
         capture?: boolean;
+        afterTick?: (game: Game<Progress, ProgressCommand>) => void;
         audio?: RegistryOptions["audio"];
         music?: RegistryOptions["music"];
     } = {},
@@ -142,6 +144,7 @@ async function createHarness(
                 if (scheduled?.intent) registry.request(scheduled.intent);
                 game.tick(scheduled?.input ?? emptyInput(), DISPLAY);
                 if (config.capture) snapshots.push(game.enumerate());
+                config.afterTick?.(game);
             }
             output.reset();
             game.render(output, 0.5);
@@ -171,7 +174,18 @@ function player(game: Game<Progress, ProgressCommand>, name: string, index = 0) 
     assert.ok(Array.isArray(components));
     const component = components.find((value) => record(value).name === name);
     assert.ok(component);
-    return record(record(component).value);
+    return fieldValues(record(component));
+}
+
+/** Schema component inspection record to `{ field: value }`. */
+function fieldValues(component: { readonly [key: string]: InspectionValue }) {
+    const fields = component.fields;
+    assert.ok(Array.isArray(fields));
+    return Object.freeze(
+        Object.fromEntries(
+            fields.map((field) => [String(record(field).name), record(field).value]),
+        ),
+    ) as { readonly [key: string]: InspectionValue };
 }
 
 function number(value: InspectionValue): number {
@@ -1496,10 +1510,13 @@ function walkthroughInput(
     return createInput(hold ? ["ArrowRight", "Space"] : ["ArrowRight"], jump ? ["Space"] : []);
 }
 
-async function runAuthoredWalkthrough() {
+async function runAuthoredWalkthrough(afterTick?: (game: Game<Progress, ProgressCommand>) => void) {
     const levels = [LEVEL_ONE, LEVEL_TWO];
     const script = new Map<number, ScheduledTick>();
-    const harness = await createHarness(levels, script);
+    const harness = await createHarness(levels, script, createProgress(), undefined, {
+        afterTick,
+    });
+    afterTick?.(harness.game);
     const control = { jumpTicks: 0 };
     try {
         for (let tick = 0; tick < 4000 && harness.game.state.level < 2; tick++) {
@@ -1541,3 +1558,93 @@ test("platformer deterministic reference walkthrough completes both authored lev
         `Authored walkthrough: ${first.simulationTick} ticks, 0 deaths, both exits, identical repeated enumeration`,
     );
 });
+
+/**
+ * Canonical state hashes captured by the NGNE-27 phase 0 parity probe on the pre-migration
+ * legacy-bridge revision 12b727e, at simulation ticks 0 (after mount), 60, ..., 1,440.
+ */
+const PRE_MIGRATION_WALKTHROUGH_HASHES = [
+    "68e215cb9df35baafe399fbdeeb377a2c4b7c4d01636f3c61268666c244c513f",
+    "b11d41f720993abf3e89e038c5c6e5d17ba8d4a5179072cdb68be0ac66f955ad",
+    "33f7631e7b8b05d5a554d7ea75af4887ea422f9e8827695eadfb2afb9c259b9f",
+    "827fa7509e2b726cadaf0ff41fcb31608a8bfa2439d0f0c726d0388adc034c5d",
+    "28ebeb65dfc9bd71fc990a22b39408b4ce320f30837da729f02bf6081154f62e",
+    "87d02a0855bdc889088b8511d8022f7523d3d46d63dc1a9d87106660988fe890",
+    "ea2f496ffcad22365bd9e414fe22a9ad5a02e9b79338efe9f7f3f69068f45c29",
+    "d256c9e552a9009c6bc5bb90d9a0da9a0f8e60117be885cc082ab14f5f27d604",
+    "36fd55c7fea2cbe4e1ef4a8679b40ac6efdc5ecaa9fa622bb817fa5ef8d6ca45",
+    "e0df9f1948c0d29a7cc13393beb5078c65f731fb0a34695b7ddafd9451d45248",
+    "dc66f4d1e848fcec7379145e9de8c8be5b4a917556fe17852beecb5fed014dc1",
+    "e00b5d0946480dfff9f62b9e20a021322812e1ded469a1a73503084281f89132",
+    "6c3f265cf14cd204c8e1ab5ff99bad0da5644efceda0e0e5e25b67ca20aa1d20",
+    "d827a76a250df6bf04b5172a2731aa65989413ba03ce2a2b4bb5a87622dbbdde",
+    "8429d4fb11cb6beea4506264497981f92dbdf1981cb7d20a1b0e67b3973a1707",
+    "5e6d1dd2a0e585f91a53f36a041af232a55dc1379d4cef92315e1d757e22fd38",
+    "25dc912ae1ab6c1f430aaafcbfd29eb472e36e2a9b3e663338b632783ccbe2ee",
+    "a3e8e5345174d368513eae2181f9e56aeeee3a6a2463fe5d44d6c9b2c453c6ff",
+    "cc60fb2d4e94f363d72eb02af9863f7f87a8f1c8c209d36c9c15dec3fa0a9f74",
+    "8a522580513c6c5622405c13465f7223165fd36e592f7e6b394fa38c1acad216",
+    "21d5fdcda4ca01647ce093e75bc5da5e71430d3132c585f874702ffbbda80f7a",
+    "5e7b1544107685229244fadbc7b6384db3b560abd4b7d1b37d87c82ef990bd14",
+    "1731f51d5793593b606384f3aa463d8e8fa5f8846043ba9b0b22115adcb6544a",
+    "b8c5d16cc2385982a8e510d0feabf7a27cbe4cd41d6dfd5b2319cbcb03f4d626",
+    "b9a09928a450deab506f88544087ec56a2b4edc5d8fdf123ede7ad3fb6e7e819",
+];
+
+test("platformer schema walkthrough matches pre-migration canonical state hashes every 60 ticks", async () => {
+    const hashes: string[] = [];
+    await runAuthoredWalkthrough((game) => {
+        if (game.simulationTick % 60 === 0) hashes.push(canonicalStateHash(game.enumerate()));
+    });
+    assert.deepEqual(hashes, PRE_MIGRATION_WALKTHROUGH_HASHES);
+});
+
+/**
+ * SHA256 of canonical JSON (recursively sorted keys) of committed state plus, per stack scene,
+ * identity, resources, RNG snapshots, camera and the sorted multiset of `{ component: { field:
+ * value } }` tuples per composition. Entity handles and row positions are excluded because
+ * schema and legacy storage may place identical entities differently.
+ */
+function canonicalStateHash(inspection: GameInspection): string {
+    const scenes = inspection.scenes.map((scene) => {
+        const entities: Record<string, string[]> = {};
+        const listed = record(scene.world).entities;
+        assert.ok(Array.isArray(listed));
+        for (const entity of listed) {
+            const components = record(entity).components;
+            assert.ok(Array.isArray(components));
+            const tuple = Object.fromEntries(
+                components.map((component) => [
+                    String(record(component).name),
+                    fieldValues(record(component)),
+                ]),
+            );
+            const composition = Object.keys(tuple).sort().join(",");
+            (entities[composition] ??= []).push(canonicalJson(tuple));
+        }
+        for (const tuples of Object.values(entities)) tuples.sort();
+        return {
+            id: scene.id,
+            definition: scene.definition,
+            key: scene.key,
+            seed: scene.seed,
+            resources: scene.resources,
+            random: scene.random,
+            camera: scene.camera,
+            entities,
+        };
+    });
+    return createHash("sha256")
+        .update(canonicalJson({ state: inspection.state, scenes }))
+        .digest("hex");
+}
+
+function canonicalJson(value: unknown): string {
+    if (value === null || typeof value !== "object") return JSON.stringify(value) ?? "null";
+    if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
+    const entries = value as Record<string, unknown>;
+    return `{${Object.keys(entries)
+        .sort()
+        .map((key) => `${JSON.stringify(key)}:${canonicalJson(entries[key])}`)
+        .join(",")}}`;
+}

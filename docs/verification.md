@@ -1,5 +1,335 @@
 # NGNE verification
 
+## NGNE-27 — 13 September 2026
+
+Migration of Starfall and the platformer to SoA and WebGPU, following the approved
+[plan](../plans/NGNE-27-game-migration.md) (SHA256
+`c65c44190c6f9d62f3b746e5d60d50f8ea171929cd4b12e91b5a96b8c14e3b01`) and
+[handoff](../plans/NGNE-27-handoff.md). In progress: phases 0 (pre-migration baseline), 1
+(NGNE-20 follow-ups) and 2 (platformer port) validated; phase 3 (Starfall port).
+NGNE-27 is not complete, and deployment verification is pending (phase 6).
+
+### Pre-migration baseline and environment
+
+Captured at HEAD `4760fe7e99b933f9927c647911ede7f8a9d6217e`. That commit differs from the
+pre-build code revision `12b727e7f095a3ddd763724190a9d12ace6d2d76` only in `plans/NGNE-27-*`, so
+every baseline below is code-identical to `12b727e`. The working tree was clean. Both games run on
+the legacy object bridge and WebGL; hello runs on WebGPU.
+
+- Windows 11 Home x64 10.0.26200; 12th Gen Intel Core i7-12650H, 10 cores / 16 logical, 16 GiB;
+  Node v24.15.0, npm 11.12.1.
+- In-app Chromium 152.0.7977.76; headful Chrome 152.0.7977.84; secure localhost; DPR 1.
+- WebGPU adapter from `validation.html`: vendor `intel`, architecture `gen-12lp`,
+  `isFallbackAdapter: false`, empty device/description; preferred `bgra8unorm`; maxBufferSize
+  268435456, maxTextureDimension2D 8192. The headful WebGL baseline reports
+  `ANGLE (Intel, Intel(R) UHD Graphics (0x000046A3) Direct3D11 vs_5_0 ps_5_0, D3D11)`.
+
+Standard gate: `npm.cmd test` 134/134 pass; `typecheck`, `build`, `format:check` and
+`git diff --check` pass. `validation.html` (dev server, trusted click) finished 182 PASS, 0 FAIL,
+0 SKIP, `ALL CHECKS PASSED`, no console errors.
+
+Raw diagnostics, scripts, revision exports and per-result manifests are outside the checkout in
+`C:/Users/jfabi/AppData/Local/Temp/ngne-27-diagnostics/`. They are local evidence, not portable
+checked-in results.
+
+### CPU benchmark at HEAD
+
+`npm.cmd run bench` twice, machine idle. CPU only; milliseconds.
+
+| Run | ECS p50 | Chaos p50 | Chaos p95 | Peak sprites / slots | Ticks over budget | Grid legacy / schema p50 | Grid ratio |
+| --- | ------- | --------- | --------- | -------------------- | ----------------- | ------------------------ | ---------- |
+| 1   | 0.230   | 0.846     | 1.012     | 7,209 / 6,986        | 0                 | 1.092 / 1.183            | 1.083      |
+| 2   | 0.218   | 0.843     | 1.086     | 7,209 / 6,986        | 0                 | 1.117 / 1.180            | 1.056      |
+
+### Chaos attribution
+
+Workload label: unchanged Starfall Chaos workload on the legacy object bridge. The script
+`chaos-only.ts` (SHA256 prefix `66e2e84bbfc1`) was copied unchanged into `git archive` exports of
+`a906f3a` (A, NGNE-20 base) and `9c00f02` (B, NGNE-20), each with `npm ci`. `demo/` is identical
+between `a906f3a` and `12b727e`. Each run was a fresh process with no preceding ECS workload:
+`arena({ stress: true })`, seed `bench`, 900 ticks of tick + render + sort at alpha 0.5, sample
+indices 101–899 (799 samples). Order A B A B A B, machine idle.
+
+| Revision    | p50 per run (ms)       | Median | Range  |
+| ----------- | ---------------------- | ------ | ------ |
+| A `a906f3a` | 0.6903, 0.6968, 0.6975 | 0.6968 | 0.0072 |
+| B `9c00f02` | 0.7087, 0.7143, 0.7179 | 0.7143 | 0.0092 |
+
+All runs: 7,209 peak sprites, 6,986 entity slots. Predeclared rule: attributable if every B p50
+exceeds every A p50 and the B−A median gap exceeds the larger same-revision p50 range.
+Both conditions hold: lowest B 0.7087 > highest A 0.6975, and gap 0.0175 ms (+2.5%) > 0.0092.
+**Verdict: attributable to NGNE-20.** Profiling-level root cause remains with NGNE-12.
+
+### Parity captures
+
+Probe `parity-probe.ts` (SHA256 prefix `73e3f5de606e`) ran on the `12b727e` export, twice per run,
+sampling tick 0 (after mount) and every committed tick. It hashes canonical JSON of `game.state`
+and, per stack scene, id/definition/key/seed, resources, named RNG snapshots, camera and the sorted
+per-composition multiset of `{ component: { field: value } }` tuples. Entity handles, rows and the
+Starfall derived `collision-grid` resource are excluded. The order window `W` is the last committed
+tick with every order-sensitive archetype at 512 live rows or fewer.
+
+| Run                                                      | Ticks | `W`               | Two runs identical | Terminal                                                                                       | Hash-list SHA256 |
+| -------------------------------------------------------- | ----- | ----------------- | ------------------ | ---------------------------------------------------------------------------------------------- | ---------------- |
+| Platformer reference walkthrough                         | 1,448 | 1,448 (whole run) | Yes                | `platformer-complete`, 0 deaths, commands checkpoint 1, exit, checkpoint 1, checkpoint 2, exit | `b216e209…0615`  |
+| Starfall normal (right 120, left 120, Space at tick 300) | 2,182 | 2,182 (whole run) | Yes                | `dead` at tick 2,182, score 55,350, 36.0 s                                                     | `19229bf9…7c67`  |
+| Starfall Chaos                                           | 900   | 210               | Yes                | `playing`, score 274,800                                                                       | `05819083…8510`  |
+
+The platformer capture includes the 25 hashes at ticks 0, 60, …, 1,440 for the phase 2 fixture.
+Chaos `W` = 210 leaves about 110 samples (indices 101–209) in the phase 3–5 attributable A/B window.
+
+### Sustained browser baseline
+
+Production build (`npm.cmd run build`, `npm.cmd run preview`); headful Chrome through
+`node --import tsx tests/browser-baseline.ts`; fresh launch per run; 10 s warmup, 60 s sample;
+window visible and machine idle (user confirmed).
+
+| Run                  | Visibility changes | Callback p50 / p99 ms | Interval p50 / p99 ms | >25 ms | Long tasks | Dropped ticks | Heap max MiB | Reclaimed MiB/s | Retained after GC MiB |
+| -------------------- | ------------------ | --------------------- | --------------------- | ------ | ---------- | ------------- | ------------ | --------------- | --------------------- |
+| Starfall Chaos Lab 1 | 0                  | 1.4 / 3.1             | 16.7 / 16.9           | 0      | 3          | 0             | 11.4         | 2.44            | 4.92 → 4.92           |
+| Starfall Chaos Lab 2 | 0                  | 1.5 / 3.1             | 16.7 / 16.9           | 0      | 3          | 0             | 11.3         | 2.63            | 5.60 → 6.59           |
+| Platformer idle 1    | 0                  | 0.2 / 0.4             | 16.7 / 17.0           | 0      | 2          | 0             | 3.4          | 0.45            | 1.92 → 2.12           |
+| Platformer idle 2    | 0                  | 0.2 / 0.6             | 16.7 / 16.9           | 0      | 2          | 0             | 3.4          | 0.45            | 1.92 → 2.10           |
+
+Starfall ended `CHAOS LAB / INVULNERABLE` with 6,626 sprites; the platformer ended on level 1 with
+63 sprites. No page errors. The retained-heap rise in Starfall run 2 is recorded, not analysed
+(NGNE-12).
+
+### WebGL reference
+
+Screenshots in headful Chrome 152.0.7977.84 on the dev server: Starfall attract, flight, result
+(`SIGNAL LOST.`, 42 s, 67,200 points) and Chaos Lab; platformer level 1, pause, level 2 and
+completion. There were no page errors, console errors or warnings. The result screen, level 2 and
+completion were reached with a diagnostic input override: the capture script substituted the
+`InputSnapshot` passed to `Game.prototype.tick`, and game code was unchanged.
+
+User reference play on the production preview with sound on (Starfall flight and Chaos Lab;
+platformer level 1): both games look as expected, music is audible and loops correctly, sound cues
+line up with actions, and no issues were seen.
+
+### NGNE-20 follow-ups (phase 1)
+
+Focused tests added to `tests/ecs-soa.test.ts`; `npm.cmd test` 138/138 (phase 0 count + 4):
+
+- Same-query nesting over 600 rows (chunks of 512 and 88) visits the chunk cross product
+  `[512,512], [512,88], [88,512], [88,88]`, with outer and each inner traversal in creation/chunk/row order.
+- `commit()` inside the inner callback of a same-query nested pair throws, it still throws in the
+  outer callback, and it succeeds after both return.
+- `entityAt(row)` returns the `===` handle from `spawn()` for rows in both chunks. After a committed
+  swap removal in each chunk, row 0 returns the moved entity's same canonical handle.
+- `Game.enumerate()` field records for null, live and stale (despawned and committed) references
+  equal `{ name: "target", kind: "entity", value }` exactly, with `value` `null` or
+  `{ index, generation }`. The target slot records show `pending: false` with row 0 (live) and
+  `generation + 1`, row −1 on the free stack (stale).
+
+Per-commit-epoch descriptor cost, included rather than deferred. `commit()` increments the borrow
+epoch unconditionally (`src/ecs.ts`, `World.commit`), so a commit without membership change forces
+descriptor reconstruction on the next typed traversal. New `epochTraversal` arm in
+`tests/benchmark.ts` on the 20,000-entity typed pass (40 chunks). It runs after all other
+sections: 100 warmup and 300 samples of a separately timed no-op commit, traversal 1 (first in the
+new epoch) and identical traversal 2. Two runs with manifests; milliseconds:
+
+| Run | Commit p50 | Traversal 1 p50 / p95 | Traversal 2 p50 / p95 | Paired delta p50 / p95 | Delta mean |
+| --- | ---------- | --------------------- | --------------------- | ---------------------- | ---------- |
+| 1   | 0.0004     | 0.392 / 0.486         | 0.218 / 0.278         | 0.172 / 0.270          | 0.193      |
+| 2   | 0.0004     | 0.393 / 0.457         | 0.219 / 0.253         | 0.173 / 0.230          | 0.198      |
+
+The first traversal after a commit costs about 0.17 ms more on this workload, about 4 µs per chunk
+descriptor. That is roughly 1.8 times the same-epoch traversal. The measurement does not separate
+descriptor construction from inline-cache effects on the fresh descriptor objects. Migrated
+Starfall commits every tick, so phase 3 evidence includes this cost in its whole-game timings.
+
+Existing bench sections in the same two runs, compared with the phase 0 ranges:
+
+| Metric          | Phase 0 range | Phase 1 runs | Difference                             |
+| --------------- | ------------- | ------------ | -------------------------------------- |
+| ECS p50         | 0.218–0.230   | 0.223, 0.222 | Within range                           |
+| Chaos p50       | 0.843–0.846   | 0.836, 0.832 | Both below range, by up to 1.3% faster |
+| Chaos p95       | 1.012–1.086   | 1.058, 0.976 | Run 2 below range                      |
+| Grid legacy p50 | 1.092–1.117   | 1.093, 1.075 | Run 2 below range                      |
+| Grid schema p50 | 1.180–1.183   | 1.170, 1.201 | Run 1 below, run 2 above (≤1.5%)       |
+| Grid ratio      | 1.056–1.083   | 1.071, 1.118 | Run 2 above range                      |
+
+The sections before the new arm are unchanged code, and the new arm runs after them. The
+differences are small and in both directions, consistent with run noise. No bench output shape
+changed besides the added `epochTraversal` key.
+
+The contract ownership inventory rows "ECS values and identity" and "Allocator and iteration
+history" now name schema chunk creation and lowest-chunk reuse order, `chunk` plus chunk-relative
+`row` locations, field-record inspection, immutable schema definitions with frozen field descriptors,
+and per-epoch descriptor borrowing. Legacy text stays until phase 4.
+
+### Platformer on schema ECS and WebGPU (phase 2)
+
+`examples/platformer/game.ts` uses schema components: `position` and `body` fields are `f64`,
+`grounded` is `bool`, `actor.kind` is `u8` and `facing` is `f64`. Traversal uses `eachChunk`, and
+each system locates the player's views and row from its canonical handle. `main.ts` opts into
+`renderer: "webgpu"` and accumulates hello-style diagnostics. No `src/` file changed; migration
+friction is recorded in [the platformer findings](../examples/platformer/FINDINGS.md).
+
+- Parity: the unchanged phase 0 probe on the working tree reproduced all 1,449 canonical hashes
+  (ticks 0–1,448) exactly. Hash-list SHA256 is `b216e209…0615`, as before. Two consecutive runs were
+  identical, `W` covers the whole run, and the walkthrough had 0 deaths with the same five commands.
+- `tests/platformer.test.ts` reads schema field records. A new test recomputes the canonical hash
+  at ticks 0, 60, …, 1,440 and matches the 25 embedded phase 0 values.
+- Gate: `npm.cmd test` 139/139; `typecheck`, `build`, `format:check` and `git diff --check` pass;
+  the A1 import scan returns nothing.
+- `validation.html` on the dev server in the in-app Chromium: 184 PASS (phase 1 count + 2), 0 FAIL,
+  0 SKIP, `ALL CHECKS PASSED`, no console errors. The two additions come from the new
+  `tests/browser-game-checks.ts` platformer fixture. It replaces `navigator.gpu` so the adapter
+  request resolves `null`, then waits for a trusted click on the fixture's Start button. It checks
+  that `WebGPU adapter unavailable. Enable browser hardware acceleration` is still shown after 500 ms,
+  that Start is unavailable, and that the page shows `Unable to continue`.
+
+Browser replay, driven by the executor: the in-app Browser pane was hidden, so its
+`requestAnimationFrame` did not run. The replay therefore ran in headful Chrome 152.0.7977.84 over
+CDP on the dev server. Keys were trusted `Input.dispatchKeyEvent` events, buttons were clicked with a
+user gesture, and state was read from a diagnostic `Game.prototype.tick` hook that never changes
+input. Chrome ran with occlusion and background throttling disabled; this was a functional replay,
+not a measurement. All 15 cases passed on WebGPU with no console errors or warnings:
+
+- Start: level 1 runs, the WebGPU canvas context is present and the canvas has focus.
+- Movement: holding right moved the player 278 px, Space reached vy −273, and the camera followed.
+- Pause and resume by P, by Escape and by the button. While paused, the overlay scene was pushed,
+  lower-scene poses and camera were identical after 67 further ticks, and canvas screenshots were
+  byte-identical.
+- NGNE-9 game flow: P pause then button resume, with focus returning to the canvas.
+- NGNE-10 step 5: three pause/resume cycles with no error UI or console error.
+- A hazard death before the first checkpoint remounted `level-0-attempt-1` at the start position.
+- Holding right with scripted jumps (trusted keys) reached level 2 and then the completion overlay
+  (`Game complete`, `Play again`) with no further deaths. Enter restarted a fresh level 1 run
+  (`runs: 1`).
+
+Screenshots of level 1, pause, level 2, completion and restart match the phase 0 WebGL references in
+layout, colours and pause dimming. Physical keyboard, audio, tab switching and a post-checkpoint
+death remount are the user's manual checks.
+
+### Starfall on schema ECS and WebGPU (phase 3)
+
+`demo/game.ts` uses schema components:
+
+- `position`: `x`, `y`, `px`, `py` are `f64`.
+- `body`: `vx`, `vy`, `radius`, `hp`, `age`, `cooldown` are `f64`; `active` is `bool`; `kind` is `u8`.
+- `visual`: `sprite` is `u8`; `size`, `angle` are `f64`.
+- `particle`: `vx`, `vy`, `life`, `maxLife`, `size` are `f64`; `color` is `u32`.
+
+Traversal uses `eachChunk`, with `chunk.count` read once per chunk. The player's views and row are
+located per update from its handle.
+
+The `collision-grid` resource holds `{ e, p, b, row }` entries: entity handle, borrowed `position` and
+`body` chunk views, and chunk-relative row. Lines `for (const cell of grid) cell.length = 0` and the
+movement traversal that pushes entries run, in that order, before the collision traversal reads the
+grid in the same system call. No commit occurs between build and probe.
+
+The particle update is unchanged in substance: each row updates independently, draws no RNG and
+reads no other entity. `demo/main.ts` changes:
+
+- The atlas is an `ImageAsset` decoded with `createImageBitmap` (`premultiplyAlpha` and
+  `colorSpaceConversion` set to `"none"`) and closed on dispose; the manual texture upload is gone.
+- `renderer: "webgpu"` is set.
+- Hello-style accumulated diagnostics replace the overwrite-only error text.
+- A boot failure reports `Unable to start Starfall. It requires WebGPU with hardware acceleration`
+  with its cause.
+- The host is disposed on `pagehide`.
+
+No `src/` file changed.
+
+Parity and determinism, using the phase 0 probe unchanged on the working tree:
+
+| Run             | `W` (migrated) | Hashes vs phase 0                                               | Two migrated runs | Terminal (pre / migrated)                         |
+| --------------- | -------------- | --------------------------------------------------------------- | ----------------- | ------------------------------------------------- |
+| Starfall normal | 2,182          | All 2,183 identical (ticks 0–2,182)                             | Identical         | `dead` at 2,182, score 55,350 / identical         |
+| Starfall Chaos  | 210            | Identical at every tick up to 237; first difference at tick 238 | Identical         | tick 900, score 274,800 / tick 900, score 280,400 |
+
+Chaos stays exact beyond its order window of 210 and diverges only after it, as the chunk-order
+rule allows.
+
+Chaos-only migration A/B: the unchanged `chaos-only.ts --window 210` ran fresh per run, order P M P M
+P M, with P the `12b727e` export and M the working tree. The attributable window is sample indices
+101–209 (109 samples); medians in ms:
+
+| Attempt                               | P p50 per run          | M p50 per run          | Window P / M median | Window M/P | Whole-run P / M median |
+| ------------------------------------- | ---------------------- | ---------------------- | ------------------- | ---------- | ---------------------- |
+| 1 (initial port)                      | 0.7102, 0.7477, 0.7421 | 0.9269, 0.9376, 0.9207 | 0.7421 / 0.9269     | **1.249**  | 0.7341 / 0.8655        |
+| 2 (`chunk.count` read once per chunk) | 0.7565, 0.7541, 0.7597 | 0.8666, 0.7979, 0.8095 | 0.7565 / 0.8095     | **1.070**  | 0.7327 / 0.7286        |
+
+Attempt 1 exceeded the plan's 20% stop trigger. The work stopped and was reported with a CPU profile
+(`--cpu-prof`, 900 ticks including setup), which attributed the added self time to four areas:
+
+- per-commit chunk descriptor reconstruction, `createChunkDescriptor` at 69 ms;
+- commit bookkeeping, `commit` at 52 ms versus 3.5 ms before;
+- borrow-checked accessor calls, `get` at 47 ms;
+- schema spawn validation and column writes, `lowerSchemaValue` and `commitSchemaBirth` at 82 ms.
+
+`eachChunk` traversal took 30 ms against 63 ms for legacy `each`.
+
+With the user's approval, attempt 2 read `chunk.count` once per chunk in every Starfall row loop.
+Migrated hashes stayed identical to attempt 1. The remaining +7.0% in the attributable window is within
+the trigger. It is recorded as the SoA cost for this workload (descriptor reconstruction, commit and
+spawn validation); profiling-level root cause stays with NGNE-12. Whole-run medians include gameplay
+divergence after tick 238 and are not attributable.
+
+Gate and tests: `npm.cmd test` 140/140 (phase 2 count + 1), with `typecheck`, `build`, `format:check`
+and `git diff --check` all passing. The A1 import scan returns nothing. The new
+`tests/game.test.ts` test gives arena setup a fake decoded atlas object: setup receives that same
+object from the loader, the resources are exactly `run`, `stars`, `collision-grid` and `player`, every
+archetype field kind is `f64`, `u8`, `u32` or `bool`, and the atlas is loaded once and disposed once.
+
+`npm.cmd run bench` twice with manifests, milliseconds. The Chaos section now runs migrated Starfall,
+and its population diverges from phase 0 after tick 238.
+
+| Run | ECS p50 | Chaos p50 / p95 | Peak sprites / slots | Grid legacy / schema p50 | Epoch traversal 1 / 2 p50 | Paired delta p50 |
+| --- | ------- | --------------- | -------------------- | ------------------------ | ------------------------- | ---------------- |
+| 1   | 0.234   | 0.752 / 1.082   | 7,211 / 6,988        | 1.076 / 1.074            | 0.414 / 0.232             | 0.182            |
+| 2   | 0.240   | 0.714 / 0.936   | 7,211 / 6,988        | 1.073 / 1.112            | 0.420 / 0.233             | 0.184            |
+
+`validation.html` in the in-app Chromium (dev server): 191 PASS (phase 2 count + 7), 0 FAIL, 0 SKIP,
+`ALL CHECKS PASSED`, no console errors. The additions are in `tests/browser-game-checks.ts`:
+
+- A WebGPU `BrowserGame` running Starfall's arena with a counting atlas `ImageAsset`, one start and
+  three `set` replacements through fresh `prepare` calls, drives frames from a manual scheduler.
+  Wrapping the instance's public `assets.acquire` observed the scene lease and the host's renderer
+  source lease separately: one of each per preparation, in that order.
+- After the start and after each replacement: exactly one scene lease and one renderer source lease are
+  live; the atlas has loaded once and been disposed zero times; and 9/9 sampled canvas pixels at the
+  player's centre match opaque atlas ship-cell colours, read back with `drawImage` from the presented
+  WebGPU canvas.
+- After `app.dispose()`: the atlas is disposed exactly once and all 4 scene and 4 source leases are
+  released.
+- A Starfall unsupported fixture (null adapter, no click) keeps both
+  `Unable to start Starfall. It requires WebGPU with hardware acceleration` and
+  `WebGPU adapter unavailable. Enable browser hardware acceleration` after 500 ms, with
+  `UNABLE TO START`.
+
+Browser replay, driven by the executor with the same method as phase 2 (headful Chrome 152.0.7977.84
+over CDP on the dev server, trusted keys, user-gesture clicks, a non-substituting state hook,
+occlusion throttling disabled). All 11 cases passed with no console errors or warnings:
+
+- Attract mode ran on WebGPU with `RUNNING`.
+- NGNE-10 step 4: Sound off to on.
+- Start Flight ran the normal arena with canvas focus.
+- NGNE-9 game flow: P shows `FLIGHT PAUSED` and the arena `run` resource stayed frozen; button resume
+  shows `FLIGHT IN PROGRESS` with canvas focus. Escape also paused and resumed.
+- One normal flight without further input ended with `SIGNAL LOST.` at 39.05 s and 65,200 points.
+  `game.state` became `runs: 1`, `best` and `lastScore` 65,200, and the HUD showed best `065200`.
+- **Fly again** started `run-1-normal` and kept the best score.
+- Chaos Lab launched three times showed `CHAOS LAB / INVULNERABLE` on `run-1-chaos` without error UI.
+
+On the dev server after the three Chaos launches, the HUD showed `17 TICKS DROPPED`. This replay does
+not measure performance; production sustained runs are phase 5 evidence. Screenshots of attract,
+flight, pause, result and Chaos Lab match the phase 0 WebGL references in atlas cells, colours, alpha
+and backdrop.
+
+Friction, all expressible with supported API:
+
+- `chunk.count` is a borrow-checked accessor, so reading it in a row-loop condition costs a checked
+  call per row. That was most of the attempt 1 regression; reading it once per chunk is the idiomatic
+  fix. The guide should say so in phase 5.
+- As in the platformer, there is no handle-to-row view lookup, so the player's row is found by
+  scanning with `entityAt`.
+- Image preparation failures reach the page wrapped in `Scene preparation failed`
+  (`AggregateError`); hello-style flattening shows the capability message beneath it.
+
 ## NGNE-21 — 12 September 2026
 
 Local, uncommitted WebGPU implementation against pre-build HEAD

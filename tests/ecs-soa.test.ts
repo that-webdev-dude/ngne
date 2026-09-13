@@ -288,6 +288,90 @@ test("typed query borrows are nested, exception-safe, visible, and invalidated b
     positions.eachChunk((chunk) => assert.equal(chunk.views.position.x[0], 3));
 });
 
+test("same-query nested traversal visits the chunk cross product in creation, chunk and row order", () => {
+    const Position = component("nested-position", { x: f64() });
+    const world = new World();
+    const handles = Array.from({ length: 600 }, (_, x) => world.spawn(Position.of({ x })));
+    world.commit();
+    const query = world.query(Position);
+    const chunkPairs: [number, number][] = [];
+    const outer: number[] = [];
+    const inner: number[][] = [];
+    query.eachChunk((outerChunk) => {
+        for (let row = 0; row < outerChunk.count; row++) outer.push(outerChunk.entityAt(row).index);
+        const visited: number[] = [];
+        query.eachChunk((innerChunk) => {
+            chunkPairs.push([outerChunk.count, innerChunk.count]);
+            for (let row = 0; row < innerChunk.count; row++)
+                visited.push(innerChunk.views["nested-position"].x[row]);
+        });
+        inner.push(visited);
+    });
+    const created = handles.map((entity) => entity.index);
+    assert.deepEqual(chunkPairs, [
+        [512, 512],
+        [512, 88],
+        [88, 512],
+        [88, 88],
+    ]);
+    assert.deepEqual(outer, created);
+    assert.deepEqual(inner, [created, created]);
+});
+
+test("commit inside the inner callback of a same-query nested traversal throws until both return", () => {
+    const Position = component("nested-commit-position", { x: f64() });
+    const world = new World();
+    const entity = world.spawn(Position.of({ x: 1 }));
+    world.commit();
+    const query = world.query(Position);
+    let innerCalls = 0;
+    query.eachChunk(() => {
+        query.eachChunk(() => {
+            innerCalls++;
+            assert.throws(() => world.commit(), /during query iteration/);
+        });
+        assert.throws(() => world.commit(), /during query iteration/);
+    });
+    assert.equal(innerCalls, 1);
+    world.despawn(entity);
+    assert.doesNotThrow(() => world.commit());
+    assert.equal(world.has(entity), false);
+    assert.equal(query.size, 0);
+});
+
+test("entityAt returns the canonical spawn handle in both chunks and after committed swap removal", () => {
+    const Position = component("canonical-position", { x: f64() });
+    const world = new World();
+    const handles = Array.from({ length: 600 }, (_, x) => world.spawn(Position.of({ x })));
+    world.commit();
+    const query = world.query(Position);
+    const rows = (): Entity[][] => {
+        const chunks: Entity[][] = [];
+        query.eachChunk((chunk) =>
+            chunks.push(Array.from({ length: chunk.count }, (_, row) => chunk.entityAt(row))),
+        );
+        return chunks;
+    };
+    const before = rows();
+    assert.deepEqual(
+        before.map((chunk) => chunk.length),
+        [512, 88],
+    );
+    before.flat().forEach((entity, index) => assert.equal(entity, handles[index]));
+    world.despawn(handles[0]);
+    world.despawn(handles[512]);
+    world.commit();
+    const after = rows();
+    assert.deepEqual(
+        after.map((chunk) => chunk.length),
+        [511, 87],
+    );
+    assert.equal(after[0][0], handles[511]);
+    assert.equal(after[1][0], handles[599]);
+    assert.equal(world.read(after[0][0], Position, "x"), 511);
+    assert.equal(world.read(after[1][0], Position, "x"), 599);
+});
+
 test("typed queries lazily discover later archetypes and skip retained empty chunks", () => {
     const Position = component("position", { x: f64() });
     const Velocity = component("velocity", { x: f64() });
@@ -405,6 +489,73 @@ test("game inspection stringifies null, live, and stale schema references determ
     const first = await run();
     assert.match(first, /"target"/);
     assert.equal(first, await run());
+});
+
+test("game inspection records exact null, live and stale reference fields and target slots", async (t) => {
+    interface FieldRecord {
+        name: string;
+        kind: string;
+        value: unknown;
+    }
+    interface WorldRecord {
+        slots: object[];
+        free: number[];
+        entities: { index: number; components: { fields?: FieldRecord[] }[] }[];
+    }
+    const Link = component("reference-record-link", { target: entityRef() });
+    const game = new Game({ seed: "reference-records", state: {}, transition: (state) => state });
+    t.after(() => game.dispose());
+    const handles: { live?: Entity; stale?: Entity; holders: Entity[] } = { holders: [] };
+    const scene: SceneDefinition = {
+        id: "reference-records",
+        setup(setup) {
+            const live = setup.world.spawn();
+            const stale = setup.world.spawn();
+            handles.live = live;
+            handles.stale = stale;
+            handles.holders.push(
+                setup.world.spawn(Link.of({ target: null })),
+                setup.world.spawn(Link.of({ target: live })),
+                setup.world.spawn(Link.of({ target: stale })),
+            );
+            let despawned = false;
+            setup.system(() => {
+                if (despawned) return;
+                despawned = true;
+                setup.world.despawn(stale);
+            });
+        },
+    };
+    await game.start(await game.prepare(scene, { key: "reference-records" }));
+    game.tick();
+    const { live, stale, holders } = handles;
+    assert.ok(live && stale);
+    const world = game.enumerate().scenes[0].world as unknown as WorldRecord;
+    const field = (holder: Entity): FieldRecord | undefined =>
+        world.entities.find((entry) => entry.index === holder.index)?.components[0].fields?.[0];
+    assert.deepStrictEqual(field(holders[0]), { name: "target", kind: "entity", value: null });
+    assert.deepStrictEqual(field(holders[1]), {
+        name: "target",
+        kind: "entity",
+        value: { index: live.index, generation: live.generation },
+    });
+    assert.deepStrictEqual(field(holders[2]), {
+        name: "target",
+        kind: "entity",
+        value: { index: stale.index, generation: stale.generation },
+    });
+    assert.deepStrictEqual(world.slots[live.index], {
+        generation: live.generation,
+        row: 0,
+        pending: false,
+    });
+    assert.deepStrictEqual(world.slots[stale.index], {
+        generation: stale.generation + 1,
+        row: -1,
+        pending: false,
+    });
+    assert.deepStrictEqual(world.free, [stale.index]);
+    assert.deepStrictEqual(JSON.parse(JSON.stringify(field(holders[2]))), field(holders[2]));
 });
 
 test("the migrated hello scene interpolates and resets both poses when wrapping", async (t) => {
