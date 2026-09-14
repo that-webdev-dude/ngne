@@ -2,7 +2,6 @@ import { BrowserGame, type FrameScheduler } from "../src/index.js";
 
 export async function checkBrowserLifecycle(
     check: (value: unknown, message: string) => void,
-    renderer?: "webgpu",
 ): Promise<void> {
     const create = () => {
         const callbacks: FrameRequestCallback[] = [];
@@ -24,7 +23,6 @@ export async function checkBrowserLifecycle(
             state: { score: 0 },
             transition: (state) => ({ score: state.score + 1 }),
             scheduler,
-            renderer,
         });
         const prepare = () =>
             app.game.prepare(
@@ -138,7 +136,7 @@ export async function checkBrowserLifecycle(
         await rejected;
         callbacks[0]?.(100);
         check(
-            app.game.lifecycle === "Disposed" && callbacks.length === (renderer ? 0 : 1),
+            app.game.lifecycle === "Disposed" && callbacks.length === 0,
             "dispose during cold startup completion never enables frames",
         );
     }

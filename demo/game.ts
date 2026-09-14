@@ -153,7 +153,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
             );
             const grid = s.resource(
                 "collision-grid",
-                Array.from({ length: 20 * 13 }, () => [] as GridEntry[]),
+                Array.from({ length: 20 * 13 }, (): GridEntry[] => []),
             );
             const moving = s.world.query(Position, Body, Visual),
                 particles = s.world.query(Position, Particle);
@@ -610,8 +610,8 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
     };
 }
 function findPlayer(moving: Moving, player: Entity): PlayerRow {
-    // Assigned inside the visitor; the assertion keeps TypeScript from narrowing it to undefined.
-    let found = undefined as PlayerRow | undefined;
+    // Assigned inside the visitor; no initializer, so TypeScript does not narrow it to undefined.
+    let found: PlayerRow | undefined;
     moving.eachChunk((chunk) => {
         for (let row = 0, count = chunk.count; row < count && !found; row++)
             if (chunk.entityAt(row) === player)

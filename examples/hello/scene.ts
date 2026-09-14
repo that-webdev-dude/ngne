@@ -22,7 +22,7 @@ export function createHelloScene(image?: ImageAsset): SceneDefinition {
             scene.system(({ dt }) => {
                 points.eachChunk((chunk) => {
                     const position = chunk.views.position;
-                    for (let row = 0; row < chunk.count; row++) {
+                    for (let row = 0, count = chunk.count; row < count; row++) {
                         position.previousX[row] = position.x[row];
                         position.x[row] += 40 * dt;
                         if (position.x[row] > 640) position.previousX[row] = position.x[row] = 0;
@@ -32,14 +32,14 @@ export function createHelloScene(image?: ImageAsset): SceneDefinition {
             scene.resetInterpolation(() => {
                 points.eachChunk((chunk) => {
                     const position = chunk.views.position;
-                    for (let row = 0; row < chunk.count; row++)
+                    for (let row = 0, count = chunk.count; row < count; row++)
                         position.previousX[row] = position.x[row];
                 });
             });
             scene.render((frame, alpha) => {
                 points.eachChunk((chunk) => {
                     const position = chunk.views.position;
-                    for (let row = 0; row < chunk.count; row++) {
+                    for (let row = 0, count = chunk.count; row < count; row++) {
                         sprite.x = lerp(position.previousX[row], position.x[row], alpha);
                         frame.sprite(sprite);
                     }

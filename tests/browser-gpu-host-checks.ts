@@ -42,7 +42,6 @@ export async function checkBrowserGpuHost(
     const diagnostics: unknown[] = [];
     const app = new BrowserGame({
         canvas: document.createElement("canvas"),
-        renderer: "webgpu",
         width: 64,
         height: 64,
         seed: 21,
@@ -128,7 +127,6 @@ export async function checkBrowserGpuHost(
     }
     const stopApp = new BrowserGame({
         canvas: document.createElement("canvas"),
-        renderer: "webgpu",
         seed: 21,
         state: {},
         transition: (state) => state,

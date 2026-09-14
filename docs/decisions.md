@@ -21,7 +21,8 @@ ECS is imported. GPU growth respects the actual device limit; synchronous submis
 removes the source's arbitrary two-frame buffer retirement lag. Handles are local
 to one device generation and checked against the safe-integer limit.
 
-WebGL and object-component bridges remain until NGNE-27 migrates both games.
+NGNE-27 migrated both games and removed the WebGL `Renderer`, the temporary renderer
+option and the object-component bridge; WebGPU is the only browser rendering path.
 
 Renderer-owned source leases/snapshots survive device generations. Only GPU identities
 are replaced. One recovery attempt bounds failure; failed recovery requires a new host.
@@ -37,7 +38,7 @@ remain intentional renderer/platform boundaries, not package subpaths.
 Allocation profiling found that clearing Frame metadata arrays on every reset discarded
 their backing capacity. Reset now retains that capacity while packing and sort trims
 the active prefix. This is an evidence-driven packing correction within NGNE-21;
-legacy per-sprite upload subviews remain owned by NGNE-27.
+the legacy per-sprite upload subviews were deleted with the WebGL `Renderer` in NGNE-27.
 
 The affine write lives in a module-scope `packAffine` helper and buffer growth in
 `Frame.grow()`. Inlined, the new `Frame.add` exceeded V8's default inlining bytecode
@@ -276,8 +277,8 @@ alpha at frame preparation avoids both problems without adding an authoring API.
 
 Supported components declare fixed numeric, boolean, or same-world entity-reference
 fields. Worlds store those fields in 512-row typed-array chunks and expose bulk
-`eachChunk()` traversal. Sparse access is field-level. Starfall and the platformer keep
-an isolated object-component bridge until NGNE-27 migrates them and deletes it.
+`eachChunk()` traversal. Sparse access is field-level. The temporary object-component
+bridge that carried Starfall and the platformer was deleted by NGNE-27 after both migrated.
 
 ### Rationale
 
@@ -310,6 +311,40 @@ an isolated object-component bridge until NGNE-27 migrates them and deletes it.
 - Float32 rounding is observable. Interpolation-critical hello positions use `f64`.
 - NGNE-27 must compare the migrated Starfall collision loop with the NGNE-26 baseline;
   the NGNE-20 synthetic fixture is not a claim about whole-game performance.
+
+## Game migration with `f64` fields and exact parity
+
+**Status:** Implemented (NGNE-27); evidence in [verification](verification.md#ngne-27--13-september-2026).
+
+### Decision
+
+Starfall and the platformer port every former numeric simulation field to `f64`, booleans to
+`bool`, small enums to `u8` and packed colours to `u32`. The migration is accepted only when a
+canonical state hash (sorted per-composition component tuples plus state, resources, RNG and
+camera) matches the pre-migration capture at every tick inside each run's chunk order window.
+
+### Rationale
+
+- `Float64Array` stores the same IEEE doubles as the former JavaScript numbers, so arithmetic
+  stays bit-identical and exact hash equality is a valid regression oracle.
+- Legacy dense order and chunk order agree while order-sensitive archetypes stay within one
+  512-row chunk; beyond that window swap removal may legitimately reorder traversal, so later
+  ticks require determinism rather than equality.
+
+### Alternatives not selected
+
+| Alternative                     | Reason                                                                     |
+| ------------------------------- | -------------------------------------------------------------------------- |
+| `f32` position and velocity     | Rounds values, which removes the exact oracle; left to NGNE-12 to measure. |
+| Behavioural playthroughs only   | Cannot show that collision and RNG outcomes are unchanged.                 |
+| Hashing entity handles and rows | Storage placement differs by design between layouts.                       |
+
+### Consequences
+
+- Platformer walkthrough and Starfall normal runs match at every tick; Starfall Chaos matches
+  beyond its order window of 210 and diverges from tick 238.
+- Row loops read `chunk.count` once per chunk; a checked accessor in the loop condition was the
+  main cost of the first Starfall port.
 
 ## Owner-scoped candidate slots
 

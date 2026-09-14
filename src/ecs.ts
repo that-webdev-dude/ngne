@@ -43,24 +43,6 @@ export function entityRef(...defaultValues: unknown[]): FieldDescriptor<Entity |
     return field("entity", null);
 }
 
-/** Deprecated object-component bridge. NGNE-27 removes it after game migration. */
-export class Component<T extends object> {
-    constructor(
-        readonly name: string,
-        readonly create: () => T,
-    ) {
-        if (!name) throw new Error("Component name required");
-    }
-    of(value: Partial<T> = {}): ComponentValue<T> {
-        return { component: this, value: Object.assign(this.create(), value) };
-    }
-}
-
-export interface ComponentValue<T extends object = object> {
-    readonly component: Component<T>;
-    readonly value: T;
-}
-
 export class SchemaComponent<Name extends string, Fields extends SchemaFields> {
     readonly [SCHEMA_COMPONENT] = true;
     readonly fields: Fields;
@@ -69,6 +51,8 @@ export class SchemaComponent<Name extends string, Fields extends SchemaFields> {
         fields: Fields,
     ) {
         if (!name) throw new Error("Component name required");
+        if (typeof fields !== "object" || fields === null)
+            throw new Error(`Component fields must be a schema object: ${name}`);
         const cloned: Record<string, FieldDescriptor<unknown>> = Object.create(null);
         for (const [fieldName, descriptor] of Object.entries(fields)) {
             if (!fieldName) throw new Error("Component field name required");
@@ -100,26 +84,13 @@ export interface SchemaComponentValue<Name extends string, Fields extends Schema
 export function component<const Name extends string, const Fields extends SchemaFields>(
     name: Name,
     fields: Fields,
-): SchemaComponent<Name, Fields>;
-export function component<T extends object>(name: string, create: () => T): Component<T>;
-export function component(
-    name: string,
-    definition: (() => object) | SchemaFields,
-): Component<object> | SchemaComponent<string, SchemaFields> {
-    return typeof definition === "function"
-        ? new Component(name, definition)
-        : new SchemaComponent(name, definition);
+): SchemaComponent<Name, Fields> {
+    return new SchemaComponent(name, fields);
 }
 
 export type Entity = Readonly<{ index: number; generation: number; owner: symbol }>;
 type AnySchemaComponent = SchemaComponent<string, SchemaFields>;
 type AnySchemaValue = SchemaComponentValue<string, SchemaFields>;
-type AnyLegacyComponent = Component<object>;
-type AnyLegacyValue = ComponentValue<object>;
-type AnyComponentValue = AnyLegacyValue | AnySchemaValue;
-type LegacyValues<Types extends readonly AnyLegacyComponent[]> = {
-    [Index in keyof Types]: Types[Index] extends Component<infer Value> ? Value : never;
-};
 type FieldColumn<Field> =
     Field extends FieldDescriptor<unknown, "f32">
         ? Float32Array
@@ -153,10 +124,6 @@ export interface SchemaChunk<Types extends readonly AnySchemaComponent[]> {
     readonly views: SchemaQueryViews<Types>;
     entityAt(row: number): Entity;
 }
-export interface Query<Types extends readonly AnyLegacyComponent[]> {
-    readonly size: number;
-    each(visit: (entity: Entity, ...values: LegacyValues<Types>) => void): void;
-}
 export interface AllQuery {
     readonly size: number;
     each(visit: (entity: Entity) => void): void;
@@ -167,12 +134,9 @@ export interface SchemaQuery<Types extends readonly AnySchemaComponent[]> {
 }
 
 export interface WorldAccess {
-    spawn(): Entity;
-    spawn(...values: AnyLegacyValue[]): Entity;
     spawn(...values: AnySchemaValue[]): Entity;
     despawn(entity: Entity): void;
     has(entity: Entity): boolean;
-    get<T extends object>(entity: Entity, type: Component<T>): T | undefined;
     read<Name extends string, Fields extends SchemaFields, Field extends keyof Fields>(
         entity: Entity,
         type: SchemaComponent<Name, Fields>,
@@ -185,7 +149,6 @@ export interface WorldAccess {
         value: FieldValue<Fields[Field]>,
     ): void;
     query(): AllQuery;
-    query<Types extends readonly AnyLegacyComponent[]>(...types: Types): Query<Types>;
     query<Types extends readonly AnySchemaComponent[]>(...types: Types): SchemaQuery<Types>;
 }
 
@@ -196,12 +159,6 @@ interface Slot {
     row: number;
     pending: boolean;
     handle?: Entity;
-}
-interface LegacyArchetype {
-    readonly mode: "legacy";
-    readonly types: AnyLegacyComponent[];
-    readonly entities: Entity[];
-    readonly columns: object[][];
 }
 type NumericColumn = Float32Array | Float64Array | Int32Array | Uint32Array | Uint8Array;
 interface EntityReferenceColumn {
@@ -215,67 +172,13 @@ interface SchemaChunkRuntime {
     readonly entities: (Entity | undefined)[];
     readonly columns: ComponentColumns[];
 }
-interface SchemaArchetype {
-    readonly mode: "schema";
+interface Archetype {
     readonly types: AnySchemaComponent[];
     readonly chunks: SchemaChunkRuntime[];
 }
-type Archetype = LegacyArchetype | SchemaArchetype;
-type PendingBirth =
-    | { readonly mode: "legacy"; readonly entity: Entity; readonly values: AnyLegacyValue[] }
-    | {
-          readonly mode: "schema";
-          readonly entity: Entity;
-          readonly values: { readonly component: AnySchemaComponent; readonly value: object }[];
-      };
-
-class LegacyQueryRuntime<Types extends readonly AnyLegacyComponent[]> implements Query<Types> {
-    #version = -1;
-    #matches: { archetype: LegacyArchetype; columns: object[][] }[] = [];
-    readonly #world: World;
-    readonly #types: Types;
-    constructor(world: World, types: Types) {
-        this.#world = world;
-        this.#types = types;
-        Object.freeze(this);
-    }
-    get size(): number {
-        this.refresh();
-        return this.#matches.reduce((size, match) => size + match.archetype.entities.length, 0);
-    }
-    each(visit: (entity: Entity, ...values: LegacyValues<Types>) => void): void {
-        this.refresh();
-        this.#world.beginRead();
-        try {
-            for (const { archetype, columns } of this.#matches) {
-                const args: unknown[] = new Array(columns.length + 1);
-                for (let row = 0; row < archetype.entities.length; row++) {
-                    args[0] = archetype.entities[row];
-                    for (let column = 0; column < columns.length; column++)
-                        args[column + 1] = columns[column][row];
-                    Reflect.apply(visit, undefined, args);
-                }
-            }
-        } finally {
-            this.#world.endRead();
-        }
-    }
-    private refresh(): void {
-        if (this.#version === this.#world.structureVersion) return;
-        this.#matches = this.#world.archetypeList
-            .filter(
-                (archetype): archetype is LegacyArchetype =>
-                    archetype.mode === "legacy" &&
-                    this.#types.every((type) => archetype.types.includes(type)),
-            )
-            .map((archetype) => ({
-                archetype,
-                columns: this.#types.map(
-                    (type) => archetype.columns[archetype.types.indexOf(type)],
-                ),
-            }));
-        this.#version = this.#world.structureVersion;
-    }
+interface PendingBirth {
+    readonly entity: Entity;
+    readonly values: { readonly component: AnySchemaComponent; readonly value: object }[];
 }
 
 class AllQueryRuntime implements AllQuery {
@@ -290,13 +193,9 @@ class AllQueryRuntime implements AllQuery {
     each(visit: (entity: Entity) => void): void {
         this.#world.beginRead();
         try {
-            for (const archetype of this.#world.archetypeList) {
-                if (archetype.mode === "legacy")
-                    for (const entity of archetype.entities) visit(entity);
-                else
-                    for (const chunk of archetype.chunks)
-                        for (let row = 0; row < chunk.count; row++) visit(chunk.entities[row]!);
-            }
+            for (const archetype of this.#world.archetypeList)
+                for (const chunk of archetype.chunks)
+                    for (let row = 0; row < chunk.count; row++) visit(chunk.entities[row]!);
         } finally {
             this.#world.endRead();
         }
@@ -307,7 +206,7 @@ class SchemaQueryRuntime<
     Types extends readonly AnySchemaComponent[],
 > implements SchemaQuery<Types> {
     #version = -1;
-    #matches: SchemaArchetype[] = [];
+    #matches: Archetype[] = [];
     #borrowEpoch = -1;
     #descriptors: SchemaChunk<Types>[] = [];
     readonly #world: World;
@@ -337,10 +236,8 @@ class SchemaQueryRuntime<
     }
     private refresh(): void {
         if (this.#version === this.#world.structureVersion) return;
-        this.#matches = this.#world.archetypeList.filter(
-            (archetype): archetype is SchemaArchetype =>
-                archetype.mode === "schema" &&
-                this.#types.every((type) => archetype.types.includes(type)),
+        this.#matches = this.#world.archetypeList.filter((archetype) =>
+            this.#types.every((type) => archetype.types.includes(type)),
         );
         this.#version = this.#world.structureVersion;
         this.#borrowEpoch = -1;
@@ -357,7 +254,6 @@ class SchemaQueryRuntime<
     }
 }
 
-Object.freeze(LegacyQueryRuntime.prototype);
 Object.freeze(AllQueryRuntime.prototype);
 Object.freeze(SchemaQueryRuntime.prototype);
 
@@ -369,16 +265,13 @@ class WorldAccessRuntime implements WorldAccess {
             spawn: this.spawn.bind(this),
             despawn: this.despawn.bind(this),
             has: this.has.bind(this),
-            get: this.get.bind(this),
             read: this.read.bind(this),
             write: this.write.bind(this),
             query: this.query.bind(this),
         });
     }
-    spawn(): Entity;
-    spawn(...values: AnyLegacyValue[]): Entity;
     spawn(...values: AnySchemaValue[]): Entity;
-    spawn(...values: AnyComponentValue[]): Entity {
+    spawn(...values: AnySchemaValue[]): Entity {
         return this.#world.spawnValues(values);
     }
     despawn(entity: Entity): void {
@@ -386,9 +279,6 @@ class WorldAccessRuntime implements WorldAccess {
     }
     has(entity: Entity): boolean {
         return this.#world.has(entity);
-    }
-    get<T extends object>(entity: Entity, type: Component<T>): T | undefined {
-        return this.#world.get(entity, type);
     }
     read<Name extends string, Fields extends SchemaFields, Field extends keyof Fields>(
         entity: Entity,
@@ -406,11 +296,8 @@ class WorldAccessRuntime implements WorldAccess {
         this.#world.write(entity, type, field, value);
     }
     query(): AllQuery;
-    query<Types extends readonly AnyLegacyComponent[]>(...types: Types): Query<Types>;
     query<Types extends readonly AnySchemaComponent[]>(...types: Types): SchemaQuery<Types>;
-    query(
-        ...types: (AnyLegacyComponent | AnySchemaComponent)[]
-    ): AllQuery | Query<AnyLegacyComponent[]> | SchemaQuery<AnySchemaComponent[]> {
+    query(...types: AnySchemaComponent[]): AllQuery | SchemaQuery<AnySchemaComponent[]> {
         return this.#world.queryTypes(types);
     }
 }
@@ -424,7 +311,7 @@ export class World implements WorldAccess {
     private readonly archetypes: Archetype[] = [];
     private readonly births: PendingBirth[] = [];
     private readonly deaths = new Set<Entity>();
-    private readonly definitions = new Map<string, AnyLegacyComponent | AnySchemaComponent>();
+    private readonly definitions = new Map<string, AnySchemaComponent>();
     private reading = 0;
     private disposed = false;
     private structuralVersion = 0;
@@ -445,10 +332,7 @@ export class World implements WorldAccess {
     get size(): number {
         return this.archetypes.reduce(
             (size, archetype) =>
-                size +
-                (archetype.mode === "legacy"
-                    ? archetype.entities.length
-                    : archetype.chunks.reduce((rows, chunk) => rows + chunk.count, 0)),
+                size + archetype.chunks.reduce((rows, chunk) => rows + chunk.count, 0),
             0,
         );
     }
@@ -461,27 +345,20 @@ export class World implements WorldAccess {
     endRead(): void {
         this.reading--;
     }
-    spawn(): Entity;
-    spawn(...values: AnyLegacyValue[]): Entity;
     spawn(...values: AnySchemaValue[]): Entity;
-    spawn(...values: AnyComponentValue[]): Entity {
+    spawn(...values: AnySchemaValue[]): Entity {
         return this.spawnValues(values);
     }
-    spawnValues(values: AnyComponentValue[]): Entity {
+    spawnValues(values: AnySchemaValue[]): Entity {
         if (this.disposed) throw new Error("World is disposed");
-        const mode = getValueMode(values);
+        for (const { component: type } of values)
+            if (!isSchemaComponent(type)) throw new Error("Schema component required");
         if (new Set(values.map((value) => value.component)).size !== values.length)
             throw new Error("Duplicate component");
-        const lowered =
-            mode === "schema"
-                ? values.map((entry) => {
-                      const schemaValue = entry as AnySchemaValue;
-                      return {
-                          component: schemaValue.component,
-                          value: this.lowerSchemaValue(schemaValue.component, schemaValue.value),
-                      };
-                  })
-                : [];
+        const lowered = values.map(({ component: type, value }) => ({
+            component: type,
+            value: this.lowerSchemaValue(type, value),
+        }));
         for (const { component: type } of values) this.registerDefinition(type);
         const index = this.free.pop() ?? this.slots.length;
         const slot = this.slots[index] ?? { generation: 0, chunk: -1, row: -1, pending: true };
@@ -489,11 +366,10 @@ export class World implements WorldAccess {
         this.slots[index] = slot;
         const entity = Object.freeze({ index, generation: slot.generation, owner: this.owner });
         slot.handle = entity;
-        if (mode === "schema") this.births.push({ mode, entity, values: lowered });
-        else this.births.push({ mode, entity, values: values as AnyLegacyValue[] });
+        this.births.push({ entity, values: lowered });
         return entity;
     }
-    private registerDefinition(type: AnyLegacyComponent | AnySchemaComponent): void {
+    private registerDefinition(type: AnySchemaComponent): void {
         const existing = this.definitions.get(type.name);
         if (existing && existing !== type)
             throw new Error(`Conflicting component identity: ${type.name}`);
@@ -560,13 +436,6 @@ export class World implements WorldAccess {
     has(entity: Entity): boolean {
         return !!this.slot(entity)?.archetype;
     }
-    get<T extends object>(entity: Entity, type: Component<T>): T | undefined {
-        if (isSchemaComponent(type)) throw new Error("Schema components use read() and write()");
-        const slot = this.slot(entity);
-        if (!slot?.archetype || slot.archetype.mode !== "legacy") return undefined;
-        const column = slot.archetype.columns[slot.archetype.types.indexOf(type)];
-        return column?.[slot.row] as T | undefined;
-    }
     read<Name extends string, Fields extends SchemaFields, Field extends keyof Fields>(
         entity: Entity,
         type: SchemaComponent<Name, Fields>,
@@ -574,7 +443,7 @@ export class World implements WorldAccess {
     ): FieldValue<Fields[Field]> | undefined {
         const descriptor = this.requireField(type, fieldName);
         const slot = this.slot(entity);
-        if (!slot?.archetype || slot.archetype.mode !== "schema") return undefined;
+        if (!slot?.archetype) return undefined;
         const typeIndex = slot.archetype.types.indexOf(type);
         if (typeIndex < 0) return undefined;
         const column = slot.archetype.chunks[slot.chunk].columns[typeIndex][String(fieldName)];
@@ -589,7 +458,7 @@ export class World implements WorldAccess {
         const descriptor = this.requireField(type, fieldName);
         const validated = this.validateField(type, String(fieldName), descriptor, value);
         const slot = this.slot(entity);
-        if (!slot?.archetype || slot.archetype.mode !== "schema") return;
+        if (!slot?.archetype) return;
         const typeIndex = slot.archetype.types.indexOf(type);
         if (typeIndex < 0) return;
         writeColumn(
@@ -628,78 +497,35 @@ export class World implements WorldAccess {
         if (slot && (slot.archetype || slot.pending)) this.deaths.add(entity);
     }
     query(): AllQuery;
-    query<Types extends readonly AnyLegacyComponent[]>(...types: Types): Query<Types>;
     query<Types extends readonly AnySchemaComponent[]>(...types: Types): SchemaQuery<Types>;
-    query(
-        ...types: (AnyLegacyComponent | AnySchemaComponent)[]
-    ): AllQuery | Query<AnyLegacyComponent[]> | SchemaQuery<AnySchemaComponent[]> {
+    query(...types: AnySchemaComponent[]): AllQuery | SchemaQuery<AnySchemaComponent[]> {
         return this.queryTypes(types);
     }
-    queryTypes(
-        types: (AnyLegacyComponent | AnySchemaComponent)[],
-    ): AllQuery | Query<AnyLegacyComponent[]> | SchemaQuery<AnySchemaComponent[]> {
+    queryTypes(types: AnySchemaComponent[]): AllQuery | SchemaQuery<AnySchemaComponent[]> {
         if (this.disposed) throw new Error("World is disposed");
         if (types.length === 0) return new AllQueryRuntime(this);
-        const schemaCount = types.filter(isSchemaComponent).length;
-        if (schemaCount !== 0 && schemaCount !== types.length)
-            throw new Error("Cannot mix schema and legacy components in a query");
-        if (schemaCount) {
-            if (new Set(types).size !== types.length) throw new Error("Duplicate component");
-            for (const type of types) this.registerDefinition(type);
-            return new SchemaQueryRuntime(this, types as AnySchemaComponent[]);
-        }
-        return new LegacyQueryRuntime(this, types as AnyLegacyComponent[]);
+        if (!types.every(isSchemaComponent)) throw new Error("Schema component required");
+        if (new Set(types).size !== types.length) throw new Error("Duplicate component");
+        for (const type of types) this.registerDefinition(type);
+        return new SchemaQueryRuntime(this, types);
     }
     commit(): void {
         if (this.reading) throw new Error("Cannot commit during query iteration");
         if (this.disposed) throw new Error("World is disposed");
         this.epoch++;
-        for (const birth of this.births)
-            if (birth.mode === "legacy") this.commitLegacyBirth(birth);
-            else this.commitSchemaBirth(birth);
+        for (const birth of this.births) this.commitBirth(birth);
         this.births.length = 0;
         for (const entity of this.deaths) this.commitDeath(entity);
         this.deaths.clear();
     }
-    private commitLegacyBirth(birth: Extract<PendingBirth, { mode: "legacy" }>): void {
+    private commitBirth(birth: PendingBirth): void {
         let archetype = this.archetypes.find(
-            (candidate): candidate is LegacyArchetype =>
-                candidate.mode === "legacy" &&
+            (candidate) =>
                 candidate.types.length === birth.values.length &&
                 birth.values.every((value) => candidate.types.includes(value.component)),
         );
         if (!archetype) {
             archetype = {
-                mode: "legacy",
-                types: birth.values.map((value) => value.component),
-                columns: birth.values.map(() => []),
-                entities: [],
-            };
-            this.archetypes.push(archetype);
-            this.structuralVersion++;
-        }
-        const slot = this.slot(birth.entity)!;
-        slot.archetype = archetype;
-        slot.chunk = -1;
-        slot.pending = false;
-        slot.row = archetype.entities.length;
-        archetype.entities.push(birth.entity);
-        archetype.types.forEach((type, index) =>
-            archetype!.columns[index].push(
-                birth.values.find((value) => value.component === type)!.value,
-            ),
-        );
-    }
-    private commitSchemaBirth(birth: Extract<PendingBirth, { mode: "schema" }>): void {
-        let archetype = this.archetypes.find(
-            (candidate): candidate is SchemaArchetype =>
-                candidate.mode === "schema" &&
-                candidate.types.length === birth.values.length &&
-                birth.values.every((value) => candidate.types.includes(value.component)),
-        );
-        if (!archetype) {
-            archetype = {
-                mode: "schema",
                 types: birth.values.map((value) => value.component),
                 chunks: [],
             };
@@ -735,33 +561,19 @@ export class World implements WorldAccess {
     private commitDeath(entity: Entity): void {
         const slot = this.slot(entity);
         if (!slot?.archetype) return;
-        if (slot.archetype.mode === "legacy") {
-            const archetype = slot.archetype,
-                last = archetype.entities.length - 1;
-            if (slot.row !== last) {
-                archetype.entities[slot.row] = archetype.entities[last];
-                this.slots[archetype.entities[slot.row].index].row = slot.row;
-                for (const column of archetype.columns) column[slot.row] = column[last];
-            }
-            archetype.entities.pop();
-            for (const column of archetype.columns) column.pop();
-        } else {
-            const archetype = slot.archetype,
-                chunk = archetype.chunks[slot.chunk],
-                last = chunk.count - 1;
-            if (slot.row !== last) {
-                const moved = chunk.entities[last]!;
-                chunk.entities[slot.row] = moved;
-                this.slots[moved.index].row = slot.row;
-                for (const columns of chunk.columns)
-                    for (const column of Object.values(columns))
-                        copyColumnRow(column, last, slot.row);
-            }
-            chunk.entities[last] = undefined;
+        const chunk = slot.archetype.chunks[slot.chunk],
+            last = chunk.count - 1;
+        if (slot.row !== last) {
+            const moved = chunk.entities[last]!;
+            chunk.entities[slot.row] = moved;
+            this.slots[moved.index].row = slot.row;
             for (const columns of chunk.columns)
-                for (const column of Object.values(columns)) clearColumnRow(column, last);
-            chunk.count--;
+                for (const column of Object.values(columns)) copyColumnRow(column, last, slot.row);
         }
+        chunk.entities[last] = undefined;
+        for (const columns of chunk.columns)
+            for (const column of Object.values(columns)) clearColumnRow(column, last);
+        chunk.count--;
         slot.archetype = undefined;
         slot.chunk = -1;
         slot.row = -1;
@@ -771,39 +583,30 @@ export class World implements WorldAccess {
     }
     enumerate(): object {
         return {
-            archetypes: this.archetypes.map((archetype) =>
-                archetype.mode === "legacy"
-                    ? {
-                          components: archetype.types.map((type) => type.name),
-                          entities: archetype.entities.map((entity) => entity.index),
-                      }
-                    : {
-                          components: archetype.types.map((type) => type.name),
-                          entities: archetype.chunks.flatMap((chunk) =>
-                              chunk.entities.slice(0, chunk.count).map((entity) => entity!.index),
-                          ),
-                          fields: archetype.types.map((type) => ({
-                              component: type.name,
-                              fields: Object.entries(type.fields).map(([name, descriptor]) => ({
-                                  name,
-                                  kind: descriptor.kind,
-                                  default: inspectFieldValue(descriptor.default),
-                              })),
-                          })),
-                          chunks: archetype.chunks.map((chunk) => ({
-                              capacity: CHUNK_CAPACITY,
-                              count: chunk.count,
-                              entities: chunk.entities
-                                  .slice(0, chunk.count)
-                                  .map((entity) => entity!.index),
-                          })),
-                      },
-            ),
+            archetypes: this.archetypes.map((archetype) => ({
+                components: archetype.types.map((type) => type.name),
+                entities: archetype.chunks.flatMap((chunk) =>
+                    chunk.entities.slice(0, chunk.count).map((entity) => entity!.index),
+                ),
+                fields: archetype.types.map((type) => ({
+                    component: type.name,
+                    fields: Object.entries(type.fields).map(([name, descriptor]) => ({
+                        name,
+                        kind: descriptor.kind,
+                        default: inspectFieldValue(descriptor.default),
+                    })),
+                })),
+                chunks: archetype.chunks.map((chunk) => ({
+                    capacity: CHUNK_CAPACITY,
+                    count: chunk.count,
+                    entities: chunk.entities.slice(0, chunk.count).map((entity) => entity!.index),
+                })),
+            })),
             slots: this.slots.map((slot) => ({
                 generation: slot.generation,
                 row: slot.row,
                 pending: slot.pending,
-                ...(slot.archetype?.mode === "schema" ? { chunk: slot.chunk } : {}),
+                ...(slot.archetype ? { chunk: slot.chunk } : {}),
             })),
             free: [...this.free],
             entities: enumerateEntities(this.archetypes),
@@ -817,16 +620,12 @@ export class World implements WorldAccess {
         this.births.length = 0;
         this.deaths.clear();
         for (const archetype of this.archetypes)
-            if (archetype.mode === "legacy") {
-                archetype.entities.length = 0;
-                for (const column of archetype.columns) column.length = 0;
-            } else
-                for (const chunk of archetype.chunks) {
-                    chunk.count = 0;
-                    chunk.entities.fill(undefined);
-                    for (const columns of chunk.columns)
-                        for (const column of Object.values(columns)) clearColumn(column);
-                }
+            for (const chunk of archetype.chunks) {
+                chunk.count = 0;
+                chunk.entities.fill(undefined);
+                for (const columns of chunk.columns)
+                    for (const column of Object.values(columns)) clearColumn(column);
+            }
         this.archetypes.length = 0;
         this.slots.length = 0;
         this.free.length = 0;
@@ -902,7 +701,7 @@ function clearColumn(column: Column): void {
 function createChunkDescriptor<Types extends readonly AnySchemaComponent[]>(
     world: World,
     epoch: number,
-    archetype: SchemaArchetype,
+    archetype: Archetype,
     chunk: SchemaChunkRuntime,
     types: Types,
 ): SchemaChunk<Types> {
@@ -994,20 +793,6 @@ function inspectFieldValue(value: unknown): unknown {
 function enumerateEntities(archetypes: readonly Archetype[]): object[] {
     const entities: object[] = [];
     for (const archetype of archetypes) {
-        if (archetype.mode === "legacy") {
-            for (let row = 0; row < archetype.entities.length; row++) {
-                const entity = archetype.entities[row];
-                entities.push({
-                    index: entity.index,
-                    generation: entity.generation,
-                    components: archetype.types.map((type, column) => ({
-                        name: type.name,
-                        value: archetype.columns[column][row],
-                    })),
-                });
-            }
-            continue;
-        }
         for (const chunk of archetype.chunks) {
             for (let row = 0; row < chunk.count; row++) {
                 const entity = chunk.entities[row]!;
@@ -1031,12 +816,6 @@ function enumerateEntities(archetypes: readonly Archetype[]): object[] {
         }
     }
     return entities;
-}
-function getValueMode(values: readonly AnyComponentValue[]): "legacy" | "schema" {
-    const schemaCount = values.filter((value) => isSchemaComponent(value.component)).length;
-    if (schemaCount !== 0 && schemaCount !== values.length)
-        throw new Error("Cannot mix schema and legacy components in a spawn");
-    return schemaCount ? "schema" : "legacy";
 }
 function isSchemaComponent(value: unknown): value is AnySchemaComponent {
     return typeof value === "object" && value !== null && SCHEMA_COMPONENT in value;

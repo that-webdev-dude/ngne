@@ -511,8 +511,8 @@ export function createOverlay(
 }
 
 function findPlayer(actors: Actors, player: Entity): PlayerRow {
-    // Assigned inside the visitor; the assertion keeps TypeScript from narrowing it to undefined.
-    let found = undefined as PlayerRow | undefined;
+    // Assigned inside the visitor; no initializer, so TypeScript does not narrow it to undefined.
+    let found: PlayerRow | undefined;
     actors.eachChunk((chunk) => {
         for (let row = 0; row < chunk.count && !found; row++)
             if (chunk.entityAt(row) === player)

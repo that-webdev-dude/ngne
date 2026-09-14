@@ -1,13 +1,10 @@
 export { bool, component, entityRef, f32, f64, i32, u32, u8 } from "./ecs.js";
 export type {
     AllQuery,
-    Component,
-    ComponentValue,
     Entity,
     EntityReferenceView,
     FieldDescriptor,
     FieldKind,
-    Query,
     SchemaChunk,
     SchemaComponent,
     SchemaComponentValue,
@@ -41,7 +38,8 @@ export type {
     SystemContext,
 } from "./scene.js";
 export type { InspectionValue } from "./inspection.js";
-export * from "./renderer.js";
+export { Frame } from "./renderer.js";
+export type { Sprite } from "./renderer.js";
 export { WebGPURenderer } from "./webgpu-renderer.js";
 export type { RendererStatus } from "./webgpu-renderer.js";
 export * from "./audio.js";

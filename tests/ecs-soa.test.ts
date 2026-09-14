@@ -198,40 +198,40 @@ test("schema lifetime preserves pending, stale, foreign, and entity-reference ru
 });
 
 test("pending schema deaths, all-query order, and many retained queries preserve structure", () => {
-    const Legacy = component("ordered-legacy", () => ({ value: 1 }));
+    const Tag = component("ordered-tag", { value: f64(1) });
     const Position = component("ordered-position", { x: f64() });
     const Velocity = component("ordered-velocity", { x: f64() });
     const world = new World();
     const all = world.query();
     const empty = world.spawn();
-    const legacy = world.spawn(Legacy.of());
+    const tagged = world.spawn(Tag.of());
     const schema = world.spawn(Position.of());
     const pendingDeath = world.spawn(Velocity.of());
     world.despawn(pendingDeath);
     world.commit();
     const order: number[] = [];
     all.each((entity) => order.push(entity.index));
-    assert.deepEqual(order, [empty.index, legacy.index, schema.index]);
+    assert.deepEqual(order, [empty.index, tagged.index, schema.index]);
     assert.equal(world.has(pendingDeath), false);
 
     const retained = Array.from({ length: 64 }, () => world.query(Position));
     world.spawn(Position.of(), Velocity.of());
     world.commit();
     assert.ok(retained.every((query) => query.size === 2));
-    world.despawn(legacy);
+    world.despawn(tagged);
     world.commit();
     order.length = 0;
     all.each((entity) => order.push(entity.index));
     assert.deepEqual(order, [empty.index, schema.index, pendingDeath.index]);
 });
 
-test("schema entity references reject uint32 overflow without changing legacy allocation", () => {
-    const Legacy = component("overflow-legacy", () => ({ value: 1 }));
+test("schema entity references reject uint32 overflow without changing allocation", () => {
+    const Plain = component("overflow-plain", { value: f64(1) });
     const Link = component("overflow-link", { target: entityRef() });
     const world = new World();
     const target = world.spawn();
     const holder = world.spawn(Link.of());
-    const legacy = world.spawn(Legacy.of());
+    const plain = world.spawn(Plain.of());
     world.commit();
     const slots = Reflect.get(world, "slots") as { generation: number }[];
     slots[target.index].generation = 0x1_0000_0000;
@@ -241,12 +241,12 @@ test("schema entity references reject uint32 overflow without changing legacy al
         owner: target.owner,
     });
     assert.throws(() => world.write(holder, Link, "target", overflow), /uint32/);
-    world.despawn(legacy);
+    world.despawn(plain);
     world.commit();
-    const reused = world.spawn(Legacy.of({ value: 2 }));
+    const reused = world.spawn(Plain.of({ value: 2 }));
     world.commit();
-    assert.equal(reused.index, legacy.index);
-    assert.equal(world.get(reused, Legacy)?.value, 2);
+    assert.equal(reused.index, plain.index);
+    assert.equal(world.read(reused, Plain, "value"), 2);
 });
 
 test("typed query borrows are nested, exception-safe, visible, and invalidated by commit", () => {
@@ -548,6 +548,7 @@ test("game inspection records exact null, live and stale reference fields and ta
         generation: live.generation,
         row: 0,
         pending: false,
+        chunk: 0,
     });
     assert.deepStrictEqual(world.slots[stale.index], {
         generation: stale.generation + 1,
@@ -575,8 +576,7 @@ test("the migrated hello scene interpolates and resets both poses when wrapping"
     assert.equal(centerX(frame), 0);
 });
 
-test("mixed storage modes reject unchecked callers and disposal invalidates queries", () => {
-    const Legacy = component("legacy", () => ({ x: 0 }));
+test("world access and query runtimes stay opaque and reject unchecked callers", () => {
     const Schema = component("schema", { x: f64() });
     const world = new World();
     const { spawn, query: queryFromAccess } = world.access;
@@ -587,21 +587,31 @@ test("mixed storage modes reject unchecked callers and disposal invalidates quer
     assert.equal(queryFromAccess().size, 0);
     assert.equal("commit" in world.access, false);
     assert.equal("enumerate" in world.access, false);
-    assert.throws(() => world.spawnValues([Legacy.of(), Schema.of()]));
-    assert.throws(() => world.queryTypes([Legacy, Schema]));
     assert.throws(() => world.queryTypes([Schema, Schema]), /Duplicate component/);
-    const sameNameLegacy = component("legacy", () => ({ x: 1 }));
-    assert.equal(world.query(sameNameLegacy).size, 0);
-    assert.doesNotThrow(() => world.query(Legacy, Legacy));
-    const allQuery = world.query();
-    const legacyQuery = world.query(Legacy);
-    const query = world.query(Schema);
-    for (const runtimeQuery of [allQuery, legacyQuery, query]) {
+    // Unchecked JavaScript callers cannot reach the removed object-component bridge.
+    const factory = (() => ({ x: 0 })) as unknown as Parameters<typeof component>[1];
+    assert.throws(() => component("object", factory), /schema object/);
+    const objectValue = { component: { name: "object", create: () => ({}) }, value: {} };
+    assert.throws(
+        () => world.spawnValues([objectValue as unknown as ReturnType<typeof Schema.of>]),
+        /Schema component required/,
+    );
+    assert.throws(
+        () => world.queryTypes([objectValue.component as unknown as typeof Schema]),
+        /Schema component required/,
+    );
+    for (const runtimeQuery of [world.query(), world.query(Schema)]) {
         assert.deepEqual(Object.keys(runtimeQuery), []);
         assert.equal(Reflect.get(runtimeQuery, "world"), undefined);
         assert.equal(Reflect.get(runtimeQuery, "matches"), undefined);
         assert.equal(Reflect.get(runtimeQuery, "descriptors"), undefined);
     }
+});
+
+test("disposal invalidates queries and chunk borrows", () => {
+    const Schema = component("schema", { x: f64() });
+    const world = new World();
+    const query = world.query(Schema);
     world.spawn(Schema.of());
     world.commit();
     let descriptor: Parameters<Parameters<typeof query.eachChunk>[0]>[0] | undefined;

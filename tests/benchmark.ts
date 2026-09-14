@@ -110,23 +110,12 @@ world.dispose();
 grid.dispose();
 
 function runCollisionGridBenchmark() {
-    interface LegacyEntry {
-        readonly position: { readonly x: number; readonly y: number };
-    }
-    const LegacyPosition = component("benchmark-grid-legacy-position", () => ({ x: 0, y: 0 }));
     const GridPosition = component("benchmark-grid-position", { x: f64(), y: f64() });
     type GridPositionView = SchemaComponentView<typeof GridPosition.fields>;
     interface SchemaEntry {
         readonly position: GridPositionView;
         readonly row: number;
     }
-    const legacyWorld = new World();
-    for (let target = 0; target < GRID_TARGETS; target++)
-        legacyWorld.spawn(LegacyPosition.of({ x: target, y: target * 2 }));
-    legacyWorld.commit();
-    const legacy = Array.from({ length: GRID_CELLS }, () => [] as LegacyEntry[]);
-    const legacyPositions = legacyWorld.query(LegacyPosition);
-
     const schemaWorld = new World();
     for (let target = 0; target < GRID_TARGETS; target++)
         schemaWorld.spawn(GridPosition.of({ x: target, y: target * 2 }));
@@ -146,21 +135,6 @@ function runCollisionGridBenchmark() {
         }
         return { samples, checks };
     };
-    const legacySample = sample(() => {
-        let checks = 0;
-        let checksum = 0;
-        for (let batch = 0; batch < GRID_BATCHES; batch++) {
-            for (const cell of legacy) cell.length = 0;
-            legacyPositions.each((_, position) => legacy[position.x].push({ position }));
-            for (const cell of probeCells)
-                for (const entry of legacy[cell]) {
-                    checksum += entry.position.x + entry.position.y;
-                    checks++;
-                }
-        }
-        if (checksum === 0) throw new Error("Legacy collision-grid benchmark was not evaluated");
-        return checks;
-    });
     const schemaSample = sample(() => {
         let checks = 0;
         let checksum = 0;
@@ -180,13 +154,9 @@ function runCollisionGridBenchmark() {
         if (checksum === 0) throw new Error("Schema collision-grid benchmark was not evaluated");
         return checks;
     });
-    if (legacySample.checks !== schemaSample.checks)
-        throw new Error("Collision-grid candidate checks differ between arms");
     const timerResolutionMs = measureTimerResolution();
-    const legacyMs = summarize(legacySample.samples);
     const schemaMs = summarize(schemaSample.samples);
-    const valid =
-        legacyMs.p50 >= timerResolutionMs * 100 && schemaMs.p50 >= timerResolutionMs * 100;
+    const valid = schemaMs.p50 >= timerResolutionMs * 100;
     return {
         result: {
             cells: GRID_CELLS,
@@ -195,28 +165,18 @@ function runCollisionGridBenchmark() {
             batchesPerSample: GRID_BATCHES,
             warmupIterations: GRID_WARMUP,
             sampledIterations: GRID_SAMPLES,
-            candidateChecksPerSample: legacySample.checks,
+            candidateChecksPerSample: schemaSample.checks,
             timerResolutionMs,
             validityThresholdMs: timerResolutionMs * 100,
             valid,
-            legacyObject: {
-                ms: legacyMs,
-                nsPerCandidateCheck: summarize(
-                    legacySample.samples.map((time) => (time * 1_000_000) / legacySample.checks),
-                ),
-            },
             schemaViewRow: {
                 ms: schemaMs,
                 nsPerCandidateCheck: summarize(
                     schemaSample.samples.map((time) => (time * 1_000_000) / schemaSample.checks),
                 ),
             },
-            medianRatio: schemaMs.p50 / legacyMs.p50,
         },
-        dispose: () => {
-            legacyWorld.dispose();
-            schemaWorld.dispose();
-        },
+        dispose: () => schemaWorld.dispose(),
     };
 }
 

@@ -6,6 +6,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
     component,
+    f64,
     Game,
     FixedStep,
     Random,
@@ -18,8 +19,8 @@ import {
     type SceneSetup,
     type PreparedScene,
 } from "../src/index.js";
-const Position = component("position", () => ({ x: 0, y: 0 }));
-const Velocity = component("velocity", () => ({ x: 0, y: 0 }));
+const Position = component("position", { x: f64(), y: f64() });
+const Velocity = component("velocity", { x: f64(), y: f64() });
 const game = (diagnostic?: (error: unknown) => void) =>
     new Game({
         seed: 123,
@@ -41,13 +42,17 @@ test("pending lifetime, stable query membership, stale and foreign handles, slot
     assert.equal(w.has(e), false);
     w.commit();
     assert.equal(q.size, 1);
-    q.each((entity, p, v) => {
-        p.x += v.x;
-        w.despawn(entity);
-        assert.equal(w.has(entity), true);
-        assert.throws(() => w.commit());
+    q.eachChunk((chunk) => {
+        const { position: p, velocity: v } = chunk.views;
+        for (let row = 0, count = chunk.count; row < count; row++) {
+            const entity = chunk.entityAt(row);
+            p.x[row] += v.x[row];
+            w.despawn(entity);
+            assert.equal(w.has(entity), true);
+            assert.throws(() => w.commit());
+        }
     });
-    assert.equal(w.get(e, Position)?.x, 3);
+    assert.equal(w.read(e, Position, "x"), 3);
     w.commit();
     assert.equal(q.size, 0);
     const fresh = w.spawn(Position.of(), Velocity.of());
@@ -57,7 +62,7 @@ test("pending lifetime, stable query membership, stale and foreign handles, slot
     w.despawn(e);
     w.commit();
     assert.equal(w.has(fresh), true);
-    assert.equal(other.get(fresh, Position), undefined);
+    assert.equal(other.read(fresh, Position, "x"), undefined);
     for (let i = 0; i < 1000; i++) {
         w.despawn(fresh);
         const id = w.spawn(Position.of());
@@ -75,7 +80,7 @@ test("cached queries include new archetypes; despawn swap preserves row lookup",
     w.commit();
     w.despawn(a);
     w.commit();
-    assert.equal(w.get(b, Position)?.x, 2);
+    assert.equal(w.read(b, Position, "x"), 2);
     w.spawn(Position.of(), Velocity.of());
     w.commit();
     assert.equal(q.size, 2);
@@ -510,8 +515,9 @@ test("inspection is frozen detached data and cannot change runtime ownership", a
         const positions = s.world.query(Position);
         s.system(() => {
             counter.nested.n++;
-            positions.each((_, p) => {
-                p.x++;
+            positions.eachChunk((chunk) => {
+                const x = chunk.views.position.x;
+                for (let row = 0, count = chunk.count; row < count; row++) x[row]++;
             });
         });
     });
@@ -535,7 +541,7 @@ test("inspection is frozen detached data and cannot change runtime ownership", a
         resources.map[0][1].n = 99;
     });
     assert.throws(() => {
-        snapshot.scenes[0].world.entities[0].components[0].value.x = 99;
+        snapshot.scenes[0].world.entities[0].components[0].fields[0].value = 99;
     });
     assert.throws(() => setup?.resource("late", {}));
     assert.equal("commit" in setup.world, false);
@@ -546,8 +552,8 @@ test("inspection is frozen detached data and cannot change runtime ownership", a
     assert.equal(g.scenes[0].id, summary.id);
     assert.equal(resources.counter.nested.n, 0);
     assert.equal(counter.nested.n, 1);
-    assert.equal(snapshot.scenes[0].world.entities[0].components[0].value.x, 4);
-    assert.equal(g.enumerate().scenes[0].world.entities[0].components[0].value.x, 5);
+    assert.equal(snapshot.scenes[0].world.entities[0].components[0].fields[0].value, 4);
+    assert.equal(g.enumerate().scenes[0].world.entities[0].components[0].fields[0].value, 5);
     g.dispose();
 });
 

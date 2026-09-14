@@ -6,7 +6,8 @@ Migration of Starfall and the platformer to SoA and WebGPU, following the approv
 [plan](../plans/NGNE-27-game-migration.md) (SHA256
 `c65c44190c6f9d62f3b746e5d60d50f8ea171929cd4b12e91b5a96b8c14e3b01`) and
 [handoff](../plans/NGNE-27-handoff.md). In progress: phases 0 (pre-migration baseline), 1
-(NGNE-20 follow-ups) and 2 (platformer port) validated; phase 3 (Starfall port).
+(NGNE-20 follow-ups), 2 (platformer port), 3 (Starfall port) and 4 (WebGL and bridge removal)
+validated; phase 5 (measurements, final docs and inspection).
 NGNE-27 is not complete, and deployment verification is pending (phase 6).
 
 ### Pre-migration baseline and environment
@@ -28,9 +29,9 @@ Standard gate: `npm.cmd test` 134/134 pass; `typecheck`, `build`, `format:check`
 `git diff --check` pass. `validation.html` (dev server, trusted click) finished 182 PASS, 0 FAIL,
 0 SKIP, `ALL CHECKS PASSED`, no console errors.
 
-Raw diagnostics, scripts, revision exports and per-result manifests are outside the checkout in
+Raw diagnostics, scripts and revision exports are outside the checkout in
 `C:/Users/jfabi/AppData/Local/Temp/ngne-27-diagnostics/`. They are local evidence, not portable
-checked-in results.
+checked-in results. Manifest coverage is incomplete; see the provenance gap in the phase 5 record.
 
 ### CPU benchmark at HEAD
 
@@ -204,6 +205,9 @@ Screenshots of level 1, pause, level 2, completion and restart match the phase 0
 layout, colours and pause dimming. Physical keyboard, audio, tab switching and a post-checkpoint
 death remount are the user's manual checks.
 
+`MANUAL (user)`: the user confirmed all phase 2 manual checks pass (physical keyboard through both
+levels, pause/resume and tab switching, audio). Gamepad: untested (no device).
+
 ### Starfall on schema ECS and WebGPU (phase 3)
 
 `demo/game.ts` uses schema components:
@@ -329,6 +333,277 @@ Friction, all expressible with supported API:
   scanning with `entityAt`.
 - Image preparation failures reach the page wrapped in `Scene preparation failed`
   (`AggregateError`); hello-style flattening shows the capability message beneath it.
+
+`MANUAL (user)`: the user confirmed all phase 3 manual checks pass (keyboard and mouse, a full flight
+with **Fly again**, visuals, audio). Touch and gamepad: untested (no device).
+
+### WebGL and object-bridge removal (phase 4)
+
+Code at HEAD `54bc67a` (phases 0–3 committed) plus the phase 4 working tree:
+
+- `src/renderer.ts` keeps `Sprite`, `Frame` and `packAffine` and deletes the WebGL `Renderer` and its
+  shaders. `git diff 12b727e -- src/renderer.ts` is a single hunk that removes the 222 lines after
+  `packAffine` and adds none.
+- `src/index.ts` exports `Frame` and the `Sprite` type by name and no longer exports `Component`,
+  `ComponentValue` or `Query`.
+- `src/browser.ts` has no `renderer` option or WebGL branches. `BrowserGame.renderer` is
+  `WebGPURenderer | undefined`, and every host path uses the former WebGPU preparation, startup,
+  rollback, stop and frame-failure teardown.
+- `src/ecs.ts` removes the factory overload, object columns, `get`, `Query.each`, the legacy
+  archetype/query runtime, mixed-mode checks and legacy enumeration. Empty `spawn()` now creates the
+  schema archetype with no components, and zero-argument `query()` remains. Unchecked JavaScript that
+  passes a factory function to `component()` or a non-schema value to `spawn`/`query` now throws
+  (`Component fields must be a schema object`, `Schema component required`) instead of silently
+  creating an empty schema or failing later with a `TypeError`.
+- Hello and both games drop `renderer: "webgpu"`; no other game code changed.
+
+Tests:
+
+- `engine.test.ts`, `simulation.contract.test.ts` and `ownership.test.ts` use schema components with
+  `eachChunk`, reading `chunk.count` once per chunk, and sparse `read`. Every asserted behaviour is
+  preserved. Inspection assertions now expect schema field records and the archetype
+  `fields`/`chunks` shape.
+- In `ecs-soa.test.ts`, legacy entities used as ordering and allocation fixtures became schema
+  entities. The mixed-mode test is split into "world access and query runtimes stay opaque and reject
+  unchecked callers" and "disposal invalidates queries and chunk borrows". Only mixed-mode and legacy
+  assertions were deleted; new assertions cover the unchecked-caller rejections. The live reference
+  target slot record gains `chunk: 0`, because empty spawns are now schema entities.
+- `api-misuse.ts` adds `@ts-expect-error` cases for the factory overload, `get`, `each`, the removed
+  `Component`/`ComponentValue`/`Query` types, a `renderer` option and `Renderer`. The option case uses
+  the value `"auto"`: an excess `renderer` property fails with any value, and the literal
+  `renderer: "webgpu"` would match the phase 4 source scan.
+- Browser tests: the eight WebGL/context-loss checks are deleted. Lifecycle and input checks run once
+  on the WebGPU host, not twice. Interpolation checks are WebGPU only, with one check per sample.
+  `browser-renderer-benchmark.ts` has no `webgl` mode. `browser-baseline.ts` reports WebGPU adapter
+  info. The `validation.html` copy and fixture canvas were updated.
+- `tests/benchmark.ts` no longer has the legacy collision-grid arm, so the `collisionGrid` result no
+  longer has `legacyObject` or `medianRatio`.
+
+Gate:
+
+- `npm.cmd test`: 141/141. Phase 3 had 140; the split test adds one.
+- `typecheck`, `build` (library, API fixture against emitted declarations, three Vite entries),
+  `format:check` and `git diff --check` all pass.
+- The A1 import scan and phase 4 entry scan return nothing.
+- The phase 4 WebGL scan returns nothing when run in Git Bash. In Windows PowerShell 5.1 the embedded
+  double quotes in `'webgl|renderer: "webgpu"'` are stripped before `git grep` receives the pattern.
+  It then matches two `renderer: WebGPURenderer` / `canvasRenderer: WebGPURenderer` type
+  annotations; neither contains `webgl` or the option.
+- Before editing, the scan listed:
+    - the WebGL `Renderer` in `src/renderer.ts`;
+    - WebGL test code in `browser-validation.ts`, `browser-interpolation-checks.ts`,
+      `browser-renderer-benchmark.ts` and `browser-baseline.ts`;
+    - the `browser-webgpu-checks.ts` comment;
+    - `validation.html` copy;
+    - README, guide, `ngne.svg`, the platformer findings and `index.html` text;
+    - ten `renderer: "webgpu"` options in games, hello, the guide and browser tests.
+
+Parity after the removal, using the unchanged phase 0 probe: the platformer, Starfall normal and
+Starfall Chaos hash lists are identical to their phase 2/3 values (`b216e209…`, `19229bf9…`,
+`969b0e59…`). `W` stayed 1,448, 2,182 and 210, terminal outcomes did not change, and two runs of each
+were identical.
+
+`npm.cmd run bench` twice with manifests, milliseconds:
+
+| Run | ECS p50 | Chaos p50 / p95 | Peak sprites / slots | Grid schema p50 | Epoch traversal 1 / 2 p50 | Paired delta p50 |
+| --- | ------- | --------------- | -------------------- | --------------- | ------------------------- | ---------------- |
+| 1   | 0.237   | 0.734 / 0.965   | 7,211 / 6,988        | 1.239           | 0.450 / 0.250             | 0.197            |
+| 2   | 0.239   | 0.737 / 0.964   | 7,211 / 6,988        | 1.254           | 0.417 / 0.233             | 0.183            |
+
+ECS, Chaos and epoch medians are within or near the phase 3 runs. The schema grid arm is about 13%
+slower than in phase 3 (1.074, 1.112). Its code is unchanged, but it now runs directly after the
+Chaos section instead of after the deleted legacy arm, so warm state differs. The cause is not
+isolated.
+
+Chaos-only A/B with the unchanged `chaos-only.ts --window 210`, fresh process per run, order
+P M P M P M (P the `12b727e` export, M the phase 4 working tree); medians in ms:
+
+| Window                               | P p50 per run          | M p50 per run          | P / M median    | M/P       |
+| ------------------------------------ | ---------------------- | ---------------------- | --------------- | --------- |
+| Attributable, indices 101–209 (109)  | 0.7345, 0.7635, 0.7604 | 0.8332, 0.8360, 0.8604 | 0.7604 / 0.8360 | **1.099** |
+| Whole run 101–899 (non-attributable) | 0.7523, 0.7414, 0.7419 | 0.7297, 0.7374, 0.7452 | 0.7419 / 0.7374 | 0.994     |
+
+The attributable ratio is within the 20% stop trigger; phase 3 attempt 2 measured 1.070. Peak
+sprites/slots: P 7,209 / 6,986, M 7,211 / 6,988.
+
+Browser validation. The in-app Browser pane stopped drawing while hidden (screenshots timed out), and
+the first run's fixture click missed. Validation therefore ran in headful Chrome 152.0.7977.84 over
+CDP on the dev server (driver `validation-cdp.mts`). Both required clicks, **Run checks** and the
+platformer fixture's **Start level 1**, were trusted `Input.dispatchMouseEvent` presses.
+
+- Result: 153 PASS, 0 FAIL, 0 SKIP, `ALL CHECKS PASSED`, no console errors or warnings. Adapter
+  `intel` / `gen-12lp`, `bgra8unorm`.
+- Phase 3 had 191. The 38 removed checks are:
+    - 8 WebGL checks (layer order, scene order, alpha, texture sampling, 10,000-sprite draw, GL error,
+      context loss, context restoration); WebGPU core and recovery checks already cover the same
+      behaviours;
+    - 14 lifecycle and 15 input checks from the former WebGL-host runs, which still run on WebGPU;
+    - 1 aggregate WebGPU interpolation check, now replaced by the 65 per-sample WebGPU checks that
+      previously ran on WebGL.
+- The Starfall and platformer unsupported fixtures pass.
+
+Production build (`npm.cmd run build`, `npm.cmd run preview`) in headful Chrome over CDP (driver
+`preview-check.mts`):
+
+- Starfall attract mode ran on WebGPU with `RUNNING` and changing presented frames. Start Flight
+  showed `FLIGHT IN PROGRESS` with no error UI; the HUD showed `14 TICKS DROPPED` after the start
+  transition, which this check does not measure.
+- Hello ran on WebGPU with a moving sprite.
+- Platformer level 1 started from a trusted Start click and the frame changed while holding right.
+- All three pages had no console errors, warnings or exceptions. The footer now reads `INSTANCED
+WEBGPU`.
+
+Documentation: the contract has migration notes for the bridge, option and `Renderer` removals and
+the empty-entity inspection shape, and an updated public symbol table. Guide, README, `ngne.svg`,
+decisions and roadmap were updated; the roadmap marks the removal done with deployment pending.
+`docs/architecture.md` needed no change.
+
+`MANUAL (user)`:
+
+- Production preview play: both games behave as in phases 2 and 3.
+- The user noticed that platformer music, while looping correctly, starts late.
+- In Chrome with `--disable-gpu`, `await navigator.gpu?.requestAdapter()` still returned an adapter,
+  so the unsupported-environment check is not reproducible on this machine. The automated
+  unsupported fixtures remain the evidence.
+
+Platformer audio-latency probe (driver `platformer-audio-latency.mts`, headful Chrome over CDP, dev
+servers, 5 fresh page loads per tree, trusted Start click and Space presses):
+
+| Tree              | Start click → looping music start (ms) | Space → jump cue start (ms) |
+| ----------------- | -------------------------------------- | --------------------------- |
+| `12b727e` (WebGL) | 100, 50, 49, 65, 67                    | 14–33, typically 15         |
+| Phase 4 (WebGPU)  | 1,127, 950, 933, 949, 934              | 12–30, typically 15         |
+
+Cues during play are unchanged. The start delay is renderer acquisition. The platformer has no image
+assets, so preparation never creates the renderer, and `app.start()` acquires it before mounting and
+scheduling the first tick that queues the music. A second probe timed the first `requestAdapter()` at
+969 and 757 ms, `requestDevice()` at 123 and 90 ms and pipeline creation at 26 and 1 ms. Starfall is
+unaffected at Start because preparing its atlas acquires the renderer at boot. No supported API
+acquires the renderer ahead of `start()` without an image asset. The finding is recorded as
+[platformer finding 15](../examples/platformer/FINDINGS.md). The user accepted the delay for NGNE-27 and
+left finding 15 open; no engine change was made. Phase 4 validated by the user.
+
+### Post-migration measurements (phase 5)
+
+Workload label for every comparison below: whole-stack change (schema SoA ECS, WebGPU renderer,
+and the removal of WebGL and the object bridge), not attributable to any one of them. Same machine,
+Chrome 152.0.7977.84, Node v24.15.0. The WebGPU adapter is `intel` / `gen-12lp`, as recorded by
+`browser-baseline.ts`.
+
+Sustained browser runs used the phase 0 method: production build, `npm.cmd run preview`, headful
+Chrome via `node --import tsx tests/browser-baseline.ts`, fresh launch per run, 10 s warmup and 60 s
+sample. The window stayed visible and the machine idle (user confirmed). All four runs recorded 0
+visibility changes, 0 intervals over 25 ms, 0 ticks dropped during the sample, no page errors and an
+empty stderr.
+
+| Run                  | Callback p50 / p99 ms (pre → post) | Interval p50 / p99 ms (pre → post) | Long tasks | Heap max MiB | Reclaimed MiB/s | Retained after GC MiB (post) |
+| -------------------- | ---------------------------------- | ---------------------------------- | ---------- | ------------ | --------------- | ---------------------------- |
+| Starfall Chaos Lab 1 | 1.4 / 3.1 → 1.3 / 3.3              | 16.7 / 16.9 → 16.7 / 16.9          | 3 → 2      | 11.4 → 17.7  | 2.44 → 7.86     | 4.52 → 6.40                  |
+| Starfall Chaos Lab 2 | 1.5 / 3.1 → 1.4 / 3.4              | 16.7 / 16.9 → 16.7 / 16.9          | 3 → 2      | 11.3 → 17.7  | 2.63 → 7.63     | 4.51 → 6.36                  |
+| Platformer idle 1    | 0.2 / 0.4 → 0.3 / 0.7              | 16.7 / 17.0 → 16.7 / 16.9          | 2 → 1      | 3.4 → 3.3    | 0.45 → 0.43     | 1.88 → 2.00                  |
+| Platformer idle 2    | 0.2 / 0.6 → 0.3 / 0.8              | 16.7 / 16.9 → 16.7 / 16.9          | 2 → 1      | 3.4 → 3.3    | 0.45 → 0.44     | 1.90 → 2.00                  |
+
+Starfall still ends `CHAOS LAB / INVULNERABLE`, now with 6,558 and 6,568 sprites against 6,626 before,
+and the platformer ends on level 1 with 63 sprites. Frame pacing is unchanged at 60 Hz. The Starfall
+Chaos garbage rate is about three times the pre-migration rate (heap max 17.7 against 11.4 MiB) and
+the retained heap after forced GC rises by about 1.9 MiB during each run. Plausible sources are the
+per-commit chunk descriptors and schema spawn lowering, but they are not isolated. Analysis belongs to
+NGNE-12.
+
+`npm.cmd run bench` twice with manifests, milliseconds:
+
+| Run | ECS p50 | Chaos p50 / p95 | Peak sprites / slots | Grid schema p50 | Epoch traversal 1 / 2 p50 | Paired delta p50 / p95 | No-op commit p50 |
+| --- | ------- | --------------- | -------------------- | --------------- | ------------------------- | ---------------------- | ---------------- |
+| 1   | 0.245   | 0.737 / 0.982   | 7,211 / 6,988        | 1.216           | 0.422 / 0.235             | 0.187 / 0.243          | 0.0004           |
+| 2   | 0.244   | 0.741 / 0.993   | 7,211 / 6,988        | 1.218           | 0.424 / 0.236             | 0.186 / 0.251          | 0.0004           |
+
+Final Chaos-only A/B with the unchanged `chaos-only.ts --window 210`, fresh process per run, order
+P M P M P M (P the `12b727e` export, M the phase 5 working tree). Attributable window P p50 0.7794,
+0.7434, 0.7672 and M 0.8564, 0.8705, 0.8585. Whole run P 0.7441, 0.7372, 0.7572 and M 0.7499, 0.7630,
+0.7345.
+
+Final comparison. Chaos label: Starfall Chaos Lab, seed `bench`, 900 ticks, CPU-only tick + render +
+sort at alpha 0.5, samples 101–899, no GPU; identical `Frame` code in both arms. The runtime variable is
+Starfall on schema ECS (post) versus the legacy object bridge (pre), including gameplay divergence after
+the order window.
+
+| Stage                      | Bench ECS p50 | Bench Chaos p50 | Chaos-only window M/P (109 samples) | Chaos-only whole-run M/P | Epoch paired delta p50 |
+| -------------------------- | ------------- | --------------- | ----------------------------------- | ------------------------ | ---------------------- |
+| Pre-build (phase 0, WebGL) | 0.230, 0.218  | 0.846, 0.843    | —                                   | —                        | not measured           |
+| Phase 3 (attempt 2)        | 0.234, 0.240  | 0.752, 0.714    | 1.070                               | 0.994                    | 0.182, 0.184           |
+| Phase 4                    | 0.237, 0.239  | 0.734, 0.737    | 1.099                               | 0.994                    | 0.197, 0.183           |
+| Final (phase 5)            | 0.245, 0.244  | 0.737, 0.741    | 1.119                               | 1.008                    | 0.187, 0.186           |
+
+The bench Chaos section is not an A/B: its pre-build runs ran on the legacy bridge with a preceding ECS
+workload in the same process. The Chaos-only A/B is the comparison for the migration. Within the
+attributable window, migrated Starfall is 7–12% slower per tick than the legacy bridge across phases
+3–5, all inside the 20% stop trigger. Across the whole 900-tick run the medians are equal within
+noise, with the divergent populations noted above.
+
+### Verification record
+
+- Environment: Windows 11 Home 10.0.26200, Intel Core i7-12650H, Node v24.15.0, npm 11.12.1, in-app
+  Chromium 152.0.7977.76, headful Chrome 152.0.7977.84, secure localhost, DPR 1. WebGPU adapter
+  `intel` / `gen-12lp`, `bgra8unorm`.
+- Chaos attribution: the NGNE-20 delta on the unchanged Starfall Chaos workload on the legacy object
+  bridge is attributable to NGNE-20 (+2.5%, phase 0).
+- Per-commit-epoch descriptor cost: included, not deferred. It is about 0.18–0.20 ms per 40-chunk
+  traversal (about 4–5 µs per chunk) and has been stable from phase 1 to phase 5. Migrated Starfall
+  commits every tick, so the whole-game timings above include it.
+- Friction:
+    - `chunk.count` must be read once per chunk; the guide now says so.
+    - There is no handle-to-row view lookup, so the player row is found by scanning with `entityAt`.
+    - Pending spawn values cannot be read in setup.
+    - `bool` view columns are `Uint8Array`.
+    - A `let` initialized to `undefined` and assigned only inside a visitor is narrowed to `undefined`
+      after the call; declaring it without an initializer avoids a type assertion.
+    - Image preparation failures arrive wrapped in `AggregateError`.
+    - The unsupported platformer fixture needs trusted input.
+    - Open: platformer music starts late because the renderer is first acquired at Start (platformer
+      finding 15, accepted by the user).
+- Remaining limits:
+    - One GPU and driver only (Intel `gen-12lp`); no portability claim (NGNE-14).
+    - Gamepad and touch are untested (no device).
+    - `--disable-gpu` Chrome still exposed an adapter, so the unsupported path is covered only by the
+      automated null-adapter fixtures.
+    - Browser replays and validation ran in headful Chrome over CDP because the hidden in-app pane does
+      not draw.
+    - The Starfall allocation rate and retained-heap growth are recorded but not analysed (NGNE-12).
+    - NGNE-21 limits carry forward: image candidate refill, general host-hook lease counts and loss
+      during replacement awaits.
+- Provenance gap: bench, sustained-run and Chaos-only A/B results from every phase, and the phase 4
+  and phase 5 parity, validation and preview results, have manifest sidecars. The phase 0–3 parity
+  captures (`platformer*.json`, `starfall-*.json`, `*-phase3*.json`), the phase 2/3 replay JSONs and
+  screenshots, the per-phase gate logs, the phase 0 validation log and the audio-latency probe
+  results have none, contrary to the plan's rule for results from phase 1 onward. Those tree states
+  cannot be reconstructed now. The phase 4 and final phase 5 parity reruns, with manifests,
+  reproduce the phase 2/3 hash lists exactly.
+- Deployment verification pending (phase 6).
+
+### Independent inspection (phase 5)
+
+Codex `gpt-5.6-sol`, read-only, in a fresh session that did not build the work, inspected the full
+`git diff 12b727e` against the plan. The first attempt and one resume of the same session
+disconnected ("Unable to verify model access right now") before producing a report. With the user's
+approval, a fresh read-only session ran the same prompt and completed.
+
+Round 1 verdict **CHANGES REQUIRED**, six findings:
+
+| #   | Severity | Finding                                                                                     | Disposition                                                                                                                                                                                                                                                                                                |
+| --- | -------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Medium   | No browser validation on the final snapshot; the recorded run predates the hello loop edit. | Fixed: `validation.html` rerun on the final tree in headful Chrome over CDP: 153 PASS, 0 FAIL, 0 SKIP, `ALL CHECKS PASSED`, no console messages, with manifest.                                                                                                                                            |
+| 2   | Medium   | Three game-side type assertions (`demo/game.ts` grid initializer and both `findPlayer`s).   | Fixed: an annotated arrow return and uninitialized `let found: PlayerRow \| undefined`; no assertion remains in the game diff. Emitted JavaScript differs only in `let found;` versus `let found = undefined;`. Typecheck and 141/141 tests pass, and the final parity rerun matches all three hash lists. |
+| 3   | Medium   | Manifests missing for many raw results, including phase 2/3 parity files.                   | Recorded as a provenance gap in the verification record above; it cannot be regenerated for past tree states. The user waived the gap.                                                                                                                                                                     |
+| 4   | Medium   | `plans/NGNE-27-review-log.md` is append-only but had been reformatted.                      | Fixed: restored byte-for-byte. The phase 5 `npx prettier --check plans/NGNE-27-*.md` gate therefore reports that file, which has been unformatted since its commit `4760fe7`. The user granted an exception for that file.                                                                                 |
+| 5   | Low      | The WebGL scan matched "WebGL era" in platformer finding 15, added after the phase 4 scan.  | Fixed: reworded; both scans return nothing.                                                                                                                                                                                                                                                                |
+| 6   | Low      | The roadmap still called post-migration measurements pending.                               | Fixed: measurements done, deployment verification pending.                                                                                                                                                                                                                                                 |
+
+The benchmarks, sustained runs and Chaos-only A/B above ran before fixes 2 and 5. Those fixes change
+only TypeScript annotations and Markdown, and the emitted JavaScript is behaviourally identical, so the
+measurements still describe the final code.
+
+Round 2, resuming the same read-only session, checked the four fixes, the recorded user decisions and
+the byte-identical review log. Verdict **APPROVED**, with no findings.
 
 ## NGNE-21 — 12 September 2026
 

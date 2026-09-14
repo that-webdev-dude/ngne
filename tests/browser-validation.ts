@@ -1,4 +1,4 @@
-import { Renderer, Frame, Camera, BrowserGame, type FrameScheduler } from "../src/index.js";
+import { BrowserGame, type FrameScheduler } from "../src/index.js";
 import { checkBrowserAudio } from "./browser-audio-checks.js";
 import { checkBrowserGames } from "./browser-game-checks.js";
 import { checkBrowserLifecycle } from "./browser-lifecycle-checks.js";
@@ -25,75 +25,6 @@ const check = (condition: unknown, message: string) => {
 async function main() {
     await checkBrowserAudio(check);
     await checkWebGPUCore(check);
-    const canvas = document.getElementById("synthetic") as HTMLCanvasElement;
-    const renderer = new Renderer(canvas, 64, 64),
-        frame = new Frame(),
-        camera = new Camera();
-    const gl = canvas.getContext("webgl2")!;
-    const pixel = () => {
-        const bytes = new Uint8Array(4);
-        gl.readPixels(32, 32, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, bytes);
-        return [...bytes];
-    };
-    frame.scene(camera, 1);
-    frame.rect(32, 32, 64, 64, 0xff0000, 1, 5);
-    frame.rect(32, 32, 32, 32, 0x00ff00, 1, 1);
-    renderer.render(frame);
-    check(pixel()[0] === 255, "layer order is independent of submission order");
-    frame.scene(camera, 1);
-    frame.rect(32, 32, 16, 16, 0x0000ff, 1, -100);
-    renderer.render(frame);
-    check(pixel()[2] === 255, "scene order takes precedence over local layers");
-    frame.rect(32, 32, 8, 8, 0xffffff, 0.5, 0);
-    renderer.render(frame);
-    const blended = pixel();
-    check(blended[0] >= 127 && blended[0] <= 128 && blended[2] === 255, "source alpha compositing");
-    const atlas = document.createElement("canvas");
-    atlas.width = atlas.height = 2;
-    const ctx = atlas.getContext("2d")!;
-    ctx.fillStyle = "#00ff00";
-    ctx.fillRect(0, 0, 2, 2);
-    renderer.texture("test", atlas);
-    frame.reset();
-    frame.scene(camera, 1);
-    frame.sprite({ x: 32, y: 32, width: 64, height: 64, texture: "test" });
-    renderer.render(frame);
-    check(pixel()[1] === 255, "decoded texture upload and UV sampling");
-    frame.reset();
-    frame.scene(camera, 1);
-    for (let i = 0; i < 10000; i++) frame.rect(i % 64, Math.floor(i / 64) % 64, 1, 1, 0xffb276);
-    renderer.render(frame);
-    check(
-        renderer.sprites === 10000 && renderer.drawCalls === 1,
-        "10,000 synthetic sprites use one instanced draw",
-    );
-    check(gl.getError() === gl.NO_ERROR, "no WebGL error after buffer growth");
-    const extension = gl.getExtension("WEBGL_lose_context");
-    if (extension) {
-        const lost = new Promise<void>((resolve) =>
-            canvas.addEventListener("webglcontextlost", () => resolve(), {
-                once: true,
-            }),
-        );
-        extension.loseContext();
-        await lost;
-        renderer.render(frame);
-        check(renderer.drawCalls === 0, "context loss safely skips GPU submission");
-        await new Promise((r) => setTimeout(r, 100));
-        const restored = new Promise<void>((resolve) =>
-            canvas.addEventListener("webglcontextrestored", () => resolve(), {
-                once: true,
-            }),
-        );
-        extension.restoreContext();
-        await restored;
-        frame.reset();
-        frame.scene(camera, 1);
-        frame.sprite({ x: 32, y: 32, width: 64, height: 64, texture: "test" });
-        renderer.render(frame);
-        check(pixel()[1] === 255, "context restoration rebuilds pipelines and textures");
-    } else results.push("SKIP context loss extension unavailable");
-    renderer.dispose();
     const surface = document.createElement("canvas");
     let callback: FrameRequestCallback = () => {};
     let cancelled = 0;
@@ -150,20 +81,12 @@ async function main() {
     );
     await app.dispose();
     check(app.game.lifecycle === "Disposed" && cancelled >= 2, "browser teardown completes");
-    await checkBrowserLifecycle(check);
-    await checkBrowserLifecycle(
-        (condition, message) => check(condition, "WebGPU " + message),
-        "webgpu",
-    );
+    await checkBrowserLifecycle((condition, message) => check(condition, "WebGPU " + message));
     await checkBrowserImages(check);
     await checkBrowserGames(check);
     await checkBrowserRecovery(check);
     await checkBrowserGpuHost(check);
-    await checkBrowserInput(check);
-    await checkBrowserInput(
-        (condition, message) => check(condition, "WebGPU " + message),
-        "webgpu",
-    );
+    await checkBrowserInput((condition, message) => check(condition, "WebGPU " + message));
     await checkBrowserInterpolation(check);
     document.getElementById("results")!.textContent = results.join("\n") + "\n\nALL CHECKS PASSED";
 }

@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { component, emptyInput, FixedStep, Frame, Game } from "../src/index.js";
+import { component, emptyInput, f64, FixedStep, Frame, Game } from "../src/index.js";
 import type { Asset, GameInspection, SceneDefinition } from "../src/index.js";
 
-const Value = component("value", () => ({ n: 0 }));
+const Value = component("value", { n: f64() });
 
 test("all selected schedules precede world, event, freeze, state and FIFO stack commits", async (t) => {
     const trace: string[] = [];
@@ -33,9 +33,12 @@ test("all selected schedules precede world, event, freeze, state and FIFO stack 
                 if (ctx.simulationTick !== 1) return;
                 trace.push(`write:${id}`);
                 resource.n++;
-                query.each((entity, value) => {
-                    value.n++;
-                    ctx.world.despawn(entity);
+                query.eachChunk((chunk) => {
+                    const n = chunk.views.value.n;
+                    for (let row = 0, count = chunk.count; row < count; row++) {
+                        n[row]++;
+                        ctx.world.despawn(chunk.entityAt(row));
+                    }
                 });
                 const born = ctx.world.spawn(Value.of({ n: 9 }));
                 assert.equal(ctx.world.has(born), false);
@@ -48,7 +51,7 @@ test("all selected schedules precede world, event, freeze, state and FIFO stack 
                 if (ctx.simulationTick !== 1) return;
                 trace.push(`read:${id}`);
                 assert.equal(resource.n, 1);
-                assert.equal(ctx.world.get(old, Value)?.n, 1);
+                assert.equal(ctx.world.read(old, Value, "n"), 1);
                 assert.equal(query.size, 1);
                 assert.deepEqual(ctx.events, []);
                 assert.deepEqual(state.read(), []);
@@ -62,7 +65,10 @@ test("all selected schedules precede world, event, freeze, state and FIFO stack 
                 trace.push(`freeze:${id}`);
                 assert.equal(scene.world.has(old), false);
                 const values: number[] = [];
-                query.each((_entity, value) => values.push(value.n));
+                query.eachChunk((chunk) => {
+                    const n = chunk.views.value.n;
+                    for (let row = 0, count = chunk.count; row < count; row++) values.push(n[row]);
+                });
                 assert.deepEqual(values, [9]);
                 // All worlds and inboxes publish before the first freeze reset.
                 for (const snapshot of game.enumerate().scenes) {
@@ -73,7 +79,9 @@ test("all selected schedules precede world, event, freeze, state and FIFO stack 
                         {
                             index: 1,
                             generation: 0,
-                            components: [{ name: "value", value: { n: 9 } }],
+                            components: [
+                                { name: "value", fields: [{ name: "n", kind: "f64", value: 9 }] },
+                            ],
                         },
                     ]);
                 }
@@ -318,9 +326,12 @@ async function runTimingScenario(cadence: readonly number[], reverse: boolean) {
                 resource.updates++;
                 resource.events += ctx.events.length;
                 resource.input += ctx.input.axes[0] ?? 0;
-                query.each((entity, value) => {
-                    value.n += motion.next() + resource.input;
-                    if (resource.updates % 3 === 0) ctx.world.despawn(entity);
+                query.eachChunk((chunk) => {
+                    const n = chunk.views.value.n;
+                    for (let row = 0, count = chunk.count; row < count; row++) {
+                        n[row] += motion.next() + resource.input;
+                        if (resource.updates % 3 === 0) ctx.world.despawn(chunk.entityAt(row));
+                    }
                 });
                 if (resource.updates % 3 === 0) ctx.world.spawn(Value.of({ n: effects.next() }));
                 scene.camera.x += resource.input;
@@ -330,7 +341,11 @@ async function runTimingScenario(cadence: readonly number[], reverse: boolean) {
             });
             scene.render((frame, alpha) => {
                 renders++;
-                query.each((_entity, value) => frame.rect(value.n + alpha, 0, 2, 2, 0xffffff));
+                query.eachChunk((chunk) => {
+                    const n = chunk.views.value.n;
+                    for (let row = 0, count = chunk.count; row < count; row++)
+                        frame.rect(n[row] + alpha, 0, 2, 2, 0xffffff);
+                });
             });
         },
     });

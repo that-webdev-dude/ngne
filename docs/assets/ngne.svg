@@ -8,5 +8,5 @@
   <path d="M536 48h2v122h-2z" fill="#394457"/>
   <text x="576" y="87" fill="#efe8d5" font-family="monospace" font-size="21" letter-spacing="3">TYPESCRIPT</text>
   <text x="576" y="122" fill="#efe8d5" font-family="monospace" font-size="21" letter-spacing="3">SPRITE ENGINE</text>
-  <text x="48" y="183" fill="#9ba9bc" font-family="monospace" font-size="13" letter-spacing="3">2D / FIXED STEP / WEBGL 2</text>
+  <text x="48" y="183" fill="#9ba9bc" font-family="monospace" font-size="13" letter-spacing="3">2D / FIXED STEP / WEBGPU</text>
 </svg>

@@ -4,16 +4,13 @@ NGNE 0.1 is an early engine baseline with a playable showcase. The public API ma
 
 ## Implemented
 
-- Dense legacy object-component ECS with buffered entity lifetime, retained temporarily
-  until NGNE-27 migrates both games.
-- Typed-array SoA schema storage with chunk queries, sparse field access and
-  deterministic inspection.
+- Typed-array SoA schema storage with buffered entity lifetime, chunk queries, sparse
+  field access and deterministic inspection.
 - Per-scene worlds, resources, seeded RNG, events, hitstop and scene stacks.
 - Committed game state, asynchronous asset preparation and owned cleanup.
 - Fixed-step browser host, input, cameras and interpolation.
-- Instanced WebGL 2 sprites, texture batching and context restoration.
-- Opt-in WebGPU affine sprites, preparation-time image readiness and bounded device
-  recovery; hello uses the new path. [NGNE-21 evidence](verification.md#ngne-21--12-september-2026)
+- WebGPU affine sprites, texture batching, preparation-time image readiness and bounded
+  device recovery. [NGNE-21 evidence](verification.md#ngne-21--12-september-2026)
   separates hardware, simulated faults and local performance results.
 - Scoped audio, synthesized effects and decoded clips.
 - Starfall '89 and its Chaos Lab stress mode.
@@ -33,13 +30,14 @@ NGNE 0.1 is an early engine baseline with a playable showcase. The public API ma
 ## Direction
 
 - The [two-level platformer](../examples/platformer/README.md) (NGNE-15, epic NGNE-17) exercises the current authoring API. NGNE-7 resolved its candidate-readiness, lifetime and replenishment findings with owner-scoped candidate slots; the remaining [findings](../examples/platformer/FINDINGS.md) feed NGNE-9/10/23/16. Its pre-migration performance measurement is recorded under NGNE-26.
-- Typed-array SoA component storage (NGNE-20), a WebGPU renderer (NGNE-21) and an owned simulation worker boundary (NGNE-22) are grouped under the SoA and WebGPU migration epic (NGNE-23). NGNE-20 establishes the schema API while Starfall and the platformer remain on an isolated legacy bridge. NGNE-27 owns migrating both games and deleting that bridge. The pre-migration baseline (NGNE-26) is recorded in [verification](verification.md#ngne-26--9-september-2026); NGNE-12 repeats it after the real-game migration.
+- Typed-array SoA component storage (NGNE-20), a WebGPU renderer (NGNE-21) and an owned simulation worker boundary (NGNE-22) are grouped under the SoA and WebGPU migration epic (NGNE-23). NGNE-20 established the schema API behind a temporary legacy bridge; NGNE-27 migrated both games and deleted that bridge. The pre-migration baseline (NGNE-26) is recorded in [verification](verification.md#ngne-26--9-september-2026); NGNE-12 repeats it after the real-game migration.
 
 ## Next validation
 
-- NGNE-27 migrates Starfall and the platformer to schema ECS and WebGPU, removes the
-  object-component bridge, legacy `Renderer` and temporary renderer selection, and
-  repeats both-game browser/performance evidence. NGNE-12 owns the broader comparison.
+- NGNE-27 (in progress): Starfall and the platformer run on schema ECS and WebGPU, and the
+  object-component bridge, legacy `Renderer` and temporary renderer selection are removed.
+  Removal and post-migration measurements are done; deployment verification is pending
+  ([verification](verification.md#ngne-27--13-september-2026)). NGNE-12 owns the broader comparison.
 - NGNE-13 CI expansion and NGNE-14 portability remain separate; one tested Intel GPU
   and controlled device destruction do not establish cross-device or driver-fault coverage.
 

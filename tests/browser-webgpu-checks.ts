@@ -4,7 +4,7 @@ import { uploadImage } from "../src/texture-assets.js";
 import { WebGPURenderer } from "../src/webgpu-renderer.js";
 import { Camera } from "../src/primitives.js";
 
-/** Hardware evidence belongs to this test-owned device, never a WebGL adapter query. */
+/** Hardware evidence belongs to this test-owned device, never a second adapter query. */
 export async function checkWebGPUEnvironment(): Promise<void> {
     const output = document.getElementById("webgpu-environment");
     if (!output) throw new Error("Missing WebGPU environment output");

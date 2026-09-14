@@ -6,7 +6,7 @@ import {
     type PreparedScene,
     type DisplaySnapshot,
 } from "./scene.js";
-import { Frame, Renderer } from "./renderer.js";
+import { Frame } from "./renderer.js";
 import { FixedStep } from "./primitives.js";
 import { Input } from "./input.js";
 import { Audio } from "./audio.js";
@@ -25,8 +25,6 @@ export interface BrowserOptions<S, C> extends GameOptions<S, C> {
     clear?: number;
     scheduler?: FrameScheduler;
     afterFrame?: (stats: Readonly<Stats>) => void;
-    /** Temporary opt-in; NGNE-27 removes the legacy default after both-game migration. */
-    renderer?: "webgpu";
 }
 export interface Stats {
     fps: number;
@@ -51,7 +49,7 @@ export class BrowserGame<S, C> {
         drawCalls: 0,
         droppedTicks: 0,
     };
-    renderer?: Renderer | WebGPURenderer;
+    renderer?: WebGPURenderer;
     private rendererPromise?: Promise<WebGPURenderer>;
     private acquisitionAbort?: AbortController;
     private acquisition = 0;
@@ -83,21 +81,20 @@ export class BrowserGame<S, C> {
             request: (callback) => requestAnimationFrame(callback),
             cancel: (id) => cancelAnimationFrame(id),
         };
-        if (options.renderer === "webgpu")
-            this.game[PREPARE_ASSET] = async (asset, signal) => {
-                if (!isImageAsset(asset)) return;
-                const source = await this.game.assets.acquire(asset, signal);
-                let renderer: WebGPURenderer;
-                try {
-                    renderer = await this.ensureRenderer();
-                    signal.throwIfAborted();
-                } catch (error) {
-                    source.release();
-                    throw error;
-                }
-                // The renderer owns the source lease from here, including on failure.
-                return renderer[ACQUIRE_IMAGE](asset, source, signal);
-            };
+        this.game[PREPARE_ASSET] = async (asset, signal) => {
+            if (!isImageAsset(asset)) return;
+            const source = await this.game.assets.acquire(asset, signal);
+            let renderer: WebGPURenderer;
+            try {
+                renderer = await this.ensureRenderer();
+                signal.throwIfAborted();
+            } catch (error) {
+                source.release();
+                throw error;
+            }
+            // The renderer owns the source lease from here, including on failure.
+            return renderer[ACQUIRE_IMAGE](asset, source, signal);
+        };
     }
     private reportRenderer = (error: unknown): void => {
         this.game.report(error);
@@ -112,7 +109,7 @@ export class BrowserGame<S, C> {
     private ensureRenderer(): Promise<WebGPURenderer> {
         if (this.disposed || this.game.lifecycle === "Failed")
             return Promise.reject(new Error("Browser renderer ownership has ended"));
-        if (this.renderer instanceof WebGPURenderer) return Promise.resolve(this.renderer);
+        if (this.renderer) return Promise.resolve(this.renderer);
         if (this.rendererPromise) return this.rendererPromise;
         const acquisition = ++this.acquisition;
         const abort = new AbortController();
@@ -200,15 +197,12 @@ export class BrowserGame<S, C> {
         } catch (e) {
             this.enabled = false;
             this.game[FAIL_GAME]();
-            if (this.options.renderer === "webgpu")
-                try {
-                    this.endRenderer();
-                } catch (cleanup) {
-                    this.game.report(
-                        new AggregateError([e, cleanup], "Browser frame teardown failed"),
-                    );
-                    return;
-                }
+            try {
+                this.endRenderer();
+            } catch (cleanup) {
+                this.game.report(new AggregateError([e, cleanup], "Browser frame teardown failed"));
+                return;
+            }
             this.game.report(e);
         }
     };
@@ -223,22 +217,10 @@ export class BrowserGame<S, C> {
         try {
             if (!cold) await this.audio.resume();
             if (this.disposed) throw new Error("Start cancelled by disposal");
-            if (this.options.renderer === "webgpu") {
-                const renderer = await this.ensureRenderer();
-                await renderer[RENDERER_READY]();
-                if (this.disposed) throw new Error("Start cancelled by disposal");
-            }
-            if (cold) {
-                if (this.options.renderer !== "webgpu")
-                    this.renderer = new Renderer(
-                        this.options.canvas,
-                        this.width,
-                        this.height,
-                        (e) => this.game.report(e),
-                    );
-                this.input.attach(this.options.canvas, this.width, this.height);
-            }
+            const renderer = await this.ensureRenderer();
+            await renderer[RENDERER_READY]();
             if (this.disposed) throw new Error("Start cancelled by disposal");
+            if (cold) this.input.attach(this.options.canvas, this.width, this.height);
             this.loop.reset();
             this.last = 0;
             await this.game.start(initial, {
@@ -260,31 +242,24 @@ export class BrowserGame<S, C> {
                 } catch (error) {
                     errors.push(error);
                 }
-                try {
-                    if (this.options.renderer !== "webgpu") this.renderer?.dispose();
-                } catch (error) {
-                    errors.push(error);
-                }
-                // WebGPU ownership also ends when Game.start could not roll itself back.
+                // Renderer ownership also ends when Game.start could not roll itself back.
                 const failed = (this.game.lifecycle as string) === "Failed";
-                if (errors.length > 1 || (this.options.renderer === "webgpu" && failed)) {
+                if (errors.length > 1 || failed) {
                     this.game[FAIL_GAME]();
-                    if (this.options.renderer === "webgpu")
-                        try {
-                            this.endRenderer();
-                        } catch (cleanup) {
-                            errors.push(cleanup);
-                        }
+                    try {
+                        this.endRenderer();
+                    } catch (cleanup) {
+                        errors.push(cleanup);
+                    }
                     throw new AggregateError(errors, "Browser startup rollback failed");
                 }
             } else {
                 this.game[FAIL_GAME]();
-                if (this.options.renderer === "webgpu")
-                    try {
-                        this.endRenderer();
-                    } catch (cleanup) {
-                        throw new AggregateError([e, cleanup], "Browser resume teardown failed");
-                    }
+                try {
+                    this.endRenderer();
+                } catch (cleanup) {
+                    throw new AggregateError([e, cleanup], "Browser resume teardown failed");
+                }
             }
             throw e;
         } finally {
@@ -327,12 +302,11 @@ export class BrowserGame<S, C> {
             }
             if (errors.length) {
                 if (!this.disposed) this.game[FAIL_GAME]();
-                if (this.options.renderer === "webgpu")
-                    try {
-                        this.endRenderer();
-                    } catch (cleanup) {
-                        errors.push(cleanup);
-                    }
+                try {
+                    this.endRenderer();
+                } catch (cleanup) {
+                    errors.push(cleanup);
+                }
                 throw new AggregateError(errors, "Stop failed");
             }
         } finally {

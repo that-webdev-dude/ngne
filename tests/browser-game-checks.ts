@@ -61,7 +61,6 @@ async function checkStarfallAtlasLifetime(check: Check): Promise<void> {
     const canvas = document.createElement("canvas");
     const app = new BrowserGame<Progress, ProgressCommand>({
         canvas,
-        renderer: "webgpu",
         width: W,
         height: H,
         seed: "ngne27-atlas-lifetime",

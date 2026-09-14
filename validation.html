@@ -8,17 +8,11 @@
         <p>
             Automated real-browser checks. Input cancellation and hot-plug cases use deterministic
             simulated events; physical-device evidence is recorded separately. This page
-            intentionally loses and restores its own WebGL context. Start it with a user gesture so
+            intentionally loses and recovers its own WebGPU devices. Start it with a user gesture so
             the audio checks can unlock a real playback device.
         </p>
         <button id="start-validation" type="button">Run checks</button>
         <pre id="webgpu-environment">Checking WebGPU environment...</pre>
-        <canvas
-            id="synthetic"
-            width="64"
-            height="64"
-            style="width: 128px; height: 128px; image-rendering: pixelated"
-        ></canvas>
         <h2>Interpolation transitions</h2>
         <p>Green: ordinary actor. Blue: continuing effect. White: stationary world landmark.</p>
         <p id="interpolation-conditions"></p>

@@ -2,7 +2,7 @@ import { BrowserGame, Input, type FrameScheduler, type InputSnapshot } from "../
 
 type Check = (condition: unknown, message: string) => void;
 
-export async function checkBrowserInput(check: Check, renderer?: "webgpu"): Promise<void> {
+export async function checkBrowserInput(check: Check): Promise<void> {
     const surface = document.createElement("canvas");
     surface.tabIndex = 0;
     surface.width = 100;
@@ -149,10 +149,10 @@ export async function checkBrowserInput(check: Check, renderer?: "webgpu"): Prom
     surface.remove();
     button.remove();
 
-    await checkFrameDelivery(check, renderer);
+    await checkFrameDelivery(check);
 }
 
-async function checkFrameDelivery(check: Check, renderer?: "webgpu"): Promise<void> {
+async function checkFrameDelivery(check: Check): Promise<void> {
     const canvas = document.createElement("canvas");
     canvas.tabIndex = 0;
     canvas.style.position = "absolute";
@@ -168,7 +168,6 @@ async function checkFrameDelivery(check: Check, renderer?: "webgpu"): Promise<vo
     };
     const snapshots: InputSnapshot[] = [];
     const app = new BrowserGame({
-        renderer,
         canvas,
         seed: 1,
         state: {},

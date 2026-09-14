@@ -17,7 +17,7 @@ const scene: SceneDefinition = {
         scene.system(({ dt }) => {
             points.eachChunk((chunk) => {
                 const position = chunk.views.position;
-                for (let row = 0; row < chunk.count; row++) {
+                for (let row = 0, count = chunk.count; row < count; row++) {
                     position.previousX[row] = position.x[row];
                     position.x[row] += 40 * dt;
                 }
@@ -26,14 +26,14 @@ const scene: SceneDefinition = {
         scene.resetInterpolation(() => {
             points.eachChunk((chunk) => {
                 const position = chunk.views.position;
-                for (let row = 0; row < chunk.count; row++)
+                for (let row = 0, count = chunk.count; row < count; row++)
                     position.previousX[row] = position.x[row];
             });
         });
         scene.render((frame, alpha) => {
             points.eachChunk((chunk) => {
                 const position = chunk.views.position;
-                for (let row = 0; row < chunk.count; row++)
+                for (let row = 0, count = chunk.count; row < count; row++)
                     frame.rect(
                         lerp(position.previousX[row], position.x[row], alpha),
                         100,
@@ -48,7 +48,6 @@ const scene: SceneDefinition = {
 
 const app = new BrowserGame({
     canvas: document.querySelector("canvas")!,
-    renderer: "webgpu",
     diagnostic: showError,
     width: 640,
     height: 400,
@@ -81,13 +80,13 @@ try {
 // await app.dispose();                 // terminal; releases all owned services
 ```
 
-Rectangles and sprites use **center coordinates**. Distances are logical canvas pixels; `dt` is seconds. Composition is fixed when an entity spawns. Schema queries invoke one callback per nonempty 512-row chunk; hoist the inferred typed columns and loop only to `chunk.count`.
+Rectangles and sprites use **center coordinates**. Distances are logical canvas pixels; `dt` is seconds. Composition is fixed when an entity spawns. Schema queries invoke one callback per nonempty 512-row chunk; hoist the inferred typed columns and read `chunk.count` once before the row loop. Chunk accessors check the borrow on every read, so a `row < chunk.count` loop condition pays that check per row; reading it once cut the median Starfall Chaos tick by about 13% in [NGNE-27 measurements](verification.md#ngne-27--13-september-2026).
 
 Use a secure origin (localhost or HTTPS) and a WebGPU-capable browser with hardware
 acceleration. The initial tested target is desktop Chromium; [verification](verification.md#ngne-21--12-september-2026)
 names the actual hardware. Unsupported startup and failed device recovery remain visible
-in the alert above. The temporary `renderer: "webgpu"` selection is explicit; omitting
-it retains legacy WebGL until NGNE-27 migrates both games.
+in the alert above. `BrowserGame` renders only through WebGPU; there is no fallback
+backend.
 
 CSS can resize the canvas on screen. BrowserGame preserves its fixed logical backing
 resolution and converts input through the current bounding rectangle. Stop/resume
@@ -166,12 +165,17 @@ Prepare initial and one-off scene candidates asynchronously using `game.prepare(
 
 ## Assets, sprites and audio
 
-`imageAsset(id, url)` and `audioAsset(id, url)` return definitions for shared decoded data. List definitions in a scene's `assets`; setup receives a map of leased values keyed by stable IDs. `game.assets.acquire(definition)` gives a manually managed lease for platform setup. Release it when finished. Renderer textures use the same stable authored IDs:
+`imageAsset(id, url)` and `audioAsset(id, url)` return definitions for shared decoded data. List definitions in a scene's `assets`; setup receives a map of leased values keyed by stable IDs. `game.assets.acquire(definition)` gives a manually managed lease for platform setup. Release it when finished. The browser host uploads every listed image asset during preparation, and sprites refer to it by the same stable authored ID. Generated images use a custom `ImageAsset` loader:
 
 ```ts
-const lease = await app.game.assets.acquire(imageAsset("ships", "/ships.png"));
-app.renderer!.texture(lease.id, lease.value); // upload after app.start()
-lease.release();
+const ships: ImageAsset = {
+    id: "ships",
+    kind: "image",
+    load: () =>
+        createImageBitmap(makeAtlas(), { premultiplyAlpha: "none", colorSpaceConversion: "none" }),
+    dispose: (bitmap) => bitmap.close(),
+};
+// List `ships` in the scene's `assets`.
 
 // In frame preparation: normalized UV coordinates, radians, center position.
 frame.sprite({
@@ -198,8 +202,8 @@ Chunk descriptors and component views are borrowed until the next world commit. 
 
 Systems receive `WorldAccess`, not commit or enumeration authority. For headless use,
 create a `Game`, prepare/start a scene, then call `game.tick()`; the runtime owns world
-commits. Direct `World` construction is internal. Schema queries expose `size` and
-`eachChunk`; the temporary object-component bridge still exposes `each` until NGNE-27 removes it.
+commits. Direct `World` construction is internal. Component queries expose `size` and
+`eachChunk`; object components, `world.get()` and per-entity `each` callbacks were removed in NGNE-27.
 [Starfall](../demo/game.ts) and the [platformer](../examples/platformer/game.ts) use schema components. `query()` with no components remains an
 entity-only compatibility traversal.
 

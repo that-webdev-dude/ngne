@@ -37,7 +37,6 @@ let ready = false,
 const times: number[] = [];
 const app = new BrowserGame<Progress, ProgressCommand>({
     canvas,
-    renderer: "webgpu",
     width: W,
     height: H,
     seed: "STARFALL-1989",

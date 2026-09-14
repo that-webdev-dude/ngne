@@ -43,7 +43,7 @@ const HOOK = `(() => {
         b.heap.push(performance.now(), m.usedJSHeapSize, m.totalJSHeapSize);
     }, 250);
 })();`;
-const SUMMARY = `((startMs, endMs) => {
+const SUMMARY = `(async (startMs, endMs) => {
     const b = window.__ngneBaseline;
     const summarize = (values) => {
         const s = [...values].sort((a, b) => a - b);
@@ -78,11 +78,18 @@ const SUMMARY = `((startMs, endMs) => {
             reclaimed += heap[i - 1][0] - heap[i][0];
         }
     const used = heap.map((h) => h[0]);
-    const gl = document.createElement("canvas").getContext("webgl2");
-    const info = gl && gl.getExtension("WEBGL_debug_renderer_info");
+    const adapter = await navigator.gpu?.requestAdapter();
     return {
         browser: navigator.userAgent,
-        gpu: info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : null,
+        gpu: adapter
+            ? {
+                  vendor: adapter.info.vendor,
+                  architecture: adapter.info.architecture,
+                  device: adapter.info.device,
+                  description: adapter.info.description,
+                  isFallbackAdapter: adapter.info.isFallbackAdapter,
+              }
+            : null,
         devicePixelRatio: devicePixelRatio,
         viewport: [innerWidth, innerHeight],
         frameCallbackMs: summarize(callbackMs),

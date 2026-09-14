@@ -1,6 +1,4 @@
 import { centerX, centerY } from "./frame-values.js";
-import { QUAD_STRIDE } from "../src/quad-layout.js";
-import { Renderer } from "../src/index.js";
 import type { Frame } from "../src/index.js";
 import { checkInterpolation } from "./interpolation-scenario.js";
 import { createQuadRenderer } from "../src/quad-renderer.js";
@@ -14,11 +12,7 @@ export async function checkBrowserInterpolation(
     const conditions = document.querySelector("#interpolation-conditions");
     if (!canvas || !select || !conditions)
         throw new Error("Interpolation fixture elements missing");
-    const renderer = new Renderer(canvas, 128, 96);
-    const gl = canvas.getContext("webgl2");
-    if (!gl) throw new Error("WebGL 2 unavailable");
-    const frames: Frame[] = [];
-    const row = new Uint8Array(128 * 4);
+    const samples: { frame: Frame; label: string; alpha: number }[] = [];
     conditions.textContent =
         `128 × 96 logical/backing pixels; CSS 384 × 288; DPR ${window.devicePixelRatio}; ` +
         `fixed simulation 1/60 s; sampled alpha 0, .25, .5, .75, 1. ${navigator.userAgent}`;
@@ -27,36 +21,9 @@ export async function checkBrowserInterpolation(
             if (!condition) throw new Error(message);
         },
         (frame, label, alpha) => {
-            renderer.render(frame);
-            // Read each sprite's horizontal center line; pixel centers lie at x + .5.
-            for (let sprite = 0; sprite < 3; sprite++) {
-                const offset = sprite * QUAD_STRIDE;
-                const center = centerX(frame, sprite);
-                gl.readPixels(
-                    0,
-                    96 - centerY(frame, sprite),
-                    128,
-                    1,
-                    gl.RGBA,
-                    gl.UNSIGNED_BYTE,
-                    row,
-                );
-                const channel = sprite === 0 ? 1 : sprite === 1 ? 2 : 0;
-                for (let x = 0; x < 128; x++) {
-                    const covered = x + 0.5 >= center - 4 && x + 0.5 < center + 4;
-                    if ((row[x * 4 + channel] === 255) !== covered)
-                        throw new Error(
-                            `${label}, alpha ${alpha}, sprite ${sprite}: unexpected pixel at ${x}`,
-                        );
-                }
-            }
-            check(
-                gl.getError() === gl.NO_ERROR,
-                `${label}, alpha ${alpha}: numeric poses and GPU pixels`,
-            );
-            frames.push(frame);
+            samples.push({ frame, label, alpha });
             const option = document.createElement("option");
-            option.value = String(frames.length - 1);
+            option.value = String(samples.length - 1);
             option.textContent = `${label} — alpha ${alpha}`;
             select.append(option);
         },
@@ -83,8 +50,7 @@ export async function checkBrowserInterpolation(
     device.queue.writeTexture({ texture: white }, new Uint8Array([255, 255, 255, 255]), {}, [1, 1]);
     try {
         await quad.texture("", white.createView());
-        for (let index = 0; index < frames.length; index++) {
-            const frame = frames[index];
+        for (const { frame, label, alpha } of samples) {
             quad.prepare(frame);
             const encoder = device.createCommandEncoder();
             quad.encode(encoder, target.createView(), frame, 128, 96, 0x090e20);
@@ -105,16 +71,13 @@ export async function checkBrowserInterpolation(
                     const covered = x + 0.5 >= center - 4 && x + 0.5 < center + 4;
                     if ((bytes[y * 512 + x * 4 + channel] === 255) !== covered)
                         throw new Error(
-                            `WebGPU interpolation frame ${index}, sprite ${sprite}, pixel ${x}`,
+                            `${label}, alpha ${alpha}, sprite ${sprite}: unexpected pixel at ${x}`,
                         );
                 }
             }
             readback.unmap();
+            check(true, `WebGPU ${label}, alpha ${alpha}: numeric poses and GPU pixels`);
         }
-        check(
-            true,
-            "WebGPU interpolation matches numeric poses at all 65 transition/alpha samples",
-        );
     } finally {
         quad.dispose();
         readback.destroy();
@@ -122,25 +85,11 @@ export async function checkBrowserInterpolation(
         white.destroy();
         device.destroy();
     }
-    const gpuCanvas = document.createElement("canvas");
-    gpuCanvas.width = 128;
-    gpuCanvas.height = 96;
-    gpuCanvas.style.cssText = canvas.style.cssText;
-    gpuCanvas.setAttribute("aria-label", "WebGPU interpolation");
-    canvas.after(gpuCanvas);
-    const gpuRenderer = await WebGPURenderer.create(gpuCanvas, 128, 96);
+    const renderer = await WebGPURenderer.create(canvas, 128, 96);
     select.addEventListener("change", () => {
-        const frame = frames[Number(select.value)];
-        if (frame) {
-            renderer.render(frame);
-            gpuRenderer.render(frame);
-        }
+        const sample = samples[Number(select.value)];
+        if (sample) renderer.render(sample.frame);
     });
-    const first = frames[0];
-    if (first) {
-        renderer.render(first);
-        gpuRenderer.render(first);
-    }
+    if (samples[0]) renderer.render(samples[0].frame);
     window.addEventListener("pagehide", () => renderer.dispose(), { once: true });
-    window.addEventListener("pagehide", () => gpuRenderer.dispose(), { once: true });
 }

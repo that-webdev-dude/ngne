@@ -21,7 +21,6 @@ function authoringBoundary(
     ctx: SystemContext,
     candidate: PreparedScene,
 ): void {
-    const Position = component("position", () => ({ x: 0 }));
     const SchemaPosition = component("schema-position", {
         x: f64(),
         speed: f32(1),
@@ -33,9 +32,10 @@ function authoringBoundary(
     });
     // @ts-expect-error Entity-reference defaults are always null and take no argument.
     entityRef(null);
-    const entity = ctx.world.spawn(Position.of());
+    // @ts-expect-error Object-component factories were removed; components declare field schemas.
+    component("position", () => ({ x: 0 }));
+    const entity = ctx.world.spawn();
     const schemaEntity = ctx.world.spawn(SchemaPosition.of({ x: 2, target: entity }));
-    ctx.world.get(entity, Position);
     const x: number | undefined = ctx.world.read(schemaEntity, SchemaPosition, "x");
     ctx.world.write(schemaEntity, SchemaPosition, "x", x ?? 0);
     ctx.world.query(SchemaPosition).eachChunk((chunk) => {
@@ -44,9 +44,6 @@ function authoringBoundary(
         const targetIndex: number = position.target.index[0];
         const targetGeneration: number = position.target.generation[0];
         void [targetIndex, targetGeneration, chunk.entityAt(0)];
-    });
-    ctx.world.query(Position).each((_, position) => {
-        position.x++;
     });
     ctx.world.query().each(() => {});
     ctx.world.despawn(entity);
@@ -81,12 +78,12 @@ function authoringBoundary(
     // @ts-expect-error System world cannot enumerate.
     ctx.world.enumerate();
     // @ts-expect-error Query membership is runtime-owned.
-    ctx.world.query(Position).add({});
+    ctx.world.query(SchemaPosition).add({});
     // @ts-expect-error Zero-argument queries do not expose schema chunks.
     ctx.world.query().eachChunk(() => {});
-    // @ts-expect-error Schema queries do not reconstruct legacy row objects.
+    // @ts-expect-error Component queries traverse chunks; per-entity each() was removed.
     ctx.world.query(SchemaPosition).each(() => {});
-    // @ts-expect-error Schema components use field-level sparse reads.
+    // @ts-expect-error Object get() was removed; components use field-level sparse reads.
     ctx.world.get(schemaEntity, SchemaPosition);
     // @ts-expect-error Unknown schema field.
     ctx.world.read(schemaEntity, SchemaPosition, "missing");
@@ -96,10 +93,13 @@ function authoringBoundary(
     SchemaPosition.of({ missing: 1 });
     // @ts-expect-error Schema component definitions are read-only.
     SchemaPosition.fields.x = f64();
-    // @ts-expect-error Schema and legacy components cannot share a query.
-    ctx.world.query(Position, SchemaPosition);
-    // @ts-expect-error Schema and legacy component values cannot share a spawn.
-    ctx.world.spawn(Position.of(), SchemaPosition.of());
+    // @ts-expect-error The object-component type was removed.
+    const removedComponent: engine.Component<object> = SchemaPosition;
+    // @ts-expect-error The object-component value type was removed.
+    const removedValue: engine.ComponentValue = SchemaPosition.of();
+    // @ts-expect-error The object-component query type was removed.
+    const removedQuery: engine.Query<[]> = ctx.world.query();
+    void [removedComponent, removedValue, removedQuery];
     // @ts-expect-error Candidates cannot be consumed by authors.
     candidate.consume(Symbol());
     // @ts-expect-error Candidate ownership is hidden.
@@ -221,5 +221,15 @@ async function webgpuBoundary(canvas: HTMLCanvasElement, bitmap: ImageBitmap): P
     // @ts-expect-error Internal renderer acquisition is not a package export.
     engine.CREATE_RENDERER;
     renderer.dispose();
+    new engine.BrowserGame({
+        canvas,
+        seed: 1,
+        state: {},
+        transition: (s) => s,
+        // @ts-expect-error BrowserGame always uses WebGPU; any renderer option is rejected.
+        renderer: "auto",
+    });
+    // @ts-expect-error The pre-WebGPU Renderer class was removed.
+    new engine.Renderer(canvas, 640, 360);
 }
 void webgpuBoundary;

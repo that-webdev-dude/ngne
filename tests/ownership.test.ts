@@ -1,13 +1,13 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { component, Frame, Game } from "../src/index.js";
+import { component, f64, Frame, Game } from "../src/index.js";
 import type { SceneDefinition } from "../src/index.js";
 import { arena, type Progress, type ProgressCommand } from "../demo/game.js";
 
 test("completed inspection retains empty archetype order and allocator reuse", async (t) => {
-    const A = component("a", () => ({ n: 0 }));
-    const B = component("b", () => ({ n: 0 }));
+    const A = component("a", { n: f64() });
+    const B = component("b", { n: f64() });
     const game = new Game({ seed: "ownership", dt: 0.02, state: {}, transition: (s) => s });
     t.after(() => game.dispose());
     const scene: SceneDefinition = {
@@ -36,10 +36,12 @@ test("completed inspection retains empty archetype order and allocator reuse", a
     assert.equal(empty.dt, 0.02);
     assert.equal(empty.simulationTick, 1);
     assert.deepEqual(empty.scenes[0].world, {
-        archetypes: [
-            { components: ["a"], entities: [] },
-            { components: ["b"], entities: [] },
-        ],
+        archetypes: ["a", "b"].map((name) => ({
+            components: [name],
+            entities: [],
+            fields: [{ component: name, fields: [{ name: "n", kind: "f64", default: 0 }] }],
+            chunks: [{ capacity: 512, count: 0, entities: [] }],
+        })),
         slots: [
             { generation: 1, row: -1, pending: false },
             { generation: 1, row: -1, pending: false },
@@ -53,10 +55,25 @@ test("completed inspection retains empty archetype order and allocator reuse", a
     game.tick();
     const populated = game.enumerate().scenes[0].world;
     assert.ok(populated && typeof populated === "object" && !Array.isArray(populated));
-    assert.deepEqual(populated.archetypes, [
-        { components: ["a"], entities: [0] },
-        { components: ["b"], entities: [1] },
-    ]);
+    assert.deepEqual(
+        populated.archetypes.map(({ components, entities, chunks }) => ({
+            components,
+            entities,
+            chunks,
+        })),
+        [
+            {
+                components: ["a"],
+                entities: [0],
+                chunks: [{ capacity: 512, count: 1, entities: [0] }],
+            },
+            {
+                components: ["b"],
+                entities: [1],
+                chunks: [{ capacity: 512, count: 1, entities: [1] }],
+            },
+        ],
+    );
     assert.deepEqual(populated.free, []);
     assert.equal(Reflect.set(populated.archetypes[0].entities, "0", 999), false);
     game.tick();

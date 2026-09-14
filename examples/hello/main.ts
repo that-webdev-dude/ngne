@@ -25,7 +25,6 @@ if (!canvas) throw new Error("Hello canvas missing");
 
 const app = new BrowserGame({
     canvas,
-    renderer: "webgpu",
     diagnostic: showError,
     width: 640,
     height: 240,

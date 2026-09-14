@@ -27,7 +27,6 @@ let presentation: Run["phase"] | "ready" | "paused" | "complete" | "error" = "re
 let failed = false;
 const app = new BrowserGame<Progress, ProgressCommand>({
     canvas: gameCanvas,
-    renderer: "webgpu",
     width: WIDTH,
     height: HEIGHT,
     clear: 0x20362d,
