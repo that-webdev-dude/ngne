@@ -5,10 +5,9 @@
 Migration of Starfall and the platformer to SoA and WebGPU, following the approved
 [plan](../plans/NGNE-27-game-migration.md) (SHA256
 `c65c44190c6f9d62f3b746e5d60d50f8ea171929cd4b12e91b5a96b8c14e3b01`) and
-[handoff](../plans/NGNE-27-handoff.md). In progress: phases 0 (pre-migration baseline), 1
-(NGNE-20 follow-ups), 2 (platformer port), 3 (Starfall port) and 4 (WebGL and bridge removal)
-validated; phase 5 (measurements, final docs and inspection).
-NGNE-27 is not complete, and deployment verification is pending (phase 6).
+[handoff](../plans/NGNE-27-handoff.md). Complete: phases 0 (pre-migration baseline), 1 (NGNE-20
+follow-ups), 2 (platformer port), 3 (Starfall port), 4 (WebGL and bridge removal), 5 (measurements,
+final docs and inspection) and 6 ([deployment closeout](#deployment-phase-6)) validated.
 
 ### Pre-migration baseline and environment
 
@@ -578,7 +577,7 @@ noise, with the divergent populations noted above.
   results have none, contrary to the plan's rule for results from phase 1 onward. Those tree states
   cannot be reconstructed now. The phase 4 and final phase 5 parity reruns, with manifests,
   reproduce the phase 2/3 hash lists exactly.
-- Deployment verification pending (phase 6).
+- Deployment: verified on 14 September 2026 ([phase 6](#deployment-phase-6)).
 
 ### Independent inspection (phase 5)
 
@@ -604,6 +603,25 @@ measurements still describe the final code.
 
 Round 2, resuming the same read-only session, checked the four fixes, the recorded user decisions and
 the byte-identical review log. Verdict **APPROVED**, with no findings.
+
+### Deployment (phase 6)
+
+Recorded 14 September 2026.
+
+- Pre-commit gate on the phase 5 tree: `npm run format` changed nothing (identical `git diff HEAD`
+  SHA256 before and after); `npm test` 141/141; typecheck, build, `format:check` and `git diff --check`
+  pass; the plan's WebGL scan returns nothing.
+- C1 `7ac4f93450362830f8e8c1afd17bae53dadc168a` (`[NGNE-27] Remove WebGL and bridge, record final
+measurements and inspection`) contains all phase 4–5 changes. Phases 0–3 are in `54bc67a`, which was
+  not yet on `origin/main`; the user-authorized push `4760fe7..7ac4f93` published both.
+- CI: "Verify and deploy" run
+  [34883013454](https://github.com/that-webdev-dude/ngne/actions/runs/34883013454) for C1 completed
+  with `verify` and `deploy` both successful.
+- `MANUAL (user)` live check against C1, Chrome hard reload: `https://that-webdev-dude.github.io/ngne/`
+  (Starfall), `/examples/hello/` and `/examples/platformer/` all start and render, with no WebGL 2 text
+  and no console errors. Confirmed by the user.
+- The docs-only closeout commit C2 records this section; its CI run and the post-C2 Starfall reload
+  are reported in the phase 6 completion report because a commit cannot record its own run.
 
 ## NGNE-21 — 12 September 2026
 

@@ -26,6 +26,7 @@ NGNE 0.1 is an early engine baseline with a playable showcase. The public API ma
 | NGNE-15 | Two-level platformer: tile collision, checkpoints, death remounts, pause and progression; deterministic authored-level walkthrough | `tests/platformer.test.ts`                                                            |
 | NGNE-20 | Schema-defined typed-array SoA ECS with a temporary legacy bridge through NGNE-27                                                  | `tests/ecs-soa.test.ts`, `tests/api-misuse.ts`, `tests/benchmark.ts`, visible hello   |
 | NGNE-26 | Pre-migration harness, sustained Starfall and sustained platformer performance baselines                                           | `tests/benchmark.ts`, `tests/browser-baseline.ts`, `docs/verification.md`             |
+| NGNE-27 | Starfall and the platformer on schema ECS and WebGPU; object bridge, legacy `Renderer` and renderer selection removed; deployed    | `tests/game.test.ts`, `tests/platformer.test.ts`, `tests/browser-game-checks.ts`      |
 
 ## Direction
 
@@ -34,10 +35,8 @@ NGNE 0.1 is an early engine baseline with a playable showcase. The public API ma
 
 ## Next validation
 
-- NGNE-27 (in progress): Starfall and the platformer run on schema ECS and WebGPU, and the
-  object-component bridge, legacy `Renderer` and temporary renderer selection are removed.
-  Removal and post-migration measurements are done; deployment verification is pending
-  ([verification](verification.md#ngne-27--13-september-2026)). NGNE-12 owns the broader comparison.
+- NGNE-27 is done: migration, removal, measurements and deployment are recorded in
+  [verification](verification.md#ngne-27--13-september-2026). NGNE-12 owns the broader comparison.
 - NGNE-13 CI expansion and NGNE-14 portability remain separate; one tested Intel GPU
   and controlled device destruction do not establish cross-device or driver-fault coverage.
 
