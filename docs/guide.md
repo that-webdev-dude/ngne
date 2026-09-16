@@ -91,7 +91,7 @@ backend.
 CSS can resize the canvas on screen. BrowserGame preserves its fixed logical backing
 resolution and converts input through the current bounding rectangle. Stop/resume
 retains the scene and renderer; use `app.dispose()` for terminal browser teardown.
-See the [renderer contract](contracts/NGNE.md#renderer) for exact recovery and ownership rules.
+See the [renderer contract](contracts/browser-and-presentation.md#renderer) for exact recovery and ownership rules.
 
 ## Image sprites
 
@@ -126,7 +126,7 @@ Blur, pointer cancellation or capture loss, host stop and disposal clear held ac
 The first connected gamepad supplies the one logical player; after cancellation it must
 return to neutral before being read again. Local multiplayer and explicit pad assignment
 remain outside the engine contract. The exact edge and hot-plug rules are in the
-[platform contract](contracts/NGNE.md#platform-and-lifecycle).
+[platform contract](contracts/browser-and-presentation.md#platform-and-lifecycle).
 
 ## Scene authoring
 
@@ -159,7 +159,7 @@ const arena: SceneDefinition<Progress, ProgressCommand> = {
 };
 ```
 
-Use the same state/command types on `SceneDefinition<S,C>` and `Game<S,C>`; `prepare()` checks compatibility and `scene.state()` infers access. Unparameterized definitions remain portable but cannot dispatch. Treat state reads and transition inputs as read-only, keep transitions synchronous, and dispatch only from the owning scene's system update; the [data contract](contracts/NGNE.md#committed-state-typing-and-ownership) defines which values are accepted and how they are copied. Resources and RNG streams bind once during setup. Register cleanup immediately with `scene.defer()` or a resource cleanup argument.
+Use the same state/command types on `SceneDefinition<S,C>` and `Game<S,C>`; `prepare()` checks compatibility and `scene.state()` infers access. Unparameterized definitions remain portable but cannot dispatch. Treat state reads and transition inputs as read-only, keep transitions synchronous, and dispatch only from the owning scene's system update; the [data contract](contracts/simulation.md#committed-state-typing-and-ownership) defines which values are accepted and how they are copied. Resources and RNG streams bind once during setup. Register cleanup immediately with `scene.defer()` or a resource cleanup argument.
 
 Prepare initial and one-off scene candidates asynchronously using `game.prepare(definition, { key, signal })`. For a repeated transition, let the host call `game.candidates.ensure(owner.id, "pause", pauseDefinition, { key: "pause", retries: 1 })`, where `owner` is the mounted scene summary from `game.scenes`. A scene callback takes the ready handle with `game.candidates.take(owner.id, "pause")` and explicitly passes it to `ctx.scenes.push()` or `.set()`. The slot refills after take and automatically releases on owner removal, stop or disposal. Preparation acquires assets but does not create or activate a world. Raw candidates remain single-use and can be abandoned with `.release()`. `blocksUpdateBelow: true` makes a pause/menu scene suspend lower simulation while preserving its rendered world.
 
@@ -236,7 +236,7 @@ A `blocksUpdateBelow` scene suspends lower updates while retaining their renderi
 
 `Game` supports headless simulation; `BrowserGame` adds input, rendering, audio and frame scheduling. A failed simulation enters `Failed`, where only disposal is supported. See the [contract](contracts/NGNE.md) for the distinct rollback behavior of scene-command and startup failures.
 
-Await `app.start()` and `app.stop()` before issuing another start/stop call; overlaps reject. `app.dispose()` is terminal and may interrupt either operation. Use the browser host's lifecycle methods when it owns the Game. The [lifecycle contract](contracts/NGNE.md#platform-and-lifecycle) tabulates every overlap and cancellation case.
+Await `app.start()` and `app.stop()` before issuing another start/stop call; overlaps reject. `app.dispose()` is terminal and may interrupt either operation. Use the browser host's lifecycle methods when it owns the Game. The [lifecycle contract](contracts/browser-and-presentation.md#platform-and-lifecycle) tabulates every overlap and cancellation case.
 
 ## Interpolation
 
@@ -246,7 +246,7 @@ Await `app.start()` and `app.stop()` before issuing another start/stop call; ove
 - Continuing effects own separate poses, copy them in a `runsDuringFreeze` system and stay outside the ordinary reset callback. They keep using the supplied alpha.
 - Suspended scenes, and resumed scenes awaiting an update, receive alpha 1. Snapping rounds composed screen coordinates and never writes back to poses.
 
-The [boundary table](contracts/NGNE.md#interpolation-and-discontinuities) defines what NGNE does at each discontinuity; `/validation.html` includes selectable transition frames.
+The [boundary table](contracts/browser-and-presentation.md#interpolation-and-discontinuities) defines what NGNE does at each discontinuity; `/validation.html` includes selectable transition frames.
 
 ### Scrolling camera and tile scenes
 
@@ -264,7 +264,7 @@ scene.system(() => {
 });
 ```
 
-The [camera coordinate contract](contracts/NGNE.md#camera-coordinates) defines the origin and mount cut. The [platformer](../examples/platformer/README.md) adds vertical clamping, a horizontal dead-zone, visible-tile rendering and game-owned collision.
+The [camera coordinate contract](contracts/browser-and-presentation.md#camera-coordinates) defines the origin and mount cut. The [platformer](../examples/platformer/README.md) adds vertical clamping, a horizontal dead-zone, visible-tile rendering and game-owned collision.
 
 ## Audio example
 

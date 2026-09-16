@@ -287,7 +287,7 @@ At that boundary, explicit owners must make all authoritative simulation state e
 - Live entities, component values, allocator state, authoritative scene resources, RNG state, freeze state, and event buffers.
 - Camera state when it can affect future simulation.
 
-Systems and closures cannot be the only owners of authoritative state. GPU state, decoded caches, wall-clock state, the platform-frame accumulator, and future environmental input are outside a simulation-state snapshot. The [ownership inventory](contracts/NGNE.md#simulation-state-ownership-inventory-ngne-5) records the current production owners and external inputs; public enumeration is lossy diagnostic data, not a capture of those owners.
+Systems and closures cannot be the only owners of authoritative state. GPU state, decoded caches, wall-clock state, the platform-frame accumulator, and future environmental input are outside a simulation-state snapshot. The [ownership inventory](contracts/ownership-and-inspection.md#simulation-state-ownership-inventory-ngne-5) records the current production owners and external inputs; public enumeration is lossy diagnostic data, not a capture of those owners.
 
 A replay from the beginning requires:
 
@@ -375,7 +375,7 @@ scene, then starts the loop last. WebGPU image preparation can initialize presen
 before start; it never activates scenes or starts input/audio/ticks. Complete rollback
 returns to `Stopped`; incomplete rollback enters `Failed`. Successfully initialized
 WebGPU presentation remains owned across complete cold-start rollback, as specified
-by the [renderer contract](contracts/NGNE.md#renderer).
+by the [renderer contract](contracts/browser-and-presentation.md#renderer).
 
 ### Stop and resume
 

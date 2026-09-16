@@ -129,7 +129,7 @@ Each platform frame runs at most a fixed positive number of simulation ticks. Wh
 ### Consequences
 
 - Simulation temporarily slows relative to wall time under severe overload.
-- The default step, budget and overload reporting are pinned in the [contract](contracts/NGNE.md#platform-and-lifecycle).
+- The default step, budget and overload reporting are pinned in the [contract](contracts/browser-and-presentation.md#platform-and-lifecycle).
 
 ## Scene-owned named RNG streams
 
