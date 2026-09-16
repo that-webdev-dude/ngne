@@ -26,8 +26,8 @@ re-read Jira NGNE-12. On any mismatch or material Jira change, stop and report.
 | 1. Harness        | Validated                                                                                               |
 | 2. CPU            | Validated; 104/104 Node runs accepted; machine idle confirmed                                           |
 | 3. Browser        | Closed by the user with existing data: blocks 1 and 2 (69/69 runs accepted); confirmation matrix waived |
-| 4. Analysis       | Done, Codex APPROVED (round 3); awaiting user validation                                                                                             |
-| 5. Decision       | Not started                                                                                             |
+| 4. Analysis       | Validated; Codex APPROVED (round 3); S1-C1 `e5a9fb3`                                                                                                 |
+| 5. Decision       | Done: U1–U4 accepted, all gaps waived, Codex check skipped by the user; NGNE-12 complete |
 
 ## User decisions (dated; they do not change the plan hash)
 
@@ -43,6 +43,8 @@ re-read Jira NGNE-12. On any mismatch or material Jira change, stop and report.
   candidate); proceed to phase 4 with the existing data and close NGNE-12.
 - **16 Sept, phase 4 entry:** block 2 confirmed uninterrupted (recorded in the verification
   section); S1-C1 authorized as commit, no push.
+- **16 Sept, phase 5:** U1–U4 accepted, all five gaps waived, Codex inspection of the docs-only delta
+  skipped; S1-C2 authorized as commit, no push.
 - **Commits:** ask at phase 4 entry (S1-C1) and phase 5 (S1-C2); one-line `[NGNE-12] <message>`, **no
   co-author line**. Push only when the user says so. No Jira writes.
 

@@ -1117,6 +1117,23 @@ Codex `gpt-5.6-sol`, read-only, one session (`01a0ab0e-5960-73e1-8848-74a435ed68
 | 3     | APPROVED | None. Round 1 also confirmed plan hash, manifests, balanced blocks, no dropped runs, recorded deviations, phase 4 deliverables and protected paths.                                             |
 
 Gate: `npm.cmd test` 141/141 pass; `typecheck`, `build`, `format` and `format:check` exit 0;
+`git diff --check` empty; protected-path scan empty. Committed as S1-C1 `e5a9fb3` (not pushed).
+
+### Decision (phase 5)
+
+The user validated phase 4 and decided on 16 September 2026:
+
+- **Fixes:** none selected. Unresolved candidates U1 (Chaos tick p95), U2 (Chaos sort p95), U3
+  (Starfall callback p95) and U4 (same-revision schema churn time) are **accepted**. No session 2 plan
+  is written.
+- **Evidence gaps:** all five **waived**: GPU execution time, leak confirmation, noise-stopped
+  comparisons, churn R0→R2 without a single matrix, and comparisons not possible by design.
+- **Inspection:** the plan's Codex read-only inspection of this docs-only delta was **skipped by the
+  user**.
+- NGNE-12 is complete under the plan (no fixes selected, every gap waived). Jira is not updated from
+  this session.
+
+Gate (S1-C2): `npm.cmd test` 141/141 pass; `typecheck`, `build`, `format` and `format:check` exit 0;
 `git diff --check` empty; protected-path scan empty.
 
 ## NGNE-27 — 13 September 2026

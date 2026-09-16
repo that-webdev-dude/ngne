@@ -37,10 +37,11 @@ NGNE 0.1 is an early engine baseline with a playable showcase. The public API ma
 
 - NGNE-27 is done: migration, removal, measurements and deployment are recorded in
   [verification](verification.md#ngne-27--13-september-2026). NGNE-12 owns the broader comparison.
-- NGNE-12 is measured (R0, RS, R1, R2 on one machine): no regression under the predeclared rules,
-  four unresolved noise-stopped candidates and five evidence gaps, recorded in
-  [verification](verification.md#analysis-phase-4). Fixes and gap waivers are pending the user's
-  selection; NGNE-12 stays open until then.
+- NGNE-12 is done: R0, RS, R1 and R2 measured on one machine, no regression under the predeclared
+  rules; the four unresolved candidates are accepted and the five evidence gaps waived, recorded in
+  [verification](verification.md#decision-phase-5). The schema structural-churn cost (7.7× the object
+  path per commit, candidate U4) is a known characteristic for a future ticket if a game needs heavy
+  spawn and despawn.
 - NGNE-13 CI expansion and NGNE-14 portability remain separate; one tested Intel GPU
   and controlled device destruction do not establish cross-device or driver-fault coverage.
 
