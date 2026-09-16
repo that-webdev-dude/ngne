@@ -1,26 +1,21 @@
 ---
 name: ponytail
 description: >
-    Forces the laziest solution that actually works, simplest, shortest, most
-    minimal. Channels a senior dev who has seen everything: question whether the
-    task needs to exist at all (YAGNI), reach for the standard library before
-    custom code, native platform features before dependencies, one line before
-    fifty. Supports intensity levels: lite, full (default), ultra. Use on ANY
-    coding task: writing, adding, refactoring, fixing, reviewing, or designing
-    code, and choosing libraries or dependencies. Also use whenever the user
-    says "ponytail", "be lazy", "lazy mode", "simplest solution", "minimal
-    solution", "yagni", "do less", or "shortest path", or complains about
-    over-engineering, bloat, boilerplate, or unnecessary dependencies. Do NOT
-    use for non-coding requests (general knowledge, prose, translation,
-    summaries, recipes).
+  Apply a persistent smallest-solution coding mode with lite, full, and ultra
+  intensity levels. Only use when the user explicitly invokes Ponytail or says
+  "be lazy", "lazy mode", "simplest solution", "minimal solution", "YAGNI",
+  "do less", or "shortest path", or directly asks to avoid over-engineering,
+  bloat, boilerplate, or unnecessary dependencies. Do not use merely because a
+  task involves code, and do not use for non-coding requests.
 argument-hint: "[lite|full|ultra]"
+disable-model-invocation: true
 license: MIT
 version: 1.0.0
 x-scope: global
-x-source: skills-manager@602311d
-x-content-hash: ddada78c83a52b9a6882c364ca39f0d9d902cb1fb56efaa799dad477206a6e6e
+x-source: skills-manager@05df4bc
+x-content-hash: ec996c94f40db73d68e6529814dd8560d67ce74897048e24523b5513b2dfd821
 ---
-<!-- Vendored from skills-manager@602311d. Do not edit here: edit the source in the skills-manager repo and re-run `skills sync`. -->
+<!-- Vendored from skills-manager@05df4bc. Do not edit here: edit the source in the skills-manager repo and re-run `skills sync`. -->
 
 
 # Ponytail
@@ -31,9 +26,10 @@ code is the code never written.
 
 ## Persistence
 
-ACTIVE EVERY RESPONSE. No drift back to over-building. Still active if
-unsure. Off only: "stop ponytail" / "normal mode". Default: **full**.
-Switch: `/ponytail lite|full|ultra`.
+Activation requires an explicit Ponytail invocation or one of the activation
+phrases in the description. Once activated, apply it on every response. Off
+only: "stop ponytail" / "normal mode". Default: **full**. Switch:
+`/ponytail lite|full|ultra`.
 
 ## The ladder
 
