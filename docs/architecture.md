@@ -38,20 +38,20 @@ Cross-world transient messaging and local multiplayer input are out of scope.
 
 ## Main terms
 
-| Term                      | Meaning                                                                                                           |
-| ------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Platform frame            | One callback from the host display loop.                                                                          |
-| Simulation tick           | One fixed-duration simulation step.                                                                               |
-| Scene definition          | Portable authoring data used to create scene instances.                                                           |
-| Scene instance            | One mounted scene with its own world and runtime state.                                                           |
-| Scene resource            | Non-entity data owned by one scene instance.                                                                      |
-| Committed game state      | Game-authored state visible for the whole current tick.                                                           |
-| Gameplay freeze           | A scene-local gate that temporarily skips ordinary gameplay systems.                                              |
-| Commit                    | The boundary where buffered simulation changes are published.                                                     |
-| Simulation-state snapshot | A future capture of authoritative simulation state at a completed commit; it excludes future environmental input. |
-| Frame preparation         | Conversion of committed scene data into renderer input.                                                           |
-| Asset lease               | A scene's claim on a shared engine asset.                                                                         |
-| Candidate slot            | One named speculative prepared scene owned by a mounted scene instance.                                           |
+| Term                      | Meaning                                                                                      |
+| ------------------------- | -------------------------------------------------------------------------------------------- |
+| Platform frame            | One callback from the host display loop.                                                     |
+| Simulation tick           | One fixed-duration simulation step.                                                          |
+| Scene definition          | Portable authoring data used to create scene instances.                                      |
+| Scene instance            | One mounted scene with its own world and runtime state.                                      |
+| Scene resource            | Non-entity data owned by one scene instance.                                                 |
+| Committed game state      | Game-authored state visible for the whole current tick.                                      |
+| Gameplay freeze           | A scene-local gate that temporarily skips ordinary gameplay systems.                         |
+| Commit                    | The boundary where buffered simulation changes are published.                                |
+| Simulation-state snapshot | Authoritative simulation state at a completed commit; it excludes later environmental input. |
+| Frame preparation         | Conversion of committed scene data into renderer input.                                      |
+| Asset lease               | A scene's claim on a shared engine asset.                                                    |
+| Candidate slot            | One named speculative prepared scene owned by a mounted scene instance.                      |
 
 ## Ownership and state lifetimes
 
@@ -143,7 +143,7 @@ flowchart LR
 - Suspension preserves resources. Unmount releases them.
 - Shared immutable definitions remain asset-owned and are leased by the scene.
 - Durable results are written deliberately to committed game state.
-- Authoritative resource state cannot live only in a closure and must be enumerable for future snapshot work. No snapshot registration scheme is required yet.
+- Authoritative resource state cannot live only in a closure and must be enumerable. The engine defines no snapshot capture or registration API.
 - The engine defines no board, tilemap, collision, or hitbox schema; dense boards may use arrays or grids and static definitions may remain immutable asset data.
 
 ### Deterministic randomness

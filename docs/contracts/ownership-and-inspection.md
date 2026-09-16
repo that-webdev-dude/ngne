@@ -9,23 +9,139 @@ code, input/display and host commands**. It is not a capture schema. Mutable aut
 gameplay values belong to explicit owners; system closures retain injected owners and
 fixed code.
 
-| State / classification                  | Owner and inspection / reconstruction considerations                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Global simulation state                 | `Game`: tick, root seed, committed state, next instance ID; `enumerate()` includes these plus fixed `dt` in seconds and engine/RNG/authored compatibility string.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| Mounted scene state                     | Stack order, instance ID, definition ID, key, resolved seed and blocking policy; scene summaries preserve these. Resources are keyed by unique nonempty names within each mount.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| ECS values and identity                 | World owns component columns and immutable index/generation/world handles. Component names identify composition; conflicting definition objects with the same name are rejected on spawn. Names are world-local, not a global schema registry. Schema definitions are frozen at creation and hold cloned, frozen field descriptors (`kind`, `default`), so they are immutable authoring, not state. Schema values live in per-chunk typed columns; entity references are encoded index/generation pairs. Query chunk descriptors, `views` and `entityAt()` row meanings are borrowed for the current commit epoch and rebuilt on the first traversal after each commit: derived, never authority.                                                                                                                                                                                                                                                                                                      |
-| Allocator and iteration history         | World owns slot generations, row positions, pending flags, free-stack order, archetype creation order and dense row order. Schema archetypes also own chunk creation order and fill: allocation reuses the lowest-created chunk with capacity and empty chunks are retained, so chunk order and counts are history. A live slot's location is its `chunk` index plus chunk-relative `row`; entities spawned without components live in an empty-component archetype with the same chunk layout. Inspection includes `archetypes` with ordered component names and entity indices, **including empty archetypes**, plus `fields` (per component, field `name`/`kind`/`default`) and `chunks` (`capacity`, `count`, ordered entity indices). `entities` retains values in archetype/chunk/row order as field records `fields: [{ name, kind, value }]`, with entity references as `null` or `{ index, generation }`. Empty archetypes and empty chunks cannot be reconstructed from live entities alone. |
-| Scene simulation state                  | Named RNG current uint32 states, resources, event inbox/outbox, pending/remaining freeze and camera fields. Suspension and stop/resume preserve mounted state; unmount releases it. Camera state must be treated as authoritative when gameplay reads it.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| Tick-local work                         | Game owns selected update plan, current updating scene, state/scene command queues and busy flag; worlds own pending births/deaths. Ordinary local variables such as aim search, collision iteration and spawn temporaries do not persist across updates. Queues normally drain at completed commit; suspended event inboxes intentionally persist.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| Starfall durable facts                  | Game state owns `best`, `runs`, `victories`, `lastScore`; finish commands capture score/win before transition.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| Starfall gameplay                       | `run` owns phase, score, wave, seconds/ticks, hp, bomb, combo/countdown, stress, spawn/shot timers, invulnerability, boss-wave and finished flag. `player` resource owns its handle. Schema components own the rest: `position` (`x`, `y`, `px`, `py`: `f64`) and `body` (`vx`, `vy`, `radius`, `hp`, `age`, `cooldown`: `f64`; `active`: `bool`; `kind`: `u8`). Systems locate the player's row from its handle each update and never retain it. `waves` RNG owns spawn/drop randomness. The decoded `ships` atlas is an `ImageAsset` lease owned by each prepared scene; no component field or resource holds it.                                                                                                                                                                                                                                                                                                                                                                                    |
-| Starfall derived cache                  | `collision-grid` resource stores entries of entity handle, borrowed `position` and `body` chunk component views and chunk-relative row. Every continuing ordinary gameplay update clears and rebuilds it before collision reads, so entries are only probed in the commit epoch that created them. After commit the retained entries are expired borrows that may name removed entities or moved rows: they are neither an authority nor a list of current entities, and inspection shows their views as empty records. Query match/column caches are likewise derived from definitions and archetypes, preserving their order.                                                                                                                                                                                                                                                                                                                                                                        |
-| Starfall presentation within simulation | `visual` (`sprite`: `u8`; `size`, `angle`: `f64`), previous poses, `particle` (`vx`, `vy`, `life`, `maxLife`, `size`: `f64`; `color`: `u32`), `effects` RNG, `run.shake/flash`, camera shake and `stars` are scene-owned and inspectable. Particle updates continue through freeze and share ECS allocation with gameplay: their lifetime cannot be omitted when reproducing allocator identity. Stars are generated once using `waves`, so mount-time draws are part of deterministic setup.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| Immutable authoring                     | Component schemas/names, scene setup/ID/policy, ordered systems and freeze flags, reset/render callbacks, transition function, arena attract/stress/reduced-motion options, dimensions, sprite/atlas definitions and texture key `ships`. These are code/configuration, not serialized values. Treat supplied definitions/options as fixed; readonly typing does not deep-freeze arbitrary authored objects or callback captures.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| Host intent and preparation             | Game owns raw candidate handles/status/leases, owner-scoped candidate slots, pending abort controllers and queued host scene commands. Game hosts own authored purposes, definitions and launch intent. These are external activation inputs, not hidden gameplay progression. Availability and authored activation tick/key must also match for repeatability; input snapshots alone do not record DOM launch/pause/visibility commands.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| Platform input / timing                 | `Input` owns held/edge/pointer/gamepad state pending consumption; BrowserGame owns display, scheduler/run token, lifecycle guards, clock, FixedStep accumulator/budget and telemetry. These control future environmental input and platform frames, outside simulation-state inspection. A game reading display data needs the same supplied display values too.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| Assets and presentation services        | Assets owns definitions, loads, decoded cache and refcounts; scene cleanup owns leases. Renderer owns texture sources/GPU objects/context state; Frame owns reusable draw buffers and sorting. Audio owns requests, voices, scope identity/disposal, buses/mute/ducking and device. These are rebuilt or resumed through their services, not simulation capture.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| Demo UI and hello                       | DOM `view`/`presentation`, prior phase, metrics/times and UI readiness are host/presentation state. View copies do not grant gameplay mutation. Hello's moving/previous X values are components; its query/callbacks contain no mutable gameplay counters. Art generation has only call-local drawing work.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+### Global simulation state
+
+`Game` owns the tick, root seed, committed state and next instance ID.
+`enumerate()` includes these plus fixed `dt` in seconds and the engine, RNG and
+authored compatibility string.
+
+### Mounted scene state
+
+Scene summaries preserve stack order, instance ID, definition ID, key, resolved
+seed and blocking policy. Resources are keyed by unique nonempty names within each
+mount.
+
+### ECS values and identity
+
+World owns component columns and immutable index/generation/world handles. Component
+names identify composition; conflicting definition objects with the same name are
+rejected on spawn. Names are world-local, not a global schema registry.
+
+Schema definitions are frozen at creation and hold cloned, frozen field descriptors
+(`kind`, `default`), so they are immutable authoring rather than state. Schema values
+live in per-chunk typed columns; entity references are encoded index/generation pairs.
+Query chunk descriptors, `views` and `entityAt()` row meanings are borrowed for the
+current commit epoch and rebuilt on the first traversal after each commit: derived,
+never authority.
+
+### Allocator and iteration history
+
+World owns slot generations, row positions, pending flags, free-stack order,
+archetype creation order and dense row order. Schema archetypes also own chunk
+creation order and fill: allocation reuses the lowest-created chunk with capacity,
+and empty chunks are retained, so chunk order and counts are history.
+
+A live slot's location is its `chunk` index plus chunk-relative `row`; entities
+spawned without components live in an empty-component archetype with the same chunk
+layout. Inspection includes `archetypes` with ordered component names and entity
+indices, **including empty archetypes**, plus `fields` (per component, field
+`name`/`kind`/`default`) and `chunks` (`capacity`, `count`, ordered entity indices).
+`entities` retains values in archetype/chunk/row order as field records
+`fields: [{ name, kind, value }]`, with entity references as `null` or
+`{ index, generation }`. Empty archetypes and empty chunks cannot be reconstructed
+from live entities alone.
+
+### Scene simulation state
+
+Named RNG current uint32 states, resources, event inbox/outbox, pending/remaining
+freeze and camera fields belong to the scene. Suspension and stop/resume preserve
+mounted state; unmount releases it. Camera state is authoritative when gameplay
+reads it.
+
+### Tick-local work
+
+Game owns the selected update plan, current updating scene, state/scene command
+queues and busy flag; worlds own pending births/deaths. Ordinary local variables
+such as aim search, collision iteration and spawn temporaries do not persist across
+updates. Queues normally drain at completed commit; suspended event inboxes
+intentionally persist.
+
+### Starfall durable facts
+
+Game state owns `best`, `runs`, `victories` and `lastScore`; finish commands capture
+score and win before transition.
+
+### Starfall gameplay
+
+`run` owns phase, score, wave, seconds/ticks, hp, bomb, combo/countdown, stress,
+spawn/shot timers, invulnerability, boss-wave and finished flag. The `player`
+resource owns its handle. Schema components own the rest: `position` (`x`, `y`,
+`px`, `py`: `f64`) and `body` (`vx`, `vy`, `radius`, `hp`, `age`, `cooldown`:
+`f64`; `active`: `bool`; `kind`: `u8`). Systems locate the player's row from its
+handle each update and never retain it. The `waves` RNG owns spawn/drop randomness.
+The decoded `ships` atlas is an `ImageAsset` lease owned by each prepared scene; no
+component field or resource holds it.
+
+### Starfall derived cache
+
+The `collision-grid` resource stores entries of entity handle, borrowed `position`
+and `body` chunk component views, and chunk-relative row. Every continuing ordinary
+gameplay update clears and rebuilds it before collision reads, so entries are probed
+only in the commit epoch that created them. After commit, retained entries are
+expired borrows that may name removed entities or moved rows: they are neither an
+authority nor a list of current entities, and inspection shows their views as empty
+records. Query match/column caches are likewise derived from definitions and
+archetypes, preserving their order.
+
+### Starfall presentation within simulation
+
+`visual` (`sprite`: `u8`; `size`, `angle`: `f64`), previous poses, `particle`
+(`vx`, `vy`, `life`, `maxLife`, `size`: `f64`; `color`: `u32`), the `effects` RNG,
+`run.shake/flash`, camera shake and `stars` are scene-owned and inspectable. Particle
+updates continue through freeze and share ECS allocation with gameplay: their
+lifetime cannot be omitted when reproducing allocator identity. Stars are generated
+once using `waves`, so mount-time draws are part of deterministic setup.
+
+### Immutable authoring
+
+Component schemas/names, scene setup/ID/policy, ordered systems and freeze flags,
+reset/render callbacks, transition function, arena attract/stress/reduced-motion
+options, dimensions, sprite/atlas definitions and texture key `ships` are
+code/configuration, not serialized values. Treat supplied definitions/options as
+fixed; readonly typing does not deep-freeze arbitrary authored objects or callback
+captures.
+
+### Host intent and preparation
+
+Game owns raw candidate handles/status/leases, owner-scoped candidate slots, pending
+abort controllers and queued host scene commands. Game hosts own authored purposes,
+definitions and launch intent. These are external activation inputs, not hidden
+gameplay progression. Availability and authored activation tick/key must also match
+for repeatability; input snapshots alone do not record DOM launch, pause or
+visibility commands.
+
+### Platform input and timing
+
+`Input` owns held/edge/pointer/gamepad state pending consumption. BrowserGame owns
+display, scheduler/run token, lifecycle guards, clock, FixedStep accumulator/budget
+and telemetry. These control later environmental input and platform frames, outside
+simulation-state inspection. A game reading display data needs the same supplied
+display values too.
+
+### Assets and presentation services
+
+Assets owns definitions, loads, decoded cache and refcounts; scene cleanup owns
+leases. Renderer owns texture sources, GPU objects and context state; Frame owns
+reusable draw buffers and sorting. Audio owns requests, voices, scope identity and
+disposal, buses, mute/ducking and device. These are rebuilt or resumed through their
+services, not simulation capture.
+
+### Demo UI and hello
+
+DOM `view`/`presentation`, prior phase, metrics/times and UI readiness are
+host/presentation state. View copies do not grant gameplay mutation. Hello's
+moving/previous X values are components; its query/callbacks contain no mutable
+gameplay counters. Art generation has only call-local drawing work.
 
 ## Inspection boundary and limits
 

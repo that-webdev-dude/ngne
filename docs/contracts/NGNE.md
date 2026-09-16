@@ -26,13 +26,56 @@ Read this file first for the supported package boundary. Read only the detailed 
 The package entry point is the supported boundary. Runtime modules are internal;
 the package export map exposes no subpaths. The consumer inventory is:
 
-| Category                   | Public symbols                                                                                                                                                                                                                                                                                                                                                                                                                                            | Consumers and ownership                                                                                                                                                                                                                                         |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Authoring                  | `component`, `f32`, `f64`, `i32`, `u32`, `u8`, `bool`, `entityRef`; types `SchemaComponent`, `SchemaComponentValue`, `SchemaFields`, `SchemaValues`, `SchemaQuery`, `SchemaChunk`, `SchemaComponentView`, `SchemaQueryViews`, `FieldDescriptor`, `FieldKind`, `EntityReferenceView`, `Entity`, `AllQuery`, `WorldAccess`; `SceneDefinition`, `SceneSetup`, `SystemContext`, `SceneCommands`, `SceneEvent`, `StateAccess`, `DeepReadonly`, `PreparedScene` | Hello, Starfall, the platformer and authoring tests. Setup injects scene capabilities; systems cannot commit, enumerate, or change query membership. Prepared handles expose only idempotent `release()`; the owning Game validates identity and consumes them. |
-| Authoring and presentation | `Camera`, `Random`, `clamp`, `lerp`, `seedOf`, `down`, `pressed`, `imageAsset`, `audioAsset`; types `Asset`, `ImageAsset`, `Lease`, `Sprite`, `Sound`, `Clip`                                                                                                                                                                                                                                                                                             | Scene authors use explicitly acquired/injected values. Constructors operate on caller-owned values; inspection never returns a live camera or RNG.                                                                                                              |
-| Platform integration       | `Game`, `BrowserGame`, `Assets`, `Input`, `Frame`, `WebGPURenderer`, `Audio`, `FixedStep`, `emptyInput`; types `GameOptions`, `SceneCandidates`, `SceneCandidateOptions`, `BrowserOptions`, `FrameScheduler`, `DisplaySnapshot`, `InputSnapshot`, `Stats`, `RendererStatus`                                                                                                                                                                               | Browser host, headless runners, renderer/audio/asset tests and benchmarks. Host lifecycle, candidate coordination, tick, render and service operations remain intentional integration APIs.                                                                     |
-| Inspection                 | `Lifecycle`, `SceneInspection`, `SceneStateInspection`, `GameInspection`, `InspectionValue`                                                                                                                                                                                                                                                                                                                                                               | Tests, benchmark capacity reporting and diagnostics. No mutable foreign world or resource binding is returned.                                                                                                                                                  |
-| Internal only              | `World`, query runtime, `SceneInstance`, candidate runtime, `Cleanup`, `immutable`, browser failure and preparation capabilities, GPU runtime/context/quad/registry modules                                                                                                                                                                                                                                                                               | Runtime modules; direct ECS tests and benchmark import their internal modules deliberately. No public runtime constructor for scenes, queries or prepared candidates.                                                                                           |
+### Authoring
+
+Public symbols: `component`, `f32`, `f64`, `i32`, `u32`, `u8`, `bool`,
+`entityRef`; types `SchemaComponent`, `SchemaComponentValue`, `SchemaFields`,
+`SchemaValues`, `SchemaQuery`, `SchemaChunk`, `SchemaComponentView`,
+`SchemaQueryViews`, `FieldDescriptor`, `FieldKind`, `EntityReferenceView`,
+`Entity`, `AllQuery`, `WorldAccess`, `SceneDefinition`, `SceneSetup`,
+`SystemContext`, `SceneCommands`, `SceneEvent`, `StateAccess`, `DeepReadonly` and
+`PreparedScene`.
+
+Hello, Starfall, the platformer and authoring tests consume this surface. Setup
+injects scene capabilities; systems cannot commit, enumerate or change query
+membership. Prepared handles expose only idempotent `release()`; the owning Game
+validates identity and consumes them.
+
+### Authoring and presentation
+
+Public symbols: `Camera`, `Random`, `clamp`, `lerp`, `seedOf`, `down`, `pressed`,
+`imageAsset`, `audioAsset`; types `Asset`, `ImageAsset`, `Lease`, `Sprite`, `Sound`
+and `Clip`.
+
+Scene authors use explicitly acquired or injected values. Constructors operate on
+caller-owned values; inspection never returns a live camera or RNG.
+
+### Platform integration
+
+Public symbols: `Game`, `BrowserGame`, `Assets`, `Input`, `Frame`,
+`WebGPURenderer`, `Audio`, `FixedStep`, `emptyInput`; types `GameOptions`,
+`SceneCandidates`, `SceneCandidateOptions`, `BrowserOptions`, `FrameScheduler`,
+`DisplaySnapshot`, `InputSnapshot`, `Stats` and `RendererStatus`.
+
+The browser host, headless runners, renderer/audio/asset tests and benchmarks
+consume this surface. Host lifecycle, candidate coordination, tick, render and
+service operations are intentional integration APIs.
+
+### Inspection
+
+Public types: `Lifecycle`, `SceneInspection`, `SceneStateInspection`,
+`GameInspection` and `InspectionValue`.
+
+Tests, benchmark capacity reporting and diagnostics consume this surface. It
+returns no mutable foreign world or resource binding.
+
+### Internal only
+
+`World`, the query runtime, `SceneInstance`, candidate runtime, `Cleanup`,
+`immutable`, browser failure and preparation capabilities, and GPU
+runtime/context/quad/registry modules are internal. Runtime modules, direct ECS
+tests and the benchmark import them deliberately. There is no public runtime
+constructor for scenes, queries or prepared candidates.
 
 - `Game.lifecycle` and `simulationTick` are getter-only values backed by private
   fields. Browser faults use an internal capability, not a writable public field.
