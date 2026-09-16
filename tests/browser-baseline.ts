@@ -1,7 +1,16 @@
-import { execSync, spawn } from "node:child_process";
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { execSync, spawn, spawnSync, type ChildProcess } from "node:child_process";
+import { createHash, randomBytes } from "node:crypto";
+import {
+    mkdirSync,
+    mkdtempSync,
+    readdirSync,
+    readFileSync,
+    statSync,
+    writeFileSync,
+} from "node:fs";
+import { createConnection } from "node:net";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 
 /**
  * Sustained browser measurement in a real headful Chromium, driven over the DevTools
@@ -11,18 +20,64 @@ import { join } from "node:path";
  * Environment: NGNE_BROWSER (Chromium executable), NGNE_URL (default preview origin),
  * NGNE_WARMUP_SECONDS (default 10), NGNE_DURATION_SECONDS (default 60).
  * The browser window must stay visible; hidden tabs throttle requestAnimationFrame.
+ *
+ * Optional measurement controls (NGNE-12); without them the run and its output fields are unchanged:
+ * - NGNE_CDP_PORT: DevTools port (default 9333). Each run gets a fresh profile directory.
+ * - NGNE_SERVE_DIR: export root whose `vite preview` the run starts on the NGNE_URL port with
+ *   `--strictPort` and NGNE_SERVE_OUT_DIR (default `dist`), and terminates afterwards.
+ * - NGNE_EXPECTED_BUILD: build directory the served HTML, JS and CSS must match byte for byte
+ *   before warmup (defaults to the served directory with NGNE_SERVE_DIR); a mismatch aborts.
+ * - NGNE_EXPECTED_BACKEND: `webgl2` or `webgpu`; the page canvas context must match, and a
+ *   software renderer or fallback adapter aborts.
+ * - NGNE_ALLOCATION_SAMPLING=1: DevTools allocation sampling over the sample window in game modes
+ *   (the renderer fixture always samples).
+ * - NGNE_CYCLES=N (multiple of 10): scene and asset cycle mode instead of a timed sample; forced GC
+ *   and retained heap every N/10 cycles, heap snapshots after the first and last checkpoints.
+ * - NGNE_SNAPSHOTS=1: heap snapshots after the forced GC at sample start and end.
+ * - NGNE_TRACE=1: browser trace over the sample window (GPU process, frames and V8 GC).
+ * - NGNE_RETAINED_EVERY_SECONDS=S: forced-GC retained-heap checkpoints during the sample.
+ * - NGNE_ARTIFACT_DIR: directory for profiles, snapshots and traces (default: the profile directory).
+ * Every artifact must parse as JSON with a non-zero node or event count, or the run aborts.
  */
 const BROWSER =
         process.env.NGNE_BROWSER ?? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
     URL_UNDER_TEST = process.env.NGNE_URL ?? "http://127.0.0.1:4173/",
     WARMUP_SECONDS = Number(process.env.NGNE_WARMUP_SECONDS ?? 10),
     DURATION_SECONDS = Number(process.env.NGNE_DURATION_SECONDS ?? 60),
-    DEBUG_PORT = 9333;
+    DEBUG_PORT = Number(process.env.NGNE_CDP_PORT ?? 9333),
+    SERVE_DIR = process.env.NGNE_SERVE_DIR,
+    SERVE_OUT_DIR = process.env.NGNE_SERVE_OUT_DIR ?? "dist",
+    EXPECTED_BUILD =
+        process.env.NGNE_EXPECTED_BUILD ?? (SERVE_DIR ? join(SERVE_DIR, SERVE_OUT_DIR) : undefined),
+    EXPECTED_BACKEND = process.env.NGNE_EXPECTED_BACKEND,
+    SAMPLES_ALLOCATIONS = process.env.NGNE_ALLOCATION_SAMPLING === "1",
+    CYCLES = Number(process.env.NGNE_CYCLES ?? 0),
+    TAKES_SNAPSHOTS = process.env.NGNE_SNAPSHOTS === "1",
+    RECORDS_TRACE = process.env.NGNE_TRACE === "1",
+    RETAINED_EVERY_SECONDS = Number(process.env.NGNE_RETAINED_EVERY_SECONDS ?? 0),
+    ORACLE_TIMEOUT_MS = 20_000,
+    SAMPLING_INTERVAL_BYTES = 32768,
+    CDP_TIMEOUT_MS = 180_000;
 const IS_PLATFORMER = new URL(URL_UNDER_TEST).pathname.includes("/examples/platformer/");
 const IS_RENDERER = new URL(URL_UNDER_TEST).searchParams.has("rendererBenchmark");
+const SOFTWARE_RENDERER = /SwiftShader|WARP|llvmpipe|Basic Render/i;
+// Chrome 152 categories proven to align GPU-process events with rAF frames (NGNE-12 phase 0).
+const TRACE_CATEGORIES = [
+    "devtools.timeline",
+    "gpu",
+    "gpu.angle",
+    "disabled-by-default-gpu.dawn",
+    "disabled-by-default-devtools.timeline.frame",
+    "v8",
+    "disabled-by-default-v8.gc",
+];
+if (EXPECTED_BACKEND && EXPECTED_BACKEND !== "webgl2" && EXPECTED_BACKEND !== "webgpu")
+    throw new Error(`Unknown NGNE_EXPECTED_BACKEND ${EXPECTED_BACKEND}`);
+if (CYCLES && (IS_RENDERER || CYCLES % 10 !== 0 || RETAINED_EVERY_SECONDS))
+    throw new Error("NGNE_CYCLES needs a game page, a multiple of 10 and no retained interval");
 const HOOK = `(() => {
     const raw = window.requestAnimationFrame.bind(window);
-    const b = (window.__ngneBaseline = { frames: [], heap: [], longTasks: 0, visibility: [] });
+    const b = (window.__ngneBaseline = { frames: [], heap: [], longTasks: 0, longTaskStarts: [], visibility: [] });
     window.requestAnimationFrame = (callback) =>
         raw((timestamp) => {
             const start = performance.now();
@@ -32,9 +87,12 @@ const HOOK = `(() => {
                 b.frames.push(timestamp, start, performance.now() - start);
             }
         });
-    new PerformanceObserver((list) => (b.longTasks += list.getEntries().length)).observe({
-        entryTypes: ["longtask"],
-    });
+    new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+            b.longTasks++;
+            b.longTaskStarts.push(entry.startTime);
+        }
+    }).observe({ entryTypes: ["longtask"] });
     document.addEventListener("visibilitychange", () =>
         b.visibility.push([performance.now(), document.visibilityState]),
     );
@@ -97,6 +155,7 @@ const SUMMARY = `(async (startMs, endMs) => {
         intervalsOver25Ms: intervalMs.filter((v) => v > 25).length,
         intervalsOver50Ms: intervalMs.filter((v) => v > 50).length,
         longTasks: b.longTasks,
+        longTasksInSample: b.longTaskStarts.filter((t) => t >= startMs && t < endMs).length,
         visibilityChanges: b.visibility,
         heapUsedMiB: {
             samples: used.length,
@@ -116,36 +175,89 @@ const READ_UI = `({
     sprites: document.getElementById("sprites")?.textContent ?? document.getElementById("game")?.dataset.sprites ?? "",
     fps: document.getElementById("fps")?.textContent ?? document.getElementById("game")?.dataset.fps ?? "",
     error: document.getElementById("error")?.textContent ?? "",
+    visibility: document.visibilityState,
     now: performance.now(),
 })`;
+// Reads the page canvas's existing context type (getContext with the other type returns null and
+// creates nothing), a probe canvas WebGL renderer string and the WebGPU adapter.
+const READ_BACKEND = `(async () => {
+    const canvas = document.getElementById("game") ?? document.querySelector("canvas");
+    const pageContext = !canvas ? "none" : canvas.getContext("webgpu") ? "webgpu" : canvas.getContext("webgl2") ? "webgl2" : "none";
+    const probe = document.createElement("canvas").getContext("webgl2");
+    const extension = probe?.getExtension("WEBGL_debug_renderer_info");
+    const webglRenderer = extension ? probe.getParameter(extension.UNMASKED_RENDERER_WEBGL) : null;
+    probe?.getExtension("WEBGL_lose_context")?.loseContext();
+    const adapter = await navigator.gpu?.requestAdapter();
+    return {
+        pageContext,
+        webglRenderer,
+        adapter: adapter ? {
+            vendor: adapter.info.vendor, architecture: adapter.info.architecture, device: adapter.info.device,
+            description: adapter.info.description, isFallbackAdapter: adapter.info.isFallbackAdapter,
+            features: [...adapter.features].sort(),
+        } : null,
+    };
+})()`;
+const STATUS = `document.getElementById("status")?.textContent`;
+const FLIGHT = `document.getElementById("flight-state")?.textContent`;
+const DEATHS = `Number(/Deaths (\\d+)/.exec(document.getElementById("progress")?.textContent ?? "")?.[1])`;
 interface UiSnapshot {
     status: string;
     flight: string;
     sprites: string;
     fps: string;
     error: string;
+    visibility: string;
     now: number;
 }
 interface Page {
     send(method: string, params?: object): Promise<unknown>;
     evaluate<T>(expression: string): Promise<T>;
+    on(event: string, handler: (params: unknown) => void): () => void;
+    once(event: string): Promise<unknown>;
+    close(): void;
+}
+interface Backend {
+    pageContext: string;
+    webglRenderer: string | null;
+    adapter: { description: string; isFallbackAdapter: boolean } | null;
+}
+interface CycleStep {
+    action: string;
+    run(page: Page): Promise<void>;
+    oracle(): string;
+    dwellMs: number;
+}
+interface Artifact {
+    path: string;
+    bytes: number;
+    sha256: string;
+    count: number;
 }
 const profile = mkdtempSync(join(tmpdir(), "ngne-baseline-"));
-const browser = spawn(
-    BROWSER,
-    [
-        `--remote-debugging-port=${DEBUG_PORT}`,
-        `--user-data-dir=${profile}`,
-        "--no-first-run",
-        "--no-default-browser-check",
-        "--enable-precise-memory-info",
-        "--window-size=1280,900",
-        "about:blank",
-    ],
-    { stdio: "ignore" },
-);
+const artifactDir = process.env.NGNE_ARTIFACT_DIR ?? profile;
+mkdirSync(artifactDir, { recursive: true });
+let preview: ChildProcess | undefined;
+let browser: ChildProcess | undefined;
+let page: Page | undefined;
+let output: Record<string, unknown> | undefined;
 try {
-    const page = await connect();
+    if (SERVE_DIR) preview = await startPreview(SERVE_DIR);
+    const servedBuild = EXPECTED_BUILD ? await checkServedBuild(EXPECTED_BUILD) : undefined;
+    browser = spawn(
+        BROWSER,
+        [
+            `--remote-debugging-port=${DEBUG_PORT}`,
+            `--user-data-dir=${profile}`,
+            "--no-first-run",
+            "--no-default-browser-check",
+            "--enable-precise-memory-info",
+            "--window-size=1280,900",
+            "about:blank",
+        ],
+        { stdio: "ignore" },
+    );
+    page = await connect(await pageTarget());
     await page.send("Page.enable");
     await page.send("Runtime.enable");
     await page.send("HeapProfiler.enable");
@@ -159,37 +271,61 @@ try {
         await waitFor(page, `document.getElementById("start")?.textContent === "Start level 1"`);
         await click(page, "start");
         await waitFor(page, `document.getElementById("status")?.textContent !== "Ready"`);
+        if (CYCLES) await waitFor(page, `${STATUS} === "Reach the blue gate"`);
     } else {
         await waitFor(page, `document.getElementById("play")?.textContent === "START FLIGHT"`);
-        await click(page, "chaos");
-        await waitFor(
-            page,
-            `document.getElementById("flight-state")?.textContent.includes("CHAOS")`,
-        );
+        // Cycle mode starts from attract; its first step launches Chaos Lab.
+        if (!CYCLES) {
+            await click(page, "chaos");
+            await waitFor(
+                page,
+                `document.getElementById("flight-state")?.textContent.includes("CHAOS")`,
+            );
+        }
     }
+    const backend = await page.evaluate<Backend>(READ_BACKEND);
+    if (EXPECTED_BACKEND) assertBackend(backend, EXPECTED_BACKEND);
     await sleep(WARMUP_SECONDS * 1000);
     await page.send("HeapProfiler.collectGarbage");
     const afterWarmup = await page.evaluate<number>("performance.memory.usedJSHeapSize");
-    if (IS_RENDERER)
+    const snapshots: Record<string, Artifact> = {};
+    if (TAKES_SNAPSHOTS) snapshots.sampleStart = await takeSnapshot(page, "sample-start");
+    if (IS_RENDERER || SAMPLES_ALLOCATIONS)
         await page.send("HeapProfiler.startSampling", {
-            samplingInterval: 32768,
+            samplingInterval: SAMPLING_INTERVAL_BYTES,
             includeObjectsCollectedByMajorGC: true,
             includeObjectsCollectedByMinorGC: true,
         });
+    const trace = RECORDS_TRACE ? await startTrace() : undefined;
     const begin = await page.evaluate<UiSnapshot>(READ_UI);
-    await sleep(DURATION_SECONDS * 1000);
+    progress("sample started");
+    const cycles = CYCLES ? await runCycles(page, snapshots) : undefined;
+    const retainedCheckpoints = CYCLES ? undefined : await sampleWindow(page);
     const end = await page.evaluate<UiSnapshot>(READ_UI);
+    progress("sample ended");
+    const traceEvidence = trace ? await stopTrace(trace) : undefined;
     const summary = await page.evaluate<Record<string, unknown>>(
         `${SUMMARY}(${begin.now}, ${end.now})`,
     );
+    progress("summary read");
     let rendererEvidence: unknown;
-    if (IS_RENDERER) {
+    let allocationEvidence: unknown;
+    if (IS_RENDERER || SAMPLES_ALLOCATIONS) {
         const allocation = (await page.send("HeapProfiler.stopSampling")) as {
             profile: SamplingProfile;
         };
-        const allocationPath = join(profile, "allocation-profile.json");
-        writeFileSync(allocationPath, JSON.stringify(allocation));
-        const renderer = await page.evaluate<Record<string, unknown>>(`(() => {
+        progress("allocation sampling stopped");
+        const allocationPath = join(artifactDir, "allocation-profile.json");
+        const text = JSON.stringify(allocation);
+        writeFileSync(allocationPath, text);
+        allocationEvidence = summarizeAllocation(
+            allocationPath,
+            text,
+            allocation.profile,
+            (end.now - begin.now) / 1000,
+        );
+        if (IS_RENDERER) {
+            const renderer = await page.evaluate<Record<string, unknown>>(`(() => {
             const b = window.__ngneRendererBenchmark;
             const prepare = [], submit = [], total = [];
             for (let i = 0; i < b.count; i++) {
@@ -206,56 +342,88 @@ try {
             return { metadata:b.metadata, metrics:b.metrics, error:b.error,
                 cpuPreparationMs:summarize(prepare),cpuSubmissionMs:summarize(submit),cpuTotalMs:summarize(total) };
         })()`);
-        rendererEvidence = {
-            ...renderer,
-            allocationPath,
-            sampledAllocationSites: allocationSites(allocation.profile.head),
-            timingBoundary: "CPU preparation and submission only; no per-frame GPU completion wait",
-        };
+            rendererEvidence = {
+                ...renderer,
+                allocationPath,
+                sampledAllocationSites: allocationSites(allocation.profile.head),
+                timingBoundary:
+                    "CPU preparation and submission only; no per-frame GPU completion wait",
+            };
+        }
     }
     await page.send("HeapProfiler.collectGarbage");
     const afterRun = await page.evaluate<number>("performance.memory.usedJSHeapSize");
-    console.log(
-        JSON.stringify(
-            {
-                revision: revision(),
-                observedBrowser,
-                url: URL_UNDER_TEST,
-                workload: IS_RENDERER
-                    ? "Fixed 10,000-sprite renderer fixture; reused authoring inputs"
-                    : IS_PLATFORMER
-                      ? "Platformer level 1 (idle player, active patrols, seed NGNE-15)"
-                      : "Starfall Chaos Lab (stress arena, seed STARFALL-1989)",
-                warmupSeconds: WARMUP_SECONDS,
-                sampledSeconds: (end.now - begin.now) / 1000,
-                ...summary,
-                rendererEvidence,
-                droppedTicks: {
-                    atStart: droppedTicks(begin.status),
-                    atEnd: droppedTicks(end.status),
-                    duringSample: droppedTicks(end.status) - droppedTicks(begin.status),
-                },
-                sprites: { atStart: begin.sprites, atEnd: end.sprites },
-                smoothedFps: { atStart: begin.fps, atEnd: end.fps },
-                flightState: { atStart: begin.flight, atEnd: end.flight },
-                pageError: end.error,
-                retainedHeapMiBAfterForcedGc: {
-                    afterWarmup: afterWarmup / 2 ** 20,
-                    afterRun: afterRun / 2 ** 20,
-                },
-            },
-            null,
-            2,
-        ),
-    );
+    if (TAKES_SNAPSHOTS) snapshots.sampleEnd = await takeSnapshot(page, "sample-end");
+    output = {
+        revision: revision(),
+        observedBrowser,
+        url: URL_UNDER_TEST,
+        workload: IS_RENDERER
+            ? "Fixed 10,000-sprite renderer fixture; reused authoring inputs"
+            : IS_PLATFORMER
+              ? CYCLES
+                  ? "Platformer level 1 cycles (pit death and respawn, pause, resume)"
+                  : "Platformer level 1 (idle player, active patrols, seed NGNE-15)"
+              : CYCLES
+                ? "Starfall cycles (Chaos Lab launch, pause, resume, normal flight launch)"
+                : "Starfall Chaos Lab (stress arena, seed STARFALL-1989)",
+        warmupSeconds: WARMUP_SECONDS,
+        sampledSeconds: (end.now - begin.now) / 1000,
+        ...summary,
+        rendererEvidence,
+        droppedTicks: {
+            atStart: droppedTicks(begin.status),
+            atEnd: droppedTicks(end.status),
+            duringSample: droppedTicks(end.status) - droppedTicks(begin.status),
+        },
+        sprites: { atStart: begin.sprites, atEnd: end.sprites },
+        smoothedFps: { atStart: begin.fps, atEnd: end.fps },
+        flightState: { atStart: begin.flight, atEnd: end.flight },
+        pageError: end.error,
+        // A page hidden from the start fires no visibilitychange event.
+        visibilityState: { atStart: begin.visibility, atEnd: end.visibility },
+        retainedHeapMiBAfterForcedGc: {
+            afterWarmup: afterWarmup / 2 ** 20,
+            afterRun: afterRun / 2 ** 20,
+        },
+        backend,
+        allocation: allocationEvidence,
+        retainedCheckpoints,
+        cycles,
+        snapshots: TAKES_SNAPSHOTS || CYCLES ? snapshots : undefined,
+        trace: traceEvidence,
+        run: {
+            cdpPort: DEBUG_PORT,
+            profileDir: profile,
+            artifactDir,
+            browserPid: browser.pid,
+            previewPid: preview?.pid,
+            servedBuild,
+        },
+    };
 } finally {
-    spawn("taskkill", ["/pid", String(browser.pid), "/T", "/F"], { stdio: "ignore" });
+    page?.close();
+    for (const child of [browser, preview])
+        if (child?.pid)
+            spawnSync("taskkill", ["/pid", String(child.pid), "/T", "/F"], { stdio: "ignore" });
+}
+if (output) {
+    await sleep(1500);
+    const surviving = [browser?.pid, preview?.pid].filter(
+        (pid): pid is number => pid !== undefined && isAlive(pid),
+    );
+    (output.run as Record<string, unknown>).survivingOwnedProcesses = surviving;
+    if (surviving.length) {
+        console.error(`Owned processes survived the run: ${surviving.join(", ")}`);
+        process.exitCode = 1;
+    }
+    console.log(JSON.stringify(output, null, 2));
 }
 interface SamplingProfile {
     head: SamplingNode;
 }
 interface SamplingNode {
-    callFrame: { functionName: string; url: string; lineNumber: number };
+    callFrame: { functionName: string; url: string; lineNumber: number; columnNumber?: number };
     selfSize: number;
     children: SamplingNode[];
 }
@@ -282,7 +450,293 @@ function allocationSites(
     visit(root);
     return [...sites.values()].sort((a, b) => b.sampledBytes - a.sampledBytes);
 }
-async function connect(): Promise<Page> {
+/** Unfiltered sampled bytes and top sites; bundle positions are 0-based line and column. */
+function summarizeAllocation(path: string, text: string, root: SamplingProfile, seconds: number) {
+    const sites = new Map<string, number>();
+    let sampledBytes = 0,
+        nodes = 0;
+    const visit = (node: SamplingNode) => {
+        nodes++;
+        if (node.selfSize) {
+            sampledBytes += node.selfSize;
+            const { functionName, url, lineNumber, columnNumber } = node.callFrame;
+            const key = `${functionName || "(anonymous)"} ${url}:${lineNumber}:${columnNumber ?? -1}`;
+            sites.set(key, (sites.get(key) ?? 0) + node.selfSize);
+        }
+        for (const child of node.children) visit(child);
+    };
+    visit(root.head);
+    if (!nodes) throw new Error(`Allocation profile has no nodes: ${path}`);
+    return {
+        path,
+        bytes: text.length,
+        sha256: sha256(text),
+        count: nodes,
+        samplingIntervalBytes: SAMPLING_INTERVAL_BYTES,
+        sampledBytes,
+        sampledBytesPerSecond: sampledBytes / seconds,
+        topSites: [...sites.entries()]
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 25)
+            .map(([site, bytes]) => ({ site, bytes })),
+    };
+}
+async function sampleWindow(page: Page) {
+    if (!RETAINED_EVERY_SECONDS) {
+        await sleep(DURATION_SECONDS * 1000);
+        return undefined;
+    }
+    const checkpoints: { atSecond: number; retainedMiB: number }[] = [];
+    for (
+        let second = RETAINED_EVERY_SECONDS;
+        second <= DURATION_SECONDS;
+        second += RETAINED_EVERY_SECONDS
+    ) {
+        await sleep(RETAINED_EVERY_SECONDS * 1000);
+        await page.send("HeapProfiler.collectGarbage");
+        const used = await page.evaluate<number>("performance.memory.usedJSHeapSize");
+        checkpoints.push({ atSecond: second, retainedMiB: used / 2 ** 20 });
+    }
+    return checkpoints;
+}
+async function runCycles(page: Page, snapshots: Record<string, Artifact>) {
+    let deathsBefore = 0;
+    const steps: CycleStep[] = IS_PLATFORMER
+        ? [
+              {
+                  action: "keyDown ArrowRight",
+                  run: async (p) => {
+                      deathsBefore = await p.evaluate<number>(DEATHS);
+                      await key(p, "keyDown");
+                  },
+                  oracle: () => `${STATUS} === "Returning to checkpoint…"`,
+                  dwellMs: 0,
+              },
+              {
+                  action: "keyUp ArrowRight",
+                  run: (p) => key(p, "keyUp"),
+                  oracle: () =>
+                      `${STATUS} === "Reach the blue gate" && ${DEATHS} === ${deathsBefore + 1}`,
+                  dwellMs: 1000,
+              },
+              {
+                  action: "click #pause",
+                  run: (p) => click(p, "pause"),
+                  oracle: () =>
+                      `${STATUS} === "Paused" && document.getElementById("overlay-title")?.textContent === "Paused"`,
+                  dwellMs: 1000,
+              },
+              {
+                  action: "click #pause",
+                  run: (p) => click(p, "pause"),
+                  oracle: () =>
+                      `${STATUS} === "Reach the blue gate" && document.getElementById("overlay").hidden`,
+                  dwellMs: 1000,
+              },
+          ]
+        : [
+              {
+                  action: "click #chaos",
+                  run: (p) => click(p, "chaos"),
+                  oracle: () => `${FLIGHT} === "CHAOS LAB / INVULNERABLE"`,
+                  dwellMs: 5000,
+              },
+              {
+                  action: "click #pause",
+                  run: (p) => click(p, "pause"),
+                  oracle: () =>
+                      `${FLIGHT} === "FLIGHT PAUSED" && document.getElementById("overlay-title")?.textContent === "TAKE A BREATH."`,
+                  dwellMs: 1000,
+              },
+              {
+                  action: "click #pause",
+                  run: (p) => click(p, "pause"),
+                  oracle: () =>
+                      `${FLIGHT} === "CHAOS LAB / INVULNERABLE" && document.getElementById("overlay").hidden`,
+                  dwellMs: 2000,
+              },
+              {
+                  action: "click #play",
+                  run: (p) => click(p, "play"),
+                  oracle: () => `${FLIGHT} === "FLIGHT IN PROGRESS"`,
+                  dwellMs: 3000,
+              },
+          ];
+    const interval = CYCLES / 10;
+    const cycleMs: number[] = [];
+    const oraclesPassed: number[] = steps.map(() => 0);
+    const checkpoints: { cycle: number; atMs: number; retainedMiB: number; sprites: string }[] = [];
+    for (let cycle = 1; cycle <= CYCLES; cycle++) {
+        const start = await page.evaluate<number>("performance.now()");
+        for (const [index, step] of steps.entries()) {
+            await step.run(page);
+            await waitFor(page, step.oracle(), ORACLE_TIMEOUT_MS, 50);
+            oraclesPassed[index]++;
+            await sleep(step.dwellMs);
+        }
+        // A hidden page stops requestAnimationFrame, so later oracles and timings are invalid.
+        const visibility = await page.evaluate<string>("document.visibilityState");
+        if (visibility !== "visible")
+            throw new Error(`Page became ${visibility} in cycle ${cycle}`);
+        progress(`cycle ${cycle} done`);
+        cycleMs.push((await page.evaluate<number>("performance.now()")) - start);
+        if (cycle % interval) continue;
+        await page.send("HeapProfiler.collectGarbage");
+        const ui = await page.evaluate<UiSnapshot>(READ_UI);
+        const used = await page.evaluate<number>("performance.memory.usedJSHeapSize");
+        checkpoints.push({ cycle, atMs: ui.now, retainedMiB: used / 2 ** 20, sprites: ui.sprites });
+        if (cycle === interval)
+            snapshots.firstCheckpoint = await takeSnapshot(page, `cycle-${cycle}`);
+        if (cycle === CYCLES) snapshots.lastCheckpoint = await takeSnapshot(page, `cycle-${cycle}`);
+    }
+    return {
+        cycles: CYCLES,
+        steps: steps.map((step, index) => ({
+            action: step.action,
+            dwellMs: step.dwellMs,
+            oraclesPassed: oraclesPassed[index],
+        })),
+        cycleMs: {
+            min: Math.min(...cycleMs),
+            max: Math.max(...cycleMs),
+            mean: cycleMs.reduce((s, v) => s + v, 0) / cycleMs.length,
+        },
+        checkpoints,
+    };
+}
+function assertBackend(backend: Backend, expected: string): void {
+    const failures: string[] = [];
+    if (backend.pageContext !== expected)
+        failures.push(`page context ${backend.pageContext}, expected ${expected}`);
+    if (!backend.webglRenderer || SOFTWARE_RENDERER.test(backend.webglRenderer))
+        failures.push(`WebGL renderer ${backend.webglRenderer}`);
+    if (expected === "webgpu" && (!backend.adapter || backend.adapter.isFallbackAdapter))
+        failures.push("WebGPU adapter missing or fallback");
+    if (backend.adapter && SOFTWARE_RENDERER.test(backend.adapter.description))
+        failures.push(`WebGPU adapter ${backend.adapter.description}`);
+    if (failures.length) throw new Error(`Backend assertion failed: ${failures.join("; ")}`);
+}
+async function startPreview(root: string): Promise<ChildProcess> {
+    const origin = new URL(URL_UNDER_TEST);
+    const child = spawn(
+        process.execPath,
+        [
+            join(root, "node_modules/vite/bin/vite.js"),
+            "preview",
+            "--host",
+            origin.hostname,
+            "--port",
+            origin.port,
+            "--strictPort",
+            "--outDir",
+            SERVE_OUT_DIR,
+        ],
+        { cwd: root, stdio: ["ignore", "pipe", "pipe"] },
+    );
+    let log = "";
+    child.stdout?.on("data", (chunk) => (log += chunk));
+    child.stderr?.on("data", (chunk) => (log += chunk));
+    for (let attempt = 0; attempt < 100; attempt++) {
+        if (child.exitCode !== null) throw new Error(`Preview exited ${child.exitCode}: ${log}`);
+        // Vite colours its banner; strip ANSI escapes before matching the bound address.
+        const plain = log.replace(/\x1b\[[0-9;]*m/g, "");
+        if (plain.includes(`Local:`) && plain.includes(`:${origin.port}/`)) {
+            await sleep(300);
+            if (child.exitCode !== null)
+                throw new Error(`Preview exited ${child.exitCode}: ${log}`);
+            return child;
+        }
+        await sleep(100);
+    }
+    throw new Error(`Preview did not report port ${origin.port}: ${log}`);
+}
+async function checkServedBuild(root: string) {
+    const origin = new URL(URL_UNDER_TEST).origin;
+    const files = listFiles(root)
+        .map((file) => relative(root, file).replaceAll("\\", "/"))
+        .filter((file) => /\.(html|js|css)$/.test(file) && !file.startsWith("engine/"))
+        .sort();
+    if (!files.length) throw new Error(`No build files under ${root}`);
+    const entries: string[] = [];
+    const mismatches: string[] = [];
+    for (const file of files) {
+        const expected = sha256(readFileSync(join(root, file)));
+        const response = await fetch(`${origin}/${file}`);
+        const served = sha256(Buffer.from(await response.arrayBuffer()));
+        entries.push(`${expected}  ${file}`);
+        if (!response.ok || served !== expected) mismatches.push(file);
+    }
+    if (mismatches.length)
+        throw new Error(`Served build does not match ${root}: ${mismatches.join(", ")}`);
+    return { root, files: files.length, servedBuildHash: sha256(entries.join("\n")) };
+}
+async function takeSnapshot(page: Page, label: string): Promise<Artifact> {
+    const chunks: string[] = [];
+    const off = page.on("HeapProfiler.addHeapSnapshotChunk", (params) =>
+        chunks.push((params as { chunk: string }).chunk),
+    );
+    await page.send("HeapProfiler.takeHeapSnapshot", { reportProgress: false });
+    off();
+    const text = chunks.join("");
+    const path = join(artifactDir, `${label}.heapsnapshot`);
+    writeFileSync(path, text);
+    const snapshot = JSON.parse(text) as { snapshot: { node_count: number } };
+    if (!snapshot.snapshot.node_count) throw new Error(`Heap snapshot has no nodes: ${path}`);
+    return { path, bytes: text.length, sha256: sha256(text), count: snapshot.snapshot.node_count };
+}
+async function startTrace() {
+    const version = (await (await fetch(`http://127.0.0.1:${DEBUG_PORT}/json/version`)).json()) as {
+        webSocketDebuggerUrl: string;
+    };
+    const session = await connect(version.webSocketDebuggerUrl);
+    const { categories } = (await session.send("Tracing.getCategories")) as {
+        categories: string[];
+    };
+    const included = TRACE_CATEGORIES.filter((category) => categories.includes(category));
+    const complete = session.once("Tracing.tracingComplete");
+    await session.send("Tracing.start", {
+        transferMode: "ReturnAsStream",
+        traceConfig: { recordMode: "recordAsMuchAsPossible", includedCategories: included },
+    });
+    return { session, complete, included };
+}
+async function stopTrace(trace: Awaited<ReturnType<typeof startTrace>>) {
+    await trace.session.send("Tracing.end");
+    const { stream, dataLossOccurred } = (await trace.complete) as {
+        stream: string;
+        dataLossOccurred: boolean;
+    };
+    const chunks: string[] = [];
+    for (;;) {
+        const chunk = (await trace.session.send("IO.read", { handle: stream, size: 1 << 20 })) as {
+            data: string;
+            eof: boolean;
+            base64Encoded?: boolean;
+        };
+        chunks.push(
+            chunk.base64Encoded ? Buffer.from(chunk.data, "base64").toString("utf8") : chunk.data,
+        );
+        if (chunk.eof) break;
+    }
+    await trace.session.send("IO.close", { handle: stream });
+    trace.session.close();
+    const text = chunks.join("");
+    const path = join(artifactDir, "trace.json");
+    writeFileSync(path, text);
+    const events = (JSON.parse(text) as { traceEvents?: { name: string }[] }).traceEvents ?? [];
+    if (!events.length) throw new Error(`Trace has no events: ${path}`);
+    if (dataLossOccurred) throw new Error(`Trace lost data: ${path}`);
+    return {
+        path,
+        bytes: text.length,
+        sha256: sha256(text),
+        count: events.length,
+        categories: trace.included,
+        fireAnimationFrames: events.filter((event) => event.name === "FireAnimationFrame").length,
+        label: "GPU-process CPU time; not GPU execution time",
+    };
+}
+async function pageTarget(): Promise<string> {
     let targets: { type: string; webSocketDebuggerUrl: string }[] = [];
     for (let attempt = 0; attempt < 50 && !targets.length; attempt++) {
         await sleep(200);
@@ -294,29 +748,57 @@ async function connect(): Promise<Page> {
         }
     }
     if (!targets.length) throw new Error("No debuggable page target found");
-    const socket = new WebSocket(targets[0].webSocketDebuggerUrl);
-    await new Promise<void>((resolve, reject) => {
-        socket.onopen = () => resolve();
-        socket.onerror = () => reject(new Error("DevTools socket failed"));
-    });
+    return targets[0].webSocketDebuggerUrl;
+}
+async function connect(url: string): Promise<Page> {
     const pending = new Map<
         number,
         { resolve(value: unknown): void; reject(error: Error): void }
     >();
+    const listeners = new Map<string, Set<(params: unknown) => void>>();
     let id = 0;
-    socket.onmessage = (event) => {
-        const message = JSON.parse(String(event.data));
-        const waiter = pending.get(message.id);
-        if (!waiter) return;
-        pending.delete(message.id);
-        if (message.error) waiter.reject(new Error(message.error.message));
-        else waiter.resolve(message.result);
-    };
+    const socket = await openDevToolsSocket(
+        url,
+        (text) => {
+            const message = JSON.parse(text);
+            if (message.id === undefined) {
+                for (const handler of listeners.get(message.method) ?? []) handler(message.params);
+                return;
+            }
+            const waiter = pending.get(message.id);
+            if (!waiter) return;
+            pending.delete(message.id);
+            if (message.error) waiter.reject(new Error(message.error.message));
+            else waiter.resolve(message.result);
+        },
+        (reason) => {
+            for (const waiter of pending.values())
+                waiter.reject(new Error(`DevTools socket closed: ${reason}`));
+            pending.clear();
+        },
+    );
     const page: Page = {
+        // A stalled reply fails the run instead of hanging it.
         send: (method, params = {}) =>
             new Promise((resolve, reject) => {
-                pending.set(++id, { resolve, reject });
-                socket.send(JSON.stringify({ id, method, params }));
+                const callId = ++id;
+                const timer = setTimeout(() => {
+                    pending.delete(callId);
+                    reject(
+                        new Error(`DevTools call ${method} timed out after ${CDP_TIMEOUT_MS} ms`),
+                    );
+                }, CDP_TIMEOUT_MS);
+                pending.set(callId, {
+                    resolve: (value) => {
+                        clearTimeout(timer);
+                        resolve(value);
+                    },
+                    reject: (error) => {
+                        clearTimeout(timer);
+                        reject(error);
+                    },
+                });
+                socket.send(JSON.stringify({ id: callId, method, params }));
             }),
         evaluate: async <T>(expression: string) => {
             const result = (await page.send("Runtime.evaluate", {
@@ -333,17 +815,139 @@ async function connect(): Promise<Page> {
                 );
             return result.result.value;
         },
+        on: (event, handler) => {
+            const handlers = listeners.get(event) ?? new Set();
+            handlers.add(handler);
+            listeners.set(event, handlers);
+            return () => handlers.delete(handler);
+        },
+        once: (event) =>
+            new Promise((resolve) => {
+                const off = page.on(event, (params) => {
+                    off();
+                    resolve(params);
+                });
+            }),
+        close: () => socket.close(),
     };
     return page;
 }
-async function waitFor(page: Page, condition: string): Promise<void> {
-    for (let attempt = 0; attempt < 150; attempt++) {
+/**
+ * Minimal RFC 6455 client over node:net: masked text frames out, unmasked (possibly fragmented)
+ * frames in, no extensions. Node 24's built-in WebSocket dropped the connection on a 4.26 MB
+ * HeapProfiler.stopSampling reply that this client receives intact (NGNE-12 phase 1).
+ * Replies must be valid UTF-8; anything else closes the socket and fails pending calls.
+ */
+async function openDevToolsSocket(
+    url: string,
+    onText: (text: string) => void,
+    onClose: (reason: string) => void,
+): Promise<{ send(text: string): void; close(): void }> {
+    const { hostname, port, pathname } = new URL(url);
+    const socket = createConnection({ host: hostname, port: Number(port) });
+    const decoder = new TextDecoder("utf-8", { fatal: true });
+    let buffer = Buffer.alloc(0);
+    let fragments: Buffer[] = [];
+    let closed = false;
+    const close = (reason: string) => {
+        if (closed) return;
+        closed = true;
+        socket.destroy();
+        onClose(reason);
+    };
+    await new Promise<void>((resolve, reject) => {
+        let upgraded = false;
+        socket.on("error", (error) => (upgraded ? close(error.message) : reject(error)));
+        socket.on("close", () => close("connection closed"));
+        socket.once("connect", () =>
+            socket.write(
+                `GET ${pathname} HTTP/1.1\r\nHost: ${hostname}:${port}\r\nUpgrade: websocket\r\n` +
+                    `Connection: Upgrade\r\nSec-WebSocket-Key: ${randomBytes(16).toString("base64")}\r\n` +
+                    "Sec-WebSocket-Version: 13\r\n\r\n",
+            ),
+        );
+        socket.on("data", (data: Buffer) => {
+            buffer = Buffer.concat([buffer, data]);
+            if (!upgraded) {
+                const headerEnd = buffer.indexOf("\r\n\r\n");
+                if (headerEnd < 0) return;
+                const head = buffer.subarray(0, headerEnd).toString();
+                if (!head.startsWith("HTTP/1.1 101"))
+                    return reject(new Error(`DevTools upgrade failed: ${head}`));
+                upgraded = true;
+                buffer = buffer.subarray(headerEnd + 4);
+                resolve();
+            }
+            for (;;) {
+                if (buffer.length < 2) return;
+                const isFinal = (buffer[0] & 0x80) !== 0;
+                const opcode = buffer[0] & 0x0f;
+                let length = buffer[1] & 0x7f;
+                let offset = 2;
+                if (length === 126) {
+                    if (buffer.length < 4) return;
+                    length = buffer.readUInt16BE(2);
+                    offset = 4;
+                } else if (length === 127) {
+                    if (buffer.length < 10) return;
+                    length = Number(buffer.readBigUInt64BE(2));
+                    offset = 10;
+                }
+                if (buffer.length < offset + length) return;
+                const payload = Buffer.from(buffer.subarray(offset, offset + length));
+                buffer = buffer.subarray(offset + length);
+                if (opcode === 0x8) return close("close frame");
+                if (opcode === 0x9 || opcode === 0xa) continue;
+                fragments.push(payload);
+                if (!isFinal) continue;
+                const message = Buffer.concat(fragments);
+                fragments = [];
+                let text: string;
+                try {
+                    text = decoder.decode(message);
+                } catch {
+                    return close(`invalid UTF-8 in a ${message.length}-byte message`);
+                }
+                onText(text);
+            }
+        });
+    });
+    return {
+        send(text) {
+            if (closed) throw new Error("DevTools socket is closed");
+            const payload = Buffer.from(text);
+            const mask = randomBytes(4);
+            let header: Buffer;
+            if (payload.length < 126) header = Buffer.from([0x81, 0x80 | payload.length]);
+            else if (payload.length < 65536) {
+                header = Buffer.from([0x81, 0xfe, 0, 0]);
+                header.writeUInt16BE(payload.length, 2);
+            } else {
+                header = Buffer.alloc(10);
+                header[0] = 0x81;
+                header[1] = 0xff;
+                header.writeBigUInt64BE(BigInt(payload.length), 2);
+            }
+            for (let i = 0; i < payload.length; i++) payload[i] ^= mask[i % 4];
+            socket.write(Buffer.concat([header, mask, payload]));
+        },
+        close: () => close("closed by driver"),
+    };
+}
+async function waitFor(
+    page: Page,
+    condition: string,
+    timeoutMs = 30_000,
+    pollMs = 200,
+): Promise<void> {
+    const deadline = Date.now() + timeoutMs;
+    while (Date.now() < deadline) {
         try {
             if (await page.evaluate<boolean>(`!!(${condition})`)) return;
         } catch {
             // The document is still navigating or its execution context was replaced.
         }
-        await sleep(200);
+        await sleep(pollMs);
     }
     const state = await page.evaluate<UiSnapshot>(READ_UI);
     throw new Error(`Timed out waiting for ${condition}; page state ${JSON.stringify(state)}`);
@@ -355,6 +959,28 @@ async function click(page: Page, id: string): Promise<void> {
         userGesture: true,
     });
 }
+async function key(page: Page, type: "keyDown" | "keyUp"): Promise<void> {
+    await page.send("Input.dispatchKeyEvent", {
+        type,
+        code: "ArrowRight",
+        key: "ArrowRight",
+        windowsVirtualKeyCode: 39,
+        nativeVirtualKeyCode: 39,
+    });
+}
+function listFiles(directory: string): string[] {
+    return readdirSync(directory).flatMap((name) => {
+        const path = join(directory, name);
+        return statSync(path).isDirectory() ? listFiles(path) : [path];
+    });
+}
+function sha256(data: string | Buffer): string {
+    return createHash("sha256").update(data).digest("hex");
+}
+function isAlive(pid: number): boolean {
+    const result = spawnSync("tasklist", ["/FI", `PID eq ${pid}`, "/NH"], { encoding: "utf8" });
+    return new RegExp(`\\b${pid}\\b`).test(result.stdout);
+}
 function droppedTicks(status: string): number {
     return Number(/(\d+) TICKS DROPPED/.exec(status)?.[1] ?? (/^\d+$/.test(status) ? status : 0));
 }
@@ -364,6 +990,10 @@ function revision(): string {
     } catch {
         return "unknown";
     }
+}
+/** Stage marker on stderr; stdout carries only the JSON result. */
+function progress(stage: string): void {
+    console.error(`[browser-baseline ${new Date().toISOString()}] ${stage}`);
 }
 function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));

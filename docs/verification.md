@@ -1,5 +1,1124 @@
 # NGNE verification
 
+## NGNE-12 — 14 September 2026
+
+Session 1 (measurement and diagnosis) of the approved [plan](../plans/NGNE-12-measurement.md)
+(SHA256 `279a8e7eeedcb8a7e438c90a108e7f6386808147a85497a834b357263b0caf9b`,
+[review log](../plans/NGNE-12-review-log.md) round 4). Phase 0 (entry, exports and definitions) is
+recorded below. Every definition was written before any timed run; phase 0 contains no timed data.
+
+### Entry and revisions (phase 0)
+
+- Plan SHA256 matches the review log. HEAD `86494fd2bcdea81bc48dc9b7fe7d0b0efb942947`;
+  `git status --porcelain` lists only the plan and its review log. Jira NGNE-12 re-read (updated
+  14 September 2026): no material change; the plan's RS revision refines Jira's R0/R1/R2 split.
+  `codex --version`: codex-cli 0.154.0.
+- Exports: fresh `git archive` of each revision with `EXPORT_REVISION`; `npm ci` and `npm run build`
+  exit 0 in all four. The NGNE-27 exports were not reused.
+
+| Id  | Revision                                   | `dist/` files | SHA256 of the `dist/` asset list (`manifests/dist-<rev>.sha256`)   |
+| --- | ------------------------------------------ | ------------: | ------------------------------------------------------------------ |
+| R0  | `a906f3a47990c0c2f7007994b1ecf8c14e9280ee` |            28 | `eece56e5889fda70e779a1138f031a6d71e12aa81167581326c59636c7d34489` |
+| RS  | `9c00f023bfeaa2fb34034a710e0f4746005b511a` |            28 | `e76da760858c9071291582f8d97e3013861554efa9a09e5734fc76d25fe3c17a` |
+| R1  | `12b727e7f095a3ddd763724190a9d12ace6d2d76` |            46 | `3d27022e6d6384611b412cc0aea72c46cb94e794cb8c015b9eaa338665ccc48b` |
+| R2  | `86494fd2bcdea81bc48dc9b7fe7d0b0efb942947` |            46 | `0e1e5add9c3aa967064881e8898bad67797bae7ebbcdf091eb54668c720865ed` |
+
+All four contain Starfall, the platformer, `tests/benchmark.ts` and `tests/browser-baseline.ts`; the
+renderer fixture exists at R1 and R2 only. `vite.config.ts` is identical in all four.
+
+### Environment
+
+- Windows 11 Home 10.0.26200 x64; 12th Gen Intel Core i7-12650H, 10 cores / 16 logical; 15.7 GiB;
+  Node v24.15.0, npm 11.12.1; headful Chrome 152.0.7977.84; DPR 1; localhost.
+- Power: Balanced plan (`381b4222-…`), on AC (battery status 2, 97%).
+- GPUs present: Intel UHD Graphics (driver 31.0.101.4314) and NVIDIA GeForce RTX 4060 Laptop
+  (32.0.15.6614). Chrome uses the Intel GPU: WebGPU adapter `intel` / `gen-12lp`,
+  `isFallbackAdapter: false`, empty device and description; WebGL renderer
+  `ANGLE (Intel, Intel(R) UHD Graphics (0x000046A3) Direct3D11 vs_5_0 ps_5_0, D3D11)`.
+- Adapter features: `bgra8unorm-storage`, `clip-distances`, `core-features-and-limits`,
+  `depth-clip-control`, `depth32float-stencil8`, `dual-source-blending`, `float32-blendable`,
+  `float32-filterable`, `indirect-first-instance`, `primitive-index`, `rg11b10ufloat-renderable`,
+  `shader-f16`, `subgroup-size-control`, `subgroups`, `texture-component-swizzle`,
+  `texture-compression-bc`, `texture-compression-bc-sliced-3d`, `texture-formats-tier1`,
+  `texture-formats-tier2`, **`timestamp-query`**. The engine requests no features, so GPU execution
+  time stays a required evidence gap (plan it in session 2 or waive it in phase 5).
+
+### Provenance
+
+- Raw results live outside the checkout in `C:/Users/jfabi/AppData/Local/Temp/ngne-12-diagnostics/`
+  (local evidence, not portable). `scripts/manifest.sh` (SHA256 prefix `5f1f9be56a2e`) writes each
+  `<result>.manifest.txt` sidecar with the plan's fields.
+- NGNE-27 scripts verified and copied unchanged: `chaos-only.ts` `66e2e84bbfc1`, `parity-probe.ts`
+  `73e3f5de606e`, `profile-summary.mjs` `b893edc25e06`.
+- Source maps: `vite build --sourcemap hidden --outDir dist-hiddenmap` in each export produced the same
+  8 page files with byte-identical JavaScript, HTML and CSS (0 differences in all four). Allocation
+  sites are therefore source-mapped through `dist-hiddenmap/*.map`; the served files are byte-identical
+  to that build.
+- Heap snapshots name classes by minified identifiers. `scripts/class-map.mjs` (`5de838f8d13d`) maps
+  every minified class in each bundle to a single source name (no ambiguous entries), in
+  `definitions/class-map-<rev>.json`.
+- Provenance gap (untimed probes only): `scripts/phase0-preview.mts` was edited twice during phase 0
+  (preview readiness accepts any HTTP status, required by the fixture build without `index.html`; trace
+  stream parsed from `traceEvents`). The cycle runs used the first version and the fixture and trace
+  runs the second. Earlier hashes were not recorded; sidecars carry the final `847b5ee1501c`. The
+  in-probe trace summary reported 0 events; alignment below comes from `scripts/trace-align.mjs`
+  (`407a5d11b717`) over the saved traces.
+
+### Attributable windows
+
+`parity-probe.ts` ran in every export (two runs each, `parity/<mode>-<rev>.json`). All eight results
+are deterministic across their two runs.
+
+| Workload                     | R0, RS, R1 hash list | R2 hash list    | Terminal R0, RS, R1           | Terminal R2              | Order window (all) |
+| ---------------------------- | -------------------- | --------------- | ----------------------------- | ------------------------ | ------------------ |
+| Starfall Chaos, 900 ticks    | `05819083…8510`      | `969b0e59…c4e9` | `playing`, score 274,800      | `playing`, score 280,400 | 210                |
+| Starfall normal, 2,182 ticks | `19229bf9…7c67`      | `19229bf9…7c67` | `dead` at 2,182, score 55,350 | identical                | 2,182              |
+
+Window rule: longest tick prefix with identical hash lists.
+
+| Pair                | Chaos `W`                                       | Starfall normal `W` |
+| ------------------- | ----------------------------------------------- | ------------------- |
+| R0→RS, RS→R1, R0→R1 | 900 (whole run identical)                       | 2,182 (whole run)   |
+| R0→R2, RS→R2, R1→R2 | 237 (ticks 0–237 identical; first mismatch 238) | 2,182 (whole run)   |
+
+- `chaos-split.ts` keeps the `chaos-only.ts` rule (sample `i` in the window when `101 ≤ i` and
+  `i + 1 ≤ W`): 136 samples (101–236) for `W` = 237; 799 samples for `W` = 900.
+- Profiling runs use `--profile-window` 237 and 900.
+- NGNE-27 used `W` = 210, its 512-row order window; the plan's identical-prefix rule gives 237. The
+  order window is still 210 in every export.
+
+### Structural churn equivalence
+
+Two standalone fresh-process scripts; only the component definitions differ.
+
+| Parameter        | `churn-object.ts` (R0, RS, R1)                                                                                                                                                                                                                                     | `churn-schema.ts` (RS, R1, R2)                                                                          |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| Import           | `World` from `src/ecs.ts`, `component` from `src/index.ts`                                                                                                                                                                                                         | Same, plus `f64`                                                                                        |
+| Components       | `position` `() => ({ x: 0, y: 0 })`, `velocity` `() => ({ x: 0, y: 0 })`, `lifetime` `() => ({ ticks: 0 })`                                                                                                                                                        | `position` `{ x: f64(), y: f64() }`, `velocity` `{ x: f64(), y: f64() }`, `lifetime` `{ ticks: f64() }` |
+| Compositions     | A = position + velocity; B = position + velocity + lifetime                                                                                                                                                                                                        | Same                                                                                                    |
+| Setup            | 10,000 spawns alternating A/B, one commit                                                                                                                                                                                                                          | Same                                                                                                    |
+| Per commit       | despawn the 1,000 oldest (FIFO), spawn 1,000 alternating A/B with values from the spawn index, one `commit()`                                                                                                                                                      | Same                                                                                                    |
+| Warmup / samples | 100 / 1,000 commits                                                                                                                                                                                                                                                | Same                                                                                                    |
+| Timed run        | per-commit time (despawn + spawn + commit) only                                                                                                                                                                                                                    | Same                                                                                                    |
+| Allocation run   | `node:inspector` `HeapProfiler.startSampling` (32,768-byte interval, GC-collected objects included) over the 1,000 sampled commits; sampled bytes per second. Retained heap after `--expose-gc` `gc()` every 100 sampled commits, reported only as retained memory | Same                                                                                                    |
+| GC run           | `--trace-gc`; count and pause total between stdout markers around the sampled commits                                                                                                                                                                              | Same                                                                                                    |
+
+R0 exports only the object `component`; RS and R1 export both overloads; R2 only the schema API.
+Numeric width: object fields are JS doubles and schema fields `f64`, so the storage comparison has no
+width difference; `width-pass.ts` owns f32/f64.
+
+### Scene and asset cycles
+
+Controls and element ids are identical in R0, RS, R1 and R2 for both pages (`demo/main.ts`
+`updateUI` and `examples/platformer/transitions.ts` are unchanged in the relevant logic). Clicks are
+`Runtime.evaluate` `click()` with `userGesture`; keys are `Input.dispatchKeyEvent`. Every oracle
+times out at 20 s.
+
+**Starfall** (`/`, start after `#play` reads `START FLIGHT`):
+
+| Step | Action         | Completion oracle                                                                        | Dwell |
+| ---- | -------------- | ---------------------------------------------------------------------------------------- | ----- |
+| 1    | click `#chaos` | `#flight-state` = `CHAOS LAB / INVULNERABLE` (new arena scene and asset preparation)     | 5 s   |
+| 2    | click `#pause` | `#flight-state` = `FLIGHT PAUSED` and `#overlay-title` = `TAKE A BREATH.` (overlay push) | 1 s   |
+| 3    | click `#pause` | `#flight-state` = `CHAOS LAB / INVULNERABLE` and `#overlay` hidden (overlay pop)         | 2 s   |
+| 4    | click `#play`  | `#flight-state` = `FLIGHT IN PROGRESS` (normal arena replaces Chaos)                     | 3 s   |
+
+**Platformer** (`/examples/platformer/`, start after clicking `#start` and `#status` =
+`Reach the blue gate`):
+
+| Step | Action                 | Completion oracle                                                                                                          | Dwell |
+| ---- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------- | ----- |
+| 1    | `keyDown` `ArrowRight` | `#status` = `Returning to checkpoint…` (walks into the pit at tile 28)                                                     | 0 s   |
+| 2    | `keyUp` `ArrowRight`   | `#status` = `Reach the blue gate` and `#progress` deaths = previous + 1 (respawn scene prepared with the next attempt key) | 1 s   |
+| 3    | click `#pause`         | `#status` = `Paused` and `#overlay-title` = `Paused`                                                                       | 1 s   |
+| 4    | click `#pause`         | `#status` = `Reach the blue gate` and `#overlay` hidden                                                                    | 1 s   |
+
+- Verification (untimed, 3 cycles per preview, `definitions/preview/`): every oracle passed on R0, RS,
+  R1 and R2; Starfall cycles took 11.28–11.55 s and platformer cycles 6.83–6.93 s; visibility stayed
+  `visible`, `#error` empty, no owned process survived.
+- **N**: Starfall 40 cycles (about 7.5 min), forced GC and retained heap every 4 cycles; platformer
+  60 cycles (about 6.9 min), every 6 cycles. Heap snapshots after the first and last checkpoints.
+- Checkpoint state: end of step 4, after `HeapProfiler.collectGarbage`.
+
+Expected cardinalities at every checkpoint (heap snapshot object and native node counts; identical at
+all three phase 0 checkpoints of each preview). `SceneInstance` is the mounted-scene count. Starfall's
+`#sprites` read 316–322 at the checkpoint state; the platformer page exposes no sprite count without
+`?baseline`.
+
+| Identity                                        | Starfall R0 |        RS |        R1 |          R2 | Platformer R0 |        RS |        R1 |          R2 |
+| ----------------------------------------------- | ----------: | --------: | --------: | ----------: | ------------: | --------: | --------: | ----------: |
+| `SceneInstance`                                 |           1 |         1 |         1 |           1 |             1 |         1 |         1 |           1 |
+| `SceneCandidate`                                |           2 |         2 |         3 |           3 |             3 |         3 |         4 |           4 |
+| `World`                                         |           1 |         1 |         1 |           1 |             1 |         1 |         1 |           1 |
+| Query runtimes (object, legacy or schema)       |           2 |         2 |         2 |           2 |             1 |         1 |         1 |           1 |
+| `Assets`                                        |           1 |         1 |         1 |           1 |             1 |         1 |         1 |           1 |
+| `AudioBuffer`                                   |           2 |         2 |         2 |           2 |             2 |         2 |         2 |           2 |
+| `AudioBufferSourceNode`                         |           0 |         0 |         0 |           0 |             2 |         2 |         2 |           2 |
+| `GainNode`                                      |           2 |         2 |         2 |           2 |             4 |         4 |         4 |           4 |
+| `ImageBitmap`                                   |           0 |         0 |         0 |           2 |             0 |         0 |         0 |           0 |
+| `CanvasRenderingContext2D`                      |           2 |         2 |         2 |           1 |             0 |         0 |         0 |           0 |
+| `WebGLTexture` / `GPUTexture`                   |       3 / 0 |     3 / 0 |     3 / 0 |       0 / 3 |         2 / 0 |     2 / 0 |     2 / 0 |       0 / 2 |
+| `WebGLBuffer` / `GPUBuffer`                     |       2 / 0 |     2 / 0 |     2 / 0 |       0 / 6 |         2 / 0 |     2 / 0 |     2 / 0 |       0 / 5 |
+| `GPUBindGroup`, `GPUTextureView`, `GPUSampler`  |           0 |         0 |         0 |     3, 1, 2 |             0 |         0 |         0 |     2, 1, 2 |
+| `Float32Array` / `Float64Array` / `ArrayBuffer` |   3 / 0 / 5 | 3 / 0 / 5 | 3 / 0 / 5 | 4 / 21 / 31 |     3 / 0 / 8 | 3 / 0 / 8 | 3 / 0 / 8 | 4 / 12 / 23 |
+
+Intentional caches and pools (bound = the phase 0 checkpoint count for that revision and game):
+
+| Cache or pool                                                     | Owner and snapshot identity                                                                                                                  | Expected bound                                                                            |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Decoded asset cache (loaded entries kept after leases reach zero) | `Assets` `entries` map, retaining `AudioBuffer`, the Starfall atlas (`HTMLCanvasElement` at R0–R1, `ImageBitmap` at R2)                      | One entry per asset id: Starfall `ships`, `starfall-music`; platformer `platformer-music` |
+| Renderer-owned textures                                           | R0–R1 `Renderer` texture and source maps (`WebGLTexture`); R2 `WebGpuRuntime` image entries (`GPUTexture`, `GPUBindGroup`, `GPUTextureView`) | White texture plus one per image id; counts in the table                                  |
+| Pooled renderer and frame buffers                                 | `WebGLBuffer`, `WebGLVertexArrayObject`, `GPUBuffer`; `Frame` typed arrays (`Float32Array`)                                                  | Counts in the table; capacity grows, count does not                                       |
+| Typed-array storage                                               | `Float64Array`, `ArrayBuffer` (schema chunk columns and other typed storage at R2; object columns at R0–R1)                                  | Counts in the table                                                                       |
+| Prepared scene candidates                                         | `SceneCandidate` per purpose (Starfall pause, result; platformer respawn, next or complete, pause)                                           | Counts in the table                                                                       |
+| Audio buses and music voice                                       | `Audio` → `GainNode`, `AudioBufferSourceNode`                                                                                                | Counts in the table                                                                       |
+
+A constructor or native type outside this list whose count grows with cycle count, or a listed
+identity above its bound, is leak-candidate evidence under the plan's rule.
+
+### GPU trace definitions
+
+- Categories exposed by Chrome 152 and used: `devtools.timeline`, `gpu`, `gpu.angle`,
+  `disabled-by-default-gpu.dawn`, `disabled-by-default-devtools.timeline.frame`, `v8`,
+  `disabled-by-default-v8.gc`. Collected from the browser target with `Tracing.start`
+  (`ReturnAsStream`) and `IO.read`.
+- Alignment proof: Starfall Chaos Lab, 5 s trace after 4 s in Chaos, one run per backend (R1 WebGL,
+  R2 WebGPU). Both traces held 301 `FireAnimationFrame` events on `CrRendererMain`, and every compared
+  event started inside 300 of 300 rAF intervals.
+- Compared per rAF interval (summed duration): `CrGpuMain` `Scheduler::RunTask` (all GPU main-thread
+  tasks), `CommandBufferStub::OnAsyncFlush` and `DXGISwapChainImageBacking::Present` on both backends;
+  `WebGL` (`gpu`) at R0–R1; `WebGPU` (`gpu`), `WebGPUDecoderImpl::HandleDawnCommands` and
+  `Queue::Submit` (`disabled-by-default-gpu.dawn`) at R2. `RasterDecoderImpl::*` events include DOM
+  HUD raster and are not compared. GC: renderer main-thread `MinorGC` and `MajorGC` counts and
+  durations.
+- Label: GPU-process CPU time; not GPU execution time. Descriptive only.
+
+### Renderer fixture serving
+
+Decision (user, 15 September 2026, at phase 0 validation): use this diagnostic fixture build.
+`tests/browser-renderer-benchmark.ts` starts from `validation.html`, which no production build
+includes; NGNE-21 ran it on the dev server. Verified candidate without tracked changes: a harness Vite
+config in the diagnostics directory (`scripts/vite.fixture-plain.config.mjs` `393475d225e9`,
+`vite.fixture-hidden.config.mjs` `21b2fe3fff69`) builds only `validation.html` from each export into
+`dist-fixture/`; the hidden-map build is byte-identical (2 files, 0 differences at R1 and R2). Served by
+`vite preview --strictPort --outDir dist-fixture` with the served-build hash check (asset-list SHA256
+R1 `f00a0006…9750`, R2 `4a7048ec…d98b`). R1 `webgl`, R1 `webgpu` and R2 `webgpu`, one-texture and
+alternating arms, reached ready with the expected backend and no fixture error: draw calls 1 and 10,000,
+upload bytes 560,000 (`webgl`) and 560,048 (`webgpu`), capacity 16,384 and 10,000, one buffer growth,
+three bindings. R2 `webgl` is correctly unavailable.
+
+### Phase 0 checks
+
+`npm.cmd test` 141/141 pass; `typecheck`, `build` and `format:check` exit 0; `git diff --check` empty;
+`git diff --name-only 86494fd -- src demo examples index.html validation.html` empty.
+
+### Harness (phase 1)
+
+Phase 0 validated by the user on 15 September 2026. Phase 1 produced no timed data; every run below is
+a smoke run.
+
+**Driver** `tests/browser-baseline.ts` (SHA256 prefix `1dd57e8f8496`). New behaviour sits behind
+environment options documented in the file header; with none set, the run keeps every earlier output
+field and adds `longTasksInSample`, `visibilityState`, `backend` and `run`.
+
+- Run isolation: `NGNE_SERVE_DIR` starts `vite preview --strictPort` on the URL port and owns it;
+  `NGNE_CDP_PORT` and a fresh profile per run; Chrome and preview are terminated with `taskkill /T`
+  and `run.survivingOwnedProcesses` must be empty (non-zero exit otherwise).
+- Served-build check: every HTML, JS and CSS file of the expected build is fetched and hashed before
+  warmup; a mismatch aborts.
+- Backend assertion (`NGNE_EXPECTED_BACKEND`): existing page-canvas context type, probe-canvas WebGL
+  renderer string, WebGPU adapter; software renderers and fallback adapters abort.
+- Game-mode allocation sampling (`NGNE_ALLOCATION_SAMPLING=1`), 32,768-byte interval with major and
+  minor GC-collected objects, unfiltered profile saved with sampled bytes per second and top sites.
+- Long tasks counted only when `startTime` lies in the sample window (`longTasksInSample`).
+- Cycle mode (`NGNE_CYCLES`): the phase 0 steps, oracles and dwells; forced GC and retained heap every
+  N/10 cycles; heap snapshots after the first and last checkpoints; aborts if the page is not visible
+  after any cycle.
+- Heap snapshots (`NGNE_SNAPSHOTS=1`), browser traces (`NGNE_TRACE=1`, phase 0 categories,
+  `ReturnAsStream`, data loss aborts) and retained-heap checkpoints (`NGNE_RETAINED_EVERY_SECONDS`).
+- Every artifact must parse with a non-zero node or event count; SHA256 and counts are recorded.
+- `visibilityState` at sample start and end (a page hidden from launch fires no `visibilitychange`).
+- DevTools calls time out after 180 s and a closed socket fails pending calls; stage markers go to
+  stderr.
+- DevTools transport is a minimal `node:net` WebSocket client (see findings).
+
+**Diagnostics scripts** (`scripts/` in the diagnostics directory; SHA256 prefixes):
+
+| Script                                | Prefix                          | Purpose                                                                                                                                                       |
+| ------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `chaos-split.ts`                      | `d9352bc8d155`                  | Chaos tick, frame preparation, sort and sum per sample; `--window`; `--profile-window` with source maps                                                       |
+| `churn-object.ts` / `churn-schema.ts` | `a0318a66b01a` / `9899df71b7f1` | Phase 0 churn definition; `timed`, `alloc`, `gc` modes; schema file generated by `make-churn-schema.mjs` (`1856c3b70cc7`), only header and definitions differ |
+| `width-pass.ts`                       | `830424fd6138`                  | R2 20,000-entity f32 and f64 pass, 300 paired samples, alternating order                                                                                      |
+| `gc-parse.mjs`                        | `c2f3f2920e22`                  | `--trace-gc` pauses aligned to the churn window                                                                                                               |
+| `snapshot-diff.mjs`                   | `7838444f13b5`                  | Constructor count, self-size and dominator retained-size deltas, shortest retainer path                                                                       |
+| `map-sites.mjs`                       | `0dedc9b446ee`                  | Allocation sites through the hidden source maps; native leaves attributed to the JavaScript caller                                                            |
+| `profile-map.mjs`                     | `c2c09b544187`                  | Successor of `profile-summary.mjs`: self time per source function and line                                                                                    |
+| `check-artifacts.mjs`                 | `ec12eb62ccc9`                  | Artifact gate: parse, count, SHA256, visibility, surviving processes                                                                                          |
+| `run-browser.sh`, `phase1-smoke.sh`   | `f326321cf917`, `e16d99db0a21`  | One isolated driver run with manifest; the phase 1 smoke batch                                                                                                |
+
+**Findings while building the harness** (all harness-side; no session 2 candidate):
+
+1. Node 24.15.0's built-in `WebSocket` (undici 7.24.4) raised a `TypeError` and closed the DevTools
+   connection (1006) when Chrome sent a 4,261,794-byte `HeapProfiler.stopSampling` reply. It reproduced
+   after 10 Starfall cycles with a forced GC per cycle on R1, with or without heap snapshots, while
+   60 s plain, snapshot and cycling runs (2.2–2.8 MB replies) returned normally. The earlier driver
+   ignored socket close, so the run hung (smoke attempt 1). A raw `node:net` client received the same
+   reply intact as valid UTF-8 in 155 ms; a local uncompressed 8 MiB frame reached the built-in client
+   normally, so the exact client-side cause (compression is suspected) is not isolated. The driver now
+   uses the raw client.
+2. Hidden windows: in attempt 1 the R1 cycle page became `hidden` for an unknown reason (no lock or
+   standby event). In the final batch the no-option compatibility run started hidden and became
+   visible at 13.6 s; the artifact gate rejects it. It directly followed a PowerShell cleanup command
+   (suspected focus change, not proven); a standalone rerun passed. Measurement batches open no
+   console windows between runs.
+3. `--trace-gc` includes a tsx loader worker isolate, and `PerformanceObserver` reports
+   incremental-marking entries (kind 8) with no trace line. `gc-parse.mjs` selects the unique isolate
+   and shift with 100% pause agreement (all six churn smoke runs) and windows by observer start time.
+4. tsx runs single-line transformed modules, so raw CPU profile frames carry only columns.
+   `chaos-split.ts` saves each module's inline source map after the profile window and
+   `profile-map.mjs` recovers source lines (99.0% of NGNE self time mapped at R2, 99.9% at R0). In game
+   bundles engine frames map to `dist/engine/*.js` (compiled lines, exact function names) because the
+   engine build emits no source maps; allocation mapping covered 99.5–99.9% of sampled bytes.
+
+**Smoke runs** (5 s sample after 2 s warmup unless cycle mode; `smoke/browser3/`, one manifest each,
+all through the served-build check):
+
+| Run                                                      | Backend                  | Artifacts (node or event counts)               | Result                                                                                 |
+| -------------------------------------------------------- | ------------------------ | ---------------------------------------------- | -------------------------------------------------------------------------------------- |
+| R2 Starfall: allocation, snapshots, retained checkpoints | webgpu                   | allocation 150; snapshots 91,710 and 92,954    | Pass                                                                                   |
+| R2 Starfall trace                                        | webgpu                   | trace 90,885 events, 301 rAF                   | Pass                                                                                   |
+| R2 platformer: allocation, snapshots, retained           | webgpu                   | allocation 65; snapshots 49,733 and 50,017     | Pass                                                                                   |
+| R2 platformer trace                                      | webgpu                   | trace 73,743 events, 301 rAF                   | Pass                                                                                   |
+| R2 fixture `webgpu` one texture, snapshots               | webgpu                   | allocation 18; snapshots 45,343 and 45,429     | Pass                                                                                   |
+| R2 fixture `webgpu` alternating, trace                   | webgpu                   | allocation 15; trace 126,982 events, 301 rAF   | Pass                                                                                   |
+| R1 fixture `webgl` one texture                           | webgl2                   | allocation 16                                  | Pass                                                                                   |
+| Starfall 10 cycles R2 / R1 / R0 (allocation sampling)    | webgpu / webgl2 / webgl2 | allocation 749 / 489 / 471; two snapshots each | Pass; 40/40 oracles each; 11.3 s per cycle                                             |
+| Platformer 10 cycles R2 / R1 / R0                        | webgpu / webgl2 / webgl2 | two snapshots each                             | Pass; 40/40 oracles each; 6.9 s per cycle                                              |
+| R0 Starfall, R1 platformer backend assertion             | webgl2                   | none                                           | Pass                                                                                   |
+| R0 page expecting `webgpu` (negative)                    | —                        | —                                              | Aborted: page context webgl2, expected webgpu                                          |
+| R0 preview on the port, R2 build expected (negative)     | —                        | —                                              | Aborted: served build does not match (8 files)                                         |
+| No new options, R2 preview on 4173                       | webgpu                   | none                                           | Rejected (window hidden at start); standalone rerun passed, all earlier fields present |
+
+Earlier attempts are kept, not reused: `smoke/browser/` (attempt 1, R1 Starfall cycle hung; marked
+`HUNG.rejected.txt`) and `smoke/browser2/` (attempt 2, R1 and R0 Starfall cycles failed with the
+180 s `stopSampling` timeout; compatibility run never rendered a frame). Snapshot diffs and site mapping
+ran on the final cycle artifacts of R0, R1 and R2.
+
+**Node smoke** (`smoke/node-final/`, 25 manifests, empty stderr): `chaos-split.ts` on R0, RS, R1
+(`W` = 900) and R2 (`W` = 237, 136 samples); profile windows 237 (R2) and 900 (R0); both churn scripts
+in all three modes on every target revision with `gc-parse.mjs` accepted; `width-pass.ts` on R2.
+
+### Phase 1 checks
+
+`npm.cmd test` 141/141 pass; `typecheck`, `build` and `format:check` exit 0; `git diff --check` empty;
+protected-path scan empty. `tests/browser-baseline.ts` is outside every tsconfig and the repository has
+no Node type declarations, so it is run by tsx without a typecheck, as before.
+
+### CPU measurements (phase 2)
+
+Phase 1 validated by the user on 15 September 2026. The method below was recorded before any phase 2
+timed run.
+
+**Batch** `scripts/phase2-cpu.sh` (`aa161303c0cc`), per-run check `scripts/phase2-check.mjs`
+(`6505a9cd2ae0`), analysis `scripts/phase2-analyze.mjs` (`22fa57e22f49`), profile comparison
+`scripts/profile-diff.mjs` (`a4b3340d303b`). Raw results in `node/phase2/<matrix>/`, `profiles/` and `bench/`.
+
+- Fresh `node` process per run in the export root, the phase 1 script text (the batch aborts if any
+  export copy differs from `scripts/`).
+- Latin squares are cyclic (row r, position p → condition (r + p) mod k), executed in this order:
+  Chaos split (R0, RS, R1, R2; one 4×4 square, `--window 237`); `churn-object` timed, alloc, gc (R0, RS,
+  R1; 3×3 each); `churn-schema` timed, alloc, gc (RS, R1, R2; 3×3 each); RS object versus schema
+  timed, alloc, gc (two 2×2 squares each); `width-pass.ts` R2 × 3; profiling runs; `npm run bench`.
+  97 matrix runs, 7 profiling runs, 8 bench runs.
+- Run rejection: non-zero exit, non-empty stderr, wrong `revision`, wrong sample count (Chaos 799
+  whole-run and 136 window samples; churn 1,000 commits; width 300 pairs), empty or unparseable heap
+  profile, fewer than 11 retained-heap points, `gc-parse.mjs` not accepted or no GC in the window. A
+  rejected run rejects its row: files get `.rejected`, a reason file is written, the row reruns (3
+  attempts, then stop).
+- CPU load percentage is logged before each matrix (`batch.log`), descriptive only.
+- Chaos windows from one run: `W` = 237 is `attributableWindow`; `W` = 900 is `wholeRun`. Pairs at
+  `W` = 237: R0→RS, RS→R1, R1→R2, R0→R1, R0→R2. Pairs at 900: R0→RS, RS→R1, R0→R1; R1→R2 and R0→R2
+  at 900 are labelled non-attributable whole-game evidence.
+- Decision metrics: Chaos tick, preparation, sort and sum p50, p95, p99; churn commit p50, p95, p99;
+  allocation sampled bytes per commit-second; `--trace-gc` pause total in the window; width-pass
+  p50, p95, p99 (f64→f32). Descriptive: bytes per commit, GC count, retained heap at the end and its
+  slope.
+- Per condition: median of run values, range, range / median. Attributable and noise stop exactly as
+  the plan; a metric with any range above 10% is reported within run noise with its ranges.
+- Profiles: one run per revision per distinct `W` (R0, RS, R1 at 900 and 237; R2 at 237), summarised
+  by `profile-map.mjs`; `profile-diff.mjs` names functions for each pair with an attributable window
+  difference above 5%. Not timing evidence.
+- Wrapper test before the batch: RS object versus schema (all three modes) and `width-pass.ts` ran
+  once through the batch into the session scratchpad to test file handling, manifests and analysis.
+  Those 27 runs are not evidence, were not idle-confirmed and are not reused; no rule changed.
+
+**Numeric fields** (source read at R0 and R2; bytes per row count field columns only).
+
+| Game       | Component  | R2 schema fields                                                                                  | Bytes/row | R0 object fields                  |
+| ---------- | ---------- | ------------------------------------------------------------------------------------------------- | --------: | --------------------------------- |
+| Starfall   | `position` | `x`, `y`, `px`, `py` `f64`                                                                        |        32 | JS numbers                        |
+| Starfall   | `body`     | `vx`, `vy`, `radius`, `hp`, `age`, `cooldown` `f64`; `active` `bool`; `kind` `u8`                 |        50 | JS numbers; `active` JS boolean   |
+| Starfall   | `visual`   | `sprite` `u8`; `size`, `angle` `f64`                                                              |        17 | JS numbers                        |
+| Starfall   | `particle` | `vx`, `vy`, `life`, `maxLife`, `size` `f64`; `color` `u32`                                        |        44 | JS numbers                        |
+| Platformer | `position` | `x`, `y`, `px`, `py` `f64`                                                                        |        32 | JS numbers                        |
+| Platformer | `body`     | `vx`, `vy`, `w`, `h`, `coyoteTicks`, `jumpBufferTicks`, `previousBottom` `f64`; `grounded` `bool` |        57 | JS numbers; `grounded` JS boolean |
+| Platformer | `actor`    | `kind` `u8`; `facing` `f64`                                                                       |         9 | JS numbers                        |
+
+- Columns: `f64` `Float64Array`, `u32` `Uint32Array`, `u8` and `bool` `Uint8Array` (`src/ecs.ts`
+  `createColumn`). Every fractional game value stays double precision, as JS numbers at R0; `u8` and
+  `u32` fields hold small integer ids and an RGB colour.
+- `Frame` narrows to `Float32Array` in all revisions. R0 and RS pack 13 floats (`x`, `y`, `w`, `h`,
+  `u`, `v`, `uw`, `vh`, `r`, `g`, `b`, `a`, `angle`): rotation is evaluated from an `f32` angle in the
+  WebGL shader. R1 and R2 pack 14 floats (`tx`, `ty`, `ix`, `iy`, `jx`, `jy` from `packAffine` in
+  double precision on the CPU, then `u`, `v`, `du`, `dv`, `r`, `g`, `b`, `a`): the affine products
+  are narrowed to `f32` instead of the angle.
+
+#### Execution
+
+- 15 September 2026, 16:42:51–16:53:48 UTC; 104 of 104 Node runs accepted (94 matrix, 3 width, 7
+  profiling), 0 rejected, no block rerun; 8 bench runs exit 0. Every raw result has a manifest.
+- Load before each matrix (`batch.log`, `Win32_Processor.LoadPercentage`, includes the probe's own
+  PowerShell start): 1–22%. Idle machine: MANUAL (user) confirmation pending.
+- Analysis: `node/phase2-analysis.json` (`5294da919c6f`) and full tables with min–max per condition in
+  `node/phase2-analysis.md` (`8de2d19b120b`), both with manifests.
+
+#### Results
+
+Medians of per-run values. **Max range** is the largest same-condition range / median in the row.
+Pair cells: change of medians, then **A↑** or **A↓** attributable, **–** within run noise, **N** noise
+stop (within run noise, narrowed; never a verdict). Rows marked descriptive never enter classification.
+Regression classification (R0→R2 thresholds) belongs to phase 4.
+
+**Chaos split, `W` = 237 window (136 samples; ms per sample)**
+
+| Metric      |     R0 |     RS |     R1 |     R2 | Max range | R0→RS   | RS→R1     | R1→R2    | R0→R1     | R0→R2     |
+| ----------- | -----: | -----: | -----: | -----: | --------: | ------- | --------- | -------- | --------- | --------- |
+| tick p50    | 0.2488 | 0.2531 | 0.2556 | 0.2633 |        6% | +1.7% – | +1.0% –   | +3.0% –  | +2.8% –   | +5.8% –   |
+| tick p95    | 0.3300 | 0.3436 | 0.3519 | 0.4189 |       27% | +4.1% N | +2.4% N   | +19.1% N | +6.6% N   | +26.9% N  |
+| tick p99    | 0.3926 | 0.4290 | 0.4041 | 0.5515 |       67% | +9.3% N | -5.8% N   | +36.5% N | +2.9% N   | +40.5% N  |
+| prepare p50 | 0.3016 | 0.3002 | 0.2934 | 0.3010 |        3% | -0.5% – | -2.2% A↓  | +2.6% A↑ | -2.7% –   | -0.2% –   |
+| prepare p95 | 0.4990 | 0.4933 | 0.3516 | 0.3762 |       10% | -1.2% N | -28.7% A↓ | +7.0% –  | -29.5% N  | -24.6% N  |
+| prepare p99 | 0.5458 | 0.5660 | 0.4047 | 0.4432 |       88% | +3.7% N | -28.5% N  | +9.5% N  | -25.9% N  | -18.8% N  |
+| sort p50    | 0.0865 | 0.0857 | 0.0887 | 0.0879 |       13% | -0.8% N | +3.4% N   | -0.9% –  | +2.6% –   | +1.7% –   |
+| sort p95    | 0.0983 | 0.1021 | 0.1052 | 0.1146 |       51% | +4.0% N | +3.0% N   | +8.9% N  | +7.1% N   | +16.6% N  |
+| sort p99    | 0.1426 | 0.1291 | 0.3739 | 0.6213 |       61% | -9.5% N | +189.7% N | +66.1% N | +162.1% N | +335.5% N |
+| sum p50     | 0.6484 | 0.6431 | 0.6432 | 0.6691 |        4% | -0.8% – | +0.0% –   | +4.0% A↑ | -0.8% –   | +3.2% –   |
+| sum p95     | 0.8492 | 0.8703 | 0.7955 | 0.8763 |       12% | +2.5% N | -8.6% N   | +10.2% N | -6.3% N   | +3.2% N   |
+| sum p99     | 0.9275 |  1.017 | 0.9451 |  1.283 |       21% | +9.6% N | -7.1% N   | +35.7% N | +1.9% N   | +38.3% N  |
+
+**Chaos split, whole run (799 samples, `W` = 900; ms per sample)**. R1→R2 and R0→R2 are
+non-attributable whole-game evidence (R2's simulation diverges at tick 238).
+
+| Metric      |     R0 |     RS |     R1 |     R2 | Max range | R0→RS    | RS→R1     | R0→R1     | R1→R2     | R0→R2     |
+| ----------- | -----: | -----: | -----: | -----: | --------: | -------- | --------- | --------- | --------- | --------- |
+| tick p50    | 0.2384 | 0.2447 | 0.2421 | 0.2043 |        4% | +2.6% A↑ | -1.1% –   | +1.5% A↑  | -15.6% A↓ | -14.3% A↓ |
+| tick p95    | 0.3113 | 0.3181 | 0.3139 | 0.3578 |        7% | +2.2% –  | -1.3% –   | +0.8% –   | +14.0% A↑ | +15.0% A↑ |
+| tick p99    | 0.4100 | 0.4316 | 0.4018 | 0.4741 |       16% | +5.3% N  | -6.9% N   | -2.0% N   | +18.0% N  | +15.6% N  |
+| prepare p50 | 0.3033 | 0.3041 | 0.2941 | 0.3017 |        5% | +0.3% –  | -3.3% A↓  | -3.0% –   | +2.5% A↑  | -0.6% –   |
+| prepare p95 | 0.4850 | 0.4772 | 0.3481 | 0.3665 |        9% | -1.6% –  | -27.1% A↓ | -28.2% A↓ | +5.3% –   | -24.4% A↓ |
+| prepare p99 | 0.6347 | 0.6144 | 0.4454 | 0.4546 |       21% | -3.2% N  | -27.5% N  | -29.8% N  | +2.1% N   | -28.4% N  |
+| sort p50    | 0.0863 | 0.0862 | 0.0888 | 0.0881 |       13% | -0.1% N  | +3.0% N   | +2.9% A↑  | -0.7% –   | +2.1% A↑  |
+| sort p95    | 0.1028 | 0.1057 | 0.1003 | 0.1088 |       11% | +2.9% N  | -5.1% N   | -2.4% –   | +8.4% –   | +5.8% A↑  |
+| sort p99    | 0.1376 | 0.1485 | 0.3650 | 0.6769 |       44% | +7.9% N  | +145.8% N | +165.2% N | +85.5% N  | +391.9% N |
+| sum p50     | 0.6319 | 0.6412 | 0.6298 | 0.6062 |        2% | +1.5% –  | -1.8% A↓  | -0.3% –   | -3.7% A↓  | -4.1% A↓  |
+| sum p95     | 0.8484 | 0.8594 | 0.7771 | 0.8111 |        6% | +1.3% –  | -9.6% A↓  | -8.4% A↓  | +4.4% –   | -4.4% –   |
+| sum p99     |  1.039 |  1.018 | 0.9520 |  1.329 |       10% | -2.0% –  | -6.5% –   | -8.4% A↓  | +39.6% N  | +27.9% N  |
+
+**`churn-object.ts` (R0 native, RS and R1 legacy bridge)**
+
+| Metric                                   |     R0 |     RS |     R1 | Max range | R0→RS     | RS→R1    | R0→R1     |
+| ---------------------------------------- | -----: | -----: | -----: | --------: | --------- | -------- | --------- |
+| commit p50 (ms)                          | 0.3238 | 0.3328 | 0.3297 |        7% | +2.8% –   | -0.9% –  | +1.8% –   |
+| commit p95 (ms)                          | 0.4964 | 0.5079 | 0.5243 |        9% | +2.3% –   | +3.2% –  | +5.6% –   |
+| commit p99 (ms)                          | 0.7007 |  1.177 |  1.148 |       40% | +67.9% N  | -2.4% N  | +63.9% N  |
+| allocation GiB/s                         |  2.753 |  2.111 |  2.117 |        4% | -23.3% A↓ | +0.3% –  | -23.1% A↓ |
+| GC pause total (ms)                      | 13.880 | 25.540 | 25.090 |      115% | +84.0% N  | -1.8% N  | +80.8% N  |
+| descriptive: allocation MiB/commit       |  1.141 |  0.890 |  0.885 |        2% | -22.0% A↓ | -0.5% –  | -22.4% A↓ |
+| descriptive: GC count                    |     61 |     30 |     30 |       80% | -50.8% N  | +0.0% N  | -50.8% N  |
+| descriptive: retained heap at end (MiB)  | 10.412 | 10.706 | 10.987 |        0% | +2.8% A↑  | +2.6% A↑ | +5.5% A↑  |
+| descriptive: retained slope (KiB/100 c.) |  1.438 |  1.439 |  1.423 |        0% | +0.1%     | -1.1%    | -1.1%     |
+
+**`churn-schema.ts` (RS, R1, R2)**
+
+| Metric                                   |     RS |     R1 |     R2 | Max range | RS→R1    | R1→R2    | RS→R2    |
+| ---------------------------------------- | -----: | -----: | -----: | --------: | -------- | -------- | -------- |
+| commit p50 (ms)                          |  2.637 |  2.590 |  2.593 |        4% | -1.8% –  | +0.1% –  | -1.6% –  |
+| commit p95 (ms)                          |  3.173 |  3.134 |  3.094 |       25% | -1.2% –  | -1.3% N  | -2.5% N  |
+| commit p99 (ms)                          |  4.836 |  4.978 |  3.473 |       49% | +2.9% N  | -30.2% N | -28.2% N |
+| allocation GiB/s                         |  1.611 |  1.599 |  1.550 |        5% | -0.7% –  | -3.1% –  | -3.8% –  |
+| GC pause total (ms)                      | 62.820 | 63.340 | 34.240 |       45% | +0.8% N  | -45.9% N | -45.5% N |
+| descriptive: allocation MiB/commit       |  4.949 |  4.948 |  4.788 |        1% | -0.0% –  | -3.2% A↓ | -3.3% A↓ |
+| descriptive: GC count                    |     78 |     79 |     74 |        1% | +1.3% –  | -6.3% A↓ | -5.1% A↓ |
+| descriptive: retained heap at end (MiB)  |  9.607 |  9.887 |  9.807 |        0% | +2.9% A↑ | -0.8% A↓ | +2.1% A↑ |
+| descriptive: retained slope (KiB/100 c.) |  1.476 |  1.413 |  1.512 |        9% | -4.3%    | +7.0%    | +2.4%    |
+
+**Same-revision churn at RS, object versus schema (causal SoA comparison)**
+
+| Metric                                   | RS object | RS schema | Max range | Object→schema |
+| ---------------------------------------- | --------: | --------: | --------: | ------------- |
+| commit p50 (ms)                          |    0.3439 |     2.638 |       12% | +667.0% N     |
+| commit p95 (ms)                          |    0.5386 |     3.197 |       17% | +493.7% N     |
+| commit p99 (ms)                          |     1.290 |     4.890 |      116% | +279.1% N     |
+| allocation GiB/s                         |     2.099 |     1.570 |        2% | -25.2% A↓     |
+| GC pause total (ms)                      |    22.580 |    65.275 |      102% | +189.1% N     |
+| descriptive: allocation MiB/commit       |     0.887 |     4.965 |        2% | +459.7% A↑    |
+| descriptive: GC count                    |        30 |        79 |       37% | +163.3% N     |
+| descriptive: retained heap at end (MiB)  |    10.705 |     9.609 |        0% | -10.2% A↓     |
+| descriptive: retained slope (KiB/100 c.) |     1.438 |     1.598 |       16% | +11.1% N      |
+
+**`width-pass.ts` at R2, 20,000 entities (ms per pass)**
+
+| Metric   |    f64 |    f32 | Max range | f64→f32  |
+| -------- | -----: | -----: | --------: | -------- |
+| pass p50 | 0.2224 | 0.2136 |        3% | -4.0% A↓ |
+| pass p95 | 0.2488 | 0.2351 |        7% | -5.5% –  |
+| pass p99 | 0.2964 | 0.3030 |        7% | +2.2% –  |
+
+#### Observations for phase 4
+
+Statements of what the rules produced; classification and ranking are phase 4.
+
+1. **Chaos, R0→R2 inside `W` = 237:** no decision metric is attributable. Sum p50 +3.2% and tick p50
+   +5.8% are within run noise (overlapping runs); every p95 and p99 except preparation p95 hits the
+   noise stop. The NGNE-27 lead (7–12% slower Chaos window) is not reproduced as attributable here.
+2. **Chaos, R1→R2 inside `W` = 237:** sum p50 +4.0% and preparation p50 +2.6% attributable; both
+   below 5%.
+3. **Chaos sort p99** rises from about 0.13–0.15 ms (R0, RS) to 0.37 ms (R1) and 0.62–0.68 ms (R2) in
+   both windows; noise stop on every pair (ranges 11–61%). Recorded as narrowed.
+4. **Same-revision churn:** schema per-commit time is 7.7 times object at p50 (every schema run
+   2.595–2.663 ms, every object run 0.327–0.367 ms), but object's range is 11.7% of its median, so
+   the predeclared noise stop applies and it is reported within run noise. Sampled allocation per
+   commit is 5.6 times object (descriptive) while the decision metric, bytes per second, is 25% lower
+   because commits take longer; GC count 30→79 is also noise-stopped. **Open decision below.**
+5. **`churn-schema.ts` RS→R2:** no attributable change in time or allocation rate; allocation per
+   commit -3.3% (descriptive). The schema churn cost measured at RS persists at R2.
+6. **`churn-object.ts` R0→RS:** allocation rate -23.3% attributable (improvement); retained heap at the
+   end +0.29 MiB (descriptive); GC pause total noise-stopped (one RS run 43 ms).
+7. **f32/f64 at R2:** f32 p50 4.0% faster than f64 (attributable); p95 and p99 within run noise.
+8. **Retained heap slope** in every churn arm is 1.4–1.6 KiB per 100 commits, including R0 (consistent
+   with the harness's own growing sample arrays; not isolated); no arm differs attributably.
+9. **Whole-run Chaos, R0→R2 (non-attributable):** tick p50 -14.3%, tick p95 +15.0%, sum p50 -4.1%,
+   sum p99 +27.9% (noise stop). The games diverge after tick 237, so these compare different play.
+
+#### CPU profiles
+
+One profiling run per revision and window (`profiles/`, manifests, `profile-map.mjs` summaries, 100 µs
+sampling, not timing evidence). `profile-diff.mjs` outputs are `profiles/diff-<W>-<X>-<Y>.json`. Self
+time covers tick, preparation and sort together, so a function is a candidate cause, not a measured
+segment share. Functions whose line moved between revisions appear as a removal plus an addition.
+
+Attributable window differences above 5%: RS→R1 preparation p95 (`W` 237 and 900), RS→R1 sum p95,
+R0→R1 preparation p95, sum p95 and sum p99 (`W` 900). All are improvements.
+
+| Pair, `W`  | NGNE self ms X→Y | Largest self-time differences (ms)                                                                                                                                                                   |
+| ---------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| RS→R1, 900 | 591 → 546        | `each` `src/ecs.ts` 88.7 → 52.4 (-36.3); `Frame.sort` plus comparator 70.9 → 75.6 (+4.7, lines moved); `runsDuringFreeze` `demo/game.ts:479` +16.6; `packAffine` +8.6 (new); `demo/game.ts:488` -8.9 |
+| RS→R1, 237 | 96 → 96          | `demo/game.ts:526` +11.6; `each` `src/ecs.ts` -4.9; `demo/game.ts:524` -4.6; `runsDuringFreeze` +3.7; sort and comparator +2.3 net                                                                   |
+| R0→R1, 900 | 629 → 546        | `each` `src/ecs.ts` 72.9 → 52.4 (-20.5); `demo/game.ts:526` -25.6; `demo/game.ts:488` -25.3; sort and comparator 82.4 → 75.6 (-6.8)                                                                  |
+
+Descriptive (no attributable difference above 5%): R1→R2 and R0→R2 at `W` = 237 total 96 → 99 and
+97 → 99 ms. R2 restructures the Starfall systems (`demo/game.ts:516`, `:557` and
+`commitSceneSimulation` `src/scene.ts:734` at 24.4 ms are new keys; `:488` and `:526` are gone), so
+line keys do not pair across R1→R2.
+
+#### `npm run bench` (historical record, not an A/B)
+
+Two runs per revision in the order R0, RS, R1, R2, R0, RS, R1, R2 (`bench/`). Chaos follows an ECS
+workload in the same process. Each run printed `fatal: not a git repository` on stderr
+(`tests/benchmark.ts` asks git for the revision inside an export; `revision` reads `unknown`); exit 0.
+
+| Revision | ECS p50 (ms) | Chaos p50 / p95 (ms)         | Collision grid p50 (ms)                  |
+| -------- | ------------ | ---------------------------- | ---------------------------------------- |
+| R0       | 0.313, 0.257 | 0.667 / 0.857, 0.642 / 0.817 | —                                        |
+| RS       | 0.203, 0.199 | 0.765 / 0.980, 0.768 / 0.971 | legacy 1.007, 0.997; schema 1.121, 1.090 |
+| R1       | 0.199, 0.198 | 0.735 / 0.872, 0.759 / 1.131 | legacy 0.995, 0.981; schema 1.117, 1.098 |
+| R2       | 0.191, 0.192 | 0.607 / 0.796, 0.614 / 0.807 | schema 1.125, 1.159                      |
+
+#### Phase 2 checks
+
+`npm.cmd test` 141/141 pass; `typecheck`, `build` and `format:check` exit 0; `git diff --check` empty;
+protected-path scan empty.
+
+#### Decisions (phase 2)
+
+The user confirmed on 15 September 2026 that the machine was idle with nothing running during the
+block, and validated phase 2. Two points were raised at the stop report; no rule change was
+authorized, so both stay as predeclared:
+
+1. **Noise stop on the same-revision churn time.** The rule gives "within run noise" for a 7.7× fully
+   separated difference because one object run is 11.7% from its median. It is carried into phase 4
+   as narrowed, with the ranges and observation 4.
+2. **Allocation normalisation.** The decision metric (sampled bytes per commit-second) reverses
+   direction against bytes per commit when per-commit time differs 7.7×. Bytes per commit stays
+   descriptive.
+
+### Browser measurements (phase 3)
+
+The method below was recorded before any phase 3 timed run.
+
+**Scripts** (diagnostics `scripts/`, SHA256 prefixes): batch `phase3-browser.sh` `8842515b03b1`,
+per-run check `phase3-check.mjs` `d073ee32b9d2`, analysis `phase3-analyze.mjs` `86060852a70c`, trace
+summary `trace-summary.mjs` `7fb935f215fc` (successor of `trace-align.mjs`), classifier
+`cycle-classify.mjs` `0d37afc93f5d`, `snapshot-diff.mjs` `2ba4ad608ede` (phase 1 script plus a
+`grownByCount` list of every constructor whose count grew); unchanged `run-browser.sh`
+`f326321cf917`, `check-artifacts.mjs` `ec12eb62ccc9`, `map-sites.mjs` `0dedc9b446ee`, driver
+`tests/browser-baseline.ts` `1dd57e8f8496`. Raw results in `browser/phase3/<matrix>/`.
+
+- One isolated driver run at a time (own preview port from 4600 and CDP port from 9700, fresh
+  profile, served-build check, backend assertion). No PowerShell or console window starts during a
+  block. Heavy post-processing (snapshot diffs, trace summaries, site mapping) runs after the block.
+- Plumbing test before any block: one 60 s `fixture-one` R1 `webgl` run into the session scratchpad
+  (81 s wall time, accepted). Not evidence, not reused.
+
+| Matrix or run        | Conditions                                       | Options (every run: 10 s warmup, `NGNE_EXPECTED_BACKEND`)                                     | Runs             |
+| -------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------------------- | ---------------- |
+| `starfall60`         | R0, R1, R2                                       | Chaos Lab, 60 s, `NGNE_ALLOCATION_SAMPLING=1`                                                 | 3×3 square       |
+| `platformer60`       | R0, R1, R2                                       | Level 1 idle, 60 s, allocation sampling                                                       | 3×3 square       |
+| `fixture-one`        | R1 `webgl`, R1 `webgpu`, R2 `webgpu`             | `alternating=0`, 60 s (fixture always samples allocations)                                    | 3×3 square       |
+| `fixture-alt`        | same                                             | `alternating=1`, 60 s                                                                         | 3×3 square       |
+| `starfall300`        | R0, R2                                           | 300 s, allocation sampling, snapshots at sample start and end, retained checkpoint every 30 s | 1 each           |
+| `trace-*`            | Starfall R0, R1, R2; both fixture arms × 3 modes | `NGNE_TRACE=1`, 60 s, no allocation sampling                                                  | 1 each (9)       |
+| `cycle-starfall`     | R0, R2                                           | `NGNE_CYCLES=40`                                                                              | 1 each           |
+| `cycle-platformer`   | R0, R2                                           | `NGNE_CYCLES=60`                                                                              | 1 each           |
+| `rs-<workload>`      | R0, RS, R1                                       | as the triggering 60 s workload                                                               | 3×3 if triggered |
+| `confirm-<workload>` | R0, R1, R2                                       | as the triggering long or cycle workload                                                      | 3×3 if triggered |
+
+- Latin squares are cyclic; a rejected run rejects its row (directories get `.rejected` and a reason
+  file; the row reruns, at most 3 attempts). A descriptive run retries once, then the batch stops.
+- Run rejection (`phase3-check.mjs`): driver exit non-zero; `check-artifacts.mjs` failure (artifact
+  parse, count or SHA256; visibility not `visible` at both ends or any change; surviving owned
+  process); no served-build hash; page context or fixture mode not the expected backend; page or
+  fixture error; sample shorter than 98% of its duration; Starfall flight state not
+  `CHAOS LAB / INVULNERABLE` at both ends; platformer status not `Reach the blue gate` at both ends
+  or progress text changed during the sample (the idle player died); any cycle oracle short of N, or
+  not 10 checkpoints.
+- Decision metrics, 60 s games: frame callback and frame interval p50, p95, p99; sampled allocation
+  MiB/s; reclaimed MiB/s (`performance.memory` drops, lower-bound proxy); dropped ticks (attributable
+  only when every Y run is above 0 and no X run is). Fixture: CPU preparation, submission and total
+  p50, p95, p99, plus the game metrics. Long runs: retained slope MiB/min. Cycles: retained slope per
+  checkpoint. Descriptive: intervals over 25 ms, long tasks in the sample, heap drops, heap maxima,
+  retained heap after warmup and after the run, fixture upload bytes and draw calls. Attribution and
+  noise stop as in phase 2. Pairs: R0→R1, R1→R2, R0→R2; fixture R1 `webgl`→R1 `webgpu`, R1
+  `webgpu`→R2 `webgpu`, R1 `webgl`→R2 `webgpu`; RS submatrix R0→RS, RS→R1, R0→R1.
+- RS submatrix trigger: any 60 s game decision metric with R0→R1 attributable.
+- Leak and cache classification (`cycle-classify.mjs`), applying the plan's rule with these
+  definitions: checkpoints are the 10 cycle checkpoints or the 10 long-run checkpoints; a
+  **grown constructor** has a snapshot count delta at least equal to the cycles (or 30 s intervals)
+  elapsed between the two snapshots; listed caches and bounds are the phase 0 table (query runtimes
+  = `QueryRuntime`, `LegacyQueryRuntime`, `SchemaQueryRuntime`; listed identities without a count
+  there are never within bound). The strict classification counts every grown constructor. Growth
+  from the performance timeline the driver observes (long-task, long-animation-frame, script and
+  attribution entries) is listed as harness-owned, with a second classification excluding it
+  reported alongside.
+- A leak candidate, or a leak or bounded-cache classification that would inform a fix-or-accept
+  decision, triggers the confirmation matrix for that workload.
+- GPU trace summary: phase 0 compared events on `CrGpuMain` per rAF interval (p50, p95, p99, total)
+  and renderer-main `MinorGC` and `MajorGC` counts and durations. Labelled GPU-process CPU time, not
+  GPU execution time; descriptive only.
+
+**Blocks and machine time** (runs take about 81 s per 60 s sample):
+
+| Block | Content                                                              |                                                        Machine time |
+| ----- | -------------------------------------------------------------------- | ------------------------------------------------------------------: |
+| 1     | `starfall60`, `platformer60`, `fixture-one`, `fixture-alt` (36 runs) |                                                        about 50 min |
+| 2     | `starfall300` ×2, 9 trace runs, 4 cycle runs                         |                                                        about 55 min |
+| 3+    | RS submatrix and confirmation matrices if triggered                  | 13 min per 60 s submatrix; 60–70 min per cycle or long confirmation |
+
+#### Block 1 execution
+
+- 15 September 2026, 17:33:07–18:21:21 UTC, after the user's go. 36 of 36 runs accepted, 0 rejected,
+  no row rerun; every run passed the served-build, backend, visibility and artifact checks and has a
+  manifest. The user confirmed the block was not interrupted.
+- Analysis `browser/phase3-analysis.json` (`140dabce444e`, manifest). Allocation sites for the 18 game
+  runs through the hidden source maps: `sites.json` per run (manifests; mapped fraction 99%+).
+- Dropped ticks were 0 in every run and long tasks in the sample 0 in every run (rows omitted).
+- Timer resolution: page `performance.now()` and rAF timestamps are coarsened to 0.1 ms here, so
+  callback and fixture CPU percentiles are multiples of 0.1 ms and interval differences of one quantum
+  (for example 17.2 → 17.1 ms, or identical 16.7 ms medians flagged by floating-point residue) are
+  at the timer's resolution.
+
+#### Block 1 results
+
+Cells as in phase 2 (medians of run values; A↑/A↓ attributable, – within run noise, N noise stop).
+
+**Starfall Chaos Lab, 60 s**
+
+| Metric                                   |    R0 |    R1 |    R2 | Max range | R0→R1     | R1→R2      | R0→R2     |
+| ---------------------------------------- | ----: | ----: | ----: | --------: | --------- | ---------- | --------- |
+| callback p50 (ms)                        |  4.40 |  4.60 |  5.20 |       31% | +4.5% –   | +13.0% N   | +18.2% N  |
+| callback p95 (ms)                        |  6.80 |  6.80 |  7.50 |       19% | 0.0% –    | +10.3% N   | +10.3% N  |
+| callback p99 (ms)                        |  8.20 |  8.30 |  8.80 |       10% | +1.2% –   | +6.0% N    | +7.3% N   |
+| interval p50 (ms)                        | 16.70 | 16.70 | 16.70 |        0% | 0.0% –    | 0.0% –     | 0.0% –    |
+| interval p95 (ms)                        | 17.00 | 17.00 | 17.00 |        1% | 0.0% –    | 0.0% –     | 0.0% –    |
+| interval p99 (ms)                        | 17.20 | 17.20 | 17.10 |        1% | 0.0% –    | -0.6% A↓   | -0.6% A↓  |
+| allocation MiB/s                         | 45.61 | 35.15 | 17.66 |        2% | -22.9% A↓ | -49.8% A↓  | -61.3% A↓ |
+| reclaimed MiB/s                          | 7.278 | 2.425 | 7.587 |        9% | -66.7% A↓ | +212.9% A↑ | +4.3% –   |
+| descriptive: heap drops                  |   154 |    82 |    91 |       10% | -46.8% A↓ | +11.0% –   | -40.9% A↓ |
+| descriptive: heap used max (MiB)         | 17.87 | 11.50 | 18.04 |        4% | -35.6% A↓ | +56.9% A↑  | +1.0% –   |
+| descriptive: heap total max (MiB)        | 34.00 | 22.09 | 33.67 |        1% | -35.0% A↓ | +52.4% A↑  | -1.0% A↓  |
+| descriptive: retained after warmup (MiB) | 5.052 | 4.799 | 6.526 |        4% | -5.0% A↓  | +36.0% A↑  | +29.2% A↑ |
+| descriptive: retained after run (MiB)    | 6.515 | 6.608 | 6.451 |       30% | +1.4% N   | -2.4% N    | -1.0% N   |
+
+**Platformer level 1 idle, 60 s**
+
+| Metric                                   |    R0 |    R1 |    R2 | Max range | R0→R1     | R1→R2    | R0→R2     |
+| ---------------------------------------- | ----: | ----: | ----: | --------: | --------- | -------- | --------- |
+| callback p50 (ms)                        |  0.80 |  0.80 |  0.90 |       22% | 0.0% N    | +12.5% N | +12.5% N  |
+| callback p95 (ms)                        |  1.40 |  1.40 |  1.50 |       20% | 0.0% –    | +7.1% N  | +7.1% N   |
+| callback p99 (ms)                        |  1.60 |  1.70 |  1.90 |       21% | +6.2% –   | +11.8% N | +18.7% N  |
+| interval p50 (ms)                        | 16.70 | 16.70 | 16.70 |        0% | 0.0% –    | 0.0% –   | 0.0% –    |
+| interval p95 (ms)                        | 17.10 | 17.10 | 17.00 |        1% | 0.0% –    | -0.6% –  | -0.6% –   |
+| interval p99 (ms)                        | 17.30 | 17.30 | 17.20 |        1% | 0.0% –    | -0.6% –  | -0.6% –   |
+| allocation MiB/s                         | 0.631 | 0.543 | 0.580 |        7% | -13.8% A↓ | +6.8% –  | -8.0% A↓  |
+| reclaimed MiB/s                          | 0.512 | 0.453 | 0.432 |        2% | -11.4% A↓ | -4.8% A↓ | -15.6% A↓ |
+| descriptive: heap drops                  |    51 |    44 |    48 |        4% | -13.7% A↓ | +9.1% A↑ | -5.9% A↓  |
+| descriptive: heap used max (MiB)         | 3.338 | 3.385 | 3.305 |        3% | +1.4% –   | -2.4% –  | -1.0% –   |
+| descriptive: heap total max (MiB)        | 4.890 | 4.938 | 5.126 |       10% | +1.0% N   | +3.8% –  | +4.8% N   |
+| descriptive: retained after warmup (MiB) | 1.823 | 1.884 | 1.985 |        1% | +3.4% A↑  | +5.3% A↑ | +8.9% A↑  |
+| descriptive: retained after run (MiB)    | 2.008 | 2.061 | 2.088 |        1% | +2.7% A↑  | +1.3% A↑ | +4.0% A↑  |
+
+**Renderer fixture, one texture (1 draw call)** — pairs: A = R1 WebGL→R1 WebGPU, B = R1 WebGPU→R2
+WebGPU, C = R1 WebGL→R2 WebGPU.
+
+| Metric                                |           R1 WebGL |          R1 WebGPU |          R2 WebGPU | Max range | A         | B       | C         |
+| ------------------------------------- | -----------------: | -----------------: | -----------------: | --------: | --------- | ------- | --------- |
+| CPU preparation p50 (ms)              |               1.00 |               1.00 |               1.00 |       40% | 0.0% N    | 0.0% N  | 0.0% –    |
+| CPU preparation p95 (ms)              |               1.40 |               1.40 |               1.40 |       21% | 0.0% N    | 0.0% N  | 0.0% N    |
+| CPU preparation p99 (ms)              |               1.80 |               1.70 |               1.70 |       29% | -5.6% N   | 0.0% N  | -5.6% –   |
+| CPU submission p50 (ms)               |               3.30 |               2.80 |               2.90 |       32% | -15.2% N  | +3.6% N | -12.1% N  |
+| CPU submission p95 (ms)               |               4.30 |               3.80 |               3.90 |       29% | -11.6% N  | +2.6% N | -9.3% A↓  |
+| CPU submission p99 (ms)               |               5.00 |               4.30 |               4.30 |       23% | -14.0% N  | 0.0% N  | -14.0% A↓ |
+| CPU total p50 (ms)                    |               4.50 |               3.90 |               3.90 |       33% | -13.3% N  | 0.0% N  | -13.3% A↓ |
+| CPU total p95 (ms)                    |               5.50 |               4.90 |               5.00 |       27% | -10.9% N  | +2.0% N | -9.1% A↓  |
+| CPU total p99 (ms)                    |               6.10 |               5.50 |               5.60 |       24% | -9.8% N   | +1.8% N | -8.2% –   |
+| callback p50 (ms)                     |               4.50 |               4.00 |               4.00 |       33% | -11.1% N  | 0.0% N  | -11.1% A↓ |
+| callback p95 (ms)                     |               5.60 |               5.00 |               5.10 |       26% | -10.7% N  | +2.0% N | -8.9% A↓  |
+| callback p99 (ms)                     |               6.20 |               5.60 |               5.70 |       23% | -9.7% N   | +1.8% N | -8.1% –   |
+| interval p50 / p95 / p99 (ms)         | 16.7 / 17.1 / 17.4 | 16.7 / 17.1 / 17.3 | 16.7 / 17.1 / 17.3 |        1% | –         | –       | –         |
+| allocation MiB/s                      |              36.71 |              2.416 |              2.422 |        3% | -93.4% A↓ | +0.3% – | -93.4% A↓ |
+| reclaimed MiB/s                       |              0.412 |              0.671 |              0.622 |       61% | +62.9% N  | -7.4% N | +50.9% N  |
+| descriptive: heap drops               |                 42 |                172 |                176 |       48% | +309.5% N | +2.3% – | +319.0% N |
+| descriptive: heap total max (MiB)     |              10.11 |               9.52 |               9.53 |        5% | -5.8% A↓  | +0.1% – | -5.8% A↓  |
+| descriptive: retained after run (MiB) |              4.738 |              4.490 |              4.471 |       13% | -5.2% N   | -0.4% – | -5.6% N   |
+
+**Renderer fixture, alternating textures (10,000 draw calls)** — pairs A, B, C as above.
+
+| Metric                                | R1 WebGL | R1 WebGPU | R2 WebGPU | Max range | A          | B        | C          |
+| ------------------------------------- | -------: | --------: | --------: | --------: | ---------- | -------- | ---------- |
+| CPU preparation p50 (ms)              |     0.10 |      0.30 |      0.30 |      100% | +200.0% N  | 0.0% N   | +200.0% N  |
+| CPU preparation p95 (ms)              |     0.30 |      0.50 |      0.50 |       40% | +66.7% N   | 0.0% N   | +66.7% N   |
+| CPU preparation p99 (ms)              |     0.30 |      0.80 |      0.90 |       44% | +166.7% N  | +12.5% N | +200.0% N  |
+| CPU submission p50 (ms)               |    21.30 |      2.40 |      2.40 |       13% | -88.7% A↓  | 0.0% N   | -88.7% N   |
+| CPU submission p95 (ms)               |    23.30 |      3.90 |      4.50 |       33% | -83.3% A↓  | +15.4% N | -80.7% N   |
+| CPU submission p99 (ms)               |    24.20 |      5.30 |      5.90 |       41% | -78.1% N   | +11.3% N | -75.6% N   |
+| CPU total p50 (ms)                    |    21.50 |      2.70 |      2.70 |       15% | -87.4% A↓  | 0.0% N   | -87.4% N   |
+| CPU total p95 (ms)                    |    23.50 |      4.30 |      4.90 |       35% | -81.7% A↓  | +14.0% N | -79.1% N   |
+| CPU total p99 (ms)                    |    24.30 |      5.70 |      6.40 |       41% | -76.5% N   | +12.3% N | -73.7% N   |
+| callback p50 (ms)                     |    21.50 |      2.80 |      2.70 |       11% | -87.0% A↓  | -3.6% N  | -87.4% N   |
+| callback p95 (ms)                     |    23.50 |      4.40 |      5.00 |       32% | -81.3% A↓  | +13.6% N | -78.7% N   |
+| callback p99 (ms)                     |    24.40 |      5.80 |      6.50 |       40% | -76.2% N   | +12.1% N | -73.4% N   |
+| interval p50 (ms)                     |    16.70 |     16.70 |     16.70 |        0% | 0.0% A↓\*  | 0.0% –   | 0.0% A↓\*  |
+| interval p95 (ms)                     |    33.40 |     17.00 |     17.00 |        1% | -49.1% A↓  | 0.0% –   | -49.1% A↓  |
+| interval p99 (ms)                     |    33.50 |     17.20 |     17.20 |        1% | -48.7% A↓  | 0.0% –   | -48.7% A↓  |
+| allocation MiB/s                      |    28.07 |     2.370 |     2.391 |        4% | -91.6% A↓  | +0.9% –  | -91.5% A↓  |
+| reclaimed MiB/s                       |    1.396 |     0.622 |     0.639 |       64% | -55.5% N   | +2.7% –  | -54.3% N   |
+| descriptive: intervals > 25 ms        |      835 |         0 |         0 |        8% | -100.0% A↓ | –        | -100.0% A↓ |
+| descriptive: heap drops               |      116 |       177 |       177 |        2% | +52.6% A↑  | 0.0% –   | +52.6% A↑  |
+| descriptive: retained after run (MiB) |    5.308 |     4.450 |     4.516 |        2% | -16.2% A↓  | +1.5% –  | -14.9% A↓  |
+
+\* Floating-point residue below the 0.1 ms timer quantum, not a frame-interval difference.
+
+Full tables, including every descriptive row and min–max per condition, are in the analysis JSON.
+
+#### Block 1 observations for phase 4
+
+1. **Starfall R0→R2:** no time metric is attributable. Callback p50 +18.2% and p95 +10.3% (the
+   plan's browser threshold is p95 +10%) hit the noise stop (ranges 19–31%). Frame intervals are
+   unchanged at the 0.1 ms quantum; 0 dropped ticks and 0 intervals over 25 ms in every run.
+2. **Starfall allocation:** sampled allocation falls R0 45.6 → R1 35.2 → R2 17.7 MiB/s, attributable at
+   every step. Top sites: R0 and R1 `native subarray <- renderer.js render` (22.7 MiB/s, WebGL
+   upload) and `demo/game.ts:526` at R0; R2 `demo/game.ts:570`, `:516`, `:371`, `:557`, `:436`
+   `chunk` callbacks (1.2–3.3 MiB/s each) and `createChunkDescriptor` `ecs.js:537` (1.1 MiB/s).
+3. **Starfall reclaimed rate** (the NGNE-27 lead, 2.4 → 7.8 MiB/s at R1→R2) reproduces as R1→R2
+   +213% attributable, but R0 is 7.3 MiB/s and R0→R2 is within run noise: R1 was the low point. Heap
+   maxima follow the same R1 dip. Retained heap after warmup is +1.5 MiB R0→R2 (attributable,
+   descriptive); after the run it is within noise.
+4. **Platformer R0→R2:** allocation -8.0% and reclaimed -15.6% (attributable improvements); callback
+   percentiles noise-stopped at 0.8–1.9 ms; retained after warmup +0.16 MiB (+8.9%, descriptive). R2's
+   top site is `createChunkDescriptor` (`ecs.js:537`, 0.14 MiB/s, plus its native `entries`).
+5. **Fixture R1 WebGPU→R2 WebGPU:** no attributable difference on any metric; p95/p99 submission and
+   total are noise-stopped (+11–15% medians). WebGPU versus WebGL in R1: alternating submission
+   21.3 → 2.4 ms p50 and interval p95 33.4 → 17.0 ms (WebGL misses every other frame, 835 intervals
+   over 25 ms); allocation 28–37 → 2.4 MiB/s in both arms.
+6. **RS submatrix triggered** for `starfall60` (R0→R1 allocation and reclaimed rate, both lower) and
+   `platformer60` (same two metrics). The plan triggers on any attributable R0→R1 decision metric,
+   improvements included.
+
+#### Block 2 execution and observations
+
+- 15 September 2026, 18:36:31–19:55:37 UTC, after the user's go: RS submatrices for `starfall60` and
+  `platformer60`, `starfall300`, 9 trace runs, 4 cycle runs. 33 of 33 runs accepted, 0 rejected.
+  Uninterrupted-block confirmation: given by the user on 16 September 2026.
+- Post-processing after the block (`phase3-post.sh`): site maps, snapshot diffs, classifications and
+  trace summaries, each with a manifest; tables below are written by `phase3-report.mjs`.
+- RS submatrices: the R0→R1 allocation decrease sits at RS→R1 in both games (Starfall -23.9%,
+  platformer -16.6%); R0→RS is within run noise.
+- `starfall300`: R0 is a **leak candidate** (retained 4.76 → 5.93 MiB, +1.17 MiB, slope 0.038
+  MiB/min; `Object` +1,890); R2 is unclassified (retained falls 1.0 MiB). A leak candidate triggers
+  the confirmation matrix `confirm-starfall300` (R0, R1, R2, 3 runs each).
+- Cycles: all four runs unclassified under the strict rule, with or without harness-owned growth.
+  Retained growth 0.95 MiB (Starfall R0 and R2) and 0.67–0.71 MiB (platformer R0 and R2) over 9
+  checkpoints: below the 1 MiB leak-candidate bound, above the 0.05 MiB per checkpoint bounded bound;
+  R0 and R2 are within 0.05 MiB of each other in both games. No confirmation trigger.
+
+<!-- ngne12:phase3-block2:start -->
+
+**rs-starfall60** (runs R0 3, R1 3, RS 3; rejected rows 0)
+
+| Metric                                       |    R0 |    R1 |    RS | Max range | R0→RS   | RS→R1     | R0→R1     |
+| -------------------------------------------- | ----: | ----: | ----: | --------: | ------- | --------- | --------- |
+| callback p50 (ms)                            | 4.600 | 4.500 | 4.700 |       28% | +2.2% N | -4.3% –   | -2.2% N   |
+| callback p95 (ms)                            | 6.900 | 6.900 | 7.000 |       19% | +1.4% N | -1.4% –   | +0.0% N   |
+| callback p99 (ms)                            | 8.200 | 8.300 | 8.600 |       16% | +4.9% N | -3.5% –   | +1.2% N   |
+| interval p50 (ms)                            | 16.70 | 16.70 | 16.70 |        0% | +0.0% – | +0.0% –   | +0.0% –   |
+| interval p95 (ms)                            | 17.00 | 17.00 | 17.00 |        1% | +0.0% – | +0.0% –   | +0.0% –   |
+| interval p99 (ms)                            | 17.20 | 17.20 | 17.20 |        1% | +0.0% – | +0.0% –   | +0.0% –   |
+| allocation MiB/s                             | 45.30 | 34.99 | 45.96 |        1% | +1.5% – | -23.9% A↓ | -22.8% A↓ |
+| reclaimed MiB/s (lower-bound proxy)          | 6.920 | 2.533 | 7.217 |       11% | +4.3% – | -64.9% N  | -63.4% N  |
+| dropped ticks                                | 0.000 | 0.000 | 0.000 |        0% | — –     | — –       | — –       |
+| descriptive: intervals > 25 ms               | 0.000 | 0.000 | 0.000 |        0% | — –     | — –       | — –       |
+| descriptive: long tasks in sample            | 0.000 | 0.000 | 0.000 |        0% | — –     | — –       | — –       |
+| descriptive: heap drops (performance.memory) |   152 | 87.00 |   153 |       14% | +0.7% – | -43.1% N  | -42.8% N  |
+| descriptive: heap used max (MiB)             | 18.07 | 11.31 | 18.26 |        3% | +1.1% – | -38.1% A↓ | -37.4% A↓ |
+| descriptive: heap total max (MiB)            | 33.50 | 22.09 | 34.26 |        2% | +2.3% – | -35.5% A↓ | -34.0% A↓ |
+| descriptive: retained after warmup (MiB)     | 4.893 | 4.792 | 4.930 |       17% | +0.8% N | -2.8% A↓  | -2.1% N   |
+| descriptive: retained after run (MiB)        | 4.546 | 6.608 | 4.657 |       42% | +2.4% N | +41.9% N  | +45.3% N  |
+
+**rs-platformer60** (runs R0 3, R1 3, RS 3; rejected rows 0)
+
+| Metric                                       |    R0 |    R1 |    RS | Max range | R0→RS   | RS→R1     | R0→R1     |
+| -------------------------------------------- | ----: | ----: | ----: | --------: | ------- | --------- | --------- |
+| callback p50 (ms)                            | 0.800 | 0.800 | 0.800 |        0% | +0.0% – | +0.0% –   | +0.0% –   |
+| callback p95 (ms)                            | 1.500 | 1.400 | 1.400 |       21% | -6.7% – | -0.0% N   | -6.7% N   |
+| callback p99 (ms)                            | 1.800 | 1.700 | 1.700 |       18% | -5.6% N | -0.0% N   | -5.6% N   |
+| interval p50 (ms)                            | 16.70 | 16.70 | 16.70 |        0% | +0.0% – | +0.0% –   | +0.0% –   |
+| interval p95 (ms)                            | 17.00 | 17.00 | 17.10 |        1% | +0.6% – | -0.6% –   | +0.0% –   |
+| interval p99 (ms)                            | 17.20 | 17.20 | 17.20 |        1% | +0.0% – | -0.0% –   | +0.0% –   |
+| allocation MiB/s                             | 0.659 | 0.540 | 0.647 |        6% | -1.8% – | -16.6% A↓ | -18.1% A↓ |
+| reclaimed MiB/s (lower-bound proxy)          | 0.511 | 0.456 | 0.517 |        2% | +1.1% – | -11.7% A↓ | -10.7% A↓ |
+| dropped ticks                                | 0.000 | 0.000 | 0.000 |        0% | — –     | — –       | — –       |
+| descriptive: intervals > 25 ms               | 0.000 | 0.000 | 0.000 |        0% | — –     | — –       | — –       |
+| descriptive: long tasks in sample            | 0.000 | 0.000 | 0.000 |        0% | — –     | — –       | — –       |
+| descriptive: heap drops (performance.memory) | 52.00 | 45.00 | 53.00 |        4% | +1.9% – | -15.1% A↓ | -13.5% A↓ |
+| descriptive: heap used max (MiB)             | 3.308 | 3.335 | 3.313 |        4% | +0.2% – | +0.7% –   | +0.8% –   |
+| descriptive: heap total max (MiB)            | 5.390 | 4.688 | 5.151 |       11% | -4.4% – | -9.0% N   | -13.0% N  |
+| descriptive: retained after warmup (MiB)     | 1.793 | 1.879 | 1.819 |        3% | +1.4% – | +3.3% A↑  | +4.8% A↑  |
+| descriptive: retained after run (MiB)        | 1.967 | 2.066 | 1.993 |        2% | +1.3% – | +3.7% A↑  | +5.0% A↑  |
+
+**Starfall Chaos Lab, 300 s (descriptive)**
+
+| Run   | Callback p50 / p95 / p99 (ms) | Allocation MiB/s | Reclaimed MiB/s | Retained at 30 s → 300 s (MiB) | Slope (MiB/min) | Classification (strict; excluding harness) | Grown constructors (count delta)                                                                                                                    | Top sites (MiB/s)                                                                                                                 |
+| ----- | ----------------------------- | ---------------: | --------------: | ------------------------------ | --------------: | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| R0-a1 | 4.300 / 6.400 / 7.700         |            46.83 |           5.640 | 4.763 → 5.933                  |           0.038 | leak candidate; leak candidate             | `Object` +1890; `system / PropertyArray` +218; `system / WeakArrayList` +35; `blink::FragmentDataList` +18; `blink::ComputedStyle` +16; `Array` +15 | native subarray <- dist/engine/renderer.js:219 render 24.08; demo/game.ts:526 (anonymous) 8.94; demo/game.ts:537 (anonymous) 4.41 |
+| R2-a1 | 3.700 / 5.900 / 7.400         |            17.05 |           3.854 | 6.500 → 5.495                  |          -0.250 | unclassified; unclassified                 | `Object` +686; `system / PropertyArray` +314; `system / WeakArrayList` +28; `blink::FragmentDataList` +18; `blink::ComputedStyle` +16; `Array` +13  | demo/game.ts:570 chunk 6.24; demo/game.ts:516 chunk 1.73; native sort <- dist/engine/renderer.js:63 sort 1.67                     |
+
+**GPU-process trace, 60 s (GPU-process CPU time per rAF interval, p50 / p95 ms; not GPU execution time; descriptive)**
+
+| Run                            | rAF frames | Scheduler::RunTask | CommandBufferStub::OnAsyncFlush | DXGISwapChainImageBacking::Present | WebGL         | WebGPU      | WebGPUDecoderImpl::HandleDawnCommands | Queue::Submit | MinorGC count / ms | MajorGC count / ms |
+| ------------------------------ | ---------: | ------------------ | ------------------------------- | ---------------------------------- | ------------- | ----------- | ------------------------------------- | ------------- | ------------------ | ------------------ |
+| trace-starfall R0-a1           |       3602 | 3.50 / 6.47        | 2.47 / 4.47                     | 0.29 / 0.64                        | 0.36 / 0.55   | —           | —                                     | —             | 294 / 178.7        | 34 / 120.9         |
+| trace-starfall R1-a1           |       3599 | 3.59 / 6.73        | 1.64 / 3.20                     | 0.55 / 0.92                        | 0.35 / 0.52   | —           | —                                     | —             | 568 / 292.4        | 33 / 143.5         |
+| trace-starfall R2-a1           |       3601 | 5.02 / 8.07        | 3.40 / 5.74                     | 0.28 / 0.64                        | —             | 0.72 / 1.15 | 0.50 / 0.84                           | 0.25 / 0.42   | 130 / 114.6        | 37 / 115.5         |
+| trace-fixture-one R1-webgl-a1  |       3602 | 2.91 / 5.33        | 0.79 / 1.25                     | 0.63 / 0.95                        | 0.80 / 1.27   | —           | —                                     | —             | 2193 / 1374.1      | 0 / 0              |
+| trace-fixture-one R1-webgpu-a1 |       3601 | 2.10 / 3.34        | 0.99 / 1.79                     | 0.21 / 0.33                        | —             | 1.00 / 1.82 | 0.71 / 1.37                           | 0.34 / 0.71   | 178 / 123.1        | 0 / 0              |
+| trace-fixture-one R2-webgpu-a1 |       3602 | 2.07 / 3.33        | 0.99 / 1.83                     | 0.22 / 0.33                        | —             | 1.00 / 1.86 | 0.72 / 1.42                           | 0.35 / 0.74   | 175 / 141.9        | 0 / 0              |
+| trace-fixture-alt R1-webgl-a1  |       2794 | 21.27 / 23.61      | 20.82 / 23.12                   | 0.10 / 0.13                        | 20.86 / 23.17 | —           | —                                     | —             | 893 / 157.2        | 0 / 0              |
+| trace-fixture-alt R1-webgpu-a1 |       3602 | 4.94 / 6.76        | 4.06 / 5.50                     | 0.15 / 0.46                        | —             | 4.06 / 5.51 | 3.91 / 5.31                           | 1.75 / 2.44   | 171 / 51.1         | 0 / 0              |
+| trace-fixture-alt R2-webgpu-a1 |       3602 | 4.92 / 6.65        | 4.06 / 5.27                     | 0.16 / 0.48                        | —             | 4.07 / 5.27 | 3.91 / 5.09                           | 1.73 / 2.36   | 170 / 54.6         | 0 / 0              |
+
+**Starfall cycles (descriptive)**
+
+| Run   | Cycles, oracles passed | Cycle time mean (ms) | Retained per checkpoint (MiB)                              | Slope all / last half (MiB per checkpoint) | Growth (MiB) | Classification (strict; excluding harness) | Grown constructors (count delta) |
+| ----- | ---------------------- | -------------------: | ---------------------------------------------------------- | ------------------------------------------ | -----------: | ------------------------------------------ | -------------------------------- |
+| R0-a1 | 40, 40/40/40/40        |                11277 | 3.10, 3.24, 3.36, 3.45, 3.51, 3.53, 3.72, 3.71, 3.73, 4.05 | 0.088 / 0.105                              |        0.946 | unclassified; unclassified                 | none                             |
+| R2-a1 | 40, 40/40/40/40        |                11282 | 3.83, 3.98, 4.07, 4.10, 4.24, 4.33, 4.44, 4.45, 4.48, 4.78 | 0.091 / 0.094                              |        0.956 | unclassified; unclassified                 | none                             |
+
+**Platformer cycles (descriptive)**
+
+| Run   | Cycles, oracles passed | Cycle time mean (ms) | Retained per checkpoint (MiB)                              | Slope all / last half (MiB per checkpoint) | Growth (MiB) | Classification (strict; excluding harness) | Grown constructors (count delta)                                                                        |
+| ----- | ---------------------- | -------------------: | ---------------------------------------------------------- | ------------------------------------------ | -----------: | ------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| R0-a1 | 60, 60/60/60/60        |                 6894 | 2.04, 2.22, 2.23, 2.32, 2.47, 2.45, 2.46, 2.65, 2.69, 2.70 | 0.071 / 0.075                              |        0.666 | unclassified; unclassified                 | `DOMRectReadOnly` +250; `LayoutShift` +125; `LayoutShiftAttribution` +125                               |
+| R2-a1 | 60, 60/60/60/60        |                 6895 | 2.24, 2.41, 2.42, 2.51, 2.66, 2.63, 2.65, 2.88, 2.91, 2.95 | 0.076 / 0.090                              |        0.712 | unclassified; unclassified                 | `DOMRectReadOnly` +250; `LayoutShift` +125; `LayoutShiftAttribution` +125; `system / WeakArrayList` +58 |
+
+<!-- ngne12:phase3-block2:end -->
+
+#### Phase 3 decisions and checks
+
+- **Confirmation matrix waived** by the user on 16 September 2026: `confirm-starfall300` (triggered
+  by the R0-only leak candidate) was not run, and phase 3 closed with the data above. Consequence for
+  phase 4: no leak or bounded-cache classification is confirmed for any revision; `starfall300` and
+  the cycle runs stay descriptive (one run each), so "confirmed leak" cannot be claimed or excluded
+  by replicated evidence. This is an evidence gap for phase 5.
+- Cycle growth in the platformer is dominated by `DOMRectReadOnly`, `LayoutShift` and
+  `LayoutShiftAttribution` (browser performance-timeline entries, same counts at R0 and R2); these are
+  outside the harness-owned pattern, so the strict and harness-excluded classifications agree.
+- Block 2 uninterrupted confirmation (MANUAL, user): confirmed on 16 September 2026; the machine ran
+  block 2 (15 September, 18:36–19:55 UTC) without interruption.
+- Scripts after block 2: `phase3-post.sh` `921fe8e6c8f2`, `phase3-report.mjs` `2e4d14321a59`;
+  analysis `browser/phase3-analysis.json` `9cbd92997c61` (both blocks, manifest).
+- Gate (16 September 2026): `npm.cmd test` 141/141 pass; `typecheck`, `build` and `format:check` exit
+  0; `git diff --check` empty; protected-path scan empty.
+
+### Analysis (phase 4)
+
+Inputs: `node/phase2-analysis.json` (`5294da919c6f`) and `browser/phase3-analysis.json`
+(`9cbd92997c61`). The tables between the markers below are written by `phase4-report.mjs` (diagnostics
+`scripts/`, `1f491132ca2b`), which applies the plan's regression rule unchanged and also writes
+`phase4-classification.json` (`9bb5a77a6e3d`, manifest). Everything here is local evidence from one machine (see
+[local limits](#local-limits-phase-4)).
+
+<!-- ngne12:phase4:start -->
+
+#### Before and after, R0→R2
+
+Medians of the run values; range is the largest same-condition range over the median. Classification applies the predeclared rule to R0→R2 in that matrix only.
+
+| Workload                          | Metric                              |    R0 |    RS |    R1 |    R2 | Max range |   R0→R2 | Runs separated    | Classification        |
+| --------------------------------- | ----------------------------------- | ----: | ----: | ----: | ----: | --------: | ------: | ----------------- | --------------------- |
+| Chaos split (Node, ms per sample) | W237 tick p50                       | 0.249 | 0.253 | 0.256 | 0.263 |        6% |   +5.8% | no                | within run noise      |
+| Chaos split (Node, ms per sample) | W237 tick p95                       | 0.330 | 0.344 | 0.352 | 0.419 |       27% |  +26.9% | up, gap > range   | noise stop (narrowed) |
+| Chaos split (Node, ms per sample) | W237 tick p99                       | 0.393 | 0.429 | 0.404 | 0.552 |       67% |  +40.5% | up, gap ≤ range   | noise stop (narrowed) |
+| Chaos split (Node, ms per sample) | W237 prepare p50                    | 0.302 | 0.300 | 0.293 | 0.301 |        3% |   -0.2% | no                | within run noise      |
+| Chaos split (Node, ms per sample) | W237 prepare p95                    | 0.499 | 0.493 | 0.352 | 0.376 |       10% |  -24.6% | down, gap > range | noise stop (narrowed) |
+| Chaos split (Node, ms per sample) | W237 prepare p99                    | 0.546 | 0.566 | 0.405 | 0.443 |       88% |  -18.8% | no                | noise stop (narrowed) |
+| Chaos split (Node, ms per sample) | W237 sort p50                       | 0.086 | 0.086 | 0.089 | 0.088 |       13% |   +1.7% | no                | within run noise      |
+| Chaos split (Node, ms per sample) | W237 sort p95                       | 0.098 | 0.102 | 0.105 | 0.115 |       51% |  +16.6% | no                | noise stop (narrowed) |
+| Chaos split (Node, ms per sample) | W237 sort p99                       | 0.143 | 0.129 | 0.374 | 0.621 |       61% | +335.5% | up, gap > range   | noise stop (narrowed) |
+| Chaos split (Node, ms per sample) | W237 sum p50                        | 0.648 | 0.643 | 0.643 | 0.669 |        4% |   +3.2% | no                | within run noise      |
+| Chaos split (Node, ms per sample) | W237 sum p95                        | 0.849 | 0.870 | 0.796 | 0.876 |       12% |   +3.2% | no                | noise stop (narrowed) |
+| Chaos split (Node, ms per sample) | W237 sum p99                        | 0.927 |  1.02 | 0.945 |  1.28 |       21% |  +38.3% | up, gap > range   | noise stop (narrowed) |
+| Starfall Chaos Lab 60 s (browser) | callback p50 (ms)                   |  4.40 |     — |  4.60 |  5.20 |       31% |  +18.2% | no                | noise stop (narrowed) |
+| Starfall Chaos Lab 60 s (browser) | callback p95 (ms)                   |  6.80 |     — |  6.80 |  7.50 |       19% |  +10.3% | no                | noise stop (narrowed) |
+| Starfall Chaos Lab 60 s (browser) | callback p99 (ms)                   |  8.20 |     — |  8.30 |  8.80 |       10% |   +7.3% | no                | noise stop (narrowed) |
+| Starfall Chaos Lab 60 s (browser) | interval p50 (ms)                   |  16.7 |     — |  16.7 |  16.7 |        0% |   +0.0% | no                | within run noise      |
+| Starfall Chaos Lab 60 s (browser) | interval p95 (ms)                   |  17.0 |     — |  17.0 |  17.0 |        1% |   +0.0% | no                | within run noise      |
+| Starfall Chaos Lab 60 s (browser) | interval p99 (ms)                   |  17.2 |     — |  17.2 |  17.1 |        1% |   -0.6% | down, gap > range | improvement           |
+| Starfall Chaos Lab 60 s (browser) | allocation MiB/s                    |  45.6 |     — |  35.1 |  17.7 |        2% |  -61.3% | down, gap > range | improvement           |
+| Starfall Chaos Lab 60 s (browser) | reclaimed MiB/s (lower-bound proxy) |  7.28 |     — |  2.42 |  7.59 |        9% |   +4.3% | up, gap ≤ range   | within run noise      |
+| Starfall Chaos Lab 60 s (browser) | dropped ticks                       | 0.000 |     — | 0.000 | 0.000 |        0% |       — | no                | within run noise      |
+| Starfall Chaos Lab 60 s (browser) | intervals > 25 ms                   | 0.000 |     — | 0.000 | 0.000 |        0% |       — | no                | descriptive           |
+| Starfall Chaos Lab 60 s (browser) | long tasks in sample                | 0.000 |     — | 0.000 | 0.000 |        0% |       — | no                | descriptive           |
+| Starfall Chaos Lab 60 s (browser) | heap drops (performance.memory)     |   154 |     — |  82.0 |  91.0 |       10% |  -40.9% | down, gap > range | descriptive decrease  |
+| Starfall Chaos Lab 60 s (browser) | heap used max (MiB)                 |  17.9 |     — |  11.5 |  18.0 |        4% |   +1.0% | no                | descriptive           |
+| Starfall Chaos Lab 60 s (browser) | heap total max (MiB)                |  34.0 |     — |  22.1 |  33.7 |        1% |   -1.0% | down, gap > range | descriptive decrease  |
+| Starfall Chaos Lab 60 s (browser) | retained after warmup (MiB)         |  5.05 |     — |  4.80 |  6.53 |        4% |  +29.2% | up, gap > range   | descriptive increase  |
+| Starfall Chaos Lab 60 s (browser) | retained after run (MiB)            |  6.52 |     — |  6.61 |  6.45 |       30% |   -1.0% | no                | descriptive           |
+| Platformer idle 60 s (browser)    | callback p50 (ms)                   | 0.800 |     — | 0.800 | 0.900 |       22% |  +12.5% | no                | noise stop (narrowed) |
+| Platformer idle 60 s (browser)    | callback p95 (ms)                   |  1.40 |     — |  1.40 |  1.50 |       20% |   +7.1% | no                | noise stop (narrowed) |
+| Platformer idle 60 s (browser)    | callback p99 (ms)                   |  1.60 |     — |  1.70 |  1.90 |       21% |  +18.7% | no                | noise stop (narrowed) |
+| Platformer idle 60 s (browser)    | interval p50 (ms)                   |  16.7 |     — |  16.7 |  16.7 |        0% |   +0.0% | no                | within run noise      |
+| Platformer idle 60 s (browser)    | interval p95 (ms)                   |  17.1 |     — |  17.1 |  17.0 |        1% |   -0.6% | no                | within run noise      |
+| Platformer idle 60 s (browser)    | interval p99 (ms)                   |  17.3 |     — |  17.3 |  17.2 |        1% |   -0.6% | no                | within run noise      |
+| Platformer idle 60 s (browser)    | allocation MiB/s                    | 0.631 |     — | 0.543 | 0.580 |        7% |   -8.0% | down, gap > range | improvement           |
+| Platformer idle 60 s (browser)    | reclaimed MiB/s (lower-bound proxy) | 0.512 |     — | 0.453 | 0.432 |        2% |  -15.6% | down, gap > range | improvement           |
+| Platformer idle 60 s (browser)    | dropped ticks                       | 0.000 |     — | 0.000 | 0.000 |        0% |       — | no                | within run noise      |
+| Platformer idle 60 s (browser)    | intervals > 25 ms                   | 0.000 |     — | 0.000 | 0.000 |        0% |       — | no                | descriptive           |
+| Platformer idle 60 s (browser)    | long tasks in sample                | 0.000 |     — | 0.000 | 0.000 |        0% |       — | no                | descriptive           |
+| Platformer idle 60 s (browser)    | heap drops (performance.memory)     |  51.0 |     — |  44.0 |  48.0 |        4% |   -5.9% | down, gap > range | descriptive decrease  |
+| Platformer idle 60 s (browser)    | heap used max (MiB)                 |  3.34 |     — |  3.38 |  3.31 |        3% |   -1.0% | no                | descriptive           |
+| Platformer idle 60 s (browser)    | heap total max (MiB)                |  4.89 |     — |  4.94 |  5.13 |       10% |   +4.8% | no                | descriptive           |
+| Platformer idle 60 s (browser)    | retained after warmup (MiB)         |  1.82 |     — |  1.88 |  1.98 |        1% |   +8.9% | up, gap > range   | descriptive increase  |
+| Platformer idle 60 s (browser)    | retained after run (MiB)            |  2.01 |     — |  2.06 |  2.09 |        1% |   +4.0% | up, gap > range   | descriptive increase  |
+
+Whole-run Chaos rows (outside `W` = 237) are in the phase 2 table and are not attributable; RS runs only in the Node matrix. Dropped ticks are 0 in every run of both browser matrices.
+
+#### Matrices without an R0→R2 pair
+
+The regression rule needs R0→R2 inside one matrix, so these rows are not classified as regressions or minor. They carry attribution for the pairs they contain.
+
+| Matrix                    | Metric                              | Medians                                          | Max range | Pairs (change, verdict)                                                                                           |
+| ------------------------- | ----------------------------------- | ------------------------------------------------ | --------: | ----------------------------------------------------------------------------------------------------------------- |
+| churn-object timed        | commit p50                          | R0 0.324; RS 0.333; R1 0.330                     |        7% | R0→RS +2.8% noise; RS→R1 -0.9% noise; R0→R1 +1.8% noise                                                           |
+| churn-object timed        | commit p95                          | R0 0.496; RS 0.508; R1 0.524                     |        9% | R0→RS +2.3% noise; RS→R1 +3.2% noise; R0→R1 +5.6% noise                                                           |
+| churn-object timed        | commit p99                          | R0 0.701; RS 1.18; R1 1.15                       |       40% | R0→RS +67.9% noise stop; RS→R1 -2.4% noise stop; R0→R1 +63.9% noise stop                                          |
+| churn-object alloc        | allocation bytes/s                  | R0 2819 MiB/s; RS 2162 MiB/s; R1 2168 MiB/s      |        4% | R0→RS -23.3% A↓; RS→R1 +0.3% noise; R0→R1 -23.1% A↓                                                               |
+| churn-object gc           | GC pause total ms                   | R0 13.9; RS 25.5; R1 25.1                        |      115% | R0→RS +84.0% noise stop; RS→R1 -1.8% noise stop; R0→R1 +80.8% noise stop                                          |
+| churn-schema timed        | commit p50                          | RS 2.64; R1 2.59; R2 2.59                        |        4% | RS→R1 -1.8% noise; R1→R2 +0.1% noise; RS→R2 -1.6% noise                                                           |
+| churn-schema timed        | commit p95                          | RS 3.17; R1 3.13; R2 3.09                        |       25% | RS→R1 -1.2% noise; R1→R2 -1.3% noise stop; RS→R2 -2.5% noise stop                                                 |
+| churn-schema timed        | commit p99                          | RS 4.84; R1 4.98; R2 3.47                        |       49% | RS→R1 +2.9% noise stop; R1→R2 -30.2% noise stop; RS→R2 -28.2% noise stop                                          |
+| churn-schema alloc        | allocation bytes/s                  | RS 1650 MiB/s; R1 1638 MiB/s; R2 1587 MiB/s      |        5% | RS→R1 -0.7% noise; R1→R2 -3.1% noise; RS→R2 -3.8% noise                                                           |
+| churn-schema gc           | GC pause total ms                   | RS 62.8; R1 63.3; R2 34.2                        |       45% | RS→R1 +0.8% noise stop; R1→R2 -45.9% noise stop; RS→R2 -45.5% noise stop                                          |
+| RS object vs schema timed | commit p50                          | RS-object 0.344; RS-schema 2.64                  |       12% | RS-object→RS-schema +667.0% noise stop                                                                            |
+| RS object vs schema timed | commit p95                          | RS-object 0.539; RS-schema 3.20                  |       17% | RS-object→RS-schema +493.7% noise stop                                                                            |
+| RS object vs schema timed | commit p99                          | RS-object 1.29; RS-schema 4.89                   |      116% | RS-object→RS-schema +279.1% noise stop                                                                            |
+| RS object vs schema alloc | allocation bytes/s                  | RS-object 2149 MiB/s; RS-schema 1608 MiB/s       |        2% | RS-object→RS-schema -25.2% A↓                                                                                     |
+| RS object vs schema gc    | GC pause total ms                   | RS-object 22.6; RS-schema 65.3                   |      102% | RS-object→RS-schema +189.1% noise stop                                                                            |
+| width-pass R2             | pass p50                            | f64 0.222; f32 0.214                             |        3% | f64→f32 -4.0% A↓                                                                                                  |
+| width-pass R2             | pass p95                            | f64 0.249; f32 0.235                             |        7% | f64→f32 -5.5% noise                                                                                               |
+| width-pass R2             | pass p99                            | f64 0.296; f32 0.303                             |        7% | f64→f32 +2.2% noise                                                                                               |
+| fixture-one               | CPU submission p50 (ms)             | R1-webgl 3.30; R1-webgpu 2.80; R2-webgpu 2.90    |       32% | R1-webgl→R1-webgpu -15.2% noise stop; R1-webgpu→R2-webgpu +3.6% noise stop; R1-webgl→R2-webgpu -12.1% noise stop  |
+| fixture-one               | CPU submission p95 (ms)             | R1-webgl 4.30; R1-webgpu 3.80; R2-webgpu 3.90    |       29% | R1-webgl→R1-webgpu -11.6% noise stop; R1-webgpu→R2-webgpu +2.6% noise stop; R1-webgl→R2-webgpu -9.3% A↓           |
+| fixture-one               | CPU submission p99 (ms)             | R1-webgl 5.00; R1-webgpu 4.30; R2-webgpu 4.30    |       23% | R1-webgl→R1-webgpu -14.0% noise stop; R1-webgpu→R2-webgpu +0.0% noise stop; R1-webgl→R2-webgpu -14.0% A↓          |
+| fixture-one               | CPU total p50 (ms)                  | R1-webgl 4.50; R1-webgpu 3.90; R2-webgpu 3.90    |       33% | R1-webgl→R1-webgpu -13.3% noise stop; R1-webgpu→R2-webgpu +0.0% noise stop; R1-webgl→R2-webgpu -13.3% A↓          |
+| fixture-one               | CPU total p95 (ms)                  | R1-webgl 5.50; R1-webgpu 4.90; R2-webgpu 5.00    |       27% | R1-webgl→R1-webgpu -10.9% noise stop; R1-webgpu→R2-webgpu +2.0% noise stop; R1-webgl→R2-webgpu -9.1% A↓           |
+| fixture-one               | CPU total p99 (ms)                  | R1-webgl 6.10; R1-webgpu 5.50; R2-webgpu 5.60    |       24% | R1-webgl→R1-webgpu -9.8% noise stop; R1-webgpu→R2-webgpu +1.8% noise stop; R1-webgl→R2-webgpu -8.2% noise         |
+| fixture-one               | callback p50 (ms)                   | R1-webgl 4.50; R1-webgpu 4.00; R2-webgpu 4.00    |       33% | R1-webgl→R1-webgpu -11.1% noise stop; R1-webgpu→R2-webgpu +0.0% noise stop; R1-webgl→R2-webgpu -11.1% A↓          |
+| fixture-one               | callback p95 (ms)                   | R1-webgl 5.60; R1-webgpu 5.00; R2-webgpu 5.10    |       26% | R1-webgl→R1-webgpu -10.7% noise stop; R1-webgpu→R2-webgpu +2.0% noise stop; R1-webgl→R2-webgpu -8.9% A↓           |
+| fixture-one               | callback p99 (ms)                   | R1-webgl 6.20; R1-webgpu 5.60; R2-webgpu 5.70    |       23% | R1-webgl→R1-webgpu -9.7% noise stop; R1-webgpu→R2-webgpu +1.8% noise stop; R1-webgl→R2-webgpu -8.1% noise         |
+| fixture-one               | interval p95 (ms)                   | R1-webgl 17.1; R1-webgpu 17.1; R2-webgpu 17.1    |        1% | R1-webgl→R1-webgpu +0.0% noise; R1-webgpu→R2-webgpu +0.0% noise; R1-webgl→R2-webgpu +0.0% noise                   |
+| fixture-one               | interval p99 (ms)                   | R1-webgl 17.4; R1-webgpu 17.3; R2-webgpu 17.3    |        1% | R1-webgl→R1-webgpu -0.6% noise; R1-webgpu→R2-webgpu +0.0% noise; R1-webgl→R2-webgpu -0.6% noise                   |
+| fixture-one               | allocation MiB/s                    | R1-webgl 36.7; R1-webgpu 2.42; R2-webgpu 2.42    |        3% | R1-webgl→R1-webgpu -93.4% A↓; R1-webgpu→R2-webgpu +0.3% noise; R1-webgl→R2-webgpu -93.4% A↓                       |
+| fixture-one               | reclaimed MiB/s (lower-bound proxy) | R1-webgl 0.412; R1-webgpu 0.671; R2-webgpu 0.622 |       61% | R1-webgl→R1-webgpu +62.9% noise stop; R1-webgpu→R2-webgpu -7.4% noise stop; R1-webgl→R2-webgpu +50.9% noise stop  |
+| fixture-one               | dropped ticks                       | R1-webgl 0.000; R1-webgpu 0.000; R2-webgpu 0.000 |        0% | R1-webgl→R1-webgpu — noise; R1-webgpu→R2-webgpu — noise; R1-webgl→R2-webgpu — noise                               |
+| fixture-alt               | CPU submission p50 (ms)             | R1-webgl 21.3; R1-webgpu 2.40; R2-webgpu 2.40    |       13% | R1-webgl→R1-webgpu -88.7% A↓; R1-webgpu→R2-webgpu -0.0% noise stop; R1-webgl→R2-webgpu -88.7% noise stop          |
+| fixture-alt               | CPU submission p95 (ms)             | R1-webgl 23.3; R1-webgpu 3.90; R2-webgpu 4.50    |       33% | R1-webgl→R1-webgpu -83.3% A↓; R1-webgpu→R2-webgpu +15.4% noise stop; R1-webgl→R2-webgpu -80.7% noise stop         |
+| fixture-alt               | CPU submission p99 (ms)             | R1-webgl 24.2; R1-webgpu 5.30; R2-webgpu 5.90    |       41% | R1-webgl→R1-webgpu -78.1% noise stop; R1-webgpu→R2-webgpu +11.3% noise stop; R1-webgl→R2-webgpu -75.6% noise stop |
+| fixture-alt               | CPU total p50 (ms)                  | R1-webgl 21.5; R1-webgpu 2.70; R2-webgpu 2.70    |       15% | R1-webgl→R1-webgpu -87.4% A↓; R1-webgpu→R2-webgpu +0.0% noise stop; R1-webgl→R2-webgpu -87.4% noise stop          |
+| fixture-alt               | CPU total p95 (ms)                  | R1-webgl 23.5; R1-webgpu 4.30; R2-webgpu 4.90    |       35% | R1-webgl→R1-webgpu -81.7% A↓; R1-webgpu→R2-webgpu +14.0% noise stop; R1-webgl→R2-webgpu -79.1% noise stop         |
+| fixture-alt               | CPU total p99 (ms)                  | R1-webgl 24.3; R1-webgpu 5.70; R2-webgpu 6.40    |       41% | R1-webgl→R1-webgpu -76.5% noise stop; R1-webgpu→R2-webgpu +12.3% noise stop; R1-webgl→R2-webgpu -73.7% noise stop |
+| fixture-alt               | callback p50 (ms)                   | R1-webgl 21.5; R1-webgpu 2.80; R2-webgpu 2.70    |       11% | R1-webgl→R1-webgpu -87.0% A↓; R1-webgpu→R2-webgpu -3.6% noise stop; R1-webgl→R2-webgpu -87.4% noise stop          |
+| fixture-alt               | callback p95 (ms)                   | R1-webgl 23.5; R1-webgpu 4.40; R2-webgpu 5.00    |       32% | R1-webgl→R1-webgpu -81.3% A↓; R1-webgpu→R2-webgpu +13.6% noise stop; R1-webgl→R2-webgpu -78.7% noise stop         |
+| fixture-alt               | callback p99 (ms)                   | R1-webgl 24.4; R1-webgpu 5.80; R2-webgpu 6.50    |       40% | R1-webgl→R1-webgpu -76.2% noise stop; R1-webgpu→R2-webgpu +12.1% noise stop; R1-webgl→R2-webgpu -73.4% noise stop |
+| fixture-alt               | interval p95 (ms)                   | R1-webgl 33.4; R1-webgpu 17.0; R2-webgpu 17.0    |        1% | R1-webgl→R1-webgpu -49.1% A↓; R1-webgpu→R2-webgpu +0.0% noise; R1-webgl→R2-webgpu -49.1% A↓                       |
+| fixture-alt               | interval p99 (ms)                   | R1-webgl 33.5; R1-webgpu 17.2; R2-webgpu 17.2    |        1% | R1-webgl→R1-webgpu -48.7% A↓; R1-webgpu→R2-webgpu -0.0% noise; R1-webgl→R2-webgpu -48.7% A↓                       |
+| fixture-alt               | allocation MiB/s                    | R1-webgl 28.1; R1-webgpu 2.37; R2-webgpu 2.39    |        4% | R1-webgl→R1-webgpu -91.6% A↓; R1-webgpu→R2-webgpu +0.9% noise; R1-webgl→R2-webgpu -91.5% A↓                       |
+| fixture-alt               | reclaimed MiB/s (lower-bound proxy) | R1-webgl 1.40; R1-webgpu 0.622; R2-webgpu 0.639  |       64% | R1-webgl→R1-webgpu -55.5% noise stop; R1-webgpu→R2-webgpu +2.7% noise; R1-webgl→R2-webgpu -54.3% noise stop       |
+| fixture-alt               | dropped ticks                       | R1-webgl 0.000; R1-webgpu 0.000; R2-webgpu 0.000 |        0% | R1-webgl→R1-webgpu — noise; R1-webgpu→R2-webgpu — noise; R1-webgl→R2-webgpu — noise                               |
+| rs-starfall60             | callback p50 (ms)                   | R0 4.60; R1 4.50; RS 4.70                        |       28% | R0→RS +2.2% noise stop; RS→R1 -4.3% noise; R0→R1 -2.2% noise stop                                                 |
+| rs-starfall60             | callback p95 (ms)                   | R0 6.90; R1 6.90; RS 7.00                        |       19% | R0→RS +1.4% noise stop; RS→R1 -1.4% noise; R0→R1 +0.0% noise stop                                                 |
+| rs-starfall60             | callback p99 (ms)                   | R0 8.20; R1 8.30; RS 8.60                        |       16% | R0→RS +4.9% noise stop; RS→R1 -3.5% noise; R0→R1 +1.2% noise stop                                                 |
+| rs-starfall60             | interval p50 (ms)                   | R0 16.7; R1 16.7; RS 16.7                        |        0% | R0→RS +0.0% noise; RS→R1 +0.0% noise; R0→R1 +0.0% noise                                                           |
+| rs-starfall60             | interval p95 (ms)                   | R0 17.0; R1 17.0; RS 17.0                        |        1% | R0→RS +0.0% noise; RS→R1 +0.0% noise; R0→R1 +0.0% noise                                                           |
+| rs-starfall60             | interval p99 (ms)                   | R0 17.2; R1 17.2; RS 17.2                        |        1% | R0→RS +0.0% noise; RS→R1 +0.0% noise; R0→R1 +0.0% noise                                                           |
+| rs-starfall60             | allocation MiB/s                    | R0 45.3; R1 35.0; RS 46.0                        |        1% | R0→RS +1.5% noise; RS→R1 -23.9% A↓; R0→R1 -22.8% A↓                                                               |
+| rs-starfall60             | reclaimed MiB/s (lower-bound proxy) | R0 6.92; R1 2.53; RS 7.22                        |       11% | R0→RS +4.3% noise; RS→R1 -64.9% noise stop; R0→R1 -63.4% noise stop                                               |
+| rs-starfall60             | dropped ticks                       | R0 0.000; R1 0.000; RS 0.000                     |        0% | R0→RS — noise; RS→R1 — noise; R0→R1 — noise                                                                       |
+| rs-platformer60           | callback p50 (ms)                   | R0 0.800; R1 0.800; RS 0.800                     |        0% | R0→RS +0.0% noise; RS→R1 +0.0% noise; R0→R1 +0.0% noise                                                           |
+| rs-platformer60           | callback p95 (ms)                   | R0 1.50; R1 1.40; RS 1.40                        |       21% | R0→RS -6.7% noise; RS→R1 -0.0% noise stop; R0→R1 -6.7% noise stop                                                 |
+| rs-platformer60           | callback p99 (ms)                   | R0 1.80; R1 1.70; RS 1.70                        |       18% | R0→RS -5.6% noise stop; RS→R1 -0.0% noise stop; R0→R1 -5.6% noise stop                                            |
+| rs-platformer60           | interval p50 (ms)                   | R0 16.7; R1 16.7; RS 16.7                        |        0% | R0→RS +0.0% noise; RS→R1 +0.0% noise; R0→R1 +0.0% noise                                                           |
+| rs-platformer60           | interval p95 (ms)                   | R0 17.0; R1 17.0; RS 17.1                        |        1% | R0→RS +0.6% noise; RS→R1 -0.6% noise; R0→R1 +0.0% noise                                                           |
+| rs-platformer60           | interval p99 (ms)                   | R0 17.2; R1 17.2; RS 17.2                        |        1% | R0→RS +0.0% noise; RS→R1 -0.0% noise; R0→R1 +0.0% noise                                                           |
+| rs-platformer60           | allocation MiB/s                    | R0 0.659; R1 0.540; RS 0.647                     |        6% | R0→RS -1.8% noise; RS→R1 -16.6% A↓; R0→R1 -18.1% A↓                                                               |
+| rs-platformer60           | reclaimed MiB/s (lower-bound proxy) | R0 0.511; R1 0.456; RS 0.517                     |        2% | R0→RS +1.1% noise; RS→R1 -11.7% A↓; R0→R1 -10.7% A↓                                                               |
+| rs-platformer60           | dropped ticks                       | R0 0.000; R1 0.000; RS 0.000                     |        0% | R0→RS — noise; RS→R1 — noise; R0→R1 — noise                                                                       |
+
+Fixture CPU preparation (0.1 ms timer quantum, noise stop in every alternating pair) and interval p50 (16.7 ms in every run) are in the phase 3 table. Units: churn time ms per commit; allocation sampled MiB per second; GC pause ms; fixture and RS rows as in phase 3.
+
+#### Regression table
+
+**No regression** under the predeclared rules: no decision metric is attributable up R0→R2 in any matrix. Leak: not assessable (confirmation waived; see gaps).
+
+**Minor** (R0→R2 attributable up, below threshold): none.
+
+**Pair-only increases** (attributable up on an intermediate pair while R0→R2 is not; not a regression by the rule):
+
+- Chaos split (Node, ms per sample), W237 prepare p50, R1→R2 +2.6%
+- Chaos split (Node, ms per sample), W237 sum p50, R1→R2 +4.0%
+- Starfall Chaos Lab 60 s (browser), reclaimed MiB/s (lower-bound proxy), R1→R2 +212.9%
+
+**Descriptive R0→R2 increases** (attributable by the same test, never a verdict):
+
+- Starfall Chaos Lab 60 s (browser), retained after warmup (MiB): R0 5.05 → R2 6.53 (+29.2%)
+- Platformer idle 60 s (browser), retained after warmup (MiB): R0 1.82 → R2 1.98 (+8.9%)
+- Platformer idle 60 s (browser), retained after run (MiB): R0 2.01 → R2 2.09 (+4.0%)
+
+#### Unresolved: noise-stopped R0→R2 at or above a threshold
+
+The median change meets a regression threshold but a same-condition range exceeds 10%, so the rule gives no verdict. Reported with the observed ranges.
+
+| Workload                          | Metric            |  R0→R2 | Threshold                            | Ranges                         | Runs separated  | Other pairs                                         |
+| --------------------------------- | ----------------- | -----: | ------------------------------------ | ------------------------------ | --------------- | --------------------------------------------------- |
+| Chaos split (Node, ms per sample) | W237 tick p95     | +26.9% | CPU p50/p95, attributable window +5% | R0 19%, RS 27%, R1 10%, R2 8%  | up, gap > range | R0→RS +4.1%; RS→R1 +2.4%; R1→R2 +19.1%; R0→R1 +6.6% |
+| Chaos split (Node, ms per sample) | W237 sort p95     | +16.6% | CPU p50/p95, attributable window +5% | R0 25%, RS 13%, R1 51%, R2 32% | no              | R0→RS +4.0%; RS→R1 +3.0%; R1→R2 +8.9%; R0→R1 +7.1%  |
+| Starfall Chaos Lab 60 s (browser) | callback p95 (ms) | +10.3% | browser callback p95 +10%            | R0 3%, R1 4%, R2 19%           | no              | R0→R1 -0.0%; R1→R2 +10.3%                           |
+
+**Improvements R0→R2** (attributable down): Starfall Chaos Lab 60 s (browser) interval p99 (ms) -0.6%; Starfall Chaos Lab 60 s (browser) allocation MiB/s -61.3%; Platformer idle 60 s (browser) allocation MiB/s -8.0%; Platformer idle 60 s (browser) reclaimed MiB/s (lower-bound proxy) -15.6%.
+
+<!-- ngne12:phase4:end -->
+
+#### Rule check
+
+A separate pass recomputed all 540 stored comparison verdicts (both analysis JSONs) from their run
+values with the predeclared definitions: 0 mismatches. `phase3-analyze.mjs` does not store the
+separation fields, so `phase4-report.mjs` recomputes them with the phase 2 definitions.
+
+#### Unresolved candidates: attribution and cause evidence
+
+None of these is a regression. Each is listed because its median meets a threshold, so a fix or an
+accept decision needs it named. Confidence describes the evidence that a real R0→R2 increase exists.
+
+| Candidate                                                   | Size (R0 → R2 medians)                 | Per-pair attribution (medians; all noise stop unless stated)                                                                               | Cause evidence                                                                                                                                                                                                                                                                                                                                                                               | Confidence                                                                                                                                 | Proposed fix direction                                                                                                                                          | Proposed closure target                                                                                                      |
+| ----------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| U1. Chaos tick p95, `W` = 237 (Node)                        | 0.330 → 0.419 ms (+26.9%, +0.089 ms)   | R0→RS +4.1%, RS→R1 +2.4%, R1→R2 +19.1%. Most of the change sits at R1→R2.                                                                  | Every R2 run (0.401–0.436) is above every R0 run (0.322–0.385) and the gap exceeds both ranges; only R0's 19% range blocks attribution. Profile `diff-237-12b727e-86494fd`: new R2 keys `commitSceneSimulation` (`src/scene.ts:734`, 24.4 ms self), `demo/game.ts:557` (19.4), `:516` (17.2), `:371` (6.3); removed `:526` (-38.5), `:488` (-12.0). NGNE self total 96 → 99 ms.              | Medium for a real tail increase; low for the cause (profiles cover tick, preparation and sort together and do not isolate the tail ticks). | Session 2 investigation of per-commit work in the R2 Starfall systems (`commitSceneSimulation`, chunk callbacks); no code change is justified yet.              | Tick p95 inside `W` = 237 within the R0 run range (0.322–0.385 ms), with every condition's range at or below 10%.            |
+| U2. Chaos sort p95, `W` = 237 (Node)                        | 0.098 → 0.115 ms (+16.6%, +0.016 ms)   | R0→RS +4.0%, RS→R1 +3.0%, R1→R2 +8.9%. Sort p99 rises at RS→R1 (+190%) and R1→R2 (+66%), also noise-stopped.                               | Runs overlap (R1 51%, R2 32% ranges). R1 widens `Frame` to 14 floats (NGNE-21); R2's browser allocation sites include `native sort <- quad-renderer.js:166 prepare` (8.8% of sampled bytes in the R2 run inspected). `Frame.sort` comparator lines moved between revisions, so profile keys do not pair.                                                                                     | Low.                                                                                                                                       | Session 2 investigation of the sort path (`Frame.sort`, comparator and its allocation); measure before changing.                                                | Sort p95 and p99 inside `W` = 237 within the R0 run ranges (p95 0.094–0.119 ms, p99 0.140–0.146 ms).                         |
+| U3. Starfall callback p95, 60 s (browser)                   | 6.8 → 7.5 ms (+10.3%, +0.7 ms)         | R0→R1 0.0% (within run noise); R1→R2 +10.3%. RS submatrix: R0→RS +1.4%, RS→R1 -1.4%. The change sits at R1→R2 (game ports and WebGPU).     | R2 runs 6.3, 7.5, 7.7 ms against R0 6.7–6.9 (not separated; R2 range 19%); p50 +18.2% with R2 range 31%. Callback includes host DOM telemetry in every revision. R2 top allocation sites are `demo/game.ts` chunk callbacks (`:570`, `:516`, `:371`, `:557`, `:436`) and `createChunkDescriptor` (`dist/engine/ecs.js:537`), while total allocation fell 61%. No browser CPU profile exists. | Low: one R2 run is below every R0 run.                                                                                                     | Session 2 investigation of Starfall's R2 per-frame work (chunk callbacks, descriptor creation, WebGPU submission); a browser CPU profile would be needed first. | Callback p95 within the R0 run range (6.7–6.9 ms) with every condition's range at or below 10%; allocation not above R2.     |
+| U4. Same-revision churn time (causal SoA, RS object→schema) | 0.344 → 2.638 ms per commit p50 (7.7×) | Not an R0→R2 pair. `churn-schema.ts` RS→R2 -1.6% (within run noise): the cost persists at R2. R0→R2 churn has no single matrix (see gaps). | Every schema run (2.595–2.663) is above every object run (0.327–0.367); object's 11.7% range triggers the noise stop. GC pause total 22.6 → 65.3 ms and count 30 → 79, both noise-stopped; bytes per commit 5.6× (descriptive), bytes per second -25% (attributable down).                                                                                                                   | High that schema structural churn costs more per commit than the object path at RS; not a regression verdict under the rule.               | Session 2 investigation of the schema spawn and despawn path (per-commit descriptors, spawn lowering), as the NGNE-27 lead suspected.                           | Schema commit p50 within a target the user sets (no R0 schema baseline exists); `churn-schema.ts` R2 range as the reference. |
+
+Not listed: Chaos R1→R2 sum p50 +4.0% and preparation p50 +2.6% (attributable on that pair only, below
+5%, and R0→R2 is within run noise), and Starfall R1→R2 reclaimed rate +213% (R1 is the low point; R0→R2
++4.3% within run noise).
+
+#### Ranking
+
+No regression exists, so the ranking orders the unresolved candidates for the phase 5 decision.
+
+| Rank | Candidate | Frame-budget headroom (16.7 ms at 60 Hz)                                                                                                                                       | Memory over a 10-minute session                                                                                                                                                            |
+| ---- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1    | U3        | p95 callback 6.8 → 7.5 ms: headroom 9.9 → 9.2 ms (-0.7 ms, 4% of the budget); frame intervals unchanged, 0 dropped ticks                                                       | Allocation -61% (attributable down); reclaimed rate within run noise; retained after warmup +1.47 MiB (descriptive increase); no replicated retained-growth evidence (confirmation waived) |
+| 2    | U4        | Not in the frame budget at current load (Starfall and the platformer do not churn at the measured rate); 2.3 ms more per commit at this churn rate would use 14% of the budget | Allocation per commit 5.6× (descriptive) but bytes per second lower; retained heap at end -1.1 MiB (descriptive); retained slope noise-stopped                                             |
+| 3    | U1        | +0.089 ms per simulation tick at p95 (0.5% of the budget)                                                                                                                      | Not measured                                                                                                                                                                               |
+| 4    | U2        | +0.016 ms per sort at p95 (0.1% of the budget)                                                                                                                                 | Not measured                                                                                                                                                                               |
+
+Memory over 10 minutes, all workloads (descriptive, one run per revision for long and cycle runs):
+
+- No replicated or confirmed retained-heap growth difference is established (confirmation waived); the single descriptive runs differ. `starfall300`: R0 4.76 → 5.93 MiB (leak candidate,
+  unconfirmed), R2 6.50 → 5.50 MiB (unclassified). Cycles: Starfall growth 0.95 (R0) and 0.96 MiB (R2)
+  over 40 cycles (about 7.5 minutes); platformer 0.67 and 0.71 MiB over 60 cycles (about 6.9 minutes).
+- In these descriptive runs R2 shows an offset rather than extra growth: Starfall retained after warmup +1.47 MiB (5.05 → 6.53) and
+  Starfall cycle checkpoints about +0.73 MiB throughout; platformer +0.16 MiB after warmup.
+- Allocation churn falls: Starfall 45.6 → 17.7 MiB/s sampled (about 27 → 11 GiB over 10 minutes);
+  platformer 0.63 → 0.58 MiB/s.
+
+#### Evidence gaps (phase 5 must plan or waive each)
+
+1. **GPU execution time:** not measured. The adapter exposes `timestamp-query`, but the engine requests
+   no features (`src/gpu-context.ts`), so timing needs an engine change. GPU-side evidence is the
+   renderer fixture (CPU preparation and submission) and the descriptive GPU-process trace.
+2. **Leak confirmation:** `confirm-starfall300` waived. No leak or bounded-cache classification is
+   replicated for any revision; "confirmed leak" is neither claimed nor excluded.
+3. **Noise-stopped comparisons:** U1–U4 above, plus Chaos p99 rows, sort p99, churn p99 and GC pause
+   totals, Starfall and platformer callback p50 and p99. Reported as narrowed, never as verdicts.
+4. **Churn R0→R2:** no single matrix holds both (the object API is absent at R2, the schema API at R0),
+   so structural churn has no whole-migration verdict; R0→RS and RS→R2 are measured separately and the
+   storage change only by the RS causal matrix.
+5. **Not comparable by design:** whole-run Chaos after tick 237 (play diverges); the renderer fixture
+   has no R0 or RS; browser GC pauses exist only in descriptive traces.
+
+#### Local limits (phase 4)
+
+- One machine (Windows 11, i7-12650H, 16 GiB, mains power), one integrated GPU (Intel `gen-12lp`), one
+  browser (Chrome 152 headful over CDP, DPR 1, 60 Hz), localhost production previews.
+- Page timers are coarsened to 0.1 ms, so browser callback and fixture percentiles are quantised and
+  small differences are unresolvable.
+- Three or four runs per condition; allocation is sampled; reclaimed rate is a lower-bound proxy.
+- At current load both games use about 1–9 ms of the 16.7 ms budget (callback p99), so frame-time differences do not
+  reach dropped frames here. None of these results is a claim about other devices (NGNE-14).
+
+#### Phase 4 inspection and checks
+
+Codex `gpt-5.6-sol`, read-only, one session (`01a0ab0e-5960-73e1-8848-74a435ed6884`), 16 September
+2026:
+
+| Round | Verdict  | Findings and disposition                                                                                                                                                                        |
+| ----- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1     | REVISE   | 1 blocking: "no retained-heap growth difference is measured" overstated the waived-confirmation evidence. Fixed: no replicated or confirmed difference is established; offset scoped.           |
+| 2     | REVISE   | 1 blocking: ranking memory cells still claimed absence. Fixed: U3 lists the attributable allocation drop, the descriptive retained increase and the waived confirmation; U1, U2 "Not measured". |
+| 3     | APPROVED | None. Round 1 also confirmed plan hash, manifests, balanced blocks, no dropped runs, recorded deviations, phase 4 deliverables and protected paths.                                             |
+
+Gate: `npm.cmd test` 141/141 pass; `typecheck`, `build`, `format` and `format:check` exit 0;
+`git diff --check` empty; protected-path scan empty.
+
 ## NGNE-27 — 13 September 2026
 
 Migration of Starfall and the platformer to SoA and WebGPU, following the approved

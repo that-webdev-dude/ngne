@@ -37,6 +37,10 @@ NGNE 0.1 is an early engine baseline with a playable showcase. The public API ma
 
 - NGNE-27 is done: migration, removal, measurements and deployment are recorded in
   [verification](verification.md#ngne-27--13-september-2026). NGNE-12 owns the broader comparison.
+- NGNE-12 is measured (R0, RS, R1, R2 on one machine): no regression under the predeclared rules,
+  four unresolved noise-stopped candidates and five evidence gaps, recorded in
+  [verification](verification.md#analysis-phase-4). Fixes and gap waivers are pending the user's
+  selection; NGNE-12 stays open until then.
 - NGNE-13 CI expansion and NGNE-14 portability remain separate; one tested Intel GPU
   and controlled device destruction do not establish cross-device or driver-fault coverage.
 
