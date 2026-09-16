@@ -80,11 +80,10 @@ try {
 // await app.dispose();                 // terminal; releases all owned services
 ```
 
-Rectangles and sprites use **center coordinates**. Distances are logical canvas pixels; `dt` is seconds. Composition is fixed when an entity spawns. Schema queries invoke one callback per nonempty 512-row chunk; hoist the inferred typed columns and read `chunk.count` once before the row loop. Chunk accessors check the borrow on every read, so a `row < chunk.count` loop condition pays that check per row; reading it once cut the median Starfall Chaos tick by about 13% in [NGNE-27 measurements](verification.md#ngne-27--13-september-2026).
+Rectangles and sprites use **center coordinates**. Distances are logical canvas pixels; `dt` is seconds. Composition is fixed when an entity spawns. Schema queries invoke one callback per nonempty 512-row chunk; hoist the inferred typed columns and read `chunk.count` once before the row loop to avoid repeating the borrow check for every row.
 
 Use a secure origin (localhost or HTTPS) and a WebGPU-capable browser with hardware
-acceleration. The initial tested target is desktop Chromium; [verification](verification.md#ngne-21--12-september-2026)
-names the actual hardware. Unsupported startup and failed device recovery remain visible
+acceleration. The supported target is desktop Chromium. Unsupported startup and failed device recovery remain visible
 in the alert above. `BrowserGame` renders only through WebGPU; there is no fallback
 backend.
 
@@ -203,9 +202,8 @@ Chunk descriptors and component views are borrowed until the next world commit. 
 Systems receive `WorldAccess`, not commit or enumeration authority. For headless use,
 create a `Game`, prepare/start a scene, then call `game.tick()`; the runtime owns world
 commits. Direct `World` construction is internal. Component queries expose `size` and
-`eachChunk`; object components, `world.get()` and per-entity `each` callbacks were removed in NGNE-27.
-[Starfall](../demo/game.ts) and the [platformer](../examples/platformer/game.ts) use schema components. `query()` with no components remains an
-entity-only compatibility traversal.
+`eachChunk`; `query()` with no components performs entity-only traversal.
+[Starfall](../demo/game.ts) and the [platformer](../examples/platformer/game.ts) use schema components.
 
 For diagnostics, read `game.scenes` and `game.enumerate()` after `game.tick()` returns;
 both return detached read-only data, never live worlds or resources. Use explicitly

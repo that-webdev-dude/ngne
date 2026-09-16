@@ -4,7 +4,7 @@
 
 This document is the authoritative high-level model for a 2D sprite game engine.
 
-The engine uses fixed-step simulation, renders after simulation, supports several active scenes, and gives each mounted scene its own ECS world. Exact APIs, storage layouts, and renderer formats are pinned in the [implementation contract](contracts/NGNE.md); the reasoning behind the rules below lives in [decisions](decisions.md).
+The engine uses fixed-step simulation, renders after simulation, supports several active scenes, and gives each mounted scene its own ECS world. Exact APIs, storage layouts, and renderer formats are pinned in the [implementation contract](contracts/NGNE.md).
 
 ## Core rules
 
@@ -21,7 +21,7 @@ The engine uses fixed-step simulation, renders after simulation, supports severa
 
 ## Required capabilities
 
-The model must accommodate these capabilities without prescribing APIs or storage formats. Each links to the section holding its rules; work that is explicitly not required yet is listed in the [roadmap](roadmap.md#deferred).
+The model must accommodate these capabilities without prescribing APIs or storage formats. Each links to the section holding its rules; capabilities outside the model are listed under [Out of scope](#out-of-scope).
 
 | Capability                                | Rules                                                                                                          |
 | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
@@ -34,7 +34,7 @@ The model must accommodate these capabilities without prescribing APIs or storag
 | Gameplay-local freeze                     | [Systems and gameplay freeze](#systems-and-gameplay-freeze)                                                    |
 | Speculative scene preparation             | [Loading, mounting, and teardown](#loading-mounting-and-teardown)                                              |
 
-Cross-world transient messaging is deferred and local multiplayer input is out of scope; both are recorded in the roadmap.
+Cross-world transient messaging and local multiplayer input are out of scope.
 
 ## Main terms
 
@@ -115,7 +115,7 @@ Rules:
 - The host stores durable game facts such as progression and room history keyed by stable authored identities, never scene entities, entity handles, queries, cameras, or event queues.
 - Committed facts survive scene replacement, suspension, and stop/resume for the lifetime of one `Game`; separate `Game` instances remain isolated.
 - Re-entering a scene rebuilds its entities from committed facts; entities do not move between worlds.
-- Serialization and external storage remain deferred.
+- The engine does not provide serialization or external storage.
 
 ## Scene model
 
@@ -171,7 +171,7 @@ Communication uses the existing ownership boundaries:
 | Modal behavior and scene replacement            | Scene-stack commands                         |
 | Live HUD                                        | Frame preparation in the gameplay scene      |
 
-General transient messaging between independently mounted worlds is deferred until a concrete game requires it. Direct access to another scene's world, entities, queries, or resources is not allowed.
+The engine does not provide general transient messaging between independently mounted worlds. Direct access to another scene's world, entities, queries, or resources is not allowed.
 
 ## Systems and gameplay freeze
 
@@ -195,7 +195,7 @@ Each scene owns one integer-tick gameplay-freeze gate for hitstop:
 - Gameplay event inboxes remain pending until ordinary gameplay resumes.
 - The freeze state survives stop/resume and ends on unmount.
 
-Fractional slow motion, named time domains, and per-entity time scaling remain deferred.
+The engine does not provide fractional slow motion, named time domains, or per-entity time scaling.
 
 ## Tick context and input
 
@@ -278,7 +278,7 @@ This is not transaction rollback for the whole tick; it is failure isolation at 
 
 ## Simulation snapshots and replay readiness
 
-Save, restore, replay control, and rollback remain deferred. The architecture preserves one coherent simulation-state boundary after a completed tick commit and before the next tick.
+The engine does not provide save, restore, replay control, or rollback. The architecture preserves one coherent simulation-state boundary after a completed tick commit and before the next tick.
 
 At that boundary, explicit owners must make all authoritative simulation state enumerable, including:
 
@@ -287,7 +287,7 @@ At that boundary, explicit owners must make all authoritative simulation state e
 - Live entities, component values, allocator state, authoritative scene resources, RNG state, freeze state, and event buffers.
 - Camera state when it can affect future simulation.
 
-Systems and closures cannot be the only owners of authoritative state. GPU state, decoded caches, wall-clock state, the platform-frame accumulator, and future environmental input are outside a simulation-state snapshot. The [ownership inventory](contracts/ownership-and-inspection.md#simulation-state-ownership-inventory-ngne-5) records the current production owners and external inputs; public enumeration is lossy diagnostic data, not a capture of those owners.
+Systems and closures cannot be the only owners of authoritative state. GPU state, decoded caches, wall-clock state, the platform-frame accumulator, and future environmental input are outside a simulation-state snapshot. The [ownership inventory](contracts/ownership-and-inspection.md#simulation-state-ownership-inventory) records the current production owners and external inputs; public enumeration is lossy diagnostic data, not a capture of those owners.
 
 A replay from the beginning requires:
 
@@ -399,6 +399,13 @@ before decoded sources close, cancels loading, unmounts scenes and releases all 
 services. Every cleanup is attempted. Independent cleanup does not wait for audio close.
 Failures are reported together and the final state is always `Disposed`.
 
-## Deferred work
+## Out of scope
 
-API, storage, and renderer choices this model once left open are pinned in the [implementation contract](contracts/NGNE.md). Work deferred until a concrete game needs it is listed in the [roadmap](roadmap.md#deferred).
+The engine does not provide:
+
+- Persistence workflows, snapshot capture or restoration, replay control, rollback, or networking.
+- Engine-defined progression, tilemap, collision, or hitbox schemas.
+- Multiple views, local multiplayer, or controller assignment.
+- Fractional time scaling, named time domains, or per-entity time scaling.
+- General cross-world messaging, background scene simulation, multithreading, or editor tooling.
+- Public entity pooling, fixed-capacity worlds, or allocation-free spawning guarantees.

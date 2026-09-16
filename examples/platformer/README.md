@@ -18,4 +18,4 @@ The two levels demonstrate:
 - Committed checkpoint/level progress; death remounts entities from durable facts, resetting patrols.
 - Engine-owned, scene-scoped candidate slots with game-owned transition intent and a blocking pause overlay.
 
-The deterministic reference walkthrough in [the tests](../../tests/platformer.test.ts) completes both authored levels with zero deaths. See [findings and validation limits](FINDINGS.md); browser playthrough remains separate evidence.
+The deterministic reference walkthrough in [the tests](../../tests/platformer.test.ts) completes both authored levels with zero deaths. Browser controls and audio require separate browser validation.

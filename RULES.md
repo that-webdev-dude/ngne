@@ -4,8 +4,8 @@
 
 - Architecture and implementation contracts outrank style preferences. Read the
   relevant documents before changing behavior.
-- Preserve public contracts unless the task intentionally changes them. Record
-  API changes and migration guidance with the implementation.
+- Preserve public contracts unless the task intentionally changes them. Keep
+  authoritative documentation aligned with the current implementation.
 - Apply changes only to the affected surface. Do not perform unrelated rewrites.
 
 ## Design and ownership
@@ -38,11 +38,12 @@
 
 ## Documentation and completion
 
-- Each fact has one owning document: contracts for semantics, decisions for
-  rationale, the guide and examples for usage, verification for dated evidence,
-  and the roadmap for direction. Other documents link instead of restating it.
+- Each fact has one owning document: architecture for the high-level model,
+  contracts for exact semantics, and the guide and examples for usage. Tests and
+  CI provide executable evidence; work tracking and history stay outside the
+  authoritative documentation.
 - Update the owning document in the same task as an observable behavior or
   public API change.
-- Keep proposals, implemented behavior, and verified results distinct.
+- Keep current behavior distinct from proposals and historical records.
 - On completion, report changes, checks and results, remaining limits, and
   unresolved decisions.

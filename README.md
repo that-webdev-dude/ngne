@@ -6,7 +6,7 @@ A TypeScript engine for 2D sprite games. Fixed-step simulation, scene-owned ECS 
 
 ![Starfall '89 gameplay](docs/assets/starfall.png)
 
-**Early release · 0.1.0.** The engine exports independently from the showcase. Its API may change as more games exercise it. Hello, Starfall and the platformer require WebGPU. The initial WebGPU target is desktop Chromium with hardware acceleration on a secure origin (localhost or HTTPS); see the [tested hardware and limits](docs/verification.md#ngne-21--12-september-2026).
+**Early release · 0.1.0.** The engine exports independently from the showcase. Its API may change as more games exercise it. Hello, Starfall and the platformer require WebGPU. The supported target is desktop Chromium with hardware acceleration on a secure origin (localhost or HTTPS).
 
 ## Run locally
 
@@ -62,7 +62,7 @@ const scene: SceneDefinition = {
 };
 ```
 
-Positions are sprite centers in logical pixels; `dt` is seconds. See the [runnable first scene](examples/hello/main.ts) for browser startup and smooth interpolation, then the [engine guide](docs/guide.md) for lifecycle, committed state, resources, interpolation, assets, audio and diagnostics. The [implementation contract](docs/contracts/NGNE.md) defines exact semantics and migration notes.
+Positions are sprite centers in logical pixels; `dt` is seconds. See the [runnable first scene](examples/hello/main.ts) for browser startup and smooth interpolation, then the [engine guide](docs/guide.md) for lifecycle, committed state, resources, interpolation, assets, audio and diagnostics. The [implementation contract](docs/contracts/NGNE.md) defines exact semantics.
 
 NGNE is not published to npm. Build this checkout to obtain ESM modules and declarations in `dist/engine/`; the entry point is `dist/engine/index.js`. The demo and hello example consume that same package entry point, and the build checks forbidden API usage against the emitted declarations.
 
@@ -78,9 +78,9 @@ npm run preview
 
 `npm run format` applies Prettier; `.editorconfig` and `.gitattributes` keep 4-space indentation and LF line endings on every platform.
 
-During development, `/validation.html` exercises real WebGPU pixels, batching, controlled device loss, image readiness and browser lifecycle. `npm run build:browser && npm run test:browser` builds and serves a separate browser-test artifact, drives those assertions plus both games' launch/pause/resume paths in Chromium, and writes machine-readable results under `.test-output/browser/`. CI selects SwiftShader, so executed assertions are software WebGPU evidence, not hardware evidence; the deployed `dist/` remains separate. `npm run bench` measures CPU workloads, not GPU time or universal frame-rate guarantees; `npx tsx tests/browser-baseline.ts` drives sustained game runs or the fixed renderer fixture in a visible Chromium. Recorded results and reproduction commands live in [verification](docs/verification.md).
+During development, `/validation.html` exercises real WebGPU pixels, batching, controlled device loss, image readiness and browser lifecycle. `npm run build:browser && npm run test:browser` builds and serves a separate browser-test artifact, drives those assertions plus both games' launch/pause/resume paths in Chromium, and writes machine-readable results under `.test-output/browser/`. CI selects SwiftShader, so executed assertions are software WebGPU evidence, not hardware evidence; the deployed `dist/` remains separate. `npm run bench` measures CPU workloads, not GPU time or universal frame-rate guarantees; `npx tsx tests/browser-baseline.ts` drives sustained game runs or the fixed renderer fixture in a visible Chromium.
 
-GitHub Actions runs the format check, tests, typechecking, production build and software-WebGPU browser integration on pull requests and pushes to `main`. It reports passed and unsupported assertions separately and uploads JSON, browser logs and failure screenshots. Successful main builds deploy the showcase to GitHub Pages only after all verification passes. See [verification evidence and hardware limits](docs/verification.md).
+GitHub Actions runs the format check, tests, typechecking, production build and software-WebGPU browser integration on pull requests and pushes to `main`. It reports passed and unsupported assertions separately and uploads JSON, browser logs and failure screenshots. Successful main builds deploy the showcase to GitHub Pages only after all verification passes.
 
 ## Documentation
 
@@ -88,18 +88,13 @@ GitHub Actions runs the format check, tests, typechecking, production build and 
 | ------------------------------------------------- | ---------------------------------------------------------------- |
 | [Engine guide](docs/guide.md)                     | Authoring examples and lifecycle rules                           |
 | [Architecture](docs/architecture.md)              | Authoritative ownership, runtime model and required capabilities |
-| [Implementation contract](docs/contracts/NGNE.md) | Precise implemented semantics and migration notes                |
-| [Decisions](docs/decisions.md)                    | Design rationale                                                 |
-| [Roadmap](docs/roadmap.md)                        | Status, direction and deferred work                              |
-| [Verification](docs/verification.md)              | Dated evidence and hardware limits                               |
+| [Implementation contract](docs/contracts/NGNE.md) | Precise API and runtime semantics                                |
 | [Showcase design](demo/DESIGN.md)                 | Starfall '89 art direction                                       |
-| [Platformer](examples/platformer/README.md)       | Controls, demonstrated capabilities and authoring findings       |
+| [Platformer](examples/platformer/README.md)       | Controls and demonstrated capabilities                           |
 
 ## Contribute
 
 Change `src/` for the engine, `demo/` for Starfall and `tests/` for regression coverage. Run the checks above; use browser validation for rendering or browser lifecycle changes. Update the owning document (contract for semantics, guide for usage) when behavior changes. Keep fixes small and report reproduction steps in issues.
-
-Historical prototype: the frozen `prototypes/ngne/v00` snapshot was removed in NGNE-18 and lives in Git history. Recover it with `git checkout 1c8a76b -- prototypes/` or inspect a file with `git show 1c8a76b:prototypes/ngne/v00/AUDIT.md`.
 
 ## License
 
