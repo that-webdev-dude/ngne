@@ -195,7 +195,7 @@ async function checkPlatformerUnsupported(check: Check): Promise<void> {
         "Click Start level 1 in the platformer fixture below to continue.",
         async (doc) => {
             await waitFor(
-                () => doc()?.getElementById("start")?.textContent === "Start level 1",
+                () => doc()?.documentElement.dataset.ngneFixtureReady === "true",
                 10_000,
                 "Platformer fixture did not become ready",
             );
@@ -243,7 +243,7 @@ async function withFixture(
     iframe.style.cssText = "flex:1;width:100%;border:0";
     iframe.srcdoc = page.replace(
         entry[0],
-        `<script type="module">${NULL_ADAPTER}await import(${JSON.stringify(entryModule)});</script>`,
+        `<script type="module">${NULL_ADAPTER}await import(${JSON.stringify(entryModule)});document.documentElement.dataset.ngneFixtureReady="true";</script>`,
     );
     if (prompt) {
         const text = document.createElement("p");

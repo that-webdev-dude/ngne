@@ -316,7 +316,7 @@ async function waitForValidation(): Promise<ValidationState> {
     const deadline = Date.now() + timeoutMs;
     while (Date.now() < deadline) {
         const fixtureNeedsClick = await cdp!.evaluate<boolean>(
-            "!!document.querySelector('iframe')?.contentDocument?.getElementById('start')",
+            "document.querySelector('iframe')?.contentDocument?.documentElement.dataset.ngneFixtureReady === 'true' && !!document.querySelector('iframe')?.contentDocument?.getElementById('start')",
         );
         if (fixtureNeedsClick)
             await click(
