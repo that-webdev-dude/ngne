@@ -155,7 +155,16 @@ function startBrowser(): ChildProcess {
         "--autoplay-policy=no-user-gesture-required",
     ];
     if (requestedAdapter) flags.push(`--use-webgpu-adapter=${requestedAdapter}`);
-    if (requestedAdapter === "swiftshader") flags.push("--enable-unsafe-webgpu");
+    if (requestedAdapter === "swiftshader") {
+        flags.push("--enable-unsafe-webgpu", "--enable-unsafe-swiftshader");
+        if (process.platform === "linux")
+            flags.push(
+                "--enable-features=Vulkan",
+                "--use-angle=vulkan",
+                "--use-vulkan=swiftshader",
+                "--disable-vulkan-surface",
+            );
+    }
     if (process.platform === "linux") flags.push("--no-sandbox");
     flags.push("about:blank");
     const child = spawn(executable, flags, {
