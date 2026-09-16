@@ -129,7 +129,11 @@ function startPreview(): ChildProcess {
             "--outDir",
             "dist-browser",
         ],
-        { cwd: root, stdio: ["ignore", "pipe", "pipe"] },
+        {
+            cwd: root,
+            detached: process.platform !== "win32",
+            stdio: ["ignore", "pipe", "pipe"],
+        },
     );
     pipeLog(child, "preview.log");
     return child;
@@ -154,7 +158,10 @@ function startBrowser(): ChildProcess {
     if (requestedAdapter === "swiftshader") flags.push("--enable-unsafe-webgpu");
     if (process.platform === "linux") flags.push("--no-sandbox");
     flags.push("about:blank");
-    const child = spawn(executable, flags, { stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn(executable, flags, {
+        detached: process.platform !== "win32",
+        stdio: ["ignore", "pipe", "pipe"],
+    });
     pipeLog(child, "browser-process.log");
     return child;
 }
@@ -510,14 +517,28 @@ function pipeLog(child: ChildProcess, filename: string): void {
 }
 
 async function stop(child: ChildProcess | undefined): Promise<void> {
-    if (!child || child.exitCode !== null) return;
-    if (process.platform === "win32")
-        spawnSync("taskkill", ["/PID", String(child.pid), "/T", "/F"], { stdio: "ignore" });
-    else child.kill("SIGTERM");
+    if (!child?.pid) return;
+    if (process.platform === "win32") {
+        if (child.exitCode === null)
+            spawnSync("taskkill", ["/PID", String(child.pid), "/T", "/F"], { stdio: "ignore" });
+        return;
+    }
+    try {
+        process.kill(-child.pid, "SIGTERM");
+    } catch {
+        return;
+    }
     await Promise.race([
         new Promise<void>((resolve) => child.once("close", () => resolve())),
         sleep(5_000),
     ]);
+    if (process.platform !== "win32") {
+        try {
+            process.kill(-child.pid, "SIGKILL");
+        } catch {
+            // The owned process group already exited.
+        }
+    }
 }
 
 function sleep(ms: number): Promise<void> {
