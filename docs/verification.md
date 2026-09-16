@@ -35,7 +35,13 @@ Local software-WebGPU run on Windows 11, Chrome 152: 160 passed, one skipped-as-
 upload, 10,000-sprite buffer growth/reuse, backing resize, controlled loss/recovery, disposal and late
 callbacks, plus built Starfall and platformer launch/pause/resume paths. A separate
 `NGNE_BROWSER_INJECT_FAILURE=1` run exited nonzero on `intentional CI assertion failure`; the ordinary
-run then passed. This is local workflow reproduction, not a completed GitHub-hosted workflow run.
+run then passed.
+
+[GitHub-hosted run 35129346775](https://github.com/that-webdev-dude/ngne/actions/runs/35129346775)
+completed verification and the gated Pages deployment on Ubuntu. Its uploaded JSON reports Google
+SwiftShader as a fallback software adapter, 160 passed, the hardware-backed evidence assertion
+skipped as unsupported, and zero failures. The preceding intentional-failure step also passed by
+detecting the injected assertion and its machine-readable failure result.
 
 ## NGNE-12 — 14 September 2026
 
