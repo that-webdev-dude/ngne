@@ -24,19 +24,23 @@ jobs:
       - run: npm run typecheck
       - run: npm run build
       - run: npm run build:browser
+      - name: Install software WebGPU presentation dependencies
+        run: sudo apt-get update && sudo apt-get install -y libvulkan1 mesa-vulkan-drivers xvfb xauth
       - name: Demonstrate browser assertion failure detection
         env:
+          NGNE_BROWSER_HEADLESS: 0
           NGNE_WEBGPU_ADAPTER: swiftshader
         run: |
-          if NGNE_BROWSER_INJECT_FAILURE=1 NGNE_BROWSER_ARTIFACT_DIR=.test-output/browser-intentional-failure npm run test:browser; then
+          if NGNE_BROWSER_INJECT_FAILURE=1 NGNE_BROWSER_ARTIFACT_DIR=.test-output/browser-intentional-failure xvfb-run -a npm run test:browser; then
             echo "Intentional browser assertion unexpectedly passed"
             exit 1
           fi
           jq -e '.failures[] | contains("intentional CI assertion failure")' .test-output/browser-intentional-failure/results.json
       - name: Run WebGPU browser integration
         env:
+          NGNE_BROWSER_HEADLESS: 0
           NGNE_WEBGPU_ADAPTER: swiftshader
-        run: npm run test:browser
+        run: xvfb-run -a npm run test:browser
       - name: Upload browser integration artifacts
         if: always()
         uses: actions/upload-artifact@v4

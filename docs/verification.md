@@ -4,13 +4,15 @@
 
 The browser integration job builds `dist-browser/` separately from the deployable `dist/`, serves it
 with a bounded Vite preview, verifies that the served validation entry matches that build, and drives
-headless Chrome through the DevTools protocol. The harness
+Chrome through the DevTools protocol. GitHub uses headed Chrome on a bounded Xvfb display so the
+software WebGPU canvas exercises the presentation path as well as offscreen readback. The harness
 writes `.test-output/browser/results.json` plus browser/process logs, captures a PNG on failure, and
 terminates the preview, browser and fresh profile. Its GitHub job summary lists passed assertions,
 skipped-as-unsupported assertions and failures separately.
 
-CI runs Chrome with Dawn's SwiftShader adapter. This executes WebGPU commands and readbacks in
-software; it is not physical-GPU, driver, display-timing or cross-browser evidence. The result records
+CI installs the Vulkan/Mesa and Xvfb runtime packages, then runs Chrome with Dawn's SwiftShader
+adapter. This executes WebGPU commands, presentation and readbacks in software; it is not
+physical-GPU, driver, display-timing or cross-browser evidence. The result records
 adapter details and marks hardware-backed evidence as skipped rather than passed. GitHub's Ubuntu
 runner image supplies Chrome, while Chromium requires unsafe WebGPU to permit its fallback adapter;
 see the [runner inventory](https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md)

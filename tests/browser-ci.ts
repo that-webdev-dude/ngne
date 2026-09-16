@@ -145,7 +145,6 @@ function startBrowser(): ChildProcess {
     const flags = [
         `--remote-debugging-port=${debugPort}`,
         `--user-data-dir=${profileDirectory}`,
-        "--headless=new",
         "--no-first-run",
         "--disable-default-apps",
         "--disable-dev-shm-usage",
@@ -154,6 +153,8 @@ function startBrowser(): ChildProcess {
         "--disable-renderer-backgrounding",
         "--autoplay-policy=no-user-gesture-required",
     ];
+    if (process.env.NGNE_BROWSER_HEADLESS !== "0") flags.push("--headless=new");
+    else flags.push("--window-size=1280,720");
     if (requestedAdapter) flags.push(`--use-webgpu-adapter=${requestedAdapter}`);
     if (requestedAdapter === "swiftshader") {
         flags.push("--enable-unsafe-webgpu", "--enable-unsafe-swiftshader");
