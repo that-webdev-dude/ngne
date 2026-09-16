@@ -1,0 +1,7 @@
+interface:
+  display_name: "Ticket"
+  short_description: "Draft actionable Jira tickets for manual entry"
+  default_prompt: "Use $ticket to draft copy-ready Jira tickets that I will enter and manage manually."
+
+policy:
+  allow_implicit_invocation: false

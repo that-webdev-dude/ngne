@@ -1,7 +1,0 @@
-interface:
-  display_name: "Jira Work Items"
-  short_description: "Draft actionable Jira tickets for manual entry"
-  default_prompt: "Use $jira-work-items to draft copy-ready Jira tickets that I will enter and manage manually."
-
-policy:
-  allow_implicit_invocation: false

@@ -1,5 +1,5 @@
 ---
-name: jira-work-items
+name: ticket
 description: Draft consistent, execution-ready Jira tickets for manual entry, with concrete acceptance criteria, validation, dependencies, documentation, and completion handoff.
 ---
 
