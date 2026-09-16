@@ -17,12 +17,21 @@ void (
     if (output) output.textContent = String(error);
 });
 const results: string[] = [];
+const validation = (window.__ngneValidation = {
+    status: "idle" as "idle" | "running" | "passed" | "failed",
+    passed: results,
+    skipped: [] as string[],
+    failures: [] as string[],
+});
 const check = (condition: unknown, message: string) => {
     if (!condition) throw new Error(message);
     results.push("PASS " + message);
     document.getElementById("results")!.textContent = results.join("\n");
 };
 async function main() {
+    validation.status = "running";
+    if (new URLSearchParams(location.search).has("injectFailure"))
+        check(false, "intentional CI assertion failure");
     await checkBrowserAudio(check);
     await checkWebGPUCore(check);
     const surface = document.createElement("canvas");
@@ -88,6 +97,7 @@ async function main() {
     await checkBrowserGpuHost(check);
     await checkBrowserInput((condition, message) => check(condition, "WebGPU " + message));
     await checkBrowserInterpolation(check);
+    validation.status = "passed";
     document.getElementById("results")!.textContent = results.join("\n") + "\n\nALL CHECKS PASSED";
 }
 document.getElementById("start-validation")!.addEventListener(
@@ -95,6 +105,8 @@ document.getElementById("start-validation")!.addEventListener(
     () => {
         document.getElementById("results")!.textContent = "Running…";
         void main().catch((error) => {
+            validation.status = "failed";
+            validation.failures.push(error instanceof Error ? error.message : String(error));
             document.getElementById("results")!.textContent =
                 results.join("\n") + "\nFAIL " + error.stack;
             console.error(error);
@@ -102,3 +114,14 @@ document.getElementById("start-validation")!.addEventListener(
     },
     { once: true },
 );
+
+declare global {
+    interface Window {
+        __ngneValidation: {
+            status: "idle" | "running" | "passed" | "failed";
+            passed: string[];
+            skipped: string[];
+            failures: string[];
+        };
+    }
+}

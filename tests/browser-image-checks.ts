@@ -229,7 +229,12 @@ async function checkHelloCapability(
         const observer=new MutationObserver(()=>{if(document.querySelector('[role="alert"]')?.textContent.includes("WebGPU recovery failed")){
             observer.disconnect();parent.postMessage("ngne21-capability-complete",parent.location.origin);}});
         observer.observe(document.body,{childList:true,subtree:true,characterData:true});device.destroy();`;
-    iframe.srcdoc = `<canvas></canvas><script type="module">${setup}await import("/examples/hello/main.ts");${finish}</script>`;
+    const pagePath = "/examples/hello/";
+    const page = await (await fetch(pagePath)).text();
+    const entry = /<script\s+type="module"[^>]*\bsrc="([^"]+)"[^>]*><\/script>/.exec(page);
+    if (!entry) throw new Error("Hello capability fixture entry script not found");
+    const entryModule = new URL(entry[1], new URL(pagePath, location.href)).href;
+    iframe.srcdoc = `<canvas></canvas><script type="module">${setup}await import(${JSON.stringify(entryModule)});${finish}</script>`;
     document.body.append(iframe);
     try {
         await complete;

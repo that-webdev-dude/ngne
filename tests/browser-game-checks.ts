@@ -1,7 +1,7 @@
 import { makeAtlas } from "../demo/art.js";
 import { arena, H, W, type Progress, type ProgressCommand } from "../demo/game.js";
-import { BrowserGame } from "../src/index.js";
-import type { Asset, FrameScheduler, ImageAsset, Lease } from "../src/index.js";
+import { BrowserGame } from "ngne";
+import type { Asset, FrameScheduler, ImageAsset, Lease } from "ngne";
 
 type Check = (condition: unknown, message: string) => void;
 
@@ -163,32 +163,25 @@ async function checkStarfallAtlasLifetime(check: Check): Promise<void> {
 
 /** Starfall boots by preparing its atlas image, which creates the renderer; no click is needed. */
 async function checkStarfallUnsupported(check: Check): Promise<void> {
-    await withFixture(
-        "/",
-        /<script type="module" src="\/demo\/main\.ts"><\/script>/,
-        "/demo/main.ts",
-        "Starfall unsupported WebGPU fixture",
-        undefined,
-        async (doc) => {
-            await waitFor(
-                () => doc()?.getElementById("error")?.hidden === false,
-                10_000,
-                "Starfall fixture reported no error",
-            );
-            // The message must persist; a later report or UI update must not hide it.
-            await new Promise((resolve) => setTimeout(resolve, 500));
-            const error = doc()?.getElementById("error");
-            check(
-                error?.hidden === false &&
-                    STARFALL_UNSUPPORTED.every((message) => error.textContent?.includes(message)),
-                `Starfall persistently reports the exact unsupported messages: ${STARFALL_UNSUPPORTED.join(" / ")}`,
-            );
-            check(
-                doc()?.getElementById("play")?.textContent === "UNABLE TO START",
-                "Starfall unsupported boot shows UNABLE TO START",
-            );
-        },
-    );
+    await withFixture("/", "Starfall unsupported WebGPU fixture", undefined, async (doc) => {
+        await waitFor(
+            () => doc()?.getElementById("error")?.hidden === false,
+            10_000,
+            "Starfall fixture reported no error",
+        );
+        // The message must persist; a later report or UI update must not hide it.
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        const error = doc()?.getElementById("error");
+        check(
+            error?.hidden === false &&
+                STARFALL_UNSUPPORTED.every((message) => error.textContent?.includes(message)),
+            `Starfall persistently reports the exact unsupported messages: ${STARFALL_UNSUPPORTED.join(" / ")}`,
+        );
+        check(
+            doc()?.getElementById("play")?.textContent === "UNABLE TO START",
+            "Starfall unsupported boot shows UNABLE TO START",
+        );
+    });
 }
 
 /**
@@ -198,8 +191,6 @@ async function checkStarfallUnsupported(check: Check): Promise<void> {
 async function checkPlatformerUnsupported(check: Check): Promise<void> {
     await withFixture(
         "/examples/platformer/index.html",
-        /<script type="module" src="[^"]*main\.ts"><\/script>/,
-        "/examples/platformer/main.ts",
         "Platformer unsupported WebGPU fixture",
         "Click Start level 1 in the platformer fixture below to continue.",
         async (doc) => {
@@ -234,14 +225,14 @@ async function checkPlatformerUnsupported(check: Check): Promise<void> {
 /** Loads a real game page in a same-origin iframe whose WebGPU adapter request resolves null. */
 async function withFixture(
     pagePath: string,
-    entry: RegExp,
-    entryModule: string,
     title: string,
     prompt: string | undefined,
     run: (doc: () => Document | null | undefined) => Promise<void>,
 ): Promise<void> {
     const page = await (await fetch(pagePath)).text();
-    if (!entry.test(page)) throw new Error(`${title}: page entry script not found`);
+    const entry = /<script\s+type="module"[^>]*\bsrc="([^"]+)"[^>]*><\/script>/.exec(page);
+    if (!entry) throw new Error(`${title}: page entry script not found`);
+    const entryModule = new URL(entry[1], new URL(pagePath, location.href)).href;
     const container = document.createElement("section");
     container.setAttribute("aria-label", title);
     container.style.cssText =
@@ -251,7 +242,7 @@ async function withFixture(
     iframe.title = title;
     iframe.style.cssText = "flex:1;width:100%;border:0";
     iframe.srcdoc = page.replace(
-        entry,
+        entry[0],
         `<script type="module">${NULL_ADAPTER}await import(${JSON.stringify(entryModule)});</script>`,
     );
     if (prompt) {

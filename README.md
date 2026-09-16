@@ -78,9 +78,9 @@ npm run preview
 
 `npm run format` applies Prettier; `.editorconfig` and `.gitattributes` keep 4-space indentation and LF line endings on every platform.
 
-During development, `/validation.html` exercises real WebGPU pixels, batching, controlled device loss, image readiness and browser lifecycle. This page is excluded from the production build. `npm run bench` measures CPU workloads, not GPU time or universal frame-rate guarantees; `npx tsx tests/browser-baseline.ts` drives sustained game runs or the fixed renderer fixture in a visible Chromium. Recorded results and reproduction commands live in [verification](docs/verification.md).
+During development, `/validation.html` exercises real WebGPU pixels, batching, controlled device loss, image readiness and browser lifecycle. `npm run build:browser && npm run test:browser` builds and serves a separate browser-test artifact, drives those assertions plus both games' launch/pause/resume paths in Chromium, and writes machine-readable results under `.test-output/browser/`. CI selects SwiftShader, so executed assertions are software WebGPU evidence, not hardware evidence; the deployed `dist/` remains separate. `npm run bench` measures CPU workloads, not GPU time or universal frame-rate guarantees; `npx tsx tests/browser-baseline.ts` drives sustained game runs or the fixed renderer fixture in a visible Chromium. Recorded results and reproduction commands live in [verification](docs/verification.md).
 
-GitHub Actions runs the format check, tests, typechecking and the build on pull requests and pushes to `main`. Successful main builds deploy the showcase to GitHub Pages. See [verification evidence and hardware limits](docs/verification.md).
+GitHub Actions runs the format check, tests, typechecking, production build and software-WebGPU browser integration on pull requests and pushes to `main`. It reports passed and unsupported assertions separately and uploads JSON, browser logs and failure screenshots. Successful main builds deploy the showcase to GitHub Pages only after all verification passes. See [verification evidence and hardware limits](docs/verification.md).
 
 ## Documentation
 

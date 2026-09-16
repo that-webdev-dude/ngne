@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import { fileURLToPath } from "node:url";
 
-export default defineConfig(({ command }) => ({
+export default defineConfig(({ command, mode }) => ({
     base: "./",
     resolve: {
         alias:
@@ -17,6 +17,7 @@ export default defineConfig(({ command }) => ({
                 game: "index.html",
                 hello: "examples/hello/index.html",
                 platformer: "examples/platformer/index.html",
+                ...(mode === "browser" ? { validation: "validation.html" } : {}),
             },
         },
     },

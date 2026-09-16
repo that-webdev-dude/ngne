@@ -6,8 +6,10 @@
     "scripts": {
         "dev": "vite --host 127.0.0.1",
         "build": "tsc --noEmit && tsc -p tests/tsconfig.browser.json && tsc -p tsconfig.lib.json && tsc -p tests/tsconfig.api.json && vite build",
+        "build:browser": "vite build --mode browser --outDir dist-browser",
         "typecheck": "tsc --noEmit",
         "test": "tsx --test tests/*.test.ts",
+        "test:browser": "tsx tests/browser-ci.ts",
         "bench": "tsx tests/benchmark.ts",
         "format": "prettier --write src demo examples tests docs .agents .github .vscode \"./*.{ts,md,json,html}\"",
         "format:check": "prettier --check src demo examples tests docs .agents .github .vscode \"./*.{ts,md,json,html}\"",

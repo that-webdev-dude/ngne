@@ -1,5 +1,40 @@
 # NGNE verification
 
+## NGNE-13 — 16 September 2026
+
+The browser integration job builds `dist-browser/` separately from the deployable `dist/`, serves it
+with a bounded Vite preview, verifies that the served validation entry matches that build, and drives
+headless Chrome through the DevTools protocol. The harness
+writes `.test-output/browser/results.json` plus browser/process logs, captures a PNG on failure, and
+terminates the preview, browser and fresh profile. Its GitHub job summary lists passed assertions,
+skipped-as-unsupported assertions and failures separately.
+
+CI runs Chrome with Dawn's SwiftShader adapter. This executes WebGPU commands and readbacks in
+software; it is not physical-GPU, driver, display-timing or cross-browser evidence. The result records
+adapter details and marks hardware-backed evidence as skipped rather than passed. GitHub's Ubuntu
+runner image supplies Chrome, while Chromium requires unsafe WebGPU to permit its fallback adapter;
+see the [runner inventory](https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md)
+and [Chromium adapter gate](https://chromium.googlesource.com/chromium/src/+/lkgr/gpu/command_buffer/service/webgpu_decoder_impl.cc).
+
+Reproduce after `npm ci`:
+
+```sh
+npm run build
+npm run build:browser
+NGNE_WEBGPU_ADAPTER=swiftshader npm run test:browser
+```
+
+On Windows PowerShell, set `$env:NGNE_WEBGPU_ADAPTER = "swiftshader"` before the last command. Omit
+the variable to use Chrome's default adapter for local hardware evidence. `NGNE_BROWSER` selects a
+specific Chromium executable.
+
+Local software-WebGPU run on Windows 11, Chrome 152: 160 passed, one skipped-as-unsupported
+(hardware-backed execution), zero failed. Coverage includes exact pixels and ordering, decoded image
+upload, 10,000-sprite buffer growth/reuse, backing resize, controlled loss/recovery, disposal and late
+callbacks, plus built Starfall and platformer launch/pause/resume paths. A separate
+`NGNE_BROWSER_INJECT_FAILURE=1` run exited nonzero on `intentional CI assertion failure`; the ordinary
+run then passed. This is local workflow reproduction, not a completed GitHub-hosted workflow run.
+
 ## NGNE-12 — 14 September 2026
 
 Session 1 (measurement and diagnosis) of the approved [plan](../plans/NGNE-12-measurement.md)
