@@ -38,6 +38,9 @@
 
 ## Documentation and completion
 
+- Keep documentation short, compact, and easy for humans and agents to scan.
+  Document current usage and contracts; omit ticket identifiers and issue-tracker
+  links from repository documentation and generated reports.
 - Each fact has one owning document: architecture for the high-level model,
   contracts for exact semantics, and the guide and examples for usage. Tests and
   CI provide executable evidence; work tracking and history stay outside the

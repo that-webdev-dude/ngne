@@ -1,15 +1,19 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { loadRun } from "./run-results.mjs";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "..");
-try {
-    main();
-} catch (error) {
-    console.error(`Benchmark comparison failed: ${error instanceof Error ? error.message : error}`);
-    process.exitCode = 1;
-}
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url))
+    try {
+        main();
+    } catch (error) {
+        console.error(
+            `Benchmark comparison failed: ${error instanceof Error ? error.message : error}`,
+        );
+        process.exitCode = 1;
+    }
 
 function main() {
     const parsed = parseArguments(process.argv.slice(2));
@@ -85,32 +89,7 @@ function resolveInputPath(path) {
     return isAbsolute(path) ? resolve(path) : resolve(process.cwd(), path);
 }
 
-function loadRun(input, role) {
-    const directory = resolveInputPath(input);
-    const manifestPath = join(directory, "manifest.json");
-    if (!existsSync(manifestPath)) throw new Error(`${role} manifest not found: ${manifestPath}`);
-    const manifest = readJson(manifestPath);
-    const results = new Map();
-    for (const stage of manifest.stages ?? []) {
-        if (stage.kind !== "benchmark") continue;
-        const resultPath = join(directory, stage.name, "result.json");
-        if (existsSync(resultPath))
-            results.set(stage.name, { path: resultPath, value: readJson(resultPath) });
-    }
-    return { role, directory, manifestPath, manifest, results };
-}
-
-function readJson(path) {
-    try {
-        return JSON.parse(readFileSync(path, "utf8"));
-    } catch (error) {
-        throw new Error(
-            `Unable to read JSON ${path}: ${error instanceof Error ? error.message : error}`,
-        );
-    }
-}
-
-function compareRuns(baseline, candidate, attentionPercent) {
+export function compareRuns(baseline, candidate, attentionPercent = 10) {
     const compatibilityWarnings = [];
     const problems = [];
     const workloads = [];
@@ -192,6 +171,23 @@ function compareRuns(baseline, candidate, attentionPercent) {
         if (name === "cpu") {
             compareCpuEnvironment(compatibilityWarnings, baselineResult, candidateResult);
             inspectCpuProblems(problems, candidateResult);
+        } else if (name === "churn" || name.startsWith("churn-")) {
+            for (const field of ["node", "platform", "arch", "cpu", "parameters", "mode"])
+                compareIdentity(
+                    compatibilityWarnings,
+                    name,
+                    field,
+                    baselineResult[field],
+                    candidateResult[field],
+                );
+            for (const file of ["../../package-lock.json", "./churn-schema.ts"])
+                compareIdentity(
+                    compatibilityWarnings,
+                    name,
+                    file,
+                    baselineResult.sourceHashes?.[file],
+                    candidateResult.sourceHashes?.[file],
+                );
         } else {
             compareBrowserEnvironment(
                 compatibilityWarnings,
@@ -384,6 +380,37 @@ function inspectBrowserProblems(problems, name, candidate) {
 
 function metricDefinitions(name) {
     if (name === "cpu") return cpuMetrics();
+    if (name === "churn")
+        return ["p50", "p95", "p99"].map((key) =>
+            metric(`Churn batch ${key}`, `batchMs.${key}`, "ms"),
+        );
+    if (name === "churn-alloc")
+        return [
+            {
+                ...metric(
+                    "Sampled allocation per batch (descriptive)",
+                    "allocation.sampledBytesPerBatch",
+                    "bytes/batch",
+                ),
+                descriptive: true,
+            },
+            {
+                ...metric(
+                    "Sampled allocation rate (throughput-dependent)",
+                    "allocation.sampledBytesPerBatchSecond",
+                    "bytes/s",
+                ),
+                descriptive: true,
+            },
+        ];
+    if (name === "churn-gc")
+        return [
+            metric("GC pause total", "gcTrace.windowPauseTotalMs", "ms"),
+            {
+                ...metric("GC count (descriptive)", "gcTrace.windowCount", "count"),
+                descriptive: true,
+            },
+        ];
     const definitions = browserMetrics();
     if (name.startsWith("renderer-webgpu")) definitions.push(...rendererMetrics());
     return definitions;
@@ -488,6 +515,7 @@ function compareMetric(definition, baseline, candidate, attentionPercent) {
     } else if (deltaPercent - 1e-9 <= -attentionPercent) {
         direction = "improvement";
     }
+    if (definition.descriptive) direction = "descriptive";
     return {
         label: definition.label,
         unit: definition.unit,

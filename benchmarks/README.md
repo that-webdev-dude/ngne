@@ -1,228 +1,67 @@
 # Benchmarks
 
-Run everything from the repository root in PowerShell.
+Run from the repository root in PowerShell. Keep benchmark Chrome windows visible.
 
-## Run all benchmarks
-
-The run-all script builds both artifacts, then executes the CPU, single-texture renderer,
-alternating-texture renderer, Starfall Chaos Lab and platformer workloads sequentially.
-
-For a full run:
+## Run
 
 ```powershell
 npm.cmd run bench:all
+npm.cmd run bench:all -- -Workload churn
+npm.cmd run bench:all -- -Workload churn -Diagnostics -Compact
 ```
 
-For a short smoke test:
+| Option                                | Effect                                                                      |
+| ------------------------------------- | --------------------------------------------------------------------------- |
+| `-Workload churn`                     | Run churn only; skip builds and browsers                                    |
+| `-Diagnostics`                        | Add churn allocation/GC analysis and browser profiles, snapshots and traces |
+| `-Compact`                            | After a successful run, retain only the three files below                   |
+| `-WarmupSeconds 1 -DurationSeconds 5` | Short browser smoke test; churn counts stay fixed                           |
+| `-SkipBuild`                          | Reuse current `dist/` and `dist-browser/` builds                            |
+| `-OutputRoot <directory>`             | Change the output location                                                  |
+
+The default suite builds both artifacts and runs CPU, churn, two renderer fixtures,
+Starfall Chaos Lab and Platformer sequentially. Diagnostics run separately from clean churn
+measurements and can perturb browser timings.
+
+Each invocation creates a unique directory under `.test-output/benchmarks/`:
+
+- `summary.md`: readable status report.
+- `analysis.json`: self-contained workload measurements and validation results.
+- `manifest.json`: revision, environment, stage status and retention metadata.
+
+Full output also retains logs and profiles. Compact output removes those artifacts only after
+validating the summaries. Failed runs retain diagnostics. Cleanup refuses links/junctions and
+never prunes historical runs or external temporary directories. Raw profiles cannot be
+re-examined after compaction; future comparisons still work.
+
+## Compare
 
 ```powershell
-npm.cmd run bench:all -- -WarmupSeconds 1 -DurationSeconds 5
+npm.cmd run bench:compare -- <baseline-directory> <candidate-directory>
 ```
 
-Each invocation writes a timestamped directory under `.test-output/benchmarks/` containing a
-manifest, Markdown summary, per-workload JSON, logs and browser artifacts. Keep each Chrome window
-visible and unminimized. Add `-Diagnostics` to capture allocation profiles for game workloads plus
-heap snapshots and browser traces; diagnostics perturb timings and are disabled by default.
+Full, compact and older run folders are supported. Reports go under
+`.test-output/comparisons/`; use `--output <directory>` to choose another location.
+Changes of 10% are attention signals, not statistical verdicts; adjust with
+`--attention-percent <number>`.
 
-Use `-SkipBuild` only when both `dist/` and `dist-browser/` are already current.
+Use the same machine, power mode, runtime and workload. Repeat measurements in fresh
+processes, alternating baseline/candidate order. For replicated churn decisions, stop if
+either condition's range exceeds 10% of its median. Otherwise, require non-overlapping
+run values and a median difference larger than both ranges. One run cannot establish this.
 
-## Compare two runs
+## Workloads
 
-Generate a scan-first Markdown report and machine-readable JSON by passing the baseline directory
-first and the candidate directory second:
+- **CPU:** ECS traversal, Chaos simulation/render preparation, collision-grid lookup and
+  first/second traversal after commit. Run separately with `npm.cmd run bench`.
+- **Churn:** 10,000 live entities, 1,000 replacements per batch, 100 warmups and 1,000 samples.
+  Batch timing includes component authoring, despawn/spawn queueing and commit; no queries.
+  Diagnostics capture allocation and GC, and validate trace alignment automatically.
+- **Browser:** hardware WebGPU, two 10,000-sprite renderer fixtures and both games.
+  Defaults are 10 seconds warmup and 60 seconds sampling. Results include visibility,
+  build identity, frame timing, dropped ticks and process cleanup.
 
-```powershell
-npm.cmd run bench:compare -- `
-    .test-output\benchmarks\<baseline-run> `
-    .test-output\benchmarks\<candidate-run>
-```
-
-The comparison is written under `.test-output/comparisons/`. It surfaces definite errors and
-environment mismatches before listing timing, long-frame, dropped-tick, retained-heap and allocation
-changes by workload. Changes of 10% or more are highlighted by default; this is an attention signal,
-not an automatic pass or failure. Override it with `--attention-percent`, or select an output folder
-with `--output`.
-
-## 1. CPU benchmarks
-
-```powershell
-npm.cmd run bench
-```
-
-This runs the CPU benchmark suite directly—no browser or server required.
-
-Expect JSON containing:
-
-- `ecs`: traversal of 20,000 entities.
-- `chaos`: simulation and render preparation for the stress arena.
-- `collisionGrid`: schema-view spatial lookup cost.
-- `epochTraversal`: commit and first/second traversal costs.
-- Environment and Git revision.
-- Min, mean, p50, p90, p95, p99, and max timings.
-
-Important:
-
-- `collisionGrid.valid` should be `true`.
-- `chaos.ticksOverBudget` reports samples exceeding a 60 Hz CPU budget.
-- These are CPU measurements, not browser FPS or GPU timings.
-- Runtime is roughly a few seconds.
-
-## 2. Build the browser benchmark
-
-```powershell
-npm.cmd run build:browser
-```
-
-Expect the output to include:
-
-```text
-dist-browser/benchmarks/browser/index.html
-dist-browser/validation.html
-```
-
-The benchmark page is deliberately absent from the normal production `dist/`.
-
-## 3. Run the WebGPU renderer benchmark
-
-Copy and run this block:
-
-```powershell
-$env:NGNE_URL = 'http://127.0.0.1:4173/benchmarks/browser/index.html?workload=renderer-webgpu'
-$env:NGNE_SERVE_DIR = (Get-Location).Path
-$env:NGNE_SERVE_OUT_DIR = 'dist-browser'
-$env:NGNE_EXPECTED_BACKEND = 'webgpu'
-$env:NGNE_WARMUP_SECONDS = '10'
-$env:NGNE_DURATION_SECONDS = '60'
-
-npm.cmd exec -- tsx benchmarks/browser/browser-baseline.ts
-```
-
-The harness will:
-
-1. Start a Vite preview server.
-2. Open a fresh, visible Chrome window.
-3. Verify that the served files match `dist-browser`.
-4. Reject software or fallback WebGPU adapters.
-5. Warm up for 10 seconds.
-6. Sample for 60 seconds.
-7. Capture allocation data.
-8. Close the browser and preview server.
-9. Print a JSON report.
-
-Keep the Chrome tab visible and unminimized throughout the run. Hidden tabs throttle `requestAnimationFrame`.
-
-## 4. Expected renderer results
-
-For the default single-texture workload, expect:
-
-- `workload`: fixed 10,000-sprite renderer fixture.
-- `metadata.mode`: `webgpu`.
-- `metadata.sprites`: `10000`.
-- `metadata.visibility`: `visible`.
-- `metadata.adapter.isFallbackAdapter`: `false`.
-- `metrics.drawCalls`: normally `1`.
-- `metrics.uploadBytes`: `560048`.
-- `rendererEvidence.error`: empty.
-- `pageError`: empty.
-- `cpuPreparationMs`, `cpuSubmissionMs`, and `cpuTotalMs` percentiles.
-- A populated allocation profile.
-- `survivingOwnedProcesses`: empty.
-
-The renderer timings cover CPU preparation and submission only. They do not wait for GPU completion.
-
-Frame intervals may be around 16.7 ms on a 60 Hz display, but refresh rate, browser state, hardware, and background activity can change this. There are no universal pass/fail timing thresholds.
-
-## 5. Alternating-texture workload
-
-This stresses texture-run batching. Change only the URL:
-
-```powershell
-$env:NGNE_URL = 'http://127.0.0.1:4173/benchmarks/browser/index.html?workload=renderer-webgpu&alternating=1'
-
-npm.cmd exec -- tsx benchmarks/browser/browser-baseline.ts
-```
-
-Expect `metadata.alternating` to be `true` and draw-call behavior to differ substantially from the single-texture workload.
-
-## 6. Preserve artifacts
-
-By default, allocation profiles are written to a fresh temporary Chrome-profile directory. To keep them somewhere predictable:
-
-```powershell
-$env:NGNE_ARTIFACT_DIR = Join-Path (Get-Location) '.test-output\benchmarks\renderer-webgpu'
-```
-
-Then run the baseline command. The report will include the artifact paths and SHA-256 hashes.
-
-Optional evidence:
-
-```powershell
-$env:NGNE_SNAPSHOTS = '1'
-$env:NGNE_TRACE = '1'
-$env:NGNE_RETAINED_EVERY_SECONDS = '10'
-```
-
-This adds heap snapshots, a Chrome trace, and forced-GC retained-heap checkpoints. It makes the run slower and can perturb timings, so use it for diagnostics rather than clean timing comparisons.
-
-## 7. Game baselines
-
-Build the normal application:
-
-```powershell
-npm.cmd run build
-```
-
-### Starfall Chaos Lab
-
-```powershell
-$env:NGNE_URL = 'http://127.0.0.1:4173/'
-$env:NGNE_SERVE_DIR = (Get-Location).Path
-$env:NGNE_SERVE_OUT_DIR = 'dist'
-$env:NGNE_EXPECTED_BACKEND = 'webgpu'
-$env:NGNE_WARMUP_SECONDS = '10'
-$env:NGNE_DURATION_SECONDS = '60'
-
-npm.cmd exec -- tsx benchmarks/browser/browser-baseline.ts
-```
-
-The harness launches Chaos Lab automatically.
-
-### Platformer
-
-```powershell
-$env:NGNE_URL = 'http://127.0.0.1:4173/examples/platformer/?baseline'
-
-npm.cmd exec -- tsx benchmarks/browser/browser-baseline.ts
-```
-
-Expect frame intervals, callback CPU time, heap activity, long tasks, FPS telemetry, sprite counts, and dropped-tick telemetry.
-
-## 8. Compare results correctly
-
-For meaningful comparisons:
-
-- Use the same machine, power mode, browser version, viewport, and backend.
-- Close unrelated CPU/GPU-heavy applications.
-- Run each condition several times.
-- Compare p50 and p95/p99, not only the mean.
-- Keep workload metadata and environment details with the result.
-- Treat heap growth from one short run as a signal to investigate, not proof of a leak.
-- Do not compare renderer CPU submission numbers as if they were GPU execution time.
-
-## 9. Clear PowerShell settings
-
-Afterward:
-
-```powershell
-'NGNE_URL',
-'NGNE_SERVE_DIR',
-'NGNE_SERVE_OUT_DIR',
-'NGNE_EXPECTED_BACKEND',
-'NGNE_WARMUP_SECONDS',
-'NGNE_DURATION_SECONDS',
-'NGNE_ARTIFACT_DIR',
-'NGNE_SNAPSHOTS',
-'NGNE_TRACE',
-'NGNE_RETAINED_EVERY_SECONDS' |
-    ForEach-Object { Remove-Item "Env:$_" -ErrorAction SilentlyContinue }
-```
+CPU measurements do not measure GPU execution. Allocation bytes per batch are descriptive;
+a faster workload can allocate more bytes per second while allocating less per batch.
+Browser heap movement alone is not evidence of a leak. Replicated A/B orchestration remains
+manual; this runner executes one sample run per selected workload and mode.

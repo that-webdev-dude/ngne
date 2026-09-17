@@ -1,4 +1,5 @@
 import { execSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
 import { cpus, totalmem } from "node:os";
 import { performance } from "node:perf_hooks";
 
@@ -257,6 +258,7 @@ function summarize(values: readonly number[]) {
     };
 }
 function revision() {
+    if (existsSync("EXPORT_REVISION")) return readFileSync("EXPORT_REVISION", "utf8").trim();
     try {
         return execSync("git rev-parse --short HEAD", { encoding: "utf8" }).trim();
     } catch {
