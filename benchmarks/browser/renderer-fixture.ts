@@ -1,5 +1,5 @@
-import { Camera, Frame, type Sprite } from "../src/index.js";
-import { WebGpuRuntime } from "../src/webgpu-runtime.js";
+import { Camera, Frame, type Sprite } from "../../src/index.js";
+import { WebGpuRuntime } from "../../src/webgpu-runtime.js";
 
 interface RendererBenchmark {
     readonly samples: Float64Array;

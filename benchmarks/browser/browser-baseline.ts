@@ -16,7 +16,7 @@ import { join, relative } from "node:path";
  * Sustained browser measurement in a real headful Chromium, driven over the DevTools
  * protocol so the same warmup, duration and sampling can be repeated later.
  *
- * Usage: `npx tsx tests/browser-baseline.ts` against a running `npm run preview`.
+ * Usage: `npx tsx benchmarks/browser/browser-baseline.ts` against a running `npm run preview`.
  * Environment: NGNE_BROWSER (Chromium executable), NGNE_URL (default preview origin),
  * NGNE_WARMUP_SECONDS (default 10), NGNE_DURATION_SECONDS (default 60).
  * The browser window must stay visible; hidden tabs throttle requestAnimationFrame.

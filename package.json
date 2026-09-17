@@ -10,9 +10,9 @@
         "typecheck": "tsc --noEmit",
         "test": "tsx --test tests/*.test.ts",
         "test:browser": "tsx tests/browser-ci.ts",
-        "bench": "tsx tests/benchmark.ts",
-        "format": "prettier --write src demo examples tests docs .agents .github .vscode \"./*.{ts,md,json,html}\"",
-        "format:check": "prettier --check src demo examples tests docs .agents .github .vscode \"./*.{ts,md,json,html}\"",
+        "bench": "tsx benchmarks/cpu/benchmark.ts",
+        "format": "prettier --write src demo examples tests benchmarks docs .agents .github .vscode \"./*.{ts,md,json,html}\"",
+        "format:check": "prettier --check src demo examples tests benchmarks docs .agents .github .vscode \"./*.{ts,md,json,html}\"",
         "preview": "vite preview --host 127.0.0.1"
     },
     "exports": {

@@ -2,9 +2,9 @@ import { execSync } from "node:child_process";
 import { cpus, totalmem } from "node:os";
 import { performance } from "node:perf_hooks";
 
-import { World, type SchemaComponentView } from "../src/ecs.js";
-import { component, f64, Game, Frame } from "../src/index.js";
-import { arena, type Progress, type ProgressCommand } from "../demo/game.js";
+import { World, type SchemaComponentView } from "../../src/ecs.js";
+import { component, f64, Game, Frame } from "../../src/index.js";
+import { arena, type Progress, type ProgressCommand } from "../../demo/game.js";
 const ECS_ENTITIES = 20000,
     ECS_WARMUP = 100,
     ECS_SAMPLES = 300,

@@ -7,7 +7,7 @@ import { checkBrowserInterpolation } from "./browser-interpolation-checks.js";
 import { checkBrowserImages } from "./browser-image-checks.js";
 import { checkBrowserRecovery } from "./browser-recovery-checks.js";
 import { checkBrowserGpuHost } from "./browser-gpu-host-checks.js";
-import { startRendererBenchmark } from "./browser-renderer-benchmark.js";
+import { startRendererBenchmark } from "../benchmarks/browser/renderer-fixture.js";
 import { checkWebGPUEnvironment, checkWebGPUCore } from "./browser-webgpu-checks.js";
 const rendererBenchmark = new URLSearchParams(location.search).get("rendererBenchmark");
 void (
