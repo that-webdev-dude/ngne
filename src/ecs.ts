@@ -91,6 +91,20 @@ export function component<const Name extends string, const Fields extends Schema
 export type Entity = Readonly<{ index: number; generation: number; owner: symbol }>;
 type AnySchemaComponent = SchemaComponent<string, SchemaFields>;
 type AnySchemaValue = SchemaComponentValue<string, SchemaFields>;
+// Definitions and their fields are immutable. Keep iteration metadata private and
+// weakly owned so repeated spawns do not enumerate the same schema or retain it.
+const schemaFieldEntries = new WeakMap<
+    AnySchemaComponent,
+    readonly (readonly [string, FieldDescriptor<unknown>])[]
+>();
+function fieldsOf(type: AnySchemaComponent) {
+    let fields = schemaFieldEntries.get(type);
+    if (!fields) {
+        fields = Object.entries(type.fields);
+        schemaFieldEntries.set(type, fields);
+    }
+    return fields;
+}
 type FieldColumn<Field> =
     Field extends FieldDescriptor<unknown, "f32">
         ? Float32Array
@@ -171,6 +185,7 @@ interface SchemaChunkRuntime {
     count: number;
     readonly entities: (Entity | undefined)[];
     readonly columns: ComponentColumns[];
+    readonly columnList: readonly Column[];
 }
 interface Archetype {
     readonly types: AnySchemaComponent[];
@@ -380,7 +395,7 @@ export class World implements WorldAccess {
         for (const fieldName of Object.keys(partial))
             if (!(fieldName in type.fields))
                 throw new Error(`Unknown component field: ${type.name}.${fieldName}`);
-        for (const [fieldName, descriptor] of Object.entries(type.fields)) {
+        for (const [fieldName, descriptor] of fieldsOf(type)) {
             const candidate = Object.prototype.hasOwnProperty.call(partial, fieldName)
                 ? Reflect.get(partial, fieldName)
                 : undefined;
@@ -544,7 +559,7 @@ export class World implements WorldAccess {
         for (let typeIndex = 0; typeIndex < archetype.types.length; typeIndex++) {
             const type = archetype.types[typeIndex],
                 value = birth.values.find((entry) => entry.component === type)!.value;
-            for (const [fieldName, descriptor] of Object.entries(type.fields))
+            for (const [fieldName, descriptor] of fieldsOf(type))
                 writeColumn(
                     chunk.columns[typeIndex][fieldName],
                     descriptor.kind,
@@ -567,12 +582,10 @@ export class World implements WorldAccess {
             const moved = chunk.entities[last]!;
             chunk.entities[slot.row] = moved;
             this.slots[moved.index].row = slot.row;
-            for (const columns of chunk.columns)
-                for (const column of Object.values(columns)) copyColumnRow(column, last, slot.row);
+            for (const column of chunk.columnList) copyColumnRow(column, last, slot.row);
         }
         chunk.entities[last] = undefined;
-        for (const columns of chunk.columns)
-            for (const column of Object.values(columns)) clearColumnRow(column, last);
+        for (const column of chunk.columnList) clearColumnRow(column, last);
         chunk.count--;
         slot.archetype = undefined;
         slot.chunk = -1;
@@ -633,17 +646,20 @@ export class World implements WorldAccess {
 }
 
 function createSchemaChunk(types: readonly AnySchemaComponent[]): SchemaChunkRuntime {
+    const columns = types.map((type) =>
+        Object.fromEntries(
+            Object.entries(type.fields).map(([name, descriptor]) => [
+                name,
+                createColumn(descriptor.kind),
+            ]),
+        ),
+    );
     return {
         count: 0,
         entities: new Array<Entity | undefined>(CHUNK_CAPACITY),
-        columns: types.map((type) =>
-            Object.fromEntries(
-                Object.entries(type.fields).map(([name, descriptor]) => [
-                    name,
-                    createColumn(descriptor.kind),
-                ]),
-            ),
-        ),
+        columns,
+        // Columns are never replaced; retain their existing component/field order.
+        columnList: columns.flatMap((componentColumns) => Object.values(componentColumns)),
     };
 }
 function createColumn(kind: FieldKind): Column {

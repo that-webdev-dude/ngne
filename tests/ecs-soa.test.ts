@@ -100,6 +100,125 @@ test("schema fields use declared columns, defaults, validation, and sparse acces
     assert.throws(() => world.read(entity, Values, "missing" as never));
 });
 
+test("schema lowering preserves authored snapshots, field order, and definition identity", () => {
+    const Values = component("snapshot-values", { "2": f64(2), "1": f64(1), x: f64(7) });
+    const world = new World();
+    const authored = { x: 3 };
+    const value = Values.of(authored);
+    authored.x = 4;
+    const first = world.spawn(value);
+    authored.x = 9;
+    const reads: string[] = [];
+    const second = world.spawn(
+        Values.of({
+            get x() {
+                reads.push("x");
+                return undefined;
+            },
+            get 2() {
+                reads.push("2");
+                return 20;
+            },
+            get 1() {
+                reads.push("1");
+                return 10;
+            },
+        }),
+    );
+    assert.deepEqual(reads, ["1", "2", "x"]);
+    world.commit();
+    assert.deepEqual(reads, ["1", "2", "x"]);
+    assert.equal(world.read(first, Values, "x"), 4);
+    assert.equal(world.read(second, Values, "x"), 7);
+    assert.equal(world.read(second, Values, "1"), 10);
+    assert.equal(world.read(second, Values, "2"), 20);
+    assert.throws(() => world.spawn(Values.of(), Values.of()), /Duplicate component/);
+    const Other = component("snapshot-values", { x: f64(99) });
+    assert.throws(() => world.spawn(Other.of()), /Conflicting component identity/);
+    const otherWorld = new World();
+    const other = otherWorld.spawn(Other.of());
+    otherWorld.commit();
+    assert.equal(otherWorld.read(other, Other, "x"), 99);
+    const changed = { x: 1, extra: 2 };
+    const unchecked = Values.of({ x: 1 });
+    Object.assign(unchecked.value, changed);
+    assert.throws(() => world.spawn(unchecked), /Unknown component field/);
+    world.dispose();
+    otherWorld.dispose();
+});
+
+test("mixed columns survive reordered births and clear swapped tails across chunks", () => {
+    const Values = component("mixed", {
+        a: f32(),
+        b: f64(),
+        c: i32(),
+        d: u32(),
+        e: u8(),
+        flag: bool(),
+        target: entityRef(),
+    });
+    const Tag = component("tag", { value: f64() });
+    const world = new World();
+    const staleTarget = world.spawn();
+    world.commit();
+    world.despawn(staleTarget);
+    world.commit();
+    const target = world.spawn();
+    assert.equal(target.generation, 1);
+    const handles = Array.from({ length: 513 }, (_, index) => {
+        const values = Values.of({ a: 1.25, b: index + 1, c: -7, d: 8, e: 9, flag: true, target });
+        const tag = Tag.of({ value: index + 10 });
+        return index % 2 ? world.spawn(tag, values) : world.spawn(values, tag);
+    });
+    world.commit();
+    world.despawn(handles[0]);
+    world.despawn(handles[512]);
+    world.commit();
+    const query = world.query(Values, Tag);
+    let visits = 0;
+    query.eachChunk((chunk) => {
+        visits++;
+        assert.equal(chunk.count, 511);
+        assert.equal(chunk.entityAt(0), handles[511]);
+        const v = chunk.views.mixed;
+        assert.deepEqual(
+            [v.a[0], v.b[0], v.c[0], v.d[0], v.e[0], v.flag[0]],
+            [1.25, 512, -7, 8, 9, 1],
+        );
+        assert.equal(chunk.views.tag.value[0], 521);
+        assert.equal(v.target.index[0], target.index + 1);
+        assert.equal(v.target.generation[0], target.generation);
+        for (const column of [
+            v.a,
+            v.b,
+            v.c,
+            v.d,
+            v.e,
+            v.flag,
+            v.target.index,
+            v.target.generation,
+            chunk.views.tag.value,
+        ])
+            assert.equal(column[511], 0);
+    });
+    assert.equal(visits, 1);
+    assert.equal(world.read(handles[511], Values, "target"), target);
+    const replacement = world.spawn(Tag.of(), Values.of());
+    const pendingDeath = world.spawn(Values.of(), Tag.of());
+    assert.equal(replacement.index, handles[512].index);
+    assert.equal(pendingDeath.index, handles[0].index);
+    world.despawn(pendingDeath);
+    world.commit();
+    assert.equal(world.has(pendingDeath), false);
+    assert.equal(world.read(replacement, Values, "target"), null);
+    assert.equal(world.read(replacement, Values, "flag"), false);
+    query.eachChunk((chunk) => {
+        assert.equal(chunk.count, 512);
+        assert.equal(chunk.entityAt(511), replacement);
+    });
+    world.dispose();
+});
+
 test("schema chunks retain 512-row capacity, canonical handles, and deterministic order", () => {
     const Position = component("position", { x: f64() });
     const Velocity = component("velocity", { x: f32() });
