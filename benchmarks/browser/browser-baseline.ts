@@ -17,6 +17,8 @@ import { join, relative } from "node:path";
  * protocol so the same warmup, duration and sampling can be repeated later.
  *
  * Usage: `npx tsx benchmarks/browser/browser-baseline.ts` against a running `npm run preview`.
+ * The renderer fixture uses `/benchmarks/browser/index.html?workload=renderer-webgpu` from the
+ * browser-mode build instead of the production preview.
  * Environment: NGNE_BROWSER (Chromium executable), NGNE_URL (default preview origin),
  * NGNE_WARMUP_SECONDS (default 10), NGNE_DURATION_SECONDS (default 60).
  * The browser window must stay visible; hidden tabs throttle requestAnimationFrame.
@@ -58,8 +60,9 @@ const BROWSER =
     ORACLE_TIMEOUT_MS = 20_000,
     SAMPLING_INTERVAL_BYTES = 32768,
     CDP_TIMEOUT_MS = 180_000;
+const WORKLOAD = new URL(URL_UNDER_TEST).searchParams.get("workload");
 const IS_PLATFORMER = new URL(URL_UNDER_TEST).pathname.includes("/examples/platformer/");
-const IS_RENDERER = new URL(URL_UNDER_TEST).searchParams.has("rendererBenchmark");
+const IS_RENDERER = WORKLOAD === "renderer-webgpu";
 const SOFTWARE_RENDERER = /SwiftShader|WARP|llvmpipe|Basic Render/i;
 // Chrome 152 categories proven to align GPU-process events with rAF frames (NGNE-12 phase 0).
 const TRACE_CATEGORIES = [
@@ -73,6 +76,7 @@ const TRACE_CATEGORIES = [
 ];
 if (EXPECTED_BACKEND && EXPECTED_BACKEND !== "webgl2" && EXPECTED_BACKEND !== "webgpu")
     throw new Error(`Unknown NGNE_EXPECTED_BACKEND ${EXPECTED_BACKEND}`);
+if (WORKLOAD && !IS_RENDERER) throw new Error(`Unknown browser benchmark workload ${WORKLOAD}`);
 if (CYCLES && (IS_RENDERER || CYCLES % 10 !== 0 || RETAINED_EVERY_SECONDS))
     throw new Error("NGNE_CYCLES needs a game page, a multiple of 10 and no retained interval");
 const HOOK = `(() => {
@@ -266,7 +270,14 @@ try {
     await page.send("Page.bringToFront");
     const observedBrowser = await page.send("Browser.getVersion");
     if (IS_RENDERER) {
-        await waitFor(page, `document.body?.dataset.rendererBenchmarkReady === "true"`);
+        await waitFor(
+            page,
+            `document.body?.dataset.rendererBenchmarkReady === "true" || document.body?.dataset.rendererBenchmarkError !== undefined`,
+        );
+        const startupError = await page.evaluate<string | undefined>(
+            "document.body?.dataset.rendererBenchmarkError",
+        );
+        if (startupError) throw new Error(`Renderer benchmark failed to start: ${startupError}`);
     } else if (IS_PLATFORMER) {
         await waitFor(page, `document.getElementById("start")?.textContent === "Start level 1"`);
         await click(page, "start");
@@ -342,6 +353,8 @@ try {
             return { metadata:b.metadata, metrics:b.metrics, error:b.error,
                 cpuPreparationMs:summarize(prepare),cpuSubmissionMs:summarize(submit),cpuTotalMs:summarize(total) };
         })()`);
+            if (typeof renderer.error === "string" && renderer.error)
+                throw new Error(`Renderer benchmark failed: ${renderer.error}`);
             rendererEvidence = {
                 ...renderer,
                 allocationPath,

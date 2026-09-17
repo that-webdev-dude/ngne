@@ -17,7 +17,12 @@ export default defineConfig(({ command, mode }) => ({
                 game: "index.html",
                 hello: "examples/hello/index.html",
                 platformer: "examples/platformer/index.html",
-                ...(mode === "browser" ? { validation: "validation.html" } : {}),
+                ...(mode === "browser"
+                    ? {
+                          benchmark: "benchmarks/browser/index.html",
+                          validation: "validation.html",
+                      }
+                    : {}),
             },
         },
     },
