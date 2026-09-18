@@ -82,6 +82,16 @@ During development, `/validation.html` exercises real WebGPU pixels, batching, c
 
 For hardware verification, set `NGNE_BROWSER_HEADLESS=0` and `NGNE_EXPECT_GPU_VENDOR=intel` or `nvidia`; a different or fallback adapter fails the run. On Windows, `NGNE_FORCE_HIGH_PERFORMANCE_GPU=1` requests Chrome's discrete GPU. Results record the browser version, launch flags and devices used for GPU submissions and canvas configuration. Use `NGNE_BROWSER_ARTIFACT_DIR` to retain separate runs. Physical controls, audible output and normal background-tab behavior still require manual checks; the automated harness emulates focus and disables background throttling.
 
+The optional installed Town/Dungeon check uses `NGNE_CONSUMER_URL` for its running
+production preview and `NGNE_CONSUMER_DIST` for the matching local build directory.
+Set both before `npm run test:browser`. The engine harness gates image readiness,
+checks playback/movement and owner-safe retries, and injects controlled device loss
+into the installed production page without consumer hooks. It temporarily corrupts
+only built room JSON and restores it on completion; use a disposable build and
+rebuild after an interrupted run. The consumer README owns authoring and setup.
+Windows teardown waits for browser process closure before asynchronously retrying
+temporary profile cleanup, so cleanup does not block process-close events.
+
 Benchmark tooling lives under `benchmarks/`. `npm run bench` measures CPU workloads, not GPU time or universal frame-rate guarantees. `npx tsx benchmarks/browser/browser-baseline.ts` drives sustained game runs in visible Chromium. For the fixed WebGPU renderer workload, first run `npm run build:browser`, then run the same baseline command with `NGNE_URL=http://127.0.0.1:4173/benchmarks/browser/index.html?workload=renderer-webgpu`, `NGNE_SERVE_DIR=.`, and `NGNE_SERVE_OUT_DIR=dist-browser`. The renderer fixture records CPU preparation and submission only; it does not wait for GPU completion. Browser benchmark pages must remain visible because hidden pages throttle `requestAnimationFrame`.
 
 GitHub Actions runs the format check, tests, typechecking, production build and software-WebGPU browser integration on pull requests and pushes to `main`. It reports passed and unsupported assertions separately and uploads JSON, browser logs and failure screenshots. Successful main builds deploy the showcase to GitHub Pages only after all verification passes.

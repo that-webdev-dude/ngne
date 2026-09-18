@@ -5,11 +5,12 @@ import {
     mkdirSync,
     mkdtempSync,
     readFileSync,
-    rmSync,
     writeFileSync,
 } from "node:fs";
+import { rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { checkInstalledContent } from "./browser-content-checks.js";
 
 interface ValidationState {
     status: "idle" | "running" | "passed" | "failed";
@@ -156,6 +157,16 @@ try {
     await recordRenderingDevices("Starfall");
     await checkPlatformer();
     await recordRenderingDevices("platformer");
+    if (process.env.NGNE_CONSUMER_URL && process.env.NGNE_CONSUMER_DIST) {
+        await checkInstalledContent(
+            cdp,
+            process.env.NGNE_CONSUMER_URL,
+            process.env.NGNE_CONSUMER_DIST,
+            passed,
+            () => recordRenderingDevices("installed content controlled recovery"),
+        );
+        await recordRenderingDevices("installed content slice");
+    }
     if (consoleMessages.some((message) => /^(error|exception):/i.test(message)))
         throw new Error("Browser console reported an error or uncaught exception");
 
@@ -172,7 +183,7 @@ try {
     await stop(browser);
     await stop(preview);
     // Chromium can release profile handles shortly after its process exits on Windows.
-    rmSync(profileDirectory, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
+    await rm(profileDirectory, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
 }
 if (failed) process.exitCode = 1;
 
@@ -615,8 +626,11 @@ function pipeLog(child: ChildProcess, filename: string): void {
 async function stop(child: ChildProcess | undefined): Promise<void> {
     if (!child?.pid) return;
     if (process.platform === "win32") {
-        if (child.exitCode === null)
+        if (child.exitCode === null) {
+            const closed = new Promise<void>((resolve) => child.once("close", () => resolve()));
             spawnSync("taskkill", ["/PID", String(child.pid), "/T", "/F"], { stdio: "ignore" });
+            await Promise.race([closed, sleep(5_000)]);
+        }
         return;
     }
     try {
