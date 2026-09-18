@@ -4,6 +4,14 @@ These contracts define browser lifecycle and input, WebGPU presentation, interpo
 
 ## Platform and lifecycle
 
+Browser presentation requires a secure context (HTTPS or localhost), an available
+WebGPU adapter/device and a WebGPU canvas context. Hardware acceleration must be
+enabled for the supported desktop targets. Adapter acquisition can still fail due
+to browser or driver restrictions; API presence alone is insufficient. The renderer
+requests no optional GPU features or raised device limits. The README owns the
+current support envelope; other browsers, GPUs and physical input modes require
+separate validation.
+
 Browser lifecycle overlaps:
 
 | Call while another operation is pending           | Result                                                                                                                                                                       |

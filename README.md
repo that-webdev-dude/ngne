@@ -6,7 +6,7 @@ A TypeScript engine for 2D sprite games. Fixed-step simulation, scene-owned ECS 
 
 ![Starfall '89 gameplay](docs/assets/starfall.png)
 
-**Early release · 0.1.0.** The engine exports independently from the showcase. Its API may change as more games exercise it. Hello, Starfall and the platformer require WebGPU. The supported target is desktop Chromium with hardware acceleration on a secure origin (localhost or HTTPS).
+**Early release · 0.1.0.** The engine exports independently from the showcase. Its API may change as more games exercise it. Hello, Starfall and the platformer require WebGPU with hardware acceleration on a secure origin (localhost or HTTPS). The initial desktop support envelope is Chrome 152 on Windows 11 with Intel UHD (`gen-12lp`) or NVIDIA RTX 4060 Laptop graphics and keyboard/mouse input. Other browsers, operating systems, GPUs and physical touch/gamepad operation remain unverified.
 
 ## Run locally
 
@@ -79,6 +79,8 @@ npm run preview
 `npm run format` applies Prettier; `.editorconfig` and `.gitattributes` keep 4-space indentation and LF line endings on every platform.
 
 During development, `/validation.html` exercises real WebGPU pixels, batching, controlled device loss, image readiness and browser lifecycle. `npm run build:browser && npm run test:browser` builds and serves a separate browser-test artifact, drives those assertions plus both games' launch/pause/resume paths in Chromium, and writes machine-readable results under `.test-output/browser/`. CI selects SwiftShader, so executed assertions are software WebGPU evidence, not hardware evidence; the deployed `dist/` remains separate.
+
+For hardware verification, set `NGNE_BROWSER_HEADLESS=0` and `NGNE_EXPECT_GPU_VENDOR=intel` or `nvidia`; a different or fallback adapter fails the run. On Windows, `NGNE_FORCE_HIGH_PERFORMANCE_GPU=1` requests Chrome's discrete GPU. Results record the browser version, launch flags and devices used for GPU submissions and canvas configuration. Use `NGNE_BROWSER_ARTIFACT_DIR` to retain separate runs. Physical controls, audible output and normal background-tab behavior still require manual checks; the automated harness emulates focus and disables background throttling.
 
 Benchmark tooling lives under `benchmarks/`. `npm run bench` measures CPU workloads, not GPU time or universal frame-rate guarantees. `npx tsx benchmarks/browser/browser-baseline.ts` drives sustained game runs in visible Chromium. For the fixed WebGPU renderer workload, first run `npm run build:browser`, then run the same baseline command with `NGNE_URL=http://127.0.0.1:4173/benchmarks/browser/index.html?workload=renderer-webgpu`, `NGNE_SERVE_DIR=.`, and `NGNE_SERVE_OUT_DIR=dist-browser`. The renderer fixture records CPU preparation and submission only; it does not wait for GPU completion. Browser benchmark pages must remain visible because hidden pages throttle `requestAnimationFrame`.
 

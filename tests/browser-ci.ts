@@ -38,6 +38,20 @@ interface BrowserResult {
     skippedAsUnsupported: string[];
     failures: string[];
     console: string[];
+    recordedAt: string;
+    browserVersion?: unknown;
+    browserFlags: string[];
+    renderingDevices: { page: string; devices: RenderingDevice[] }[];
+}
+
+interface RenderingDevice {
+    vendor: string;
+    architecture: string;
+    device: string;
+    description: string;
+    isFallbackAdapter: boolean;
+    submissions: number;
+    canvasConfigurations: number;
 }
 
 interface Cdp {
@@ -66,6 +80,9 @@ let preview: ChildProcess | undefined;
 let browser: ChildProcess | undefined;
 let cdp: Cdp | undefined;
 let failed = false;
+let browserVersion: unknown;
+let browserFlags: string[] = [];
+const renderingDevices: BrowserResult["renderingDevices"] = [];
 
 mkdirSync(artifactDirectory, { recursive: true });
 
@@ -77,6 +94,47 @@ try {
     await cdp.send("Runtime.enable");
     await cdp.send("Page.enable");
     await cdp.send("Log.enable");
+    browserVersion = await cdp.send("Browser.getVersion");
+    await cdp.send("Page.addScriptToEvaluateOnNewDocument", {
+        // Observe acquired devices and actual submission/presentation use without selecting adapters.
+        source: `(() => {
+            const records = window.__ngneRenderingDevices = [];
+            if (!window.GPUAdapter || !window.GPUCanvasContext || !window.GPUQueue) return;
+            const queues = new WeakMap();
+            function observe(device) {
+                if (!queues.has(device.queue)) {
+                    const info = device.adapterInfo;
+                    const record = {
+                        vendor: info.vendor, architecture: info.architecture,
+                        device: info.device, description: info.description,
+                        isFallbackAdapter: info.isFallbackAdapter, submissions: 0, canvasConfigurations: 0
+                    };
+                    queues.set(device.queue, record);
+                    records.push(record);
+                }
+                return queues.get(device.queue);
+            }
+            const requestDevice = GPUAdapter.prototype.requestDevice;
+            GPUAdapter.prototype.requestDevice = async function (...args) {
+                const device = await requestDevice.apply(this, args);
+                observe(device);
+                return device;
+            };
+            const configure = GPUCanvasContext.prototype.configure;
+            GPUCanvasContext.prototype.configure = function (descriptor) {
+                const result = configure.call(this, descriptor);
+                observe(descriptor.device).canvasConfigurations++;
+                return result;
+            };
+            const submit = GPUQueue.prototype.submit;
+            GPUQueue.prototype.submit = function (...args) {
+                const result = submit.apply(this, args);
+                const record = queues.get(this);
+                if (record) record.submissions++;
+                return result;
+            };
+        })();`,
+    });
     await cdp.send("Emulation.setFocusEmulationEnabled", { enabled: true });
     captureBrowserLogs(cdp);
 
@@ -90,11 +148,14 @@ try {
     if (validation.status !== "passed") throw new Error(validation.failures.join("; "));
 
     environment = await readEnvironment();
+    await recordRenderingDevices("validation");
     renderer = isSoftware(environment) ? "software" : "hardware";
     if (renderer === "software")
         skippedAsUnsupported.push("hardware-backed WebGPU execution evidence");
     await checkStarfall();
+    await recordRenderingDevices("Starfall");
     await checkPlatformer();
+    await recordRenderingDevices("platformer");
     if (consoleMessages.some((message) => /^(error|exception):/i.test(message)))
         throw new Error("Browser console reported an error or uncaught exception");
 
@@ -151,11 +212,12 @@ function startBrowser(): ChildProcess {
         "--disable-background-timer-throttling",
         "--disable-backgrounding-occluded-windows",
         "--disable-renderer-backgrounding",
-        "--autoplay-policy=no-user-gesture-required",
     ];
     if (process.env.NGNE_BROWSER_HEADLESS !== "0") flags.push("--headless=new");
     else flags.push("--window-size=1280,720");
     if (requestedAdapter) flags.push(`--use-webgpu-adapter=${requestedAdapter}`);
+    if (process.env.NGNE_FORCE_HIGH_PERFORMANCE_GPU === "1")
+        flags.push("--force-high-performance-gpu");
     if (requestedAdapter === "swiftshader") {
         flags.push("--enable-unsafe-webgpu", "--enable-unsafe-swiftshader");
         if (process.platform === "linux")
@@ -168,6 +230,7 @@ function startBrowser(): ChildProcess {
     }
     if (process.platform === "linux") flags.push("--no-sandbox");
     flags.push("about:blank");
+    browserFlags = flags.filter((flag) => !flag.startsWith("--user-data-dir="));
     const child = spawn(executable, flags, {
         detached: process.platform !== "win32",
         stdio: ["ignore", "pipe", "pipe"],
@@ -316,7 +379,7 @@ async function waitForValidation(): Promise<ValidationState> {
     const deadline = Date.now() + timeoutMs;
     while (Date.now() < deadline) {
         const fixtureNeedsClick = await cdp!.evaluate<boolean>(
-            "document.querySelector('iframe')?.contentDocument?.documentElement.dataset.ngneFixtureReady === 'true' && !!document.querySelector('iframe')?.contentDocument?.getElementById('start')",
+            "document.querySelector('iframe')?.contentDocument?.documentElement?.dataset.ngneFixtureReady === 'true' && !!document.querySelector('iframe')?.contentDocument?.getElementById('start')",
         );
         if (fixtureNeedsClick)
             await click(
@@ -337,6 +400,24 @@ async function readEnvironment(): Promise<AdapterEnvironment> {
         return JSON.parse(text) as AdapterEnvironment;
     } catch {
         throw new Error(`WebGPU environment was not machine-readable: ${text}`);
+    }
+}
+
+async function recordRenderingDevices(page: string): Promise<void> {
+    const devices = await cdp!.evaluate<RenderingDevice[]>("window.__ngneRenderingDevices");
+    renderingDevices.push({ page, devices });
+    if (!devices?.some((device) => device.submissions > 0 && device.canvasConfigurations > 0))
+        throw new Error(`${page}: no submissions on an observed presentation device`);
+    const expected = process.env.NGNE_EXPECT_GPU_VENDOR?.toLowerCase();
+    if (expected) {
+        if (
+            devices.some(
+                (device) =>
+                    device.vendor.toLowerCase() !== expected || device.isFallbackAdapter !== false,
+            )
+        )
+            throw new Error(`${page}: expected physical ${expected} rendering devices`);
+        passed.push(`${page} submits using the expected physical ${expected} adapter`);
     }
 }
 
@@ -483,6 +564,10 @@ function writeResult(status: BrowserResult["status"]): void {
         skippedAsUnsupported,
         failures: [...new Set(failures.filter(Boolean))],
         console: consoleMessages,
+        recordedAt: new Date().toISOString(),
+        browserVersion,
+        browserFlags,
+        renderingDevices,
     };
     writeFileSync(join(artifactDirectory, "results.json"), JSON.stringify(result, null, 2));
     writeFileSync(join(artifactDirectory, "browser.log"), consoleMessages.join("\n"));
