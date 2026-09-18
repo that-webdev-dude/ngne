@@ -12,10 +12,10 @@ disable-model-invocation: true
 license: MIT
 version: 1.0.0
 x-scope: global
-x-source: skills-manager@05df4bc
-x-content-hash: ec996c94f40db73d68e6529814dd8560d67ce74897048e24523b5513b2dfd821
+x-source: skills-manager@08a3835
+x-content-hash: 8d97080714cf314e59b36cded469658484b8204fa48fccf81380f01542013fef
 ---
-<!-- Vendored from skills-manager@05df4bc. Do not edit here: edit the source in the skills-manager repo and re-run `skills sync`. -->
+<!-- Vendored from skills-manager@08a3835. Do not edit here: edit the source in the skills-manager repo and re-run `skills sync`. -->
 
 
 # Ponytail

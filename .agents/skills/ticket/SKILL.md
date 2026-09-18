@@ -2,10 +2,10 @@
 name: ticket
 description: Draft consistent, execution-ready Jira tickets for manual entry. Only use when the user explicitly invokes Ticket or directly asks for copy-ready Jira ticket drafts; do not use for ordinary implementation work or live Jira operations.
 disable-model-invocation: true
-x-source: skills-manager@05df4bc
-x-content-hash: 7883ac1bc0e86094909514edb0271bd43d1653afdd9434cc738f1c6059486597
+x-source: skills-manager@08a3835
+x-content-hash: bc6a5df78767178d19e982bc0792b45aa23c3fa875724e5307d2a5f4cfcfe319
 ---
-<!-- Vendored from skills-manager@05df4bc. Do not edit here: edit the source in the skills-manager repo and re-run `skills sync`. -->
+<!-- Vendored from skills-manager@08a3835. Do not edit here: edit the source in the skills-manager repo and re-run `skills sync`. -->
 
 
 # Jira ticket drafts

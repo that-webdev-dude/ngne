@@ -3,10 +3,10 @@ name: handoff
 description: Compact the current conversation into a handoff document for another agent to pick up. Only use when the user explicitly invokes Handoff or directly asks for a handoff document.
 argument-hint: "What will the next session be used for?"
 disable-model-invocation: true
-x-source: skills-manager@05df4bc
-x-content-hash: 31d74387985c51ec0849b3314396e797d1af9195eb6ec03ec9787aab09e180b5
+x-source: skills-manager@08a3835
+x-content-hash: 6456533bbc293eb7ee0436953e2272e843d2aa72e7c965513b074760b85e08a2
 ---
-<!-- Vendored from skills-manager@05df4bc. Do not edit here: edit the source in the skills-manager repo and re-run `skills sync`. -->
+<!-- Vendored from skills-manager@08a3835. Do not edit here: edit the source in the skills-manager repo and re-run `skills sync`. -->
 
 
 Write a handoff document summarising the current conversation so a fresh agent can continue the work. Save to the temporary directory of the user's OS - not the current workspace.
