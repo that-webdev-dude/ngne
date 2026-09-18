@@ -3,6 +3,11 @@
     "version": "0.1.0",
     "type": "module",
     "private": true,
+    "files": [
+        "dist/engine",
+        "docs/guide.md",
+        "docs/contracts"
+    ],
     "scripts": {
         "dev": "vite --host 127.0.0.1",
         "build": "tsc --noEmit && tsc -p tests/tsconfig.browser.json && tsc -p benchmarks/browser/tsconfig.json && tsc -p tsconfig.lib.json && tsc -p tests/tsconfig.api.json && vite build",

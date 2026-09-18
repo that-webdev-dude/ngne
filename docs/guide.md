@@ -2,6 +2,38 @@
 
 Examples assume a TypeScript browser app with a canvas. Use the runnable [first scene](../examples/hello/index.html) in this checkout, or adapt the imports to your project. NGNE is not published to npm.
 
+## Install a local package
+
+Use Node 24 or newer. From the engine checkout, build before packing:
+
+```powershell
+npm ci
+npm run build
+New-Item -ItemType Directory -Force .test-output/package-smoke
+npm pack --pack-destination .test-output/package-smoke
+```
+
+Copy `ngne-0.1.0.tgz` into the separate application's `vendor` directory,
+then run `npm install ./vendor/ngne-0.1.0.tgz` there. Commit the tarball and
+consumer lockfile together; subsequent clean installs use `npm ci`.
+Record `git rev-parse HEAD`, any engine changes, and `Get-FileHash` of the tarball.
+Do not use a workspace link, source alias, or imports from engine `src`.
+
+The reusable Town/Dungeon consumer lives in the sibling `../ngne-town-dungeon`
+project. Its README owns consumer commands and fixtures. It uses TypeScript
+with `moduleResolution: "Bundler"`, DOM libraries, `types: []` and
+`skipLibCheck: false`; no `@webgpu/types` dependency is required by consumers.
+Vite uses `build.target: "es2022"` for top-level await and
+`build.assetsInlineLimit: 0` to keep its PNG/WAV fixtures external.
+Use `new URL("../assets/file.png", import.meta.url)` so Vite rewrites asset URLs
+for either `/` or a configured base such as `/town-dungeon/`.
+
+The package includes `dist/engine` JavaScript and declarations. WGSL source is
+embedded in `quad-shader.js`; no shader loader or extra shader-file copy is needed.
+Browser WebGPU, Web Audio, fetch and image decoding remain platform requirements.
+Check the production preview at both bases, click to unlock audio, and record
+visible rendering and audible playback separately from successful decoding.
+
 ## Your first scene
 
 ```ts

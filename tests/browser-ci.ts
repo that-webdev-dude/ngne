@@ -171,7 +171,8 @@ try {
     cdp?.close();
     await stop(browser);
     await stop(preview);
-    rmSync(profileDirectory, { recursive: true, force: true });
+    // Chromium can release profile handles shortly after its process exits on Windows.
+    rmSync(profileDirectory, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
 }
 if (failed) process.exitCode = 1;
 
