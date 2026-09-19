@@ -2,6 +2,26 @@
 
 Examples assume a TypeScript browser app with a canvas. Use the runnable [first scene](../examples/hello/index.html) in this checkout, or adapt the imports to your project. NGNE is not published to npm.
 
+## Bounded decoded retention
+
+For long-lived content consumers, opt in to decoded-cache limits through
+`new BrowserGame({ ...options, assetRetention: { maxEntries: 32, maxBytes: 64 * 1024 * 1024 } })`.
+Headless `Game` accepts the same option; direct services use
+`new Assets({ retention: { maxEntries: 32, maxBytes: 64 * 1024 * 1024 } })`.
+Omitting the policy preserves retention until disposal. Values still in use may
+exceed these limits. Release every acquired lease, including dependency claims;
+do not close a borrowed bitmap yourself. An evicted asset reloads on reacquisition.
+
+Sample `app.game.assets.inspect(20)` and `app.renderer?.inspect(20)` on demand.
+Use `protectedOverBudget` to distinguish a live working set from unused retention,
+and `unknownSizes` to identify payloads excluded from byte estimates. Entry limits
+also bound unknown-size entries. `trim()` applies configured limits;
+`evict(id)` returns false for absent, loading or leased entries. Custom assets can
+provide `estimateBytes(value)` and acquisitions may label a third argument
+`"dependency"`; neither option creates a dependency registry. See the
+[resource observation limits](contracts/ownership-and-inspection.md#resource-diagnostics)
+before combining CPU and renderer totals.
+
 ## Install a local package
 
 Use Node 24 or newer. From the engine checkout, build before packing:

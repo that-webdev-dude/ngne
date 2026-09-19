@@ -42,5 +42,6 @@ export { Frame } from "./renderer.js";
 export type { Sprite } from "./renderer.js";
 export { WebGPURenderer } from "./webgpu-renderer.js";
 export type { RendererStatus } from "./webgpu-renderer.js";
+export type { RendererResourceInspection } from "./resource-inspection.js";
 export * from "./audio.js";
 export * from "./browser.js";

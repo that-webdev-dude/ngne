@@ -3,6 +3,7 @@ import { createGpuContext, type GpuContext } from "./gpu-context.js";
 import { createQuadRenderer, type QuadRenderer } from "./quad-renderer.js";
 import type { Frame } from "./renderer.js";
 import { uploadImage } from "./texture-assets.js";
+import type { RendererResourceInspection } from "./resource-inspection.js";
 
 interface ImageEntry {
     readonly id: string;
@@ -112,6 +113,67 @@ export class WebGpuRuntime {
     /** Internal diagnostics used by the sustained renderer harness. Stable until generation changes. */
     get stats(): Readonly<QuadRenderer["stats"]> | undefined {
         return this.generation?.quad?.stats;
+    }
+    inspect(limit = 100): RendererResourceInspection {
+        if (!Number.isSafeInteger(limit) || limit < 0 || limit > 1000)
+            throw new Error("Invalid renderer inspection limit");
+        let leasedSources = 0,
+            manualSources = 0,
+            consumers = 0,
+            estimatedSourceBytes = 0;
+        let textures = 0,
+            uploads = 0,
+            estimatedTextureBytes = 0;
+        const entries: RendererResourceInspection["entries"][number][] = [];
+        const sources = new Set<ImageBitmap>();
+        const gpuTextures = new Set<GPUTexture>();
+        for (const entry of this.entries.values()) {
+            const bytes = entry.source.width * entry.source.height * 4;
+            if (entry.definition) leasedSources++;
+            else manualSources++;
+            consumers += entry.refs;
+            if (!sources.has(entry.source)) {
+                sources.add(entry.source);
+                estimatedSourceBytes += bytes;
+            }
+            if (entries.length < limit)
+                entries.push(
+                    Object.freeze({
+                        id: entry.id,
+                        ownership: entry.definition ? "asset-lease" : "manual-snapshot",
+                        consumers: entry.refs,
+                        estimatedSourceBytes: bytes,
+                    }),
+                );
+        }
+        for (const generation of new Set([this.generation, this.pending])) {
+            if (!generation || generation.disposed) continue;
+            uploads += generation.uploads.size;
+            if (generation.white && !gpuTextures.has(generation.white)) {
+                gpuTextures.add(generation.white);
+                textures++;
+                estimatedTextureBytes += 4;
+            }
+            for (const [entry, texture] of generation.images)
+                if (!gpuTextures.has(texture)) {
+                    gpuTextures.add(texture);
+                    textures++;
+                    estimatedTextureBytes += entry.source.width * entry.source.height * 4;
+                }
+        }
+        return Object.freeze({
+            sources: sources.size,
+            leasedSources,
+            manualSources,
+            consumers,
+            textures,
+            uploads,
+            manualReplacements: this.replacements.size,
+            estimatedSourceBytes,
+            estimatedTextureBytes,
+            entries: Object.freeze(entries),
+            truncated: this.entries.size > entries.length,
+        });
     }
 
     private async initialize(): Promise<void> {

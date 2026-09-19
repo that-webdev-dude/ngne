@@ -1,5 +1,5 @@
 import { World, type WorldAccess } from "./ecs.js";
-import { Assets, type Asset, type Lease } from "./assets.js";
+import { Assets, type Asset, type Lease, type AssetRetention } from "./assets.js";
 import { Camera, Cleanup, immutable, Random, seedOf } from "./primitives.js";
 import type { DeepReadonly } from "./primitives.js";
 import { emptyInput, type InputSnapshot } from "./input.js";
@@ -219,12 +219,13 @@ export interface GameOptions<S, C> {
     dt?: number;
     compatibility?: string;
     diagnostic?: (error: unknown) => void;
+    assetRetention?: AssetRetention;
 }
 /** Headless orchestrator. BrowserGame owns platform services and delegates simulation here. */
 export class Game<S = Record<string, never>, C = never> {
     [PREPARE_ASSET]?: (asset: Asset, signal: AbortSignal) => Promise<(() => void) | undefined>;
     readonly rootSeed: number;
-    readonly assets = new Assets();
+    readonly assets: Assets;
     readonly dt: number;
     readonly candidates: SceneCandidates<S, C>;
     #simulationTick = 0;
@@ -242,6 +243,10 @@ export class Game<S = Record<string, never>, C = never> {
     private initialized = false;
     private busy = false;
     constructor(private options: GameOptions<S, C>) {
+        this.assets = new Assets({
+            retention: options.assetRetention,
+            diagnostic: (error) => this.report(error),
+        });
         if (typeof options.seed === "number" && !Number.isFinite(options.seed))
             throw new Error("Invalid root seed");
         this.rootSeed = seedOf(options.seed);
@@ -306,7 +311,7 @@ export class Game<S = Record<string, never>, C = never> {
         try {
             // Each acquired lease is owned before the next await; rollback is deterministic.
             for (const asset of definition.assets ?? []) {
-                const lease = await this.assets.acquire(asset, controller.signal);
+                const lease = await this.assets.acquire(asset, controller.signal, "scene");
                 let cleanup: (() => void) | undefined;
                 let released = false;
                 leases.push({

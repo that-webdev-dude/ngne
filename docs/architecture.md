@@ -84,6 +84,13 @@ flowchart TD
 
 State belongs to the narrowest lifetime that needs it.
 
+Decoded retention defaults to service lifetime. An opt-in asset budget reclaims only
+unleased values; scene/candidate and renderer upload/recovery leases protect the
+live working set even above budget. Consumer document edges end after flattening
+validated content into explicit resources. Resource diagnostics describe ownership
+and estimated payload sizes separately from simulation enumeration; exact policy
+and observation limits belong to the presentation and ownership contracts.
+
 | State                                         | Owner                  | Survives                          | Ends with                                |
 | --------------------------------------------- | ---------------------- | --------------------------------- | ---------------------------------------- |
 | Root seed and committed game state            | `Game`                 | Scene replacement and stop/resume | `dispose()`                              |

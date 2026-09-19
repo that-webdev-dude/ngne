@@ -18,7 +18,8 @@ transfers them to the scene, or abandonment releases them. Failure unwinds the
 attempt; preparation constructs no world. A renderer image registration separately
 retains one decoded source lease shared by its overlapping image consumers. Its last
 consumer releases GPU resources before that retained source lease. Decoded cache
-retention until service disposal is a separate policy, not an outstanding scene claim.
+retention is a separate policy, not an outstanding scene claim; see the
+[retention contract](browser-and-presentation.md#retention-policy).
 
 Candidate slots can retain speculative preparations: `take` transfers the ready
 candidate and starts a refill while the mounted owner still exists. Account for
@@ -26,6 +27,45 @@ mounted scenes, raw candidates, slots/refills, consumer dependency claims and re
 sources separately; there is no universal literal reference count. Owner removal,
 stop and disposal cancel slots. Recovery changes renderer generations, not scene
 ownership; released sources and stale completions cannot become replacement members.
+
+### Resource diagnostics
+
+`Assets.inspect(limit = 100)` and `WebGPURenderer.inspect(limit = 100)` produce
+detached, recursively frozen snapshots. Detail limits accept integers 0–1000;
+`truncated` signals omitted entries, while every aggregate remains complete.
+Details follow registry insertion order. Observing does not trim, wait for pending
+work, retain resources or change simulation. No event history is retained.
+
+Asset loaded/loading and leased/unleased counts refer to unique resident identities.
+Claims count acquisitions separately: `scene` includes preparation, candidates,
+refills and mounted ownership; `renderer` includes host acquisition and retained
+upload/recovery sources; `dependency` and default `external` label explicit consumer
+acquisitions. Per-entry claim counts show these relationships, not scene instance IDs
+or a graph traversal. Failed/aborted entries leave the registry immediately even if
+their external loader has not settled. Claims protect values regardless of label.
+
+Decoded image estimates are width × height × 4; decoded audio estimates are sample
+length × channel count × 4. Custom assets may supply `estimateBytes`; omitted sizes
+are unknown, counted separately and excluded from byte totals. Invalid estimates
+fail acquisition and clean up the returned value. `overBudget` includes all loaded
+entries; `protectedOverBudget` identifies the live set that cannot be reclaimed.
+`cleanupFailures` is a cumulative count, not retained exceptions or successful frees.
+
+Renderer diagnostics count unique registered sources and textures, source claims,
+manual snapshots, in-flight registered uploads and manual replacements. Texture
+estimates use RGBA8 width × height × 4, including the four-byte white texture.
+Manual snapshots belong only to the renderer. Asset-backed source estimates overlap
+the asset service's image totals and must not be added to them. Registered images
+in published or rebuilding generations are counted once per texture. Upload-local
+allocations awaiting validation and unpublished manual snapshots are excluded;
+pending counts expose that observation limit.
+
+These are payload estimates, not process or driver memory: object/definition tables,
+consumer snapshots retained by closures, compressed/network data, allocator padding,
+GPU buffers, bindings, pipelines, render targets and driver allocations are excluded.
+Service eviction releases its ownership; external JavaScript references may still
+retain ordinary values. Inspection has no mutable registry, bitmap, AudioBuffer or
+GPU handle and is intended for explicit diagnostic sampling, not every frame.
 
 This inventory describes the state determining the next tick **given the same authored
 code, input/display and host commands**. It is not a capture schema. Mutable authoritative
