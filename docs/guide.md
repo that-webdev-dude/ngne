@@ -196,6 +196,16 @@ Prepare initial and one-off scene candidates asynchronously using `game.prepare(
 
 ## Assets, sprites and audio
 
+For externally authored content, resolve the required room/animation/atlas graph in
+the consumer first. Validate references and deduplicate definitions there, then use
+`assets: [snapshot, image, audio]` (plus any other required resources) in the scene.
+Reuse the same image definition across overlapping rooms. `game.prepare` completes
+only after the browser host prepares the listed images; merely fetching atlas JSON
+does not upload its texture. Keep the requesting owner's abort signal through both
+resolution and preparation, and release a completed candidate if that owner has
+departed. Format, URL and graph policies remain consumer-owned; see the
+[referenced-content contract](contracts/browser-and-presentation.md#referenced-consumer-content).
+
 `imageAsset(id, url)` and `audioAsset(id, url)` return definitions for shared decoded data. List definitions in a scene's `assets`; setup receives a map of leased values keyed by stable IDs. `game.assets.acquire(definition)` gives a manually managed lease for platform setup. Release it when finished. The browser host uploads every listed image asset during preparation, and sprites refer to it by the same stable authored ID. Generated images use a custom `ImageAsset` loader:
 
 ```ts

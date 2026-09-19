@@ -155,6 +155,27 @@ WebGPU uses the premultiplied pipeline and retained source ownership described a
 
 ## Assets and audio
 
+### Referenced consumer content
+
+NGNE prepares the explicit `SceneDefinition.assets` list; it does not traverse
+JSON references. Consumers resolve and validate their complete required graph before
+calling `prepare`, flatten its resource definitions into that list, and reuse one
+definition object per asset ID. Listing an atlas JSON value alone does not prepare
+its image. Every referenced image must appear as an `ImageAsset`; decoding is not
+GPU readiness. The browser hook below supplies that readiness for each listed image.
+
+Consumers own document schemas, URL bases, missing-reference and cycle detection,
+duplicate-edge deduplication, conflicting-definition rejection and deliberate retry.
+Navigation targets are distinct from required dependencies: a return doorway need
+not recursively load another scene. Repeated animation frames are playback data,
+not additional asset claims. Immutable validated snapshots can be scene assets;
+temporary document-request claims may end after creating that snapshot, before
+engine preparation begins. A failed resolver must release its own claims and never
+publish a partial scene. No registry, format parser or automatic discovery API is
+provided by the engine.
+
+### Decoding, upload and recovery
+
 `ImageAsset extends Asset<ImageBitmap>` carries readonly `kind: "image"`.
 `imageAsset()` uses explicit non-premultiplied, unconverted bitmap decoding; image
 bytes are authored as sRGB. Custom image loaders must follow the same convention.

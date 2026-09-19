@@ -18,8 +18,12 @@ export async function checkInstalledContent(
     const hook = await cdp.send("Page.addScriptToEvaluateOnNewDocument", {
         source: `(() => {
             const state = window.__contentHarness = { devices: [], callbacks: new Map(), next: 0, now: 1000, imageWaiting: false };
+            state.jsonRead = 0;
+            const json = Response.prototype.json;
+            Response.prototype.json = async function () { const value = await json.call(this); state.jsonRead++; return value; };
             const request = GPUAdapter.prototype.requestDevice;
             GPUAdapter.prototype.requestDevice = async function (...args) {
+                if (state.holdDevice) { state.deviceWaiting = true; await new Promise(resolve => state.releaseDevice = resolve); state.holdDevice = false; state.deviceWaiting = false; }
                 const device = await request.apply(this, args); state.devices.push(device); return device;
             };
             window.requestAnimationFrame = fn => { const id = ++state.next; state.callbacks.set(id, fn); return id; };
@@ -131,6 +135,51 @@ export async function checkInstalledContent(
             "controlled recovery produces no consumer error",
         );
 
+        await recordRecoveryDevices();
+        // Hold replacement acquisition so transition preparation overlaps real device loss.
+        for (const cancel of [true, false]) {
+            const count = await cdp.evaluate<number>("window.__contentHarness.devices.length");
+            const documents = await cdp.evaluate<number>("window.__contentHarness.jsonRead");
+            await cdp.evaluate(
+                "window.__contentHarness.holdDevice = true; window.__contentHarness.devices.at(-1).destroy()",
+            );
+            await wait("window.__contentHarness.deviceWaiting === true");
+            await cdp.evaluate("document.querySelector('#travel').click()");
+            await wait("document.querySelector('#loading').textContent.includes('Loading')");
+            await wait(`window.__contentHarness.jsonRead >= ${documents + 3}`);
+            check(
+                await cdp.evaluate<boolean>(
+                    "document.querySelector('#room').textContent === 'Town courtyard'",
+                ),
+                "recovery preparation preserves the mounted room",
+            );
+            if (cancel) await cdp.evaluate("document.querySelector('#cancel').click()");
+            await cdp.evaluate("window.__contentHarness.releaseDevice()");
+            await wait(
+                `window.__contentHarness.devices.length === ${count + 1} && window.__ngneRenderingDevices.at(-1).canvasConfigurations > 0`,
+            );
+            if (cancel) {
+                await cdp.evaluate("window.__contentHarness.step(2)");
+                check(
+                    await cdp.evaluate<boolean>(
+                        "document.querySelector('#room').textContent === 'Town courtyard' && document.querySelector('[role=alert]').textContent === ''",
+                    ),
+                    "cancelled transition during recovery preserves the surviving consumer",
+                );
+            } else {
+                await wait("document.querySelector('#loading').textContent.includes('Activating')");
+                await cdp.evaluate("window.__contentHarness.step(2)");
+                check(
+                    await cdp.evaluate<boolean>(
+                        "document.querySelector('#room').textContent === 'Dungeon threshold'",
+                    ),
+                    "transition prepared during recovery mounts after replacement readiness",
+                );
+                await cdp.evaluate("document.querySelector('#travel').click()");
+                await wait("document.querySelector('#loading').textContent.includes('Activating')");
+                await cdp.evaluate("window.__contentHarness.step(2)");
+            }
+        }
         await recordRecoveryDevices();
         writeFileSync(destinationPath, "{invalid");
         await cdp.evaluate("document.querySelector('#travel').click()");

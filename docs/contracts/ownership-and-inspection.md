@@ -4,6 +4,29 @@ These contracts define authoritative state, diagnostic inspection and the limits
 
 ## Simulation-state ownership inventory
 
+### Content claims outside simulation
+
+Consumer document-resolution attempts own their pending request claims, including
+claims acquired before later validation fails. Cancellation relinquishes only that
+attempt; shared work continues for surviving owners. A consumer may flatten a
+validated graph into an immutable snapshot and explicit resource definitions, ending
+temporary document claims without retaining a live dependency service in simulation.
+
+`Game.prepare` immediately owns each acquired CPU lease before awaiting host
+readiness. Its candidate owns those leases and GPU cleanup callbacks until mounting
+transfers them to the scene, or abandonment releases them. Failure unwinds the
+attempt; preparation constructs no world. A renderer image registration separately
+retains one decoded source lease shared by its overlapping image consumers. Its last
+consumer releases GPU resources before that retained source lease. Decoded cache
+retention until service disposal is a separate policy, not an outstanding scene claim.
+
+Candidate slots can retain speculative preparations: `take` transfers the ready
+candidate and starts a refill while the mounted owner still exists. Account for
+mounted scenes, raw candidates, slots/refills, consumer dependency claims and renderer
+sources separately; there is no universal literal reference count. Owner removal,
+stop and disposal cancel slots. Recovery changes renderer generations, not scene
+ownership; released sources and stale completions cannot become replacement members.
+
 This inventory describes the state determining the next tick **given the same authored
 code, input/display and host commands**. It is not a capture schema. Mutable authoritative
 gameplay values belong to explicit owners; system closures retain injected owners and
