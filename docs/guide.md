@@ -226,6 +226,27 @@ resolution and preparation, and release a completed candidate if that owner has
 departed. Format, URL and graph policies remain consumer-owned; see the
 [referenced-content contract](contracts/browser-and-presentation.md#referenced-consumer-content).
 
+The installed Town/Dungeon consumer expands each validated room into four explicit
+assets: an immutable room snapshot, the shared player image, a distinct environment
+image and distinct music. Its scene definition uses
+`assets: [content.definition, content.image, content.environmentImage, content.audio]`.
+Atlas rectangles and animation timing stay in external JSON; each actor owns its
+position and playback state. Setup creates a scene audio scope and defers its disposal,
+so committing the destination stops the old track and retains shared image ownership.
+
+With `assetRetention: { maxEntries: 3, maxBytes: 1048576 }`, one mounted room has
+four scene claims and two image consumers; overlapping a ready destination has
+eight scene claims, four image consumers and three unique renderer sources. Live
+claims remain protected above the budget. Cancel or commit returns to one room's
+claims. Inspect on demand with `game.assets.inspect(20)` and `renderer.inspect(20)`;
+these aggregates are not attribution to particular scene instances or exact driver
+memory. The consumer does not enable speculative candidate refill.
+
+For explicit pause, cancel the consumer's loading mailbox before `app.stop()`:
+stop releases unconsumed candidates. Resume with `app.start()` and deliberately
+prepare again when needed. Mounted actors retain their state and audio suspends/
+resumes. Focus and visibility input cancellation alone do not pause the game.
+
 `imageAsset(id, url)` and `audioAsset(id, url)` return definitions for shared decoded data. List definitions in a scene's `assets`; setup receives a map of leased values keyed by stable IDs. `game.assets.acquire(definition)` gives a manually managed lease for platform setup. Release it when finished. The browser host uploads every listed image asset during preparation, and sprites refer to it by the same stable authored ID. Generated images use a custom `ImageAsset` loader:
 
 ```ts

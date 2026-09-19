@@ -17,13 +17,22 @@ export async function checkInstalledContent(
 ): Promise<void> {
     const hook = await cdp.send("Page.addScriptToEvaluateOnNewDocument", {
         source: `(() => {
-            const state = window.__contentHarness = { devices: [], callbacks: new Map(), next: 0, now: 1000, imageWaiting: false };
+            const state = window.__contentHarness = { devices: [], callbacks: new Map(), next: 0, now: 1000, imageWaiting: false, holdImage: true, voices: [], contexts: [] };
+            const createVoice = AudioContext.prototype.createBufferSource;
+            AudioContext.prototype.createBufferSource = function () {
+                if (!state.contexts.includes(this)) state.contexts.push(this);
+                const source = createVoice.call(this), voice = { source, stops: 0 };
+                const stop = source.stop.bind(source);
+                source.stop = (...args) => { voice.stops++; return stop(...args); };
+                state.voices.push(voice); return source;
+            };
             state.jsonRead = 0;
             const json = Response.prototype.json;
             Response.prototype.json = async function () { const value = await json.call(this); state.jsonRead++; return value; };
             const request = GPUAdapter.prototype.requestDevice;
             GPUAdapter.prototype.requestDevice = async function (...args) {
                 if (state.holdDevice) { state.deviceWaiting = true; await new Promise(resolve => state.releaseDevice = resolve); state.holdDevice = false; state.deviceWaiting = false; }
+                if (state.failDevice) throw Error('Controlled replacement acquisition failure');
                 const device = await request.apply(this, args); state.devices.push(device); return device;
             };
             window.requestAnimationFrame = fn => { const id = ++state.next; state.callbacks.set(id, fn); return id; };
@@ -31,11 +40,15 @@ export async function checkInstalledContent(
             state.step = count => { for (let i = 0; i < count; i++) { const callbacks = [...state.callbacks.values()]; state.callbacks.clear(); state.now += 1000 / 60; for (const cb of callbacks) cb(state.now); } };
             const decode = window.createImageBitmap;
             window.createImageBitmap = async (...args) => {
-                const bitmap = await decode(...args); state.imageWaiting = true;
-                await new Promise(resolve => state.releaseImage = resolve); return bitmap;
+                const bitmap = await decode(...args);
+                if (state.holdImage) { state.holdImage = false; state.imageWaiting = true;
+                    await new Promise(resolve => state.releaseImage = () => { state.imageWaiting = false; resolve(); }); }
+                return bitmap;
             };
+            state.inspect = () => { document.querySelector('#inspect').click(); return JSON.parse(document.querySelector('#diagnostics').textContent); };
             state.snapshot = () => JSON.parse(document.querySelector('#actors').textContent);
             state.pixels = () => { state.step(1); const actor = state.snapshot().actors[0], canvas = document.querySelector('canvas'), read = document.createElement('canvas'); read.width = canvas.width; read.height = canvas.height; const ctx = read.getContext('2d'); ctx.drawImage(canvas, 0, 0); return Array.from(ctx.getImageData(actor.x, actor.y - 3, 1, 1).data); };
+            state.environmentPixel = () => { state.step(1); const canvas = document.querySelector('canvas'), read = document.createElement('canvas'); read.width = canvas.width; read.height = canvas.height; const ctx = read.getContext('2d'); ctx.drawImage(canvas, 0, 0); return Array.from(ctx.getImageData(2, 2, 1, 1).data); };
         })();`,
     });
     const townPath = join(directory, "content/town.json");
@@ -75,6 +88,9 @@ export async function checkInstalledContent(
             "initial production scene activates after image readiness",
         );
         const before = await cdp.evaluate<number[]>("window.__contentHarness.pixels()");
+        const townEnvironment = await cdp.evaluate<number[]>(
+            "window.__contentHarness.environmentPixel()",
+        );
         check(
             before[3] === 255 && before[1] > before[0],
             "exported atlas presents opaque green player texels",
@@ -83,8 +99,58 @@ export async function checkInstalledContent(
             actors: { playback: { frame: number; elapsed: number } }[];
         }>("window.__contentHarness.snapshot()");
         check(
+            actors.actors.length === 4,
+            "production rooms contain a player and three independently animated companions",
+        );
+        check(
             JSON.stringify(actors.actors[0].playback) !== JSON.stringify(actors.actors[1].playback),
             "shared animation has independent actor playback",
+        );
+        check(
+            await cdp.evaluate<boolean>(
+                "(() => { const d = window.__contentHarness.inspect(); return d.assets.claims.scene === 4 && d.assets.claims.renderer === 2 && d.renderer.sources === 2 && d.renderer.consumers === 2 && d.assets.protectedOverBudget; })()",
+            ),
+            "active room protects four scene claims and two renderer claims above the three-entry budget",
+        );
+        await cdp.evaluate("document.querySelector('#audio').click()", true);
+        await wait(
+            "document.querySelector('#playback').textContent.includes('Playback requested')",
+        );
+        await cdp.evaluate("window.__contentHarness.step(2)");
+        check(
+            await cdp.evaluate<boolean>(
+                "window.__contentHarness.voices.length === 1 && window.__contentHarness.voices[0].source.loop",
+            ),
+            "audio unlock starts one looping room track",
+        );
+        await cdp.evaluate("document.querySelector('#audio').click()", true);
+        await cdp.evaluate("window.__contentHarness.step(2)");
+        check(
+            await cdp.evaluate<boolean>("window.__contentHarness.voices.length === 1"),
+            "repeated unlock does not duplicate room music",
+        );
+        await cdp.evaluate("document.querySelector('#pause').click()", true);
+        await wait("document.querySelector('#pause').textContent === 'Resume game'");
+        const paused = await cdp.evaluate<string>("document.querySelector('#actors').textContent");
+        await cdp.evaluate("window.__contentHarness.step(120)");
+        check(
+            (await cdp.evaluate<string>("document.querySelector('#actors').textContent")) ===
+                paused &&
+                (await cdp.evaluate<boolean>(
+                    "window.__contentHarness.contexts[0].state === 'suspended'",
+                )),
+            "explicit pause preserves scene state and suspends audio",
+        );
+        await cdp.evaluate("document.querySelector('#pause').click()", true);
+        await wait("document.querySelector('#pause').textContent === 'Pause game'");
+        await cdp.evaluate("window.__contentHarness.step(3)");
+        check(
+            (await cdp.evaluate<string>("document.querySelector('#actors').textContent")) !==
+                paused &&
+                (await cdp.evaluate<boolean>(
+                    "window.__contentHarness.contexts[0].state === 'running' && window.__contentHarness.voices.length === 1",
+                )),
+            "resume advances retained state and resumes the existing music voice",
         );
         await cdp.evaluate(
             "document.querySelector('canvas').focus(); document.querySelector('canvas').dispatchEvent(new KeyboardEvent('keydown', {code:'KeyD', bubbles:true})); window.__contentHarness.step(12); window.dispatchEvent(new KeyboardEvent('keyup', {code:'KeyD', bubbles:true})); window.__contentHarness.step(1)",
@@ -93,6 +159,16 @@ export async function checkInstalledContent(
             await cdp.evaluate<boolean>("window.__contentHarness.snapshot().actors[0].x > 80"),
             "focused movement advances simulation-owned position",
         );
+        await cdp.evaluate(
+            "document.querySelector('canvas').dispatchEvent(new KeyboardEvent('keydown', {code:'KeyD', bubbles:true})); window.__contentHarness.step(2); document.querySelector('#travel').focus(); window.__contentHarness.blurX = window.__contentHarness.snapshot().actors[0].x; window.__contentHarness.effectBeforeBlur = window.__contentHarness.snapshot().effect.tick; window.__contentHarness.step(4)",
+        );
+        check(
+            await cdp.evaluate<boolean>(
+                "window.__contentHarness.snapshot().actors[0].x === window.__contentHarness.blurX && window.__contentHarness.snapshot().effect.tick !== window.__contentHarness.effectBeforeBlur && window.__contentHarness.inspect().lifecycle === 'Running'",
+            ),
+            "normal focus loss clears held movement while simulation and effect keep running",
+        );
+        await cdp.evaluate("document.querySelector('canvas').focus()");
         await cdp.evaluate(
             "document.querySelector('canvas').dispatchEvent(new KeyboardEvent('keydown', {code:'KeyD', bubbles:true})); window.__contentHarness.step(100); window.dispatchEvent(new KeyboardEvent('keyup', {code:'KeyD', bubbles:true})); window.__contentHarness.step(1)",
         );
@@ -146,7 +222,7 @@ export async function checkInstalledContent(
             await wait("window.__contentHarness.deviceWaiting === true");
             await cdp.evaluate("document.querySelector('#travel').click()");
             await wait("document.querySelector('#loading').textContent.includes('Loading')");
-            await wait(`window.__contentHarness.jsonRead >= ${documents + 3}`);
+            await wait(`window.__contentHarness.jsonRead >= ${documents + 4}`);
             check(
                 await cdp.evaluate<boolean>(
                     "document.querySelector('#room').textContent === 'Town courtyard'",
@@ -166,14 +242,39 @@ export async function checkInstalledContent(
                     ),
                     "cancelled transition during recovery preserves the surviving consumer",
                 );
+                await wait("window.__contentHarness.inspect().assets.claims.scene === 4");
+                check(
+                    await cdp.evaluate<boolean>(
+                        "(() => { const d = window.__contentHarness.inspect(); return d.renderer.sources === 2 && d.renderer.consumers === 2; })()",
+                    ),
+                    "abandoned preparation releases only its own image consumers",
+                );
             } else {
                 await wait("document.querySelector('#loading').textContent.includes('Activating')");
+                check(
+                    await cdp.evaluate<boolean>(
+                        "(() => { const d = window.__contentHarness.inspect(); return d.assets.claims.scene === 8 && d.renderer.sources === 3 && d.renderer.consumers === 4; })()",
+                    ),
+                    "ready destination and surviving room own eight scene claims, three unique images and four image consumers",
+                );
                 await cdp.evaluate("window.__contentHarness.step(2)");
                 check(
                     await cdp.evaluate<boolean>(
                         "document.querySelector('#room').textContent === 'Dungeon threshold'",
                     ),
                     "transition prepared during recovery mounts after replacement readiness",
+                );
+                check(
+                    JSON.stringify(
+                        await cdp.evaluate<number[]>("window.__contentHarness.environmentPixel()"),
+                    ) !== JSON.stringify(townEnvironment),
+                    "destination presents distinct external environment atlas pixels",
+                );
+                check(
+                    await cdp.evaluate<boolean>(
+                        "(() => { const s = window.__contentHarness, d = s.inspect(); return d.assets.claims.scene === 4 && d.renderer.sources === 2 && d.renderer.consumers === 2 && s.voices[0].stops === 1 && s.voices.at(-1).source.loop && s.voices.at(-1).source.buffer !== s.voices[0].source.buffer; })()",
+                    ),
+                    "committed destination reclaims old ownership and replaces music exactly once",
                 );
                 await cdp.evaluate("document.querySelector('#travel').click()");
                 await wait("document.querySelector('#loading').textContent.includes('Activating')");
@@ -225,6 +326,35 @@ export async function checkInstalledContent(
             "return transition keeps shared images usable",
         );
 
+        await cdp.evaluate("document.querySelector('#travel').click()");
+        await wait("document.querySelector('#loading').textContent.includes('Activating')");
+        await cdp.evaluate("document.querySelector('#pause').click()", true);
+        await wait("document.querySelector('#pause').textContent === 'Resume game'");
+        check(
+            await cdp.evaluate<boolean>(
+                "window.__contentHarness.inspect().assets.claims.scene === 4",
+            ),
+            "pause abandons a ready destination and keeps only mounted ownership",
+        );
+        await cdp.evaluate("document.querySelector('#pause').click()", true);
+        await wait("document.querySelector('#pause').textContent === 'Pause game'");
+        await cdp.evaluate("window.__contentHarness.step(3)");
+        check(
+            await cdp.evaluate<boolean>(
+                "document.querySelector('#room').textContent === 'Town courtyard' && document.querySelector('[role=alert]').textContent === ''",
+            ),
+            "resume cannot consume the destination revoked by stop",
+        );
+        await cdp.evaluate("document.querySelector('#retry').click()");
+        await wait("document.querySelector('#loading').textContent.includes('Activating')");
+        await cdp.evaluate("window.__contentHarness.step(2)");
+        check(
+            await cdp.evaluate<boolean>(
+                "document.querySelector('#room').textContent === 'Dungeon threshold'",
+            ),
+            "deliberate retry after pause prepares a fresh destination",
+        );
+
         writeFileSync(townPath, "{invalid");
         await cdp.send("Page.navigate", { url: origin });
         await wait("document.querySelector('[role=alert]')?.textContent.includes('invalid JSON')");
@@ -260,6 +390,37 @@ export async function checkInstalledContent(
                 "document.querySelector('#room').textContent === 'Town courtyard' && document.querySelector('[role=alert]').textContent === ''",
             ),
             "corrected initial content retries successfully after cancellation",
+        );
+        await recordRecoveryDevices();
+        await cdp.evaluate(
+            "window.__contentHarness.failDevice = true; window.__contentHarness.devices.at(-1).destroy()",
+        );
+        await wait("document.querySelector('[role=alert]').textContent.length > 0");
+        const terminalDevices = await cdp.evaluate<number>(
+            "window.__contentHarness.devices.length",
+        );
+        await cdp.evaluate("window.__contentHarness.step(60)");
+        check(
+            await cdp.evaluate<boolean>(
+                `window.__contentHarness.devices.length === ${terminalDevices}`,
+            ),
+            "terminal recovery failure reports an error without frame-driven device retries",
+        );
+        await start();
+        await cdp.evaluate(
+            "window.__contentHarness.holdDevice = true; window.__contentHarness.devices.at(-1).destroy()",
+        );
+        await wait("window.__contentHarness.deviceWaiting === true");
+        await cdp.evaluate(
+            "window.dispatchEvent(new PageTransitionEvent('pagehide')); window.__contentHarness.releaseDevice()",
+        );
+        await wait("window.__contentHarness.devices.length === 2");
+        await cdp.evaluate("window.__contentHarness.devices.at(-1).lost");
+        check(
+            await cdp.evaluate<boolean>(
+                "window.__contentHarness.callbacks.size === 0 && window.__contentHarness.inspect().assets.claims.scene === 0",
+            ),
+            "disposal during recovery destroys late replacement and releases all scene ownership",
         );
     } finally {
         writeFileSync(townPath, originalTown);
