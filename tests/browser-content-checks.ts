@@ -18,6 +18,16 @@ export async function checkInstalledContent(
     const hook = await cdp.send("Page.addScriptToEvaluateOnNewDocument", {
         source: `(() => {
             const state = window.__contentHarness = { devices: [], callbacks: new Map(), next: 0, now: 1000, imageWaiting: false, holdImage: true, voices: [], contexts: [] };
+            const connect = AudioNode.prototype.connect;
+            AudioNode.prototype.connect = function (destination, ...args) {
+                const result = connect.call(this, destination, ...args);
+                if (destination instanceof AudioDestinationNode) {
+                    const analyser = this.context.createAnalyser(); analyser.fftSize = 2048;
+                    connect.call(this, analyser); state.output = analyser;
+                }
+                return result;
+            };
+            state.outputRms = () => { const values = new Float32Array(state.output.fftSize); state.output.getFloatTimeDomainData(values); return Math.sqrt(values.reduce((sum, value) => sum + value * value, 0) / values.length); };
             const createVoice = AudioContext.prototype.createBufferSource;
             AudioContext.prototype.createBufferSource = function () {
                 if (!state.contexts.includes(this)) state.contexts.push(this);
@@ -122,6 +132,10 @@ export async function checkInstalledContent(
                 "window.__contentHarness.voices.length === 1 && window.__contentHarness.voices[0].source.loop",
             ),
             "audio unlock starts one looping room track",
+        );
+        await wait("window.__contentHarness.outputRms() > 0.001");
+        passed.push(
+            "Installed content: Town music produces a nonzero signal at the destination input",
         );
         await cdp.evaluate("document.querySelector('#audio').click()", true);
         await cdp.evaluate("window.__contentHarness.step(2)");
@@ -276,6 +290,10 @@ export async function checkInstalledContent(
                     ),
                     "committed destination reclaims old ownership and replaces music exactly once",
                 );
+                await wait("window.__contentHarness.outputRms() > 0.001");
+                passed.push(
+                    "Installed content: Dungeon music produces a nonzero signal at the destination input",
+                );
                 await cdp.evaluate("document.querySelector('#travel').click()");
                 await wait("document.querySelector('#loading').textContent.includes('Activating')");
                 await cdp.evaluate("window.__contentHarness.step(2)");
@@ -392,6 +410,27 @@ export async function checkInstalledContent(
             "corrected initial content retries successfully after cancellation",
         );
         await recordRecoveryDevices();
+        // Exercise the ordinary first transition without a prior pause/resume or recovery gesture.
+        await cdp.evaluate("document.querySelector('#audio').click()", true);
+        await wait(
+            "document.querySelector('#playback').textContent.includes('Playback requested')",
+        );
+        await cdp.evaluate("window.__contentHarness.step(2)");
+        await wait("window.__contentHarness.outputRms() > 0.001");
+        await cdp.evaluate("document.querySelector('#travel').click()");
+        await wait("document.querySelector('#loading').textContent.includes('Activating')");
+        await cdp.evaluate(
+            "window.__contentHarness.step(2); window.__contentHarness.audioAt = window.__contentHarness.contexts[0].currentTime",
+        );
+        await wait(
+            "window.__contentHarness.contexts[0].currentTime > window.__contentHarness.audioAt + 0.15 && window.__contentHarness.outputRms() > 0.001",
+        );
+        check(
+            await cdp.evaluate<boolean>(
+                "document.querySelector('#room').textContent === 'Dungeon threshold' && window.__contentHarness.voices.length === 2 && window.__contentHarness.voices[0].stops === 1",
+            ),
+            "ordinary Town-to-Dungeon transition produces fresh output without another unlock gesture",
+        );
         await cdp.evaluate(
             "window.__contentHarness.failDevice = true; window.__contentHarness.devices.at(-1).destroy()",
         );
