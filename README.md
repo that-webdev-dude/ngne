@@ -89,6 +89,11 @@ checks playback/movement and owner-safe retries, and injects controlled device l
 into the installed production page without consumer hooks. It temporarily corrupts
 only built room JSON and restores it on completion; use a disposable build and
 rebuild after an interrupted run. The consumer README owns authoring and setup.
+`npm run test:installed` builds a clean consumer installation from the
+[pinned consumer fixture](tests/fixtures/README.md). CI exercises its root and
+nested production builds with SwiftShader. The [artifact evidence matrix](docs/evidence/installed-content.md)
+separates executed results from pending hosted or device gates.
+
 Windows teardown waits for browser process closure before asynchronously retrying
 temporary profile cleanup, so cleanup does not block process-close events.
 
