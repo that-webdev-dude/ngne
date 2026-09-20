@@ -83,7 +83,7 @@ export class BrowserGame<S, C> {
         };
         this.game[PREPARE_ASSET] = async (asset, signal) => {
             if (!isImageAsset(asset)) return;
-            const source = await this.game.assets.acquire(asset, signal);
+            const source = await this.game.assets.acquire(asset, signal, "renderer");
             let renderer: WebGPURenderer;
             try {
                 renderer = await this.ensureRenderer();

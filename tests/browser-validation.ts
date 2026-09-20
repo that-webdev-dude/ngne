@@ -6,6 +6,7 @@ import { checkBrowserInput } from "./browser-input-checks.js";
 import { checkBrowserInterpolation } from "./browser-interpolation-checks.js";
 import { checkBrowserImages } from "./browser-image-checks.js";
 import { checkBrowserRecovery } from "./browser-recovery-checks.js";
+import { checkBrowserRetention } from "./browser-retention-checks.js";
 import { checkBrowserGpuHost } from "./browser-gpu-host-checks.js";
 import { checkWebGPUEnvironment, checkWebGPUCore } from "./browser-webgpu-checks.js";
 void checkWebGPUEnvironment().catch((error: unknown) => {
@@ -90,6 +91,7 @@ async function main() {
     await checkBrowserImages(check);
     await checkBrowserGames(check);
     await checkBrowserRecovery(check);
+    await checkBrowserRetention(check);
     await checkBrowserGpuHost(check);
     await checkBrowserInput((condition, message) => check(condition, "WebGPU " + message));
     await checkBrowserInterpolation(check);

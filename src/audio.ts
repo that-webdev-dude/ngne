@@ -16,6 +16,8 @@ export interface Clip {
 export function audioAsset(id: string, url: string): Asset<AudioBuffer> {
     return {
         id,
+        kind: "audio",
+        estimateBytes: (buffer) => buffer.length * buffer.numberOfChannels * 4,
         async load(signal) {
             const response = await fetch(url, { signal });
             if (!response.ok) throw new Error(`Audio load failed: ${response.status}`);

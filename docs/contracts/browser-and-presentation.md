@@ -151,9 +151,60 @@ subtracts interpolated camera plus shake before `Math.round` when `pixelSnap` is
 Screen-space sprites bypass camera/shake but still snap. Packed coordinates are
 float32; JavaScript half-pixel rounding applies, including negative coordinates.
 
-WebGPU uses the premultiplied pipeline and retained source ownership described above. The shared asset cache retains decoded data until disposal.
+WebGPU uses the premultiplied pipeline and retained source ownership described above. The shared asset cache follows the opt-in retention policy below.
 
 ## Assets and audio
+
+### Retention policy
+
+Retention is opt-in via `Assets({ retention: { maxEntries, maxBytes } })` or
+`GameOptions.assetRetention`. Omitted limits are unlimited; defaults retain loaded
+values until disposal. Limits are nonnegative safe integers and cover all loaded
+entries and their known decoded-byte estimates, including leased entries. Unknown
+sizes contribute zero estimated bytes and remain explicitly counted; an entry limit
+is needed to bound unknown-size content.
+
+Acquisition order defines deterministic LRU order (no wall clock). Completion and
+release trim the oldest unleased loaded entries until both limits are met or no
+eligible entry remains. A live working set, including an oversize leased entry,
+is never forcibly evicted. Oversize entries become eligible on final release.
+`trim()` applies configured limits; `evict(id)` removes only an unleased loaded
+entry. Reacquisition reloads an evicted value. Definitions must remain stable while
+resident. Release remains idempotent, including after terminal disposal.
+
+Entries are removed before cleanup. Explicit trim/evict and terminal disposal
+attempt all selected cleanups and aggregate failures; failed disposal never restores
+ownership. Automatic trimming contains errors through the diagnostic callback and a
+cumulative failure count, without retaining error history. Terminal disposal is
+idempotent and does not retry failed cleanup. Late cancelled loads dispose their
+result without publishing it.
+
+Consumer document edges end after immutable snapshot creation; flattened scene
+resources do not retain each other. Releasing every external claim therefore makes
+the entire unused graph eligible. Arbitrary custom loader closures are outside this
+graph model: callers must release dependency leases themselves; claim labels are
+diagnostics, not garbage collection or a dependency registry.
+
+### Referenced consumer content
+
+NGNE prepares the explicit `SceneDefinition.assets` list; it does not traverse
+JSON references. Consumers resolve and validate their complete required graph before
+calling `prepare`, flatten its resource definitions into that list, and reuse one
+definition object per asset ID. Listing an atlas JSON value alone does not prepare
+its image. Every referenced image must appear as an `ImageAsset`; decoding is not
+GPU readiness. The browser hook below supplies that readiness for each listed image.
+
+Consumers own document schemas, URL bases, missing-reference and cycle detection,
+duplicate-edge deduplication, conflicting-definition rejection and deliberate retry.
+Navigation targets are distinct from required dependencies: a return doorway need
+not recursively load another scene. Repeated animation frames are playback data,
+not additional asset claims. Immutable validated snapshots can be scene assets;
+temporary document-request claims may end after creating that snapshot, before
+engine preparation begins. A failed resolver must release its own claims and never
+publish a partial scene. No registry, format parser or automatic discovery API is
+provided by the engine.
+
+### Decoding, upload and recovery
 
 `ImageAsset extends Asset<ImageBitmap>` carries readonly `kind: "image"`.
 `imageAsset()` uses explicit non-premultiplied, unconverted bitmap decoding; image
@@ -171,8 +222,8 @@ identity-evicted immediately, so a retry can begin while older consumers unwind.
 WebGPU image entries are keyed by string ID and definition identity. Overlapping
 consumers share one upload and one additional retained source lease. Cancellation
 releases only its consumer; the final release unregisters bindings before destroying
-the texture and releasing that lease. The decoded cache closes sources only on Assets
-disposal. Conflicting/manual/leased IDs reject; empty ID is reserved for white.
+the texture and releasing that lease. The decoded cache closes unleased sources on
+eviction or terminal disposal. Conflicting/manual/leased IDs reject; empty ID is reserved for white.
 Validation and out-of-memory scopes finish before readiness is published, including
 when the copy throws synchronously. Failed uploads permit explicit retry.
 
@@ -182,7 +233,7 @@ its original after resolution. Replacement is transactional; cancellation/failur
 preserves the old ready binding. Already-premultiplied inputs may have lost precision
 before snapshotting; the renderer cannot reconstruct those original bytes.
 
-Asset identity must map to one definition object per service. Leases release once; loaded cache entries remain until disposal. Cancelling one consumer does not abort a load still needed by another. The last cancelled pending consumer aborts the loader. Late completion after cancellation disposes its returned value and cannot activate a scene.
+Asset identity must map to one definition object per service. Leases release once; loaded entries follow the retention policy. Cancelling one consumer does not abort a load still needed by another. The last cancelled pending consumer aborts the loader. Late completion after cancellation disposes its returned value and cannot activate a scene.
 
 The playback device is optional until unlocked by a user gesture. Named scopes are internally instance-isolated, even with the same authored name. Effects use oscillator envelopes; clips use decoded AudioBuffers, optionally looping. Scope buses support independent gain; the master supports mute and ducking. Requests flush after simulation commit, and unmount removes queued/active scope voices before releasing scene asset leases. Scope and terminal disposal become final before cleanup, attempt every owned voice, gain and bus action, and aggregate failures; a failed cleanup cannot make that scope usable again. Unlock, resume and suspension failures propagate. Suspension clears queued requests before awaiting the device. Limits: 128 pending requests and 32 active voices; excess is dropped. Audio presentation state is outside simulation enumeration.
 

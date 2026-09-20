@@ -3,6 +3,11 @@
     "version": "0.1.0",
     "type": "module",
     "private": true,
+    "files": [
+        "dist/engine",
+        "docs/guide.md",
+        "docs/contracts"
+    ],
     "scripts": {
         "dev": "vite --host 127.0.0.1",
         "build": "tsc --noEmit && tsc -p tests/tsconfig.browser.json && tsc -p benchmarks/browser/tsconfig.json && tsc -p tsconfig.lib.json && tsc -p tests/tsconfig.api.json && vite build",
@@ -15,7 +20,9 @@
         "bench:compare": "node benchmarks/compare-runs.mjs",
         "format": "prettier --write src demo examples tests benchmarks docs .agents .github .vscode \"./*.{ts,md,json,html}\"",
         "format:check": "prettier --check src demo examples tests benchmarks docs .agents .github .vscode \"./*.{ts,md,json,html}\"",
-        "preview": "vite preview --host 127.0.0.1"
+        "preview": "vite preview --host 127.0.0.1",
+        "bench:content": "node benchmarks/content/run.mjs",
+        "test:installed": "node tests/installed-content.mjs"
     },
     "exports": {
         ".": {

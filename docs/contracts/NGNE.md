@@ -55,7 +55,8 @@ caller-owned values; inspection never returns a live camera or RNG.
 Public symbols: `Game`, `BrowserGame`, `Assets`, `Input`, `Frame`,
 `WebGPURenderer`, `Audio`, `FixedStep`, `emptyInput`; types `GameOptions`,
 `SceneCandidates`, `SceneCandidateOptions`, `BrowserOptions`, `FrameScheduler`,
-`DisplaySnapshot`, `InputSnapshot`, `Stats` and `RendererStatus`.
+`DisplaySnapshot`, `InputSnapshot`, `Stats`, `RendererStatus`, `AssetRetention`,
+`AssetsOptions` and `AssetClaim`.
 
 The browser host, headless runners, renderer/audio/asset tests and benchmarks
 consume this surface. Host lifecycle, candidate coordination, tick, render and
@@ -64,7 +65,10 @@ service operations are intentional integration APIs.
 ### Inspection
 
 Public types: `Lifecycle`, `SceneInspection`, `SceneStateInspection`,
-`GameInspection` and `InspectionValue`.
+`GameInspection`, `InspectionValue`, `AssetInspection`, `AssetEntryInspection`
+and `RendererResourceInspection`. `Assets.inspect` and `WebGPURenderer.inspect`
+provide bounded resource detail with complete aggregates; `Assets.trim` and
+`Assets.evict` apply the retention contract without revoking live leases.
 
 Tests, benchmark capacity reporting and diagnostics consume this surface. It
 returns no mutable foreign world or resource binding.

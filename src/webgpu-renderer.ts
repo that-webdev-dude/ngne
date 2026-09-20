@@ -2,6 +2,7 @@ import type { ImageAsset, Lease } from "./assets.js";
 import type { Frame } from "./renderer.js";
 import { ACQUIRE_IMAGE, CREATE_RENDERER, RENDERER_READY } from "./renderer-host.js";
 import { WebGpuRuntime } from "./webgpu-runtime.js";
+import type { RendererResourceInspection } from "./resource-inspection.js";
 
 export type RendererStatus = "ready" | "recovering" | "failed" | "disposed";
 
@@ -45,6 +46,9 @@ export class WebGPURenderer {
     }
     get sprites(): number {
         return this.#runtime.sprites;
+    }
+    inspect(limit = 100): RendererResourceInspection {
+        return this.#runtime.inspect(limit);
     }
     texture(
         id: string,
