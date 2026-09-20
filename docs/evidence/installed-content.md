@@ -14,12 +14,15 @@ manifest alongside this report owns exact package, source, fixture and build has
 | Physical GPU, root          | Passed                    | 231 browser assertions, zero failures/skips; acquired Intel gen-12lp, non-fallback                               |
 | Physical GPU, nested base   | Passed                    | 231 assertions, zero failures/skips at `/town-dungeon/`                                                          |
 | Local software WebGPU       | Passed                    | 231 assertions; SwiftShader; physical-device evidence explicitly unsupported                                     |
-| Hosted software WebGPU      | Unverified                | Workflow now includes the pinned installed consumer at both bases; no hosted execution of this change yet        |
+| Hosted software WebGPU      | Passed                    | 231 assertions at each base on Ubuntu 24.04.5 / Chrome 152.0.7977.82 / SwiftShader                               |
 | Manual gameplay/audio       | Passed                    | User confirmed movement, both tracks, travel both ways, pause/resume and switching away/back on the root preview |
 | Transition/churn accounting | Applicable prior evidence | Final production JS/content match the measured artifact; see equivalence below                                   |
 
-Acceptance remains incomplete while the hosted gate is unverified. No source
-inspection or locally executed software run substitutes for that result.
+All required gates passed. [Hosted run 35540679567](https://github.com/that-webdev-dude/ngne/actions/runs/35540679567)
+verified commit `845a55732cdb4c6074dada01ce0ef86f1393cd83`, including intentional
+assertion-failure detection and both installed consumer bases. Deployment was skipped.
+The hosted tarball, every installed file and both production builds are byte-identical
+to the local final artifact. Later evidence-only edits do not change that package.
 
 ## Device and browser scope
 
@@ -77,7 +80,12 @@ runs can require `NGNE_EXPECT_GPU_VENDOR=intel`. For software runs set
 builds because failure checks temporarily corrupt and restore built JSON.
 
 `installed-content.json` retains identities and full browser results;
-`installed-content-raw.json.gz` retains raw JSON/log evidence. Uncompressed local
+`installed-content-raw.json.gz` retains raw local JSON/log evidence.
+`installed-content-hosted.zip` preserves the complete hosted artifact (including
+logs, manifests, package and builds), SHA-256
+`f35d24346ac87f4137a7c129f209591dcbf8735b276a5316b9449696a3f5d545`.
+`installed-content-package.tgz` is the final package, SHA-256
+`47802378efdbb084e4b052817f035971d0f2fbfc7d9236c812270a538296dcb1`. Uncompressed local
 builds and logs remain under `.test-output/final-package/` and the clean-install
 output named in the manifest. Initial sandbox npm-cache/esbuild failures and occupied
 preview ports were environmental setup failures; retries used normal filesystem

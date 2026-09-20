@@ -2802,8 +2802,24 @@
         ]
     },
     "hosted": {
-        "result": "unverified",
-        "reason": "Workflow change has not been pushed or executed"
+        "result": "passed",
+        "run": "https://github.com/that-webdev-dude/ngne/actions/runs/35540679567",
+        "revision": "845a55732cdb4c6074dada01ce0ef86f1393cd83",
+        "jobId": 106157633356,
+        "artifactId": 10614074534,
+        "artifactSHA256": "f35d24346ac87f4137a7c129f209591dcbf8735b276a5316b9449696a3f5d545",
+        "retainedArtifact": "installed-content-hosted.zip",
+        "os": "Ubuntu 24.04.5",
+        "browser": "Chrome/152.0.7977.82",
+        "renderer": "SwiftShader",
+        "packageAndInstalledFiles": "byte-identical to local final artifact",
+        "rootAndNestedBuilds": "byte-identical to local final artifact",
+        "rootAssertions": 231,
+        "nestedAssertions": 231,
+        "failures": 0,
+        "unsupported": ["hardware-backed WebGPU execution evidence"],
+        "intentionalFailureDetection": "passed",
+        "deployment": "skipped"
     },
     "equivalence": {
         "runtimeAndDeclarations": "identical",
@@ -2828,6 +2844,7 @@
             "README.md"
         ],
         "runtime": "unchanged",
-        "packageSHA256": "47802378efdbb084e4b052817f035971d0f2fbfc7d9236c812270a538296dcb1"
+        "packageSHA256": "47802378efdbb084e4b052817f035971d0f2fbfc7d9236c812270a538296dcb1",
+        "packageCommit": "7c9818cb2b9dc3cbb7dc053fdcc9fa1a80ab0ed4"
     }
 }
