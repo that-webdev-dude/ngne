@@ -20,7 +20,8 @@
         "bench:compare": "node benchmarks/compare-runs.mjs",
         "format": "prettier --write src demo examples tests benchmarks docs .agents .github .vscode \"./*.{ts,md,json,html}\"",
         "format:check": "prettier --check src demo examples tests benchmarks docs .agents .github .vscode \"./*.{ts,md,json,html}\"",
-        "preview": "vite preview --host 127.0.0.1"
+        "preview": "vite preview --host 127.0.0.1",
+        "bench:content": "node benchmarks/content/run.mjs"
     },
     "exports": {
         ".": {

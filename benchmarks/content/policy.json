@@ -1,0 +1,20 @@
+{
+    "version": 1,
+    "repetitions": 3,
+    "roundTrips": 100,
+    "warmupRoundTrips": 5,
+    "distinctRooms": 12,
+    "churnVisits": 120,
+    "warmupChurnVisits": 12,
+    "checkpointEvery": 10,
+    "settleMs": 120,
+    "seed": "town-dungeon",
+    "viewport": [1280, 900],
+    "retention": { "maxEntries": 3, "maxBytes": 1048576 },
+    "budgets": {
+        "transitionP95Ms": 500,
+        "transitionMaxMs": 2000,
+        "retainedHeapGrowthBytes": 8388608,
+        "retainedHeapSlopeBytesPerTransition": 65536
+    }
+}
