@@ -41,12 +41,21 @@
 - Keep documentation short, compact, and easy for humans and agents to scan.
   Document current usage and contracts; omit ticket identifiers and issue-tracker
   links from repository documentation and generated reports.
-- Each fact has one owning document: architecture for the high-level model,
-  contracts for exact semantics, and the guide and examples for usage. Tests and
-  CI provide executable evidence; work tracking and history stay outside the
-  authoritative documentation.
+- Each topic has one authoritative owner: architecture for the high-level model,
+  contracts for exact semantics, and the guide and examples for usage. Other
+  documents may summarize or demonstrate it and link to that owner; they must not
+  maintain competing specifications. Consumer-specific configuration and mechanics
+  belong in consumer documentation. Tests and CI provide executable evidence;
+  work tracking and history stay outside the authoritative documentation.
 - Update the owning document in the same task as an observable behavior or
   public API change.
 - Keep current behavior distinct from proposals and historical records.
+- Historical validation records may live under `docs/evidence/`. Identify their
+  recorded date, revision, environment and limits; they do not define current
+  contracts or establish validation of later revisions. Editorial cleanup must
+  preserve recorded results and existing evidence artifacts.
+- Documentation restructuring must preserve conditions, exceptions, ordering
+  guarantees and limits. Report contradictions between documents or implementation
+  rather than silently resolving them as editorial changes.
 - On completion, report changes, checks and results, remaining limits, and
   unresolved decisions.
