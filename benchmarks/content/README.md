@@ -72,3 +72,27 @@ visibility, seed and content/package/build identities; mismatches are
 Visible physical-GPU runs, controlled cancellation, V8 heap and deterministic
 tests are separate evidence classes. This procedure does not certify other
 devices, software WebGPU, background tabs or spontaneous driver reset.
+
+## Runner cleanup and comparison
+
+The shared internal transport in `tests/tooling/` owns socket lifecycle, request
+correlation, deadlines and event delivery. Opening is bounded to 10 seconds and
+commands to 30 seconds; a timed-out command is never replayed or assumed cancelled.
+A healthy socket remains available for diagnostics. Terminal failures reject all
+pending calls and remove connection listeners. Full event envelopes are retained
+in `browser-events.jsonl`; evaluation keeps the benchmark's user-gesture behavior.
+
+Each repetition closes its socket, terminates and verifies its owned browser tree,
+and removes its temporary profile. The HTTP server closes after all repetitions or
+failure. Termination escalates to force after a grace period. Process inspection,
+termination commands, exit waits and profile retries are bounded. Every cleanup
+step runs even if a preceding step fails. `cleanup.json` records resources, actions,
+errors and surviving PIDs when available; `result.json` is written only after
+cleanup and includes `cleanupPassed` and all workload/diagnostic/cleanup failures.
+A cleanup failure cannot produce an accepted result.
+
+Manifest fingerprints include all shared `tests/tooling/` files as well as the
+benchmark harness. Comparison requires matching tooling fingerprints and explicit
+successful cleanup. Older artifacts without these fields remain historical
+evidence, but cannot be compared as accepted runs by the updated checker.
+Exploratory runs remain functional evidence, never performance acceptance.

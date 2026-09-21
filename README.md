@@ -94,8 +94,21 @@ rebuild after an interrupted run. The consumer README owns authoring and setup.
 nested production builds with SwiftShader. The [artifact evidence matrix](docs/evidence/installed-content.md)
 separates executed results from pending hosted or device gates.
 
-Windows teardown waits for browser process closure before asynchronously retrying
-temporary profile cleanup, so cleanup does not block process-close events.
+The browser and content runners share internal DevTools request ownership. A request
+has a finite deadline and is never replayed; timeout does not cancel browser work.
+Disconnect or explicit close rejects pending and subsequent requests immediately.
+Only navigation-context protocol errors are retried during readiness polling.
+
+Results are finalized after socket, owned process-tree and temporary-profile cleanup.
+Shutdown escalates from termination to forced termination and verifies exit; Windows
+uses captured process identities and Linux uses the runner's detached process group.
+Cleanup continues after individual failures. Results retain the original validation,
+diagnostic and cleanup errors, including the affected resource and surviving PID
+when available. Any cleanup failure fails the run, even if assertions passed.
+`results.json` includes per-resource cleanup evidence. Controlled CI checks use
+`NGNE_BROWSER_INJECT_FAILURE`, `NGNE_BROWSER_INJECT_SCREENSHOT_FAILURE` and
+`NGNE_BROWSER_INJECT_CLEANUP_FAILURE`; the last injects a failure after actual
+resource release, without deliberately leaking a process.
 
 Benchmark tooling lives under `benchmarks/`. `npm run bench` measures CPU workloads, not GPU time or universal frame-rate guarantees. `npx tsx benchmarks/browser/browser-baseline.ts` drives sustained game runs in visible Chromium. For the fixed WebGPU renderer workload, first run `npm run build:browser`, then run the same baseline command with `NGNE_URL=http://127.0.0.1:4173/benchmarks/browser/index.html?workload=renderer-webgpu`, `NGNE_SERVE_DIR=.`, and `NGNE_SERVE_OUT_DIR=dist-browser`. The renderer fixture records CPU preparation and submission only; it does not wait for GPU completion. Browser benchmark pages must remain visible because hidden pages throttle `requestAnimationFrame`.
 

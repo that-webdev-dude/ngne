@@ -1,3 +1,5 @@
+import { cleanupSteps } from "./tooling/cleanup.mjs";
+import { isNavigationError } from "./tooling/devtools.mjs";
 import assert from "node:assert/strict";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -15,8 +17,15 @@ export async function checkInstalledContent(
     passed: string[],
     recordRecoveryDevices: () => Promise<void>,
 ): Promise<void> {
-    const hook = await cdp.send("Page.addScriptToEvaluateOnNewDocument", {
-        source: `(() => {
+    const townPath = join(directory, "content/town.json");
+    const destinationPath = join(directory, "content/dungeon.json");
+    const originalTown = readFileSync(townPath, "utf8");
+    const originalDestination = readFileSync(destinationPath, "utf8");
+    const errors: unknown[] = [];
+    let hook: unknown;
+    try {
+        hook = await cdp.send("Page.addScriptToEvaluateOnNewDocument", {
+            source: `(() => {
             const state = window.__contentHarness = { devices: [], callbacks: new Map(), next: 0, now: 1000, imageWaiting: false, holdImage: true, voices: [], contexts: [] };
             const connect = AudioNode.prototype.connect;
             AudioNode.prototype.connect = function (destination, ...args) {
@@ -60,36 +69,36 @@ export async function checkInstalledContent(
             state.pixels = () => { state.step(1); const actor = state.snapshot().actors[0], canvas = document.querySelector('canvas'), read = document.createElement('canvas'); read.width = canvas.width; read.height = canvas.height; const ctx = read.getContext('2d'); ctx.drawImage(canvas, 0, 0); return Array.from(ctx.getImageData(actor.x, actor.y - 3, 1, 1).data); };
             state.environmentPixel = () => { state.step(1); const canvas = document.querySelector('canvas'), read = document.createElement('canvas'); read.width = canvas.width; read.height = canvas.height; const ctx = read.getContext('2d'); ctx.drawImage(canvas, 0, 0); return Array.from(ctx.getImageData(2, 2, 1, 1).data); };
         })();`,
-    });
-    const townPath = join(directory, "content/town.json");
-    const destinationPath = join(directory, "content/dungeon.json");
-    const originalTown = readFileSync(townPath, "utf8");
-    const originalDestination = readFileSync(destinationPath, "utf8");
-    const check = (condition: unknown, message: string) => {
-        assert(condition, message);
-        passed.push(`Installed content: ${message}`);
-    };
-    async function wait(expression: string): Promise<void> {
-        const deadline = Date.now() + 20_000;
-        while (!(await cdp.evaluate<boolean>(expression))) {
-            if (Date.now() > deadline) throw new Error(`Content timeout: ${expression}`);
-            await new Promise((resolve) => setTimeout(resolve, 50));
+        });
+        const check = (condition: unknown, message: string) => {
+            assert(condition, message);
+            passed.push(`Installed content: ${message}`);
+        };
+        async function wait(expression: string): Promise<void> {
+            const deadline = Date.now() + 20_000;
+            while (true) {
+                try {
+                    if (await cdp.evaluate<boolean>(expression)) return;
+                } catch (error) {
+                    if (!isNavigationError(error)) throw error;
+                }
+                if (Date.now() > deadline) throw new Error(`Content timeout: ${expression}`);
+                await new Promise((resolve) => setTimeout(resolve, 50));
+            }
         }
-    }
-    async function start(): Promise<void> {
-        await cdp.send("Page.navigate", { url: origin });
-        await wait("window.__contentHarness?.imageWaiting === true");
-        check(
-            await cdp.evaluate<boolean>(
-                "document.querySelector('#room').textContent === 'No active room' && document.querySelector('#loading').textContent.includes('Loading')",
-            ),
-            "delayed image decode prevents initial activation and shows loading",
-        );
-        await cdp.evaluate("window.__contentHarness.releaseImage()");
-        await wait("window.__contentHarness.callbacks.size > 0");
-        await cdp.evaluate("window.__contentHarness.step(2)");
-    }
-    try {
+        async function start(): Promise<void> {
+            await cdp.send("Page.navigate", { url: origin });
+            await wait("window.__contentHarness?.imageWaiting === true");
+            check(
+                await cdp.evaluate<boolean>(
+                    "document.querySelector('#room').textContent === 'No active room' && document.querySelector('#loading').textContent.includes('Loading')",
+                ),
+                "delayed image decode prevents initial activation and shows loading",
+            );
+            await cdp.evaluate("window.__contentHarness.releaseImage()");
+            await wait("window.__contentHarness.callbacks.size > 0");
+            await cdp.evaluate("window.__contentHarness.step(2)");
+        }
         await start();
         check(
             await cdp.evaluate<boolean>(
@@ -461,12 +470,30 @@ export async function checkInstalledContent(
             ),
             "disposal during recovery destroys late replacement and releases all scene ownership",
         );
+    } catch (error) {
+        errors.push(error);
     } finally {
-        writeFileSync(townPath, originalTown);
-        writeFileSync(destinationPath, originalDestination);
-        if (hook && typeof hook === "object" && "identifier" in hook)
-            await cdp.send("Page.removeScriptToEvaluateOnNewDocument", {
-                identifier: hook.identifier,
-            });
+        const cleanup = await cleanupSteps([
+            [`restore ${townPath}`, () => writeFileSync(townPath, originalTown)],
+            [
+                `restore ${destinationPath}`,
+                () => writeFileSync(destinationPath, originalDestination),
+            ],
+            [
+                "remove installed-content DevTools script",
+                async () => {
+                    if (hook && typeof hook === "object" && "identifier" in hook)
+                        await cdp.send("Page.removeScriptToEvaluateOnNewDocument", {
+                            identifier: hook.identifier,
+                        });
+                },
+            ],
+        ]);
+        errors.push(
+            ...cleanup
+                .filter((step) => step.status === "failed")
+                .map((step) => new Error(`${step.resource}: ${step.error}`)),
+        );
     }
+    if (errors.length) throw new AggregateError(errors, "Installed content checks/cleanup failed");
 }

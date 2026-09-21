@@ -1,4 +1,6 @@
-import { spawn, spawnSync, type ChildProcess } from "node:child_process";
+import { connectDevTools, isNavigationError } from "./tooling/devtools.mjs";
+import { runWithCleanup, ownProcess } from "./tooling/cleanup.mjs";
+import { spawn, type ChildProcess } from "node:child_process";
 import {
     appendFileSync,
     existsSync,
@@ -42,6 +44,7 @@ interface BrowserResult {
     recordedAt: string;
     browserVersion?: unknown;
     browserFlags: string[];
+    cleanup: { resource: string; status: string; error?: string }[];
     renderingDevices: { page: string; devices: RenderingDevice[] }[];
 }
 
@@ -59,7 +62,7 @@ interface Cdp {
     send(method: string, params?: object): Promise<unknown>;
     evaluate<T>(expression: string, userGesture?: boolean): Promise<T>;
     on(method: string, handler: (params: unknown) => void): void;
-    close(): void;
+    close(): Promise<void>;
 }
 
 const root = process.cwd();
@@ -70,7 +73,7 @@ const artifactDirectory = join(
     root,
     process.env.NGNE_BROWSER_ARTIFACT_DIR ?? ".test-output/browser",
 );
-const profileDirectory = mkdtempSync(join(tmpdir(), "ngne-browser-ci-"));
+let profileDirectory: string | undefined;
 const consoleMessages: string[] = [];
 const failures: string[] = [];
 const passed: string[] = [];
@@ -80,25 +83,32 @@ let renderer: BrowserResult["renderer"] = "unknown";
 let preview: ChildProcess | undefined;
 let browser: ChildProcess | undefined;
 let cdp: Cdp | undefined;
-let failed = false;
+const cleanup: { resource: string; status: string; error?: string }[] = [];
+let browserOwner: ReturnType<typeof ownProcess> | undefined;
+let previewOwner: ReturnType<typeof ownProcess> | undefined;
 let browserVersion: unknown;
 let browserFlags: string[] = [];
 const renderingDevices: BrowserResult["renderingDevices"] = [];
 
 mkdirSync(artifactDirectory, { recursive: true });
 
-try {
-    preview = startPreview();
-    await waitForPreview(15_000);
-    browser = startBrowser();
-    cdp = await connectToPage();
-    await cdp.send("Runtime.enable");
-    await cdp.send("Page.enable");
-    await cdp.send("Log.enable");
-    browserVersion = await cdp.send("Browser.getVersion");
-    await cdp.send("Page.addScriptToEvaluateOnNewDocument", {
-        // Observe acquired devices and actual submission/presentation use without selecting adapters.
-        source: `(() => {
+failures.push(
+    ...(await runWithCleanup(
+        async () => {
+            profileDirectory = mkdtempSync(join(tmpdir(), "ngne-browser-ci-"));
+            preview = startPreview();
+            previewOwner = ownProcess(preview, "preview");
+            await waitForPreview(15_000);
+            browser = startBrowser();
+            browserOwner = ownProcess(browser, "browser");
+            cdp = await connectToPage();
+            await cdp.send("Runtime.enable");
+            await cdp.send("Page.enable");
+            await cdp.send("Log.enable");
+            browserVersion = await cdp.send("Browser.getVersion");
+            await cdp.send("Page.addScriptToEvaluateOnNewDocument", {
+                // Observe acquired devices and actual submission/presentation use without selecting adapters.
+                source: `(() => {
             const records = window.__ngneRenderingDevices = [];
             if (!window.GPUAdapter || !window.GPUCanvasContext || !window.GPUQueue) return;
             const queues = new WeakMap();
@@ -135,57 +145,73 @@ try {
                 return result;
             };
         })();`,
-    });
-    await cdp.send("Emulation.setFocusEmulationEnabled", { enabled: true });
-    captureBrowserLogs(cdp);
+            });
+            await cdp.send("Emulation.setFocusEmulationEnabled", { enabled: true });
+            captureBrowserLogs(cdp);
 
-    await navigate(
-        `${origin}/validation.html${process.env.NGNE_BROWSER_INJECT_FAILURE ? "?injectFailure" : ""}`,
-    );
-    await click("document.getElementById('start-validation')?.click()");
-    const validation = await waitForValidation();
-    passed.push(...validation.passed.map((message) => message.replace(/^PASS /, "")));
-    failures.push(...validation.failures);
-    if (validation.status !== "passed") throw new Error(validation.failures.join("; "));
+            await navigate(
+                `${origin}/validation.html${process.env.NGNE_BROWSER_INJECT_FAILURE ? "?injectFailure" : ""}`,
+            );
+            await click("document.getElementById('start-validation')?.click()");
+            const validation = await waitForValidation();
+            passed.push(...validation.passed.map((message) => message.replace(/^PASS /, "")));
+            failures.push(...validation.failures);
+            if (validation.status !== "passed") throw new Error(validation.failures.join("; "));
 
-    environment = await readEnvironment();
-    await recordRenderingDevices("validation");
-    renderer = isSoftware(environment) ? "software" : "hardware";
-    if (renderer === "software")
-        skippedAsUnsupported.push("hardware-backed WebGPU execution evidence");
-    await checkStarfall();
-    await recordRenderingDevices("Starfall");
-    await checkPlatformer();
-    await recordRenderingDevices("platformer");
-    if (process.env.NGNE_CONSUMER_URL && process.env.NGNE_CONSUMER_DIST) {
-        await checkInstalledContent(
-            cdp,
-            process.env.NGNE_CONSUMER_URL,
-            process.env.NGNE_CONSUMER_DIST,
-            passed,
-            () => recordRenderingDevices("installed content controlled recovery"),
-        );
-        await recordRenderingDevices("installed content slice");
-    }
-    if (consoleMessages.some((message) => /^(error|exception):/i.test(message)))
-        throw new Error("Browser console reported an error or uncaught exception");
-
-    writeResult("passed");
-    printSummary();
-} catch (error) {
-    failed = true;
-    failures.push(error instanceof Error ? error.message : String(error));
-    await captureScreenshot();
-    writeResult("failed");
-    printSummary();
-} finally {
-    cdp?.close();
-    await stop(browser);
-    await stop(preview);
-    // Chromium can release profile handles shortly after its process exits on Windows.
-    await rm(profileDirectory, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
-}
-if (failed) process.exitCode = 1;
+            environment = await readEnvironment();
+            await recordRenderingDevices("validation");
+            renderer = isSoftware(environment) ? "software" : "hardware";
+            if (renderer === "software")
+                skippedAsUnsupported.push("hardware-backed WebGPU execution evidence");
+            await checkStarfall();
+            await recordRenderingDevices("Starfall");
+            await checkPlatformer();
+            await recordRenderingDevices("platformer");
+            if (process.env.NGNE_CONSUMER_URL && process.env.NGNE_CONSUMER_DIST) {
+                await checkInstalledContent(
+                    cdp,
+                    process.env.NGNE_CONSUMER_URL,
+                    process.env.NGNE_CONSUMER_DIST,
+                    passed,
+                    () => recordRenderingDevices("installed content controlled recovery"),
+                );
+                await recordRenderingDevices("installed content slice");
+            }
+            if (consoleMessages.some((message) => /^(error|exception):/i.test(message)))
+                throw new Error("Browser console reported an error or uncaught exception");
+        },
+        captureScreenshot,
+        [
+            ["DevTools socket close", () => cdp?.close()],
+            ["browser process tree terminate/verify", () => browserOwner?.stop()],
+            ["preview process tree terminate/verify", () => previewOwner?.stop()],
+            [
+                "temporary profile remove",
+                async () => {
+                    if (!profileDirectory) return { action: "no profile created" };
+                    await rm(profileDirectory, {
+                        recursive: true,
+                        force: true,
+                        maxRetries: 10,
+                        retryDelay: 200,
+                    });
+                    return { path: profileDirectory };
+                },
+            ],
+            [
+                "controlled cleanup failure",
+                () => {
+                    if (process.env.NGNE_BROWSER_INJECT_CLEANUP_FAILURE)
+                        throw new Error("intentional CI cleanup failure after resource release");
+                },
+            ],
+        ],
+        cleanup,
+    )),
+);
+writeResult(failures.length ? "failed" : "passed");
+printSummary();
+if (failures.length) process.exitCode = 1;
 
 function startPreview(): ChildProcess {
     const url = new URL(origin);
@@ -261,100 +287,23 @@ function browserExecutable(): string {
 async function connectToPage(): Promise<Cdp> {
     const deadline = Date.now() + 20_000;
     while (Date.now() < deadline) {
+        browserOwner?.check();
         try {
-            const response = await fetch(`http://127.0.0.1:${debugPort}/json/list`);
+            const response = await fetch(`http://127.0.0.1:${debugPort}/json/list`, {
+                signal: AbortSignal.timeout(1_000),
+            });
             const targets = (await response.json()) as {
                 type: string;
                 webSocketDebuggerUrl: string;
             }[];
             const page = targets.find((target) => target.type === "page");
-            if (page) return connect(page.webSocketDebuggerUrl);
+            if (page) return connectDevTools(page.webSocketDebuggerUrl);
         } catch {
             // Chrome is still starting.
         }
         await sleep(100);
     }
     throw new Error("Chrome DevTools target did not start within 20 seconds");
-}
-
-async function connect(url: string): Promise<Cdp> {
-    const socket = new WebSocket(url);
-    await new Promise<void>((resolve, reject) => {
-        const timer = setTimeout(() => reject(new Error("DevTools WebSocket timed out")), 10_000);
-        socket.addEventListener("open", () => {
-            clearTimeout(timer);
-            resolve();
-        });
-        socket.addEventListener("error", () => reject(new Error("DevTools WebSocket failed")));
-    });
-    let id = 0;
-    const pending = new Map<
-        number,
-        {
-            resolve(value: unknown): void;
-            reject(error: Error): void;
-            timer: ReturnType<typeof setTimeout>;
-        }
-    >();
-    const listeners = new Map<string, Set<(params: unknown) => void>>();
-    socket.addEventListener("message", (event) => {
-        const message = JSON.parse(String(event.data)) as {
-            id?: number;
-            method?: string;
-            params?: unknown;
-            result?: unknown;
-            error?: { message: string };
-        };
-        if (message.id === undefined) {
-            for (const handler of listeners.get(message.method ?? "") ?? [])
-                handler(message.params);
-            return;
-        }
-        const call = pending.get(message.id);
-        if (!call) return;
-        clearTimeout(call.timer);
-        pending.delete(message.id);
-        if (message.error) call.reject(new Error(message.error.message));
-        else call.resolve(message.result);
-    });
-    const client: Cdp = {
-        send(method, params = {}) {
-            return new Promise((resolve, reject) => {
-                const callId = ++id;
-                const timer = setTimeout(() => {
-                    pending.delete(callId);
-                    reject(new Error(`DevTools ${method} timed out`));
-                }, 30_000);
-                pending.set(callId, { resolve, reject, timer });
-                socket.send(JSON.stringify({ id: callId, method, params }));
-            });
-        },
-        async evaluate<T>(expression: string, userGesture = false): Promise<T> {
-            const reply = (await client.send("Runtime.evaluate", {
-                expression,
-                awaitPromise: true,
-                returnByValue: true,
-                userGesture,
-            })) as {
-                result: { value: T };
-                exceptionDetails?: { text: string; exception?: { description?: string } };
-            };
-            if (reply.exceptionDetails)
-                throw new Error(
-                    reply.exceptionDetails.exception?.description ?? reply.exceptionDetails.text,
-                );
-            return reply.result.value;
-        },
-        on(method, handler) {
-            const handlers = listeners.get(method) ?? new Set();
-            handlers.add(handler);
-            listeners.set(method, handlers);
-        },
-        close() {
-            socket.close();
-        },
-    };
-    return client;
 }
 
 function captureBrowserLogs(client: Cdp): void {
@@ -395,7 +344,7 @@ async function waitForValidation(): Promise<ValidationState> {
         );
         if (fixtureNeedsClick)
             await click(
-                "document.querySelector('iframe').contentDocument.getElementById('start').click()",
+                "document.querySelector('iframe')?.contentDocument?.getElementById('start')?.click()",
             );
         const state = await cdp!.evaluate<ValidationState | undefined>("window.__ngneValidation");
         if (state?.status === "passed" || state?.status === "failed") return state;
@@ -515,7 +464,8 @@ async function waitFor(condition: string, limitMs: number, label: string): Promi
     while (Date.now() < deadline) {
         try {
             if (await cdp!.evaluate<boolean>(`!!(${condition})`)) return;
-        } catch {
+        } catch (error) {
+            if (!isNavigationError(error)) throw error;
             // Navigation may replace the execution context while polling.
         }
         await sleep(100);
@@ -527,9 +477,12 @@ async function waitForPreview(limitMs: number): Promise<void> {
     const deadline = Date.now() + limitMs;
     const expected = readFileSync(join(root, "dist-browser/validation.html"), "utf8");
     while (Date.now() < deadline) {
+        previewOwner?.check();
         if (preview?.exitCode !== null) throw new Error(`Preview exited ${preview?.exitCode}`);
         try {
-            const response = await fetch(`${origin}/validation.html`);
+            const response = await fetch(`${origin}/validation.html`, {
+                signal: AbortSignal.timeout(1_000),
+            });
             if (response.ok && (await response.text()) === expected) {
                 await sleep(100);
                 if (preview?.exitCode !== null)
@@ -556,15 +509,16 @@ function isSoftware(value: AdapterEnvironment): boolean {
 
 async function captureScreenshot(): Promise<void> {
     if (!cdp) return;
-    try {
-        const result = (await cdp.send("Page.captureScreenshot", {
+    const result = (await cdp.send(
+        process.env.NGNE_BROWSER_INJECT_SCREENSHOT_FAILURE
+            ? "NGNE.invalidScreenshotCommand"
+            : "Page.captureScreenshot",
+        {
             format: "png",
             captureBeyondViewport: true,
-        })) as { data: string };
-        writeFileSync(join(artifactDirectory, "failure.png"), Buffer.from(result.data, "base64"));
-    } catch (error) {
-        consoleMessages.push(`screenshot: ${String(error)}`);
-    }
+        },
+    )) as { data: string };
+    writeFileSync(join(artifactDirectory, "failure.png"), Buffer.from(result.data, "base64"));
 }
 
 function writeResult(status: BrowserResult["status"]): void {
@@ -580,6 +534,7 @@ function writeResult(status: BrowserResult["status"]): void {
         browserVersion,
         browserFlags,
         renderingDevices,
+        cleanup,
     };
     writeFileSync(join(artifactDirectory, "results.json"), JSON.stringify(result, null, 2));
     writeFileSync(join(artifactDirectory, "browser.log"), consoleMessages.join("\n"));
@@ -621,34 +576,6 @@ function pipeLog(child: ChildProcess, filename: string): void {
     child.on("close", () =>
         writeFileSync(join(artifactDirectory, filename), Buffer.concat(chunks)),
     );
-}
-
-async function stop(child: ChildProcess | undefined): Promise<void> {
-    if (!child?.pid) return;
-    if (process.platform === "win32") {
-        if (child.exitCode === null) {
-            const closed = new Promise<void>((resolve) => child.once("close", () => resolve()));
-            spawnSync("taskkill", ["/PID", String(child.pid), "/T", "/F"], { stdio: "ignore" });
-            await Promise.race([closed, sleep(5_000)]);
-        }
-        return;
-    }
-    try {
-        process.kill(-child.pid, "SIGTERM");
-    } catch {
-        return;
-    }
-    await Promise.race([
-        new Promise<void>((resolve) => child.once("close", () => resolve())),
-        sleep(5_000),
-    ]);
-    if (process.platform !== "win32") {
-        try {
-            process.kill(-child.pid, "SIGKILL");
-        } catch {
-            // The owned process group already exited.
-        }
-    }
 }
 
 function sleep(ms: number): Promise<void> {

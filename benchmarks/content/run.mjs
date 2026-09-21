@@ -1,3 +1,11 @@
+import { rm } from "node:fs/promises";
+import { connectDevTools, isNavigationError } from "../../tests/tooling/devtools.mjs";
+import {
+    cleanupSteps,
+    failureText,
+    ownProcess,
+    closeServer,
+} from "../../tests/tooling/cleanup.mjs";
 import assert from "node:assert/strict";
 import { spawn, execFileSync } from "node:child_process";
 import {
@@ -30,27 +38,9 @@ const save = (name, value) => writeFileSync(join(root, name), JSON.stringify(val
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const revision = (cwd) =>
     execFileSync("git", ["rev-parse", "HEAD"], { cwd, encoding: "utf8" }).trim();
-const manifest = {
-    exploratory,
-    policy,
-    engine: revision(process.cwd()),
-    consumer: revision(consumer),
-    package: hash(readFileSync(join(consumer, "vendor/ngne-0.1.0.tgz"))),
-    installed: identities(join(consumer, "node_modules/ngne")),
-    build: identities(join(consumer, "dist")),
-    source: identities(join(consumer, "src")),
-    harness: identities(resolve("benchmarks/content")),
-    os: { platform: platform(), release: release(), arch: arch() },
-    node: process.version,
-};
-save("manifest.json", manifest);
-save("policy.json", policy);
+let manifest;
 const production = join(root, "production"),
     churn = join(root, "churn");
-cpSync(join(consumer, "dist"), production, { recursive: true });
-cpSync(production, churn, { recursive: true });
-generateChurn(churn, policy.distinctRooms);
-save("fixtures.json", { production: identities(production), churn: identities(churn) });
 let served = production;
 const server = createServer((req, res) => {
     const pathname = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
@@ -77,62 +67,32 @@ const server = createServer((req, res) => {
     });
     res.end(readFileSync(path));
 });
-await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
-const origin = `http://127.0.0.1:${server.address().port}/`;
+let origin;
+const cleanup = [],
+    failures = [];
 const runs = [];
-async function connect(port) {
+async function connect(port, owner) {
     let page;
     for (let attempt = 0; attempt < 100; attempt++) {
+        owner.check();
         try {
-            page = (await (await fetch(`http://127.0.0.1:${port}/json/list`)).json()).find(
-                (p) => p.type === "page",
-            );
+            page = (
+                await (
+                    await fetch(`http://127.0.0.1:${port}/json/list`, {
+                        signal: AbortSignal.timeout(1_000),
+                    })
+                ).json()
+            ).find((p) => p.type === "page");
         } catch {}
         if (page) break;
         await delay(100);
     }
     assert(page, "browser target available");
-    const ws = new WebSocket(page.webSocketDebuggerUrl);
-    await new Promise((resolve, reject) => {
-        ws.addEventListener("open", resolve, { once: true });
-        ws.addEventListener("error", reject, { once: true });
+    return connectDevTools(page.webSocketDebuggerUrl, {
+        userGesture: true,
+        onEvent: (message) =>
+            appendFileSync(join(root, "browser-events.jsonl"), JSON.stringify(message) + "\n"),
     });
-    let id = 0;
-    const pending = new Map();
-    ws.addEventListener("message", (event) => {
-        const msg = JSON.parse(String(event.data));
-        if (!msg.id) {
-            appendFileSync(join(root, "browser-events.jsonl"), JSON.stringify(msg) + "\n");
-            return;
-        }
-        const p = pending.get(msg.id);
-        if (!p) return;
-        clearTimeout(p.timer);
-        pending.delete(msg.id);
-        if (msg.error) p.reject(Error(msg.error.message));
-        else p.resolve(msg.result);
-    });
-    const send = (method, params = {}) =>
-        new Promise((resolve, reject) => {
-            const call = ++id,
-                timer = setTimeout(() => {
-                    pending.delete(call);
-                    reject(Error(method + " timed out"));
-                }, 30000);
-            pending.set(call, { resolve, reject, timer });
-            ws.send(JSON.stringify({ id: call, method, params }));
-        });
-    const evaluate = async (expression) => {
-        const value = await send("Runtime.evaluate", {
-            expression,
-            awaitPromise: true,
-            returnByValue: true,
-            userGesture: true,
-        });
-        if (value.exceptionDetails) throw Error(JSON.stringify(value.exceptionDetails));
-        return value.result.value;
-    };
-    return { send, evaluate, close: () => ws.close() };
 }
 function metrics(samples, checkpoints) {
     const values = samples.map((s) => s.ms).sort((a, b) => a - b);
@@ -155,6 +115,38 @@ function metrics(samples, checkpoints) {
     };
 }
 try {
+    manifest = {
+        exploratory,
+        policy,
+        engine: revision(process.cwd()),
+        consumer: revision(consumer),
+        package: hash(readFileSync(join(consumer, "vendor/ngne-0.1.0.tgz"))),
+        installed: identities(join(consumer, "node_modules/ngne")),
+        build: identities(join(consumer, "dist")),
+        source: identities(join(consumer, "src")),
+        harness: identities(resolve("benchmarks/content")),
+        tooling: identities(resolve("tests/tooling")),
+        os: { platform: platform(), release: release(), arch: arch() },
+        node: process.version,
+    };
+    save("manifest.json", manifest);
+    save("policy.json", policy);
+    cpSync(join(consumer, "dist"), production, { recursive: true });
+    cpSync(production, churn, { recursive: true });
+    generateChurn(churn, policy.distinctRooms);
+    save("fixtures.json", { production: identities(production), churn: identities(churn) });
+    await new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error("HTTP server listen timed out")), 5_000);
+        server.once("error", (error) => {
+            clearTimeout(timer);
+            reject(error);
+        });
+        server.listen(0, "127.0.0.1", () => {
+            clearTimeout(timer);
+            resolve();
+        });
+    });
+    origin = `http://127.0.0.1:${server.address().port}/`;
     for (let repetition = 0; repetition < (exploratory ? 1 : policy.repetitions); repetition++) {
         const port = 9450 + repetition,
             profile = mkdtempSync(join(tmpdir(), "ngne-content-"));
@@ -170,16 +162,20 @@ try {
         const executable =
             process.env.NGNE_BROWSER ??
             "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
-        const child = spawn(executable, flags, { stdio: ["ignore", "pipe", "pipe"] });
-        child.stdout.on("data", (bytes) =>
-            appendFileSync(join(root, `browser-${repetition}.log`), bytes),
-        );
-        child.stderr.on("data", (bytes) =>
-            appendFileSync(join(root, `browser-${repetition}.log`), bytes),
-        );
-        let cdp;
+        let owner, cdp;
         try {
-            cdp = await connect(port);
+            const child = spawn(executable, flags, {
+                detached: process.platform !== "win32",
+                stdio: ["ignore", "pipe", "pipe"],
+            });
+            owner = ownProcess(child, `browser repetition ${repetition}`);
+            child.stdout.on("data", (bytes) =>
+                appendFileSync(join(root, `browser-${repetition}.log`), bytes),
+            );
+            child.stderr.on("data", (bytes) =>
+                appendFileSync(join(root, `browser-${repetition}.log`), bytes),
+            );
+            cdp = await connect(port, owner);
             await cdp.send("Page.enable");
             await cdp.send("Runtime.enable");
             await cdp.send("Emulation.setDeviceMetricsOverride", {
@@ -193,13 +189,21 @@ try {
             });
             const wait = async (expression) => {
                 for (let i = 0; i < 200; i++) {
-                    if (await cdp.evaluate(expression)) return;
+                    try {
+                        if (await cdp.evaluate(expression)) return;
+                    } catch (error) {
+                        if (!isNavigationError(error)) throw error;
+                    }
                     await delay(50);
                 }
-                const state = await cdp.evaluate(
-                    "({body:document.body?.innerText, visibility:document.visibilityState, observation: window.__contentMeasurement?.sample?.()})",
-                );
-                save("timeout-state.json", state);
+                try {
+                    const state = await cdp.evaluate(
+                        "({body:document.body?.innerText, visibility:document.visibilityState, observation: window.__contentMeasurement?.sample?.()})",
+                    );
+                    save("timeout-state.json", state);
+                } catch (error) {
+                    failures.push(`diagnostic timeout state: ${failureText(error)}`);
+                }
                 throw Error("Timeout: " + expression);
             };
             for (const workload of ["roundTrips", "churn"]) {
@@ -360,28 +364,51 @@ try {
                 save("runs.json", runs);
                 console.log(JSON.stringify({ repetition, workload, ...run.metrics }));
             }
+        } catch (error) {
+            failures.push(failureText(error));
         } finally {
-            if (cdp) {
-                try {
-                    await cdp.send("Browser.close");
-                } catch {}
-                cdp.close();
-            }
-            child.kill();
+            await cleanupSteps(
+                [
+                    [`DevTools repetition ${repetition} close`, () => cdp?.close()],
+                    [`browser repetition ${repetition} terminate/verify`, () => owner?.stop()],
+                    [
+                        `temporary profile remove ${profile}`,
+                        () =>
+                            rm(profile, {
+                                recursive: true,
+                                force: true,
+                                maxRetries: 10,
+                                retryDelay: 200,
+                            }),
+                    ],
+                ],
+                cleanup,
+            );
         }
+        if (failures.length || cleanup.some((step) => step.status === "failed")) break;
     }
+} catch (error) {
+    failures.push(failureText(error));
+} finally {
+    await cleanupSteps([["HTTP server close", () => closeServer(server)]], cleanup);
+    failures.push(
+        ...cleanup
+            .filter((step) => step.status === "failed")
+            .map((step) => `${step.resource}: ${step.error}`),
+    );
+    save("cleanup.json", cleanup);
+    save("runs.json", runs);
     save("result.json", {
-        status: exploratory ? "exploratory" : "passed",
+        status: failures.length ? "failed" : exploratory ? "exploratory" : "passed",
+        cleanupPassed: cleanup.every((step) => step.status === "passed"),
+        failures,
         root,
         runs: runs.length,
     });
-} catch (error) {
-    save("failure.json", { message: error.message, stack: error.stack });
-    save("runs.json", runs);
-    save("result.json", { status: "failed", root });
-    console.error(error);
-    process.exitCode = 1;
-} finally {
-    server.close();
+    if (failures.length) {
+        save("failure.json", { failures });
+        console.error(failures.join("\n"));
+        process.exitCode = 1;
+    }
     console.log(root);
 }
