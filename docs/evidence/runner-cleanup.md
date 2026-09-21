@@ -20,7 +20,7 @@ SHA-256. This is historical execution evidence, not a runtime contract.
 | Content startup failure                             | Exit 1; missing executable identified; profile/server cleanup passed                             |
 | Exploratory content workloads                       | 20 transitions per workload, six cancellation trials, two terminal disposals; all cleanup passed |
 | Comparison guards                                   | Changed tooling and cleanup-failed fixtures rejected; real exploratory run rejected with exit 2  |
-| Hosted Linux browser workflow                       | Pending execution                                                                                |
+| Hosted Linux browser workflow                       | Passed: Ubuntu 24.04.5; 189 browser assertions, 231 installed assertions at each base            |
 
 The process fixture verified parent and child exit while an unrelated process
 remained alive. Real browser and preview shutdown exercised Windows taskkill
@@ -43,5 +43,22 @@ were denied; the required checks passed with host access.
 
 The exploratory benchmark is functional evidence only. No new performance
 acceptance, other GPU/browser support, manual audible-output approval, spontaneous
-driver-loss proof or Linux result is inferred from these Windows runs. Engine APIs,
+driver-loss proof is inferred from these runs. Engine APIs,
 contracts, package exports and historical content-performance evidence are unchanged.
+
+## Hosted Linux evidence
+
+[Workflow run 35657573022](https://github.com/that-webdev-dude/ngne/actions/runs/35657573022)
+passed on code revision `fbc24ce7eeadba16444feb6d7a9ed7fce677c8f8`.
+Formatting, 185 tests, typecheck, both builds, clean installed-consumer preparation,
+all controlled failures and normal browser/installed checks passed. Deployment
+was skipped. This section adds evidence only; the validated tooling hashes above
+remain unchanged.
+
+The downloaded `browser-integration` archive has SHA-256
+`58cad7d4fce332a8303fa10d5389872185cffb4dd1b0e20b1742ff36d8654bfb`.
+Its six result files verify socket closure, empty owned process groups and removed
+profiles. The injected cleanup case retained 189 passing assertions but failed
+acceptance; the combined assertion/screenshot case retained both errors. Each
+successful software run records one unsupported hardware-evidence skip. These
+SwiftShader results do not extend physical-GPU support claims.

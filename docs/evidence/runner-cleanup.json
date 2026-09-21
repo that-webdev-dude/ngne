@@ -798,6 +798,377 @@
         "survivors": []
     },
     "hostedLinux": {
-        "status": "pending"
+        "status": "passed",
+        "os": "Ubuntu 24.04.5",
+        "revision": "fbc24ce7eeadba16444feb6d7a9ed7fce677c8f8",
+        "workflowRun": 35657573022,
+        "url": "https://github.com/that-webdev-dude/ngne/actions/runs/35657573022",
+        "artifactId": 10665907281,
+        "artifactSHA256": "58cad7d4fce332a8303fa10d5389872185cffb4dd1b0e20b1742ff36d8654bfb",
+        "deployment": "skipped",
+        "browser": [
+            {
+                "artifactPath": "browser/results.json",
+                "status": "passed",
+                "passed": 189,
+                "skipped": ["hardware-backed WebGPU execution evidence"],
+                "failures": [],
+                "browserVersion": {
+                    "protocolVersion": "1.3",
+                    "product": "Chrome/152.0.7977.82",
+                    "revision": "@d04cdb24d67b081f6cf80200ffc5233f44b61109",
+                    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+                    "jsVersion": "15.2.124.21"
+                },
+                "environment": {
+                    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+                    "secureContext": true,
+                    "dpr": 1,
+                    "format": "rgba8unorm",
+                    "adapter": {
+                        "vendor": "google",
+                        "architecture": "swiftshader",
+                        "device": "",
+                        "description": "",
+                        "isFallbackAdapter": true
+                    },
+                    "maxBufferSize": 268435456,
+                    "maxTextureDimension2D": 8192
+                },
+                "cleanup": [
+                    {
+                        "resource": "DevTools socket close",
+                        "status": "passed"
+                    },
+                    {
+                        "resource": "browser process tree terminate/verify",
+                        "status": "passed",
+                        "detail": {
+                            "resource": "browser PID 4458",
+                            "attempts": ["terminate"],
+                            "survivors": []
+                        }
+                    },
+                    {
+                        "resource": "preview process tree terminate/verify",
+                        "status": "passed",
+                        "detail": {
+                            "resource": "preview PID 4435",
+                            "attempts": ["terminate"],
+                            "survivors": []
+                        }
+                    },
+                    {
+                        "resource": "temporary profile remove",
+                        "status": "passed",
+                        "detail": {
+                            "path": "/tmp/ngne-browser-ci-JuF1OL"
+                        }
+                    },
+                    {
+                        "resource": "controlled cleanup failure",
+                        "status": "passed"
+                    }
+                ]
+            },
+            {
+                "artifactPath": "browser-cleanup-failure/results.json",
+                "status": "failed",
+                "passed": 189,
+                "skipped": ["hardware-backed WebGPU execution evidence"],
+                "failures": [
+                    "controlled cleanup failure: intentional CI cleanup failure after resource release"
+                ],
+                "browserVersion": {
+                    "protocolVersion": "1.3",
+                    "product": "Chrome/152.0.7977.82",
+                    "revision": "@d04cdb24d67b081f6cf80200ffc5233f44b61109",
+                    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+                    "jsVersion": "15.2.124.21"
+                },
+                "environment": {
+                    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+                    "secureContext": true,
+                    "dpr": 1,
+                    "format": "rgba8unorm",
+                    "adapter": {
+                        "vendor": "google",
+                        "architecture": "swiftshader",
+                        "device": "",
+                        "description": "",
+                        "isFallbackAdapter": true
+                    },
+                    "maxBufferSize": 268435456,
+                    "maxTextureDimension2D": 8192
+                },
+                "cleanup": [
+                    {
+                        "resource": "DevTools socket close",
+                        "status": "passed"
+                    },
+                    {
+                        "resource": "browser process tree terminate/verify",
+                        "status": "passed",
+                        "detail": {
+                            "resource": "browser PID 4171",
+                            "attempts": ["terminate"],
+                            "survivors": []
+                        }
+                    },
+                    {
+                        "resource": "preview process tree terminate/verify",
+                        "status": "passed",
+                        "detail": {
+                            "resource": "preview PID 4148",
+                            "attempts": ["terminate"],
+                            "survivors": []
+                        }
+                    },
+                    {
+                        "resource": "temporary profile remove",
+                        "status": "passed",
+                        "detail": {
+                            "path": "/tmp/ngne-browser-ci-tgxeZX"
+                        }
+                    },
+                    {
+                        "resource": "controlled cleanup failure",
+                        "status": "failed",
+                        "error": "intentional CI cleanup failure after resource release"
+                    }
+                ]
+            },
+            {
+                "artifactPath": "browser-diagnostic-failure/results.json",
+                "status": "failed",
+                "passed": 0,
+                "skipped": [],
+                "failures": [
+                    "intentional CI assertion failure",
+                    "diagnostics: NGNE.invalidScreenshotCommand: 'NGNE.invalidScreenshotCommand' wasn't found"
+                ],
+                "browserVersion": {
+                    "protocolVersion": "1.3",
+                    "product": "Chrome/152.0.7977.82",
+                    "revision": "@d04cdb24d67b081f6cf80200ffc5233f44b61109",
+                    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+                    "jsVersion": "15.2.124.21"
+                },
+                "environment": null,
+                "cleanup": [
+                    {
+                        "resource": "DevTools socket close",
+                        "status": "passed"
+                    },
+                    {
+                        "resource": "browser process tree terminate/verify",
+                        "status": "passed",
+                        "detail": {
+                            "resource": "browser PID 3941",
+                            "attempts": ["terminate"],
+                            "survivors": []
+                        }
+                    },
+                    {
+                        "resource": "preview process tree terminate/verify",
+                        "status": "passed",
+                        "detail": {
+                            "resource": "preview PID 3918",
+                            "attempts": ["terminate"],
+                            "survivors": []
+                        }
+                    },
+                    {
+                        "resource": "temporary profile remove",
+                        "status": "passed",
+                        "detail": {
+                            "path": "/tmp/ngne-browser-ci-o2Xrjs"
+                        }
+                    },
+                    {
+                        "resource": "controlled cleanup failure",
+                        "status": "passed"
+                    }
+                ]
+            },
+            {
+                "artifactPath": "browser-intentional-failure/results.json",
+                "status": "failed",
+                "passed": 0,
+                "skipped": [],
+                "failures": ["intentional CI assertion failure"],
+                "browserVersion": {
+                    "protocolVersion": "1.3",
+                    "product": "Chrome/152.0.7977.82",
+                    "revision": "@d04cdb24d67b081f6cf80200ffc5233f44b61109",
+                    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+                    "jsVersion": "15.2.124.21"
+                },
+                "environment": null,
+                "cleanup": [
+                    {
+                        "resource": "DevTools socket close",
+                        "status": "passed"
+                    },
+                    {
+                        "resource": "browser process tree terminate/verify",
+                        "status": "passed",
+                        "detail": {
+                            "resource": "browser PID 3700",
+                            "attempts": ["terminate"],
+                            "survivors": []
+                        }
+                    },
+                    {
+                        "resource": "preview process tree terminate/verify",
+                        "status": "passed",
+                        "detail": {
+                            "resource": "preview PID 3681",
+                            "attempts": ["terminate"],
+                            "survivors": []
+                        }
+                    },
+                    {
+                        "resource": "temporary profile remove",
+                        "status": "passed",
+                        "detail": {
+                            "path": "/tmp/ngne-browser-ci-DmX5EG"
+                        }
+                    },
+                    {
+                        "resource": "controlled cleanup failure",
+                        "status": "passed"
+                    }
+                ]
+            },
+            {
+                "artifactPath": "installed-content/software-nested/results.json",
+                "status": "passed",
+                "passed": 231,
+                "skipped": ["hardware-backed WebGPU execution evidence"],
+                "failures": [],
+                "browserVersion": {
+                    "protocolVersion": "1.3",
+                    "product": "Chrome/152.0.7977.82",
+                    "revision": "@d04cdb24d67b081f6cf80200ffc5233f44b61109",
+                    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+                    "jsVersion": "15.2.124.21"
+                },
+                "environment": {
+                    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+                    "secureContext": true,
+                    "dpr": 1,
+                    "format": "rgba8unorm",
+                    "adapter": {
+                        "vendor": "google",
+                        "architecture": "swiftshader",
+                        "device": "",
+                        "description": "",
+                        "isFallbackAdapter": true
+                    },
+                    "maxBufferSize": 268435456,
+                    "maxTextureDimension2D": 8192
+                },
+                "cleanup": [
+                    {
+                        "resource": "DevTools socket close",
+                        "status": "passed"
+                    },
+                    {
+                        "resource": "browser process tree terminate/verify",
+                        "status": "passed",
+                        "detail": {
+                            "resource": "browser PID 5161",
+                            "attempts": ["terminate"],
+                            "survivors": []
+                        }
+                    },
+                    {
+                        "resource": "preview process tree terminate/verify",
+                        "status": "passed",
+                        "detail": {
+                            "resource": "preview PID 5138",
+                            "attempts": ["terminate"],
+                            "survivors": []
+                        }
+                    },
+                    {
+                        "resource": "temporary profile remove",
+                        "status": "passed",
+                        "detail": {
+                            "path": "/tmp/ngne-browser-ci-yYxxH6"
+                        }
+                    },
+                    {
+                        "resource": "controlled cleanup failure",
+                        "status": "passed"
+                    }
+                ]
+            },
+            {
+                "artifactPath": "installed-content/software-root/results.json",
+                "status": "passed",
+                "passed": 231,
+                "skipped": ["hardware-backed WebGPU execution evidence"],
+                "failures": [],
+                "browserVersion": {
+                    "protocolVersion": "1.3",
+                    "product": "Chrome/152.0.7977.82",
+                    "revision": "@d04cdb24d67b081f6cf80200ffc5233f44b61109",
+                    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+                    "jsVersion": "15.2.124.21"
+                },
+                "environment": {
+                    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+                    "secureContext": true,
+                    "dpr": 1,
+                    "format": "rgba8unorm",
+                    "adapter": {
+                        "vendor": "google",
+                        "architecture": "swiftshader",
+                        "device": "",
+                        "description": "",
+                        "isFallbackAdapter": true
+                    },
+                    "maxBufferSize": 268435456,
+                    "maxTextureDimension2D": 8192
+                },
+                "cleanup": [
+                    {
+                        "resource": "DevTools socket close",
+                        "status": "passed"
+                    },
+                    {
+                        "resource": "browser process tree terminate/verify",
+                        "status": "passed",
+                        "detail": {
+                            "resource": "browser PID 4805",
+                            "attempts": ["terminate"],
+                            "survivors": []
+                        }
+                    },
+                    {
+                        "resource": "preview process tree terminate/verify",
+                        "status": "passed",
+                        "detail": {
+                            "resource": "preview PID 4782",
+                            "attempts": ["terminate"],
+                            "survivors": []
+                        }
+                    },
+                    {
+                        "resource": "temporary profile remove",
+                        "status": "passed",
+                        "detail": {
+                            "path": "/tmp/ngne-browser-ci-EQph6f"
+                        }
+                    },
+                    {
+                        "resource": "controlled cleanup failure",
+                        "status": "passed"
+                    }
+                ]
+            }
+        ]
     }
 }
