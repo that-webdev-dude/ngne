@@ -12,6 +12,39 @@ requests no optional GPU features or raised device limits. The README owns the
 current support envelope; other browsers, GPUs and physical input modes require
 separate validation.
 
+### First start
+
+The first `start()` publishes ready platform services and mounts the prepared initial
+scene, then starts the loop last. WebGPU image preparation can initialize presentation
+before start; it never activates scenes or starts input/audio/ticks. Complete rollback
+returns to `Stopped`; incomplete rollback enters `Failed`. Successfully initialized
+WebGPU presentation remains owned across complete cold-start rollback, as specified
+by the [renderer contract](#renderer).
+
+### Stop and resume
+
+`stop()` is a suspension, not teardown:
+
+1. Disable future tick and render work immediately, so a late callback is harmless.
+2. Stop the loop.
+3. Cancel pending preparation and scene transitions.
+4. Preserve initialized services, committed game state, mounted scenes, resources, RNG, freeze, cameras, and leases.
+
+Both stop actions are attempted. If either fails, the game reports all failures and enters `Failed`; only `dispose()` is then allowed. If both succeed, it enters `Stopped`.
+
+A later `start()` from this stopped state is a resume. It starts the loop while tick and render work remain disabled, then enables work only after loop startup succeeds. It does not initialize services or recreate the initial scene. A `Game` records whether first start has completed, so cold start and resume cannot take the same path accidentally.
+
+If loop startup fails during resume, work stays disabled, the engine makes a best-effort attempt to stop any partially started loop, preserves the mounted scenes and initialized services for disposal, reports all failures, and enters `Failed`. Only `dispose()` is then allowed.
+
+### Dispose
+
+`dispose()` is terminal. It disables work, stops the loop, invalidates renderer work
+before decoded sources close, cancels loading, unmounts scenes and releases all owned
+services. Every cleanup is attempted. Independent cleanup does not wait for audio close.
+Failures are reported together and the final state is always `Disposed`.
+
+### Concurrent browser operations
+
 Browser lifecycle overlaps:
 
 | Call while another operation is pending           | Result                                                                                                                                                                       |
@@ -34,13 +67,7 @@ all original failures. A superseded start/stop reports its own outcome through i
 own promise; callers must handle both promises. Disposal does not wait for an
 unsettled resume/suspend promise.
 
-Headless `Game.start()` performs mounting and loop startup synchronously, although
-its result is a promise. Invalid lifecycle calls reject. `Game.stop()` also cancels
-preparations and unused candidates when already stopped, including before first
-start. Cancellation cannot publish a late candidate; a shared asset load stays alive
-while another consumer needs it. Cancelled loaders that eventually return data
-dispose that data. An external loader that ignores abort may remain pending until
-it settles, without retaining permission to activate a scene.
+Headless lifecycle and preparation cancellation follow the [simulation contract](simulation.md#headless-lifecycle).
 
 `Game` is headless. `BrowserGame` owns its input, renderer, audio and host frame scheduler. The injected scheduler must follow requestAnimationFrame semantics: asynchronous callbacks, cancellable IDs and monotonic millisecond timestamps. Late callbacks do no work after disabling. Cold loop failure rolls back the initial mounted world. Resume loop failure preserves it for terminal disposal. All independent teardown actions are attempted.
 
@@ -235,6 +262,20 @@ before snapshotting; the renderer cannot reconstruct those original bytes.
 
 Asset identity must map to one definition object per service. Leases release once; loaded entries follow the retention policy. Cancelling one consumer does not abort a load still needed by another. The last cancelled pending consumer aborts the loader. Late completion after cancellation disposes its returned value and cannot activate a scene.
 
-The playback device is optional until unlocked by a user gesture. Named scopes are internally instance-isolated, even with the same authored name. Effects use oscillator envelopes; clips use decoded AudioBuffers, optionally looping. Scope buses support independent gain; the master supports mute and ducking. Requests flush after simulation commit, and unmount removes queued/active scope voices before releasing scene asset leases. Scope and terminal disposal become final before cleanup, attempt every owned voice, gain and bus action, and aggregate failures; a failed cleanup cannot make that scope usable again. Unlock, resume and suspension failures propagate. Suspension clears queued requests before awaiting the device. Limits: 128 pending requests and 32 active voices; excess is dropped. Audio presentation state is outside simulation enumeration.
+### Audio scopes and playback
+
+- The playback device is optional until unlocked by a user gesture. Unlock,
+  resume and suspension failures propagate.
+- Named scopes are internally instance-isolated, even with the same authored name.
+  Effects use oscillator envelopes; clips use decoded AudioBuffers, optionally looping.
+- Scope buses support independent gain; the master supports mute and ducking.
+- Requests flush after simulation commit. Unmount removes queued/active scope
+  voices before releasing scene asset leases.
+- Scope and terminal disposal become final before cleanup, attempt every owned
+  voice, gain and bus action, and aggregate failures. A failed cleanup cannot make
+  that scope usable again.
+- Suspension clears queued requests before awaiting the device.
+- Limits: 128 pending requests and 32 active voices; excess is dropped.
+- Audio presentation state is outside simulation enumeration.
 
 The engine provides no entity collision schema. Starfall owns a spatial grid resource and collision rules. The engine does not provide snapshot capture, restore, replay or editors.

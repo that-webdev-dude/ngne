@@ -2,26 +2,6 @@
 
 Examples assume a TypeScript browser app with a canvas. Use the runnable [first scene](../examples/hello/index.html) in this checkout, or adapt the imports to your project. NGNE is not published to npm.
 
-## Bounded decoded retention
-
-For long-lived content consumers, opt in to decoded-cache limits through
-`new BrowserGame({ ...options, assetRetention: { maxEntries: 32, maxBytes: 64 * 1024 * 1024 } })`.
-Headless `Game` accepts the same option; direct services use
-`new Assets({ retention: { maxEntries: 32, maxBytes: 64 * 1024 * 1024 } })`.
-Omitting the policy preserves retention until disposal. Values still in use may
-exceed these limits. Release every acquired lease, including dependency claims;
-do not close a borrowed bitmap yourself. An evicted asset reloads on reacquisition.
-
-Sample `app.game.assets.inspect(20)` and `app.renderer?.inspect(20)` on demand.
-Use `protectedOverBudget` to distinguish a live working set from unused retention,
-and `unknownSizes` to identify payloads excluded from byte estimates. Entry limits
-also bound unknown-size entries. `trim()` applies configured limits;
-`evict(id)` returns false for absent, loading or leased entries. Custom assets can
-provide `estimateBytes(value)` and acquisitions may label a third argument
-`"dependency"`; neither option creates a dependency registry. See the
-[resource observation limits](contracts/ownership-and-inspection.md#resource-diagnostics)
-before combining CPU and renderer totals.
-
 ## Install a local package
 
 Use Node 24 or newer. From the engine checkout, build before packing:
@@ -39,14 +19,13 @@ consumer lockfile together; subsequent clean installs use `npm ci`.
 Record `git rev-parse HEAD`, any engine changes, and `Get-FileHash` of the tarball.
 Do not use a workspace link, source alias, or imports from engine `src`.
 
-The reusable Town/Dungeon consumer lives in the sibling `../ngne-town-dungeon`
-project. Its README owns consumer commands and fixtures. It uses TypeScript
-with `moduleResolution: "Bundler"`, DOM libraries, `types: []` and
-`skipLibCheck: false`; no `@webgpu/types` dependency is required by consumers.
-Vite uses `build.target: "es2022"` for top-level await and
-`build.assetsInlineLimit: 0` to keep its PNG/WAV fixtures external.
-Use `new URL("../assets/file.png", import.meta.url)` so Vite rewrites asset URLs
-for either `/` or a configured base such as `/town-dungeon/`.
+The sibling [Town/Dungeon consumer](../../ngne-town-dungeon/README.md) demonstrates
+a separately installed package; its README owns consumer commands and fixtures.
+For a Vite application, use TypeScript with `moduleResolution: "Bundler"`, DOM
+libraries, `types: []` and `skipLibCheck: false`; consumer declarations need no
+`@webgpu/types`. Set `build.target: "es2022"` for top-level await. Use
+`new URL("../assets/file.png", import.meta.url)` so Vite rewrites asset URLs for
+root or nested deployment bases.
 
 The package includes `dist/engine` JavaScript and declarations. WGSL source is
 embedded in `quad-shader.js`; no shader loader or extra shader-file copy is needed.
@@ -212,7 +191,22 @@ const arena: SceneDefinition<Progress, ProgressCommand> = {
 
 Use the same state/command types on `SceneDefinition<S,C>` and `Game<S,C>`; `prepare()` checks compatibility and `scene.state()` infers access. Unparameterized definitions remain portable but cannot dispatch. Treat state reads and transition inputs as read-only, keep transitions synchronous, and dispatch only from the owning scene's system update; the [data contract](contracts/simulation.md#committed-state-typing-and-ownership) defines which values are accepted and how they are copied. Resources and RNG streams bind once during setup. Register cleanup immediately with `scene.defer()` or a resource cleanup argument.
 
-Prepare initial and one-off scene candidates asynchronously using `game.prepare(definition, { key, signal })`. For a repeated transition, let the host call `game.candidates.ensure(owner.id, "pause", pauseDefinition, { key: "pause", retries: 1 })`, where `owner` is the mounted scene summary from `game.scenes`. A scene callback takes the ready handle with `game.candidates.take(owner.id, "pause")` and explicitly passes it to `ctx.scenes.push()` or `.set()`. The slot refills after take and automatically releases on owner removal, stop or disposal. Preparation acquires assets but does not create or activate a world. Raw candidates remain single-use and can be abandoned with `.release()`. `blocksUpdateBelow: true` makes a pause/menu scene suspend lower simulation while preserving its rendered world.
+For scene transitions:
+
+1. Prepare initial and one-off candidates with `game.prepare(definition, { key, signal })`.
+   Preparation acquires assets without creating or activating a world.
+2. For repeated transitions, let the host call
+   `game.candidates.ensure(owner.id, "pause", pauseDefinition, { key: "pause", retries: 1 })`.
+   Obtain `owner` from `game.scenes`.
+3. In a scene callback, take the ready handle with
+   `game.candidates.take(owner.id, "pause")` and pass it explicitly to
+   `ctx.scenes.push()` or `.set()`.
+4. Abandon an unused raw candidate with `.release()`; it is single-use.
+
+The slot refills after take and releases on owner removal, stop or disposal; see
+the [candidate contract](contracts/simulation.md#candidate-slots).
+Use `blocksUpdateBelow: true` for pause/menu scenes that suspend lower simulation
+while preserving its rendered world.
 
 ## Assets, sprites and audio
 
@@ -226,26 +220,10 @@ resolution and preparation, and release a completed candidate if that owner has
 departed. Format, URL and graph policies remain consumer-owned; see the
 [referenced-content contract](contracts/browser-and-presentation.md#referenced-consumer-content).
 
-The installed Town/Dungeon consumer expands each validated room into four explicit
-assets: an immutable room snapshot, the shared player image, a distinct environment
-image and distinct music. Its scene definition uses
-`assets: [content.definition, content.image, content.environmentImage, content.audio]`.
-Atlas rectangles and animation timing stay in external JSON; each actor owns its
-position and playback state. Setup creates a scene audio scope and defers its disposal,
-so committing the destination stops the old track and retains shared image ownership.
-
-With `assetRetention: { maxEntries: 3, maxBytes: 1048576 }`, one mounted room has
-four scene claims and two image consumers; overlapping a ready destination has
-eight scene claims, four image consumers and three unique renderer sources. Live
-claims remain protected above the budget. Cancel or commit returns to one room's
-claims. Inspect on demand with `game.assets.inspect(20)` and `renderer.inspect(20)`;
-these aggregates are not attribution to particular scene instances or exact driver
-memory. The consumer does not enable speculative candidate refill.
-
-For explicit pause, cancel the consumer's loading mailbox before `app.stop()`:
-stop releases unconsumed candidates. Resume with `app.start()` and deliberately
-prepare again when needed. Mounted actors retain their state and audio suspends/
-resumes. Focus and visibility input cancellation alone do not pause the game.
+The [Town/Dungeon consumer](../../ngne-town-dungeon/README.md#content-ownership-and-retention)
+demonstrates validated external rooms, shared images, independent actor playback
+and scene-owned music. Its README owns the asset list, retention configuration,
+resource-count table and pause/retry workflow.
 
 `imageAsset(id, url)` and `audioAsset(id, url)` return definitions for shared decoded data. List definitions in a scene's `assets`; setup receives a map of leased values keyed by stable IDs. `game.assets.acquire(definition)` gives a manually managed lease for platform setup. Release it when finished. The browser host uploads every listed image asset during preparation, and sprites refer to it by the same stable authored ID. Generated images use a custom `ImageAsset` loader:
 
@@ -274,7 +252,40 @@ frame.sprite({
 });
 ```
 
-Call `await app.audio.unlock()` from a user gesture. Create an audio scope during scene setup with `app.audio.scene('room')`, immediately register its `.dispose`, and enqueue `scope.play({ frequency: 440, duration: .15 })` or `scope.play({ buffer, loop: true, volume: .2 })` from systems. Requests flush after commit, never from render callbacks. Scopes have independent volume controls; `audio.duck(.25)` lowers the overall mix and `audio.duck(1)` restores it. Voice count and pending requests are bounded. Starfall and the platformer lease decoded looping music per gameplay scene alongside synthesized cues.
+For audio:
+
+- Call `await app.audio.unlock()` from a user gesture.
+- During setup, create `app.audio.scene('room')` and immediately register its
+  `.dispose` with scene cleanup.
+- From systems, enqueue `scope.play({ frequency: 440, duration: .15 })` or
+  `scope.play({ buffer, loop: true, volume: .2 })`. Requests flush after commit;
+  never enqueue from render callbacks.
+- Adjust independent scope volume, or use `audio.duck(.25)` for the overall mix
+  and `audio.duck(1)` to restore it.
+
+The [audio contract](contracts/browser-and-presentation.md#audio-scopes-and-playback)
+owns voice/request limits and cleanup failures. Starfall and the platformer lease
+decoded looping music per gameplay scene alongside synthesized cues.
+
+## Bounded decoded retention
+
+For long-lived content consumers, opt in to decoded-cache limits through
+`new BrowserGame({ ...options, assetRetention: { maxEntries: 32, maxBytes: 64 * 1024 * 1024 } })`.
+Headless `Game` accepts the same option; direct services use
+`new Assets({ retention: { maxEntries: 32, maxBytes: 64 * 1024 * 1024 } })`.
+Omitting the policy preserves retention until disposal. Values still in use may
+exceed these limits. Release every acquired lease, including dependency claims;
+do not close a borrowed bitmap yourself. An evicted asset reloads on reacquisition.
+
+Sample `app.game.assets.inspect(20)` and `app.renderer?.inspect(20)` on demand.
+Use `protectedOverBudget` to distinguish a live working set from unused retention,
+and `unknownSizes` to identify payloads excluded from byte estimates. Entry limits
+also bound unknown-size entries. `trim()` applies configured limits;
+`evict(id)` returns false for absent, loading or leased entries. Custom assets can
+provide `estimateBytes(value)` and acquisitions may label a third argument
+`"dependency"`; neither option creates a dependency registry. See the
+[resource observation limits](contracts/ownership-and-inspection.md#resource-diagnostics)
+before combining CPU and renderer totals.
 
 ## Entity lifetime and update order
 
@@ -291,10 +302,10 @@ commits. Direct `World` construction is internal. Component queries expose `size
 For diagnostics, read `game.scenes` and `game.enumerate()` after `game.tick()` returns;
 both return detached read-only data, never live worlds or resources. Use explicitly
 injected capabilities for gameplay writes. The
-[inspection contract](contracts/NGNE.md#public-api-and-inspection) defines what each
+[inspection contract](contracts/ownership-and-inspection.md#public-inspection) defines what each
 result contains and its limits.
 
-Commit order is fixed by the [architecture](architecture.md#platform-frame-and-tick-commit). In practice: events emitted now become visible on the next ordinary update, frozen ordinary simulation retains events, and systems marked `runsDuringFreeze` can continue presentation effects.
+Commit order is fixed by the [simulation contract](contracts/simulation.md#tick-commit-and-scene-command-failures). In practice: events emitted now become visible on the next ordinary update, frozen ordinary simulation retains events, and systems marked `runsDuringFreeze` can continue presentation effects.
 
 ## Lifecycle and ownership
 
@@ -315,7 +326,7 @@ Bind resources, RNG streams and systems synchronously during setup. Register cle
 
 A `blocksUpdateBelow` scene suspends lower updates while retaining their rendering. Hitstop freezes ordinary systems for whole ticks. Render callbacks prepare presentation from committed state and must not drive gameplay, consume simulation RNG or enqueue sound.
 
-`Game` supports headless simulation; `BrowserGame` adds input, rendering, audio and frame scheduling. A failed simulation enters `Failed`, where only disposal is supported. See the [contract](contracts/NGNE.md) for the distinct rollback behavior of scene-command and startup failures.
+`Game` supports headless simulation; `BrowserGame` adds input, rendering, audio and frame scheduling. A failed simulation enters `Failed`, where only disposal is supported. See [scene-command failures](contracts/simulation.md#tick-commit-and-scene-command-failures) and [startup rollback](contracts/browser-and-presentation.md#first-start) for their distinct behavior.
 
 Await `app.start()` and `app.stop()` before issuing another start/stop call; overlaps reject. `app.dispose()` is terminal and may interrupt either operation. Use the browser host's lifecycle methods when it owns the Game. The [lifecycle contract](contracts/browser-and-presentation.md#platform-and-lifecycle) tabulates every overlap and cancellation case.
 

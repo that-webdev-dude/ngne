@@ -86,33 +86,15 @@ mount.
 
 ### ECS values and identity
 
-World owns component columns and immutable index/generation/world handles. Component
-names identify composition; conflicting definition objects with the same name are
-rejected on spawn. Names are world-local, not a global schema registry.
+The world owns component columns, entity identity and allocator/iteration history.
+Schema definitions are immutable authoring; query views and row caches are derived
+borrows, never authoritative state.
 
-Schema definitions are frozen at creation and hold cloned, frozen field descriptors
-(`kind`, `default`), so they are immutable authoring rather than state. Schema values
-live in per-chunk typed columns; entity references are encoded index/generation pairs.
-Query chunk descriptors, `views` and `entityAt()` row meanings are borrowed for the
-current commit epoch and rebuilt on the first traversal after each commit: derived,
-never authority.
-
-### Allocator and iteration history
-
-World owns slot generations, row positions, pending flags, free-stack order,
-archetype creation order and dense row order. Schema archetypes also own chunk
-creation order and fill: allocation reuses the lowest-created chunk with capacity,
-and empty chunks are retained, so chunk order and counts are history.
-
-A live slot's location is its `chunk` index plus chunk-relative `row`; entities
-spawned without components live in an empty-component archetype with the same chunk
-layout. Inspection includes `archetypes` with ordered component names and entity
-indices, **including empty archetypes**, plus `fields` (per component, field
-`name`/`kind`/`default`) and `chunks` (`capacity`, `count`, ordered entity indices).
-`entities` retains values in archetype/chunk/row order as field records
-`fields: [{ name, kind, value }]`, with entity references as `null` or
-`{ index, generation }`. Empty archetypes and empty chunks cannot be reconstructed
-from live entities alone.
+The simulation contract owns [schemas](simulation.md#schema-definitions-and-fields),
+[storage and order](simulation.md#storage-lifetime-and-order),
+[borrowing](simulation.md#chunk-traversal-and-borrowing) and
+[ECS inspection](simulation.md#inspection-and-empty-entities). Empty archetypes and
+chunks carry history that cannot be reconstructed from live entities alone.
 
 ### Scene simulation state
 
@@ -205,6 +187,28 @@ DOM `view`/`presentation`, prior phase, metrics/times and UI readiness are
 host/presentation state. View copies do not grant gameplay mutation. Hello's
 moving/previous X values are components; its query/callbacks contain no mutable
 gameplay counters. Art generation has only call-local drawing work.
+
+## Public inspection
+
+Constructors operate on caller-owned values; inspection never returns a live camera
+or RNG.
+
+- `Game.lifecycle` and `simulationTick` are getter-only values backed by private
+  fields. Browser faults use an internal capability, not a writable public field.
+- `Game.scenes` returns a fresh frozen array of frozen summaries in stack order:
+  instance `id`, definition ID string, authored `key`, seed, blocking policy,
+  entity count/capacity and remaining freeze ticks. Compare `id`, not object identity,
+  across reads. Old summaries remain unchanged after updates or unmount.
+- `Game.enumerate()` returns detached, recursively frozen diagnostic data. Resource
+  bindings, component values, camera, RNG, event data and game state cannot be
+  mutated through this result. Dynamic values use `InspectionValue` and require
+  narrowing. Enumeration copies on demand and is unsuitable for per-frame telemetry.
+- Enumeration preserves enumerable string-keyed data and cycles. Arrays remain arrays;
+  Maps become entry arrays, Sets become value arrays, and typed arrays become indexed
+  records. Symbols become descriptions and functions become `"[Function]"`; prototypes,
+  methods, non-enumerable and symbol-keyed properties are omitted. Opaque objects with
+  no enumerable data inspect as empty records. This is neither a lossless snapshot nor
+  a save/restore format, and it never grants entity ownership.
 
 ## Inspection boundary and limits
 

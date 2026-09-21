@@ -6,13 +6,18 @@ These contracts define ECS storage and traversal, scene lifetime, committed stat
 
 ### Schema definitions and fields
 
+Components require schema definitions; unchecked JavaScript calls that pass a factory
+function or non-schema component value throw.
+
 `component(name, schema)` creates an immutable schema definition. Each world registers
-schema identities independently, and the schema plus cloned field descriptors retain
+schema identities independently, and the schema plus cloned, frozen field descriptors retain
 their literal component/field names. `.of(partial)` supplies a complete fixed composition
 to `spawn`; omitted or explicitly `undefined` fields use their declared defaults. Names
 are nonempty and one schema definition identity owns each schema name inside a world.
 Conflicting schema identities, non-schema definitions or values, duplicate schema
 components, unknown fields, and invalid authored values fail at the authoring boundary.
+Names are world-local, not a global schema registry; conflicting definition objects
+with the same name are rejected on spawn.
 
 | Helper        | Logical value                 | Physical column                               | Valid authored or sparse value                                      |
 | ------------- | ----------------------------- | --------------------------------------------- | ------------------------------------------------------------------- |
@@ -41,7 +46,8 @@ capacity. Swap removal repairs the moved slot and clears the vacated handle and 
 cells. Empty archetypes and allocated chunks remain until disposal; rows at or above
 `count` are never live.
 
-The world retains generation-bearing slots, a LIFO free stack, buffered FIFO-equivalent
+The world owns immutable index/generation/world handles, slot row positions and
+pending flags. It retains generation-bearing slots, a LIFO free stack, buffered FIFO-equivalent
 birth/death publication, and fixed entity composition. Iteration order is archetype
 creation, then chunk creation, then dense row order. `World.size` counts every live
 row; `capacity` is the slot-array length. A schema query's `size`
@@ -63,7 +69,7 @@ cross-query traversal is supported. A visitor exception releases its read scope,
 commit during any active query callback fails.
 
 Descriptors, `views`, component lookups, and row meanings are borrowed for the current
-world commit epoch. A component view plus row may be retained across later traversals
+world commit epoch and rebuilt on the first traversal after each commit. A component view plus row may be retained across later traversals
 in the same update, allowing a spatial index to build then probe. The descriptor guards
 expire when the next allowed commit begins or the world is disposed. Hoisted component
 views and raw typed arrays cannot be revoked without proxies or buffer detachment; using
@@ -78,9 +84,18 @@ do not satisfy ownership for authoritative resource state.
 
 ### Inspection and empty entities
 
-Enumeration reconstructs detached schema row records only on demand. It records ordered
-schema fields/kinds/defaults, chunk capacity/count/order, chunk-relative row plus chunk
-index for live slots, JSON-safe entity references, and allocator/free-stack facts.
+Enumeration reconstructs detached schema row records and allocator/free-stack facts
+only on demand.
+A live slot's location is its `chunk` index plus chunk-relative `row`; entities
+spawned without components live in an empty-component archetype with the same chunk
+layout. Inspection includes `archetypes` with ordered component names and entity
+indices, **including empty archetypes**, plus `fields` (per component, field
+`name`/`kind`/`default`) and `chunks` (`capacity`, `count`, ordered entity indices).
+`entities` retains values in archetype/chunk/row order as field records
+`fields: [{ name, kind, value }]`, with entity references as `null` or
+`{ index, generation }`. Empty archetypes and empty chunks cannot be reconstructed
+from live entities alone.
+
 Enumeration is diagnostic, not a hot query or restore format. The engine compatibility
 prefix is `NGNE/2;mulberry32/1`.
 
@@ -92,13 +107,70 @@ component values or chunk views. No runtime component changes or public pools ex
 
 ## Scenes and state
 
+Prepared handles expose only idempotent `release()`; the owning Game validates
+identity and consumes them.
+
 Definitions contain identity, assets, policy and synchronous setup. Candidates are asynchronous leased intent, owned by exactly one Game, consumed once. `key` is authored, not allocated from timing or load order. Explicit scene seeds are uint32. Stop/dispose cancels pending preparation and releases unconsumed candidates. Shared loads remain available to other live consumers.
 
-`Game.candidates.ensure(ownerId, purpose, definition, options)` keeps at most one pending or ready candidate for that mounted scene instance and nonempty purpose. Repeating the same request is idempotent; a changed definition or option replaces and releases the old slot. `options.retries` is a non-negative count of additional attempts, and only the final failure is reported through the Game diagnostic. `take(ownerId, purpose)` returns a ready handle once and schedules replenishment outside the current tick while the owner remains mounted. `release(ownerId, purpose?)` abandons one or all slots. Scene unmount, stop and disposal perform the same cancellation/release automatically. Slots never mount or enqueue scene commands; activation remains an explicit `set`/`push` at commit. Raw `prepare()` remains the path for initial scenes and one-off host transitions.
+### Candidate slots
 
-Private mounting owns a reverse cleanup stack before setup runs. Setup binds resources and named RNG, registers the immutable system schedule, initial entities and frame preparation. Setup failures dispose everything acquired, report aggregated cleanup errors, and never publish the partial world. `set` mounts first, then unmounts old scenes. Cleanup failures never republish a torn-down scene.
+| Operation                                                       | Rules                                                                                                                                                                                                      |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Game.candidates.ensure(ownerId, purpose, definition, options)` | Keeps at most one pending or ready candidate per mounted scene instance and nonempty purpose. Repeating the same request is idempotent; a changed definition or option replaces and releases the old slot. |
+| `options.retries`                                               | Non-negative count of additional attempts; only the final failure is reported through the Game diagnostic.                                                                                                 |
+| `take(ownerId, purpose)`                                        | Returns a ready handle once and schedules replenishment outside the current tick while the owner remains mounted.                                                                                          |
+| `release(ownerId, purpose?)`                                    | Abandons one or all slots. Scene unmount, stop and disposal perform the same cancellation/release automatically.                                                                                           |
 
-Tick commit order and scene-command failure isolation follow the [architecture](../architecture.md#platform-frame-and-tick-commit); scene commands apply FIFO. Arbitrary system/transition faults enter Failed. Only disposal is then supported.
+Slots never mount or enqueue scene commands; activation remains an explicit
+`set`/`push` at commit. Raw `prepare()` remains the path for initial scenes
+and one-off host transitions.
+
+### Private mounting and cleanup
+
+Private mounting owns a reverse cleanup stack before setup runs. Setup binds resources
+and named RNG, registers the immutable system schedule, initial entities and frame
+preparation.
+
+Every acquired or created item registers one cleanup action as mounting proceeds. Normal unmount and failed mount use the same teardown stack, unwound in reverse registration order. Cleanup is best-effort: every action is attempted and failures are reported together. A partly disposed scene is never republished.
+
+For `set`, the replacement mounts successfully before old scenes are removed. A failed private mount never changes the published stack.
+
+### Tick commit and scene-command failures
+
+Scene commands apply FIFO.
+
+One tick commits in this order:
+
+1. Snapshot the update plan from the committed stack.
+2. Update selected scenes bottom-to-top.
+3. Publish whole-entity spawn and despawn.
+4. Advance event buffers only for scenes whose ordinary systems ran.
+5. Commit freeze countdowns and requests.
+6. Apply game-state commands.
+7. Apply scene-stack commands and publish the resulting stack.
+
+A scene command may mount a prepared scene during step 7. If that mount fails:
+
+- Steps 3-6 remain committed.
+- The failed scene command is discarded.
+- All later scene-stack commands for that boundary are discarded.
+- Scene-stack commands that succeeded before the failure remain effective; their resulting stack is published.
+- The tick completes and the `Game` remains `Running`.
+- The failure is reported as a diagnostic.
+
+This is not transaction rollback for the whole tick; it is failure isolation at the scene-stack stage.
+
+Arbitrary system/transition faults enter `Failed`. Only disposal is then supported.
+
+### Headless lifecycle
+
+Headless `Game.start()` performs mounting and loop startup synchronously, although
+its result is a promise. Invalid lifecycle calls reject. `Game.stop()` also cancels
+preparations and unused candidates when already stopped, including before first
+start. Cancellation cannot publish a late candidate; a shared asset load stays alive
+while another consumer needs it. Cancelled loaders that eventually return data
+dispose that data. An external loader that ignores abort may remain pending until
+it settles, without retaining permission to activate a scene.
 
 ### Committed state typing and ownership
 

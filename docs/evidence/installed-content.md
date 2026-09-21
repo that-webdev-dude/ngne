@@ -1,5 +1,10 @@
 # Installed content acceptance
 
+Historical acceptance recorded **2026-09-20** (manifest `recordedAt`:
+`2026-09-20T21:57:34.791Z`). Results apply only to the revisions, artifacts and
+environments recorded here; they are not current validation or an API specification.
+See the [evidence index](README.md) for ownership and reproduction links.
+
 ## Evidence matrix
 
 The engine runtime and consumer runtime were unchanged during this acceptance.
@@ -90,13 +95,3 @@ builds and logs remain under `.test-output/final-package/` and the clean-install
 output named in the manifest. Initial sandbox npm-cache/esbuild failures and occupied
 preview ports were environmental setup failures; retries used normal filesystem
 access and fresh ports. They are not reported as runtime passes.
-
-## Documentation ownership
-
-Reviewed architecture, public export inventory, simulation, browser/presentation,
-ownership/inspection, guide and consumer README against the implemented pipeline.
-No runtime contract change was needed. Architecture owns the lifecycle model;
-contracts own preparation, recovery, leases and retention semantics; the guide owns
-engine usage; the consumer README owns schemas, mechanics and authoring. Measurement
-methodology and accepted budgets remain under `benchmarks/`. No temporary proposal
-or ticket ledger remains in authoritative documentation.

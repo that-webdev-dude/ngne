@@ -1,6 +1,8 @@
 # NGNE implementation contracts
 
-These contracts define the supported API and storage semantics. The high-level architecture remains authoritative.
+This index lists the supported package exports and their owning contracts. The
+[architecture](../architecture.md) owns the high-level model; detailed contracts own
+exact semantics, ordering, failures and limits. The [guide](../guide.md) owns usage.
 
 ## Contract map
 
@@ -11,15 +13,6 @@ These contracts define the supported API and storage semantics. The high-level a
 | [Browser and presentation](browser-and-presentation.md) | Browser lifecycle, input, rendering, camera interpolation, assets and audio              |
 
 Read this file first for the supported package boundary. Read only the detailed contract that owns the behavior being changed; broad ownership or architecture work may require all three.
-
-## Contract-wide invariants
-
-- `Game` owns simulation lifecycle, scene publication and commit authority.
-- Each mounted scene owns its world, resources, RNG streams, events, freeze and camera state.
-- `BrowserGame` owns platform input, frame scheduling, rendering and audio integration.
-- Inspection is detached diagnostic data, not a save, restore or replay format.
-- Rendering and asynchronous platform completion never mutate simulation state.
-- Ownership, lifetime, ordering and determinism take precedence over implementation style.
 
 ## Public API and inspection
 
@@ -36,10 +29,9 @@ Public symbols: `component`, `f32`, `f64`, `i32`, `u32`, `u8`, `bool`,
 `SystemContext`, `SceneCommands`, `SceneEvent`, `StateAccess`, `DeepReadonly` and
 `PreparedScene`.
 
-Hello, Starfall, the platformer and authoring tests consume this surface. Setup
-injects scene capabilities; systems cannot commit, enumerate or change query
-membership. Prepared handles expose only idempotent `release()`; the owning Game
-validates identity and consumes them.
+Hello, Starfall, the platformer and authoring tests consume this surface. See
+[ECS authority](simulation.md#storage-lifetime-and-order) and
+[prepared scenes](simulation.md#scenes-and-state) for capability and handle rules.
 
 ### Authoring and presentation
 
@@ -47,8 +39,8 @@ Public symbols: `Camera`, `Random`, `clamp`, `lerp`, `seedOf`, `down`, `pressed`
 `imageAsset`, `audioAsset`; types `Asset`, `ImageAsset`, `Lease`, `Sprite`, `Sound`
 and `Clip`.
 
-Scene authors use explicitly acquired or injected values. Constructors operate on
-caller-owned values; inspection never returns a live camera or RNG.
+Scene authors use this surface for explicitly acquired or injected values. See
+[state ownership](ownership-and-inspection.md#simulation-state-ownership-inventory).
 
 ### Platform integration
 
@@ -66,12 +58,15 @@ service operations are intentional integration APIs.
 
 Public types: `Lifecycle`, `SceneInspection`, `SceneStateInspection`,
 `GameInspection`, `InspectionValue`, `AssetInspection`, `AssetEntryInspection`
-and `RendererResourceInspection`. `Assets.inspect` and `WebGPURenderer.inspect`
-provide bounded resource detail with complete aggregates; `Assets.trim` and
-`Assets.evict` apply the retention contract without revoking live leases.
+and `RendererResourceInspection`.
 
-Tests, benchmark capacity reporting and diagnostics consume this surface. It
-returns no mutable foreign world or resource binding.
+Public resource operations: `Assets.inspect`, `WebGPURenderer.inspect`,
+`Assets.trim` and `Assets.evict`.
+
+Tests, benchmark capacity reporting and diagnostics consume this surface. See
+[public inspection](ownership-and-inspection.md#public-inspection),
+[resource diagnostics](ownership-and-inspection.md#resource-diagnostics) and
+[retention operations](browser-and-presentation.md#retention-policy).
 
 ### Internal only
 
@@ -80,24 +75,3 @@ returns no mutable foreign world or resource binding.
 runtime/context/quad/registry modules are internal. Runtime modules, direct ECS
 tests and the benchmark import them deliberately. There is no public runtime
 constructor for scenes, queries or prepared candidates.
-
-- `Game.lifecycle` and `simulationTick` are getter-only values backed by private
-  fields. Browser faults use an internal capability, not a writable public field.
-- `Game.scenes` returns a fresh frozen array of frozen summaries in stack order:
-  instance `id`, definition ID string, authored `key`, seed, blocking policy,
-  entity count/capacity and remaining freeze ticks. Compare `id`, not object identity,
-  across reads. Old summaries remain unchanged after updates or unmount.
-- `Game.enumerate()` returns detached, recursively frozen diagnostic data. Resource
-  bindings, component values, camera, RNG, event data and game state cannot be
-  mutated through this result. Dynamic values use `InspectionValue` and require
-  narrowing. Enumeration copies on demand and is unsuitable for per-frame telemetry.
-- Enumeration preserves enumerable string-keyed data and cycles. Arrays remain arrays;
-  Maps become entry arrays, Sets become value arrays, and typed arrays become indexed
-  records. Symbols become descriptions and functions become `"[Function]"`; prototypes,
-  methods, non-enumerable and symbol-keyed properties are omitted. Opaque objects with
-  no enumerable data inspect as empty records. This is neither a lossless snapshot nor
-  a save/restore format, and it never grants entity ownership.
-
-Components require schema definitions; unchecked JavaScript calls that pass a factory
-function or non-schema component value throw. A zero-component `query()` performs
-entity-only traversal.

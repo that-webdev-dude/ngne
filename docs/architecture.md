@@ -262,26 +262,7 @@ flowchart TD
 
 The tick budget is fixed while running. If it is exhausted, the loop drops complete pending ticks, retains the fractional interpolation remainder, and reports the loss outside simulation. It never enlarges the fixed delta.
 
-One tick commits in this order:
-
-1. Snapshot the update plan from the committed stack.
-2. Update selected scenes bottom-to-top.
-3. Publish whole-entity spawn and despawn.
-4. Advance event buffers only for scenes whose ordinary systems ran.
-5. Commit freeze countdowns and requests.
-6. Apply game-state commands.
-7. Apply scene-stack commands and publish the resulting stack.
-
-A scene command may mount a prepared scene during step 7. If that mount fails:
-
-- Steps 3-6 remain committed.
-- The failed scene command is discarded.
-- All later scene-stack commands for that boundary are discarded.
-- Scene-stack commands that succeeded before the failure remain effective; their resulting stack is published.
-- The tick completes and the `Game` remains `Running`.
-- The failure is reported as a diagnostic.
-
-This is not transaction rollback for the whole tick; it is failure isolation at the scene-stack stage.
+The [simulation contract](contracts/simulation.md#tick-commit-and-scene-command-failures) owns tick ordering and scene-command failure isolation. Earlier simulation commits survive a failed scene mount.
 
 ## Simulation snapshots and replay readiness
 
@@ -338,7 +319,7 @@ Mutable per-scene derivatives belong in scene resources. Releasing a lease does 
 
 Preparation is asynchronous and outside simulation. It acquires leases and prepares immutable data but creates no world or active scene. Cancellation and stale completion cannot activate a scene.
 
-A game may prepare a likely next scene before requesting a transition. This speculative preparation has no simulation effect until a later scene command consumes it. Host coordination uses per-Game candidate slots keyed by mounted scene instance and authored purpose. A slot deduplicates preparation, may retry an authored number of times, returns its ready handle once, and refills after take while the owner remains mounted. Owner removal, explicit release, stop and disposal cancel pending work and release ready handles; a late result can never activate itself.
+Speculative preparation has no simulation effect until explicitly activated. The host owns coordination; [candidate slots](contracts/simulation.md#candidate-slots) bind reusable intent to a mounted scene owner and authored purpose.
 
 Mounting is synchronous at a tick boundary:
 
@@ -351,9 +332,7 @@ flowchart LR
     Prep --> Publish["Publish scene"]
 ```
 
-Every acquired or created item registers one cleanup action as mounting proceeds. Normal unmount and failed mount use the same teardown stack, unwound in reverse registration order. Cleanup is best-effort: every action is attempted and failures are reported together. A partly disposed scene is never republished.
-
-For `set`, the replacement mounts successfully before old scenes are removed. A failed private mount never changes the published stack.
+Mounting publishes only fully ready scenes. The [simulation contract](contracts/simulation.md#private-mounting-and-cleanup) owns reverse cleanup, failed mounts and replacement ordering.
 
 ## Lifecycle
 
@@ -375,36 +354,7 @@ stateDiagram-v2
     Disposing --> Disposed
 ```
 
-### First start
-
-The first `start()` publishes ready platform services and mounts the prepared initial
-scene, then starts the loop last. WebGPU image preparation can initialize presentation
-before start; it never activates scenes or starts input/audio/ticks. Complete rollback
-returns to `Stopped`; incomplete rollback enters `Failed`. Successfully initialized
-WebGPU presentation remains owned across complete cold-start rollback, as specified
-by the [renderer contract](contracts/browser-and-presentation.md#renderer).
-
-### Stop and resume
-
-`stop()` is a suspension, not teardown:
-
-1. Disable future tick and render work immediately, so a late callback is harmless.
-2. Stop the loop.
-3. Cancel pending preparation and scene transitions.
-4. Preserve initialized services, committed game state, mounted scenes, resources, RNG, freeze, cameras, and leases.
-
-Both stop actions are attempted. If either fails, the game reports all failures and enters `Failed`; only `dispose()` is then allowed. If both succeed, it enters `Stopped`.
-
-A later `start()` from this stopped state is a resume. It starts the loop while tick and render work remain disabled, then enables work only after loop startup succeeds. It does not initialize services or recreate the initial scene. A `Game` records whether first start has completed, so cold start and resume cannot take the same path accidentally.
-
-If loop startup fails during resume, work stays disabled, the engine makes a best-effort attempt to stop any partially started loop, preserves the mounted scenes and initialized services for disposal, reports all failures, and enters `Failed`. Only `dispose()` is then allowed.
-
-### Dispose
-
-`dispose()` is terminal. It disables work, stops the loop, invalidates renderer work
-before decoded sources close, cancels loading, unmounts scenes and releases all owned
-services. Every cleanup is attempted. Independent cleanup does not wait for audio close.
-Failures are reported together and the final state is always `Disposed`.
+First start publishes ready services and an initial scene; stop/resume preserves mounted state, while disposal ends ownership. The [lifecycle contract](contracts/browser-and-presentation.md#first-start) owns startup rollback, stop/resume ordering and terminal cleanup.
 
 ## Out of scope
 
