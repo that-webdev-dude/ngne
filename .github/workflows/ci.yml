@@ -38,6 +38,27 @@ jobs:
             exit 1
           fi
           jq -e '.failures[] | contains("intentional CI assertion failure")' .test-output/browser-intentional-failure/results.json
+          jq -e '.status == "failed" and ([.cleanup[].status] | all(. == "passed"))' .test-output/browser-intentional-failure/results.json
+      - name: Preserve assertion and screenshot failures through cleanup
+        env:
+          NGNE_BROWSER_HEADLESS: 0
+          NGNE_WEBGPU_ADAPTER: swiftshader
+        run: |
+          if NGNE_BROWSER_INJECT_FAILURE=1 NGNE_BROWSER_INJECT_SCREENSHOT_FAILURE=1 NGNE_BROWSER_ARTIFACT_DIR=.test-output/browser-diagnostic-failure xvfb-run -a npm run test:browser; then
+            echo "Intentional diagnostic failure unexpectedly passed"
+            exit 1
+          fi
+          jq -e '.status == "failed" and (.failures | any(contains("intentional CI assertion failure"))) and (.failures | any(contains("NGNE.invalidScreenshotCommand"))) and ([.cleanup[].status] | all(. == "passed"))' .test-output/browser-diagnostic-failure/results.json
+      - name: Reject successful validation when cleanup fails
+        env:
+          NGNE_BROWSER_HEADLESS: 0
+          NGNE_WEBGPU_ADAPTER: swiftshader
+        run: |
+          if NGNE_BROWSER_INJECT_CLEANUP_FAILURE=1 NGNE_BROWSER_ARTIFACT_DIR=.test-output/browser-cleanup-failure xvfb-run -a npm run test:browser; then
+            echo "Intentional cleanup failure unexpectedly passed"
+            exit 1
+          fi
+          jq -e '.status == "failed" and (.passed | length > 0) and (.failures | any(contains("intentional CI cleanup failure"))) and ([.cleanup[] | select(.resource != "controlled cleanup failure") | .status] | all(. == "passed"))' .test-output/browser-cleanup-failure/results.json
       - name: Run WebGPU browser integration
         env:
           NGNE_BROWSER_HEADLESS: 0

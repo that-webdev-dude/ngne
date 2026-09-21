@@ -14,6 +14,7 @@ const signature = (root) => {
         build: m.build,
         source: m.source,
         harness: m.harness,
+        tooling: m.tooling,
         fixtures: read(root, "fixtures"),
         environment: runs.map((r) => ({
             workload: r.workload,
@@ -22,7 +23,14 @@ const signature = (root) => {
         })),
     };
 };
-const accepted = (root) => read(root, "result").status === "passed";
+const accepted = (root) => {
+    const result = read(root, "result");
+    return (
+        result.status === "passed" &&
+        result.cleanupPassed === true &&
+        !!read(root, "manifest").tooling
+    );
+};
 if (!accepted(a) || !accepted(b) || JSON.stringify(signature(a)) !== JSON.stringify(signature(b))) {
     console.log(
         "CHECK COMPARABILITY: acceptance status, workload, artifact or environment differs.",

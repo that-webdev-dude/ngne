@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, writeFileSync, rmSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -16,6 +16,7 @@ test("content comparison refuses a failed run and incompatible browser environme
             build: {},
             source: {},
             harness: {},
+            tooling: { "devtools.mjs": "first" },
         };
         const put = (name: string, value: unknown) =>
             writeFileSync(join(root, name + ".json"), JSON.stringify(value));
@@ -29,7 +30,7 @@ test("content comparison refuses a failed run and incompatible browser environme
                 metrics: {},
             },
         ]);
-        put("result", { status: "passed" });
+        put("result", { status: "passed", cleanupPassed: true });
         const compare = () =>
             spawnSync(process.execPath, ["benchmarks/content/compare.mjs", root, root], {
                 encoding: "utf8",
@@ -40,13 +41,16 @@ test("content comparison refuses a failed run and incompatible browser environme
         assert.equal(failed.status, 2);
         assert.match(failed.stdout, /CHECK COMPARABILITY/);
         // Two distinct roots differ only by the observed environment.
-        put("result", { status: "passed" });
+        put("result", { status: "passed", cleanupPassed: true });
+        put("result", { status: "passed", cleanupPassed: false });
+        assert.equal(compare().status, 2);
+        put("result", { status: "passed", cleanupPassed: true });
         const other = mkdtempSync(join(tmpdir(), "ngne-content-comparison-"));
         try {
             for (const [name, value] of Object.entries({
                 manifest,
                 fixtures: {},
-                result: { status: "passed" },
+                result: { status: "passed", cleanupPassed: true },
                 runs: [
                     {
                         workload: "roundTrips",
@@ -64,6 +68,17 @@ test("content comparison refuses a failed run and incompatible browser environme
             );
             assert.equal(result.status, 2);
             assert.match(result.stdout, /CHECK COMPARABILITY/);
+            writeFileSync(join(other, "runs.json"), readFileSync(join(root, "runs.json")));
+            writeFileSync(
+                join(other, "manifest.json"),
+                JSON.stringify({ ...manifest, tooling: { "devtools.mjs": "changed" } }),
+            );
+            const changed = spawnSync(
+                process.execPath,
+                ["benchmarks/content/compare.mjs", root, other],
+                { encoding: "utf8" },
+            );
+            assert.equal(changed.status, 2);
         } finally {
             rmSync(other, { recursive: true });
         }
