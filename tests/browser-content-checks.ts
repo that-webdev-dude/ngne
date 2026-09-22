@@ -3,6 +3,7 @@ import { isNavigationError } from "./tooling/devtools.mjs";
 import assert from "node:assert/strict";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { checkInstalledSaves } from "./browser-save-checks.js";
 
 interface Driver {
     send(method: string, params?: object): Promise<unknown>;
@@ -27,6 +28,18 @@ export async function checkInstalledContent(
         hook = await cdp.send("Page.addScriptToEvaluateOnNewDocument", {
             source: `(() => {
             const state = window.__contentHarness = { devices: [], callbacks: new Map(), next: 0, now: 1000, imageWaiting: false, holdImage: true, voices: [], contexts: [] };
+            state.saveKey = ${JSON.stringify(`ngne-town-dungeon:${new URL(origin).pathname}:save`)};
+            const getItem = Storage.prototype.getItem, setItem = Storage.prototype.setItem;
+            Storage.prototype.getItem = function(key) {
+                if (key === state.saveKey && state.failSaveRead) throw Error('Controlled save read failure');
+                return getItem.call(this, key);
+            };
+            Storage.prototype.setItem = function(key, value) {
+                if (key === state.saveKey && state.failSaveWrite) throw Error('Controlled save write failure');
+                return setItem.call(this, key, value);
+            };
+            state.failSaveRead = sessionStorage.getItem('save-read-failure') === 'yes';
+            state.failSaveWrite = sessionStorage.getItem('save-write-failure') === 'yes';
             const connect = AudioNode.prototype.connect;
             AudioNode.prototype.connect = function (destination, ...args) {
                 const result = connect.call(this, destination, ...args);
@@ -87,6 +100,11 @@ export async function checkInstalledContent(
             }
         }
         async function start(): Promise<void> {
+            // browser-ci owns a disposable profile; only this consumer's test slot is cleared.
+            await cdp.evaluate(`if (location.origin === ${JSON.stringify(new URL(origin).origin)}) {
+                localStorage.removeItem(${JSON.stringify(`ngne-town-dungeon:${new URL(origin).pathname}:save`)});
+                sessionStorage.removeItem('save-read-failure'); sessionStorage.removeItem('save-write-failure');
+            }`);
             await cdp.send("Page.navigate", { url: origin });
             await wait("window.__contentHarness?.imageWaiting === true");
             check(
@@ -576,6 +594,9 @@ export async function checkInstalledContent(
                 );
                 if (cycle === 0) await screenshot("checkpoint-restored");
                 await cdp.evaluate("window.__contentHarness.step(1)"); // first Town update captures
+            }
+            if (await cdp.evaluate<boolean>("!!document.querySelector('#save')")) {
+                await checkInstalledSaves(cdp, wait, check, walk, screenshot);
             }
         }
         await cdp.evaluate(
