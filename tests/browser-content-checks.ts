@@ -440,6 +440,144 @@ export async function checkInstalledContent(
             ),
             "ordinary Town-to-Dungeon transition produces fresh output without another unlock gesture",
         );
+        // Older retained package fixtures predate gameplay retry. The current consumer opts in
+        // through its visible control; no production hooks or private engine access are needed.
+        if (await cdp.evaluate<boolean>("!!document.querySelector('#checkpoint-retry')")) {
+            async function walk(code: string, ticks: number): Promise<void> {
+                await cdp.evaluate(
+                    `document.querySelector('canvas').focus(); document.querySelector('canvas').dispatchEvent(new KeyboardEvent('keydown', {code:${JSON.stringify(code)}, bubbles:true})); window.__contentHarness.step(${ticks}); window.dispatchEvent(new KeyboardEvent('keyup', {code:${JSON.stringify(code)}, bubbles:true}));`,
+                );
+            }
+            async function screenshot(name: string): Promise<void> {
+                const result = await cdp.send("Page.captureScreenshot", { format: "png" });
+                assert(
+                    result &&
+                        typeof result === "object" &&
+                        "data" in result &&
+                        typeof result.data === "string",
+                );
+                writeFileSync(
+                    join(
+                        process.cwd(),
+                        process.env.NGNE_BROWSER_ARTIFACT_DIR ?? ".test-output/browser",
+                        name + ".png",
+                    ),
+                    Buffer.from(result.data, "base64"),
+                );
+            }
+            // Collect the real authored relic before dying, so rollback is observable.
+            await walk("ArrowUp", 40);
+            await walk("ArrowLeft", 200);
+            check(
+                await cdp.evaluate<boolean>(
+                    "window.__contentHarness.inspect().run.live.objective === 'return-relic'",
+                ),
+                "authored relic is collected before checkpoint rollback",
+            );
+            await walk("ArrowRight", 200);
+            await walk("ArrowDown", 40);
+            for (let cycle = 0; cycle < 3; cycle++) {
+                if (cycle > 0) {
+                    await cdp.evaluate("document.querySelector('#travel').click()");
+                    await wait(
+                        "document.querySelector('#loading').textContent.includes('Activating')",
+                    );
+                    await cdp.evaluate("window.__contentHarness.step(2)");
+                    check(
+                        await cdp.evaluate<boolean>(
+                            "window.__contentHarness.snapshot().roomFacts.items.some(item => item.id === 'relic')",
+                        ),
+                        `retry cycle ${cycle}: rolled-back relic reconstructs`,
+                    );
+                }
+                await walk("ArrowDown", 50); // (520,260), inside the marked hazard.
+                await cdp.evaluate("window.__contentHarness.step(180)");
+                check(
+                    await cdp.evaluate<boolean>(
+                        "window.__contentHarness.inspect().run.status === 'dead' && document.querySelector('#health').textContent === 'Health: 0/3' && document.querySelector('#objective').textContent.includes('You died') && document.querySelector('#travel').disabled && document.querySelector('#retry').disabled && !document.querySelector('#checkpoint-retry').disabled",
+                    ),
+                    `retry cycle ${cycle}: visible death and distinct actionable checkpoint control`,
+                );
+                const dead = await cdp.evaluate<string>(
+                    "JSON.stringify(window.__contentHarness.snapshot())",
+                );
+                await walk("ArrowLeft", 30);
+                await cdp.evaluate(
+                    "document.querySelector('canvas').dispatchEvent(new KeyboardEvent('keydown', {code:'KeyE', bubbles:true})); document.querySelector('#travel').click(); window.__contentHarness.step(2); window.dispatchEvent(new KeyboardEvent('keyup', {code:'KeyE', bubbles:true}));",
+                );
+                check(
+                    (await cdp.evaluate<string>(
+                        "JSON.stringify(window.__contentHarness.snapshot())",
+                    )) === dead,
+                    `retry cycle ${cycle}: dead movement, travel, actors and effects remain blocked`,
+                );
+                if (cycle === 0) {
+                    const pixel = await cdp.evaluate<number[]>("window.__contentHarness.pixels()");
+                    check(
+                        pixel[0] > pixel[1] * 2 && pixel[3] === 255,
+                        "dead player presents opaque red feedback",
+                    );
+                    await screenshot("checkpoint-death");
+                    writeFileSync(townPath, "{invalid");
+                    await cdp.evaluate("document.querySelector('#checkpoint-retry').click()");
+                    await wait(
+                        "document.querySelector('[role=alert]').textContent.includes('invalid JSON')",
+                    );
+                    check(
+                        await cdp.evaluate<boolean>(
+                            "(() => { const d = window.__contentHarness.inspect(); return d.run.status === 'dead' && d.run.live.objective === 'return-relic' && d.assets.claims.scene === 4 && !document.querySelector('#checkpoint-retry').disabled; })()",
+                        ),
+                        "failed checkpoint preparation retains dead facts, four claims and deliberate retry",
+                    );
+                    writeFileSync(townPath, originalTown);
+                    await cdp.evaluate("document.querySelector('#checkpoint-retry').click()");
+                    await wait(
+                        "document.querySelector('#loading').textContent.includes('Activating')",
+                    );
+                    await cdp.evaluate("document.querySelector('#cancel').click()");
+                    check(
+                        await cdp.evaluate<boolean>(
+                            "window.__contentHarness.inspect().assets.claims.scene === 4 && !document.querySelector('#checkpoint-retry').disabled && document.querySelector('#travel').disabled",
+                        ),
+                        "cancelled ready checkpoint releases candidate and keeps the dead owner blocked",
+                    );
+                }
+                await cdp.evaluate(
+                    "document.querySelector('#checkpoint-retry').click(); document.querySelector('#checkpoint-retry').dispatchEvent(new MouseEvent('click')); document.querySelector('#travel').dispatchEvent(new MouseEvent('click'));",
+                );
+                await wait("document.querySelector('#loading').textContent.includes('Activating')");
+                check(
+                    await cdp.evaluate<boolean>(
+                        "window.__contentHarness.inspect().assets.claims.scene === 8",
+                    ),
+                    `retry cycle ${cycle}: duplicate requests retain only one candidate`,
+                );
+                await cdp.evaluate("window.__contentHarness.step(1)");
+                check(
+                    await cdp.evaluate<boolean>(
+                        "(() => { const s = window.__contentHarness.snapshot(), d = window.__contentHarness.inspect(); return document.querySelector('#room').textContent === 'Town courtyard' && d.run.status === 'playing' && d.run.live.objective === 'find-relic' && d.run.live.collectedItems.length === 0 && s.health.current === 3 && !s.health.dead && s.actors[0].x === 80 && s.actors[0].y === 160 && s.actors[0].playback.elapsed === 0 && s.effect.tick === 0; })()",
+                    ),
+                    `retry cycle ${cycle}: restore commits before fresh Town setup and resets transients`,
+                );
+                check(
+                    await cdp.evaluate<boolean>(
+                        "(() => { const s = window.__contentHarness, d = s.inspect(); return d.assets.claims.scene === 4 && d.renderer.sources === 2 && d.renderer.consumers === 2 && s.voices.filter(v => v.stops === 0).length === 1 && s.voices.slice(0, -1).every(v => v.stops === 1); })()",
+                    ),
+                    `retry cycle ${cycle}: departing claims and audio voices release exactly once`,
+                );
+                await cdp.evaluate(
+                    "window.__contentHarness.audioAt = window.__contentHarness.contexts[0].currentTime",
+                );
+                await wait(
+                    "window.__contentHarness.contexts[0].currentTime > window.__contentHarness.audioAt + 0.15 && window.__contentHarness.outputRms() > 0.001",
+                );
+                passed.push(
+                    `Installed content: retry cycle ${cycle}: fresh Town music has nonzero destination-input signal (not a listening check)`,
+                );
+                if (cycle === 0) await screenshot("checkpoint-restored");
+                await cdp.evaluate("window.__contentHarness.step(1)"); // first Town update captures
+            }
+        }
         await cdp.evaluate(
             "window.__contentHarness.failDevice = true; window.__contentHarness.devices.at(-1).destroy()",
         );
