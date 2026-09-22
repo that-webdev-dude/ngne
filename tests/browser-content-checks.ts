@@ -5,6 +5,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { checkInstalledSaves } from "./browser-save-checks.js";
 import { chooseSession, checkSessionControls } from "./browser-session-checks.js";
+import { checkProgressionRaces } from "./browser-progression-checks.js";
 
 interface Driver {
     send(method: string, params?: object): Promise<unknown>;
@@ -64,8 +65,21 @@ export async function checkInstalledContent(
                 state.voices.push(voice); return source;
             };
             state.jsonRead = 0;
+            const audioInstance = Function.prototype[Symbol.hasInstance];
+            Object.defineProperty(AudioBuffer, Symbol.hasInstance, { configurable: true, value(value) {
+                if (state.failMount) { state.failMount = false; state.mountFailures = (state.mountFailures || 0) + 1; throw Error('Controlled private mount decoded-audio check failure'); }
+                return audioInstance.call(this, value);
+            } });
             const json = Response.prototype.json;
-            Response.prototype.json = async function () { const value = await json.call(this); state.jsonRead++; return value; };
+            Response.prototype.json = async function () {
+                const value = await json.call(this); state.jsonRead++;
+                if (state.holdJson && this.url.endsWith('/' + state.holdJson)) {
+                    state.holdJson = undefined; state.jsonWaiting = true; state.jsonSettled = false;
+                    try { await new Promise((resolve, reject) => state.releaseJson = fail => { state.jsonWaiting = false; if (fail) reject(Error('Controlled late JSON failure')); else resolve(); }); }
+                    finally { state.jsonSettled = true; }
+                }
+                return value;
+            };
             const request = GPUAdapter.prototype.requestDevice;
             GPUAdapter.prototype.requestDevice = async function (...args) {
                 if (state.holdDevice) { state.deviceWaiting = true; await new Promise(resolve => state.releaseDevice = resolve); state.holdDevice = false; state.deviceWaiting = false; }
@@ -605,6 +619,15 @@ export async function checkInstalledContent(
             if (await cdp.evaluate<boolean>("!!document.querySelector('#save')")) {
                 await checkInstalledSaves(cdp, wait, check, walk, screenshot);
                 await checkSessionControls(cdp, wait, check, screenshot);
+                await checkProgressionRaces(
+                    cdp,
+                    wait,
+                    check,
+                    walk,
+                    screenshot,
+                    townPath,
+                    originalTown,
+                );
             }
         }
         await cdp.evaluate(
