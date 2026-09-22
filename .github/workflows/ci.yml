@@ -68,18 +68,7 @@ jobs:
         env:
           NGNE_BROWSER_HEADLESS: 0
           NGNE_WEBGPU_ADAPTER: swiftshader
-        run: |
-          consumer="$PWD/.test-output/installed-content/consumer"
-          npm --prefix "$consumer" run preview -- --port 4297 --strictPort > .test-output/installed-content/preview-root.log 2>&1 &
-          root_pid=$!
-          npm --prefix "$consumer" run preview -- --port 4298 --strictPort --base=/town-dungeon/ --outDir=dist-nested > .test-output/installed-content/preview-nested.log 2>&1 &
-          nested_pid=$!
-          trap 'kill "$root_pid" "$nested_pid" 2>/dev/null || true' EXIT
-          for url in http://127.0.0.1:4297/ http://127.0.0.1:4298/town-dungeon/; do
-            curl --fail --retry 20 --retry-connrefused --retry-delay 1 "$url" > /dev/null
-          done
-          NGNE_CONSUMER_URL=http://127.0.0.1:4297/ NGNE_CONSUMER_DIST="$consumer/dist" NGNE_BROWSER_ARTIFACT_DIR=.test-output/installed-content/software-root xvfb-run -a npm run test:browser
-          NGNE_CONSUMER_URL=http://127.0.0.1:4298/town-dungeon/ NGNE_CONSUMER_DIST="$consumer/dist-nested" NGNE_BROWSER_ARTIFACT_DIR=.test-output/installed-content/software-nested xvfb-run -a npm run test:browser
+        run: xvfb-run -a node tests/installed-browser.mjs
       - name: Upload browser integration artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -89,7 +78,7 @@ jobs:
             .test-output/browser*
             .test-output/installed-content/*.json
             .test-output/installed-content/*.log
-            .test-output/installed-content/software-*/
+            .test-output/installed-content/browser/
             .test-output/installed-content/consumer/vendor/
             .test-output/installed-content/consumer/dist/
             .test-output/installed-content/consumer/dist-nested/

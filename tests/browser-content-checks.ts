@@ -140,6 +140,12 @@ export async function checkInstalledContent(
         await start();
         check(
             await cdp.evaluate<boolean>(
+                "['#start', '#continue', '#new-game', '#checkpoint-retry', '#save'].every(selector => document.querySelector(selector))",
+            ),
+            "completed consumer exposes required session, checkpoint and persistence controls",
+        );
+        check(
+            await cdp.evaluate<boolean>(
                 "document.querySelector('#room').textContent === 'Town courtyard'",
             ),
             "initial production scene activates after image readiness",
