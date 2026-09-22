@@ -1,3 +1,5 @@
+import { chooseSession } from "./browser-session-checks.js";
+
 interface Driver {
     send(method: string, params?: object): Promise<unknown>;
     evaluate<T>(expression: string, userGesture?: boolean): Promise<T>;
@@ -19,6 +21,7 @@ export async function checkInstalledSaves(
     }
     async function reload() {
         await cdp.send("Page.reload", { ignoreCache: true });
+        await chooseSession(cdp, wait);
         await wait("window.__contentHarness?.imageWaiting === true");
         await cdp.evaluate("window.__contentHarness.releaseImage()");
         await wait("window.__contentHarness.callbacks.size > 0");

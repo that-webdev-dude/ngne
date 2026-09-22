@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { checkInstalledSaves } from "./browser-save-checks.js";
+import { chooseSession, checkSessionControls } from "./browser-session-checks.js";
 
 interface Driver {
     send(method: string, params?: object): Promise<unknown>;
@@ -29,7 +30,11 @@ export async function checkInstalledContent(
             source: `(() => {
             const state = window.__contentHarness = { devices: [], callbacks: new Map(), next: 0, now: 1000, imageWaiting: false, holdImage: true, voices: [], contexts: [] };
             state.saveKey = ${JSON.stringify(`ngne-town-dungeon:${new URL(origin).pathname}:save`)};
-            const getItem = Storage.prototype.getItem, setItem = Storage.prototype.setItem;
+            const getItem = Storage.prototype.getItem, setItem = Storage.prototype.setItem, removeItem = Storage.prototype.removeItem;
+            Storage.prototype.removeItem = function(key) {
+                if (key === state.saveKey && state.failSaveReset) throw Error('Controlled save reset failure');
+                return removeItem.call(this, key);
+            };
             Storage.prototype.getItem = function(key) {
                 if (key === state.saveKey && state.failSaveRead) throw Error('Controlled save read failure');
                 return getItem.call(this, key);
@@ -106,6 +111,7 @@ export async function checkInstalledContent(
                 sessionStorage.removeItem('save-read-failure'); sessionStorage.removeItem('save-write-failure');
             }`);
             await cdp.send("Page.navigate", { url: origin });
+            await chooseSession(cdp, wait);
             await wait("window.__contentHarness?.imageWaiting === true");
             check(
                 await cdp.evaluate<boolean>(
@@ -402,6 +408,7 @@ export async function checkInstalledContent(
 
         writeFileSync(townPath, "{invalid");
         await cdp.send("Page.navigate", { url: origin });
+        await chooseSession(cdp, wait);
         await wait("document.querySelector('[role=alert]')?.textContent.includes('invalid JSON')");
         check(
             await cdp.evaluate<boolean>(
@@ -597,6 +604,7 @@ export async function checkInstalledContent(
             }
             if (await cdp.evaluate<boolean>("!!document.querySelector('#save')")) {
                 await checkInstalledSaves(cdp, wait, check, walk, screenshot);
+                await checkSessionControls(cdp, wait, check, screenshot);
             }
         }
         await cdp.evaluate(
