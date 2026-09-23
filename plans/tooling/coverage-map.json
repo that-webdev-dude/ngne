@@ -5,6 +5,664 @@
     "runId": "migration-baseline-7d7585ede1aa25147b423f48c9c7f1339678f280",
     "surfaces": [
         {
+            "id": "ci:.github/workflows/ci-baseline.yml:0133ca8807166b18:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:03287f55c9714ea3:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:08d172118863b279:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:0929cb8fc2979c07:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:0aacecd52c894308:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:0ac92a4648c1d66c:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:1a21be8bb1dc4721:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:1a21be8bb1dc4721:2",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:1a21be8bb1dc4721:3",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:21dce373febb6f71:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:233208fff267ace1:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:24bc7562490be842:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:26de2f5b78dca8e7:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:2741f456ec9cf5d3:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:2acaf51d4461b0b8:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:307f14137bcddfd9:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:31d9430f44b06818:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:3313497c6720969a:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:3721842f537d5059:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:3bcf5b44c3c94686:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:3c262f04f1d1d26e:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:3c4f2d8bd0d6ba59:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:3ed7d99d5da3de08:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:4b65928ccf18c9cd:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:4d508ac828047f3b:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:4d508ac828047f3b:2",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:4d508ac828047f3b:3",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:4f0c32580b672953:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:4f75d69b341a7ab5:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:513327fe62c7241e:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:56501c6b552835bb:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:5694ea9dd0477e3d:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:57287972bcc92cc8:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:5cc371992e1ec6c8:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:5d2bea72cdab266c:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:65ff2df2be4c4e28:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:761e4921a97565f7:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:78802002b9bf7df3:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:7c6cb86a3bc8f44f:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:7ede01e3cddf98d8:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:7f51ff4ede74ee6e:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:834a9db4b8881d7a:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:85752ad825f06847:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:86df7daf5573a93b:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:8db700617f195949:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:8db700617f195949:2",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:8db700617f195949:3",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:8db700617f195949:4",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:8db700617f195949:5",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:8fbf345c88368916:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:91552f0fb0c7c67f:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:94287c4d73aca95f:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:9aaca4bacd14c136:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:a175257e7bb08904:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:a2c8cbb81d210b50:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:af7f71663bbdfc62:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:b1383c4681aba46d:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:b1c04e75d1a93c56:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:b2208e0f74a4a212:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:b49c63ffde6aa1af:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:b4b0dbf9d4b45f20:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:b4bdc848109722a3:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:b4bdc848109722a3:2",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:b4bdc848109722a3:3",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:b97adc33989bec14:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:beaf5c197ce9df7d:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:beaf5c197ce9df7d:2",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:beaf5c197ce9df7d:3",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:beaf5c197ce9df7d:4",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:c2eff39554277c59:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:c49a073d1e986311:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:cd84a2476d44157e:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:d080186a22723377:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:d080186a22723377:2",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:d080186a22723377:3",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:d080186a22723377:4",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:d080186a22723377:5",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:d0fb26b90aa51510:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:d12556bba4e37bfd:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:d6eae703bab3f661:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:d7c9d3341c7716bc:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:da6f8d99c2f91e58:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:da6f8d99c2f91e58:2",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:da6f8d99c2f91e58:3",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:da6f8d99c2f91e58:4",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:da6f8d99c2f91e58:5",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:e02400c51488e536:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:e593feed500f3760:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:ec3c2f85838d5bed:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:f017303a589086c3:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:fb1398181210c039:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:fc4c6ccc8ffc97c9:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:fc8135fd1264162a:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
+            "id": "ci:.github/workflows/ci-baseline.yml:fd092212e8e90a6d:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:02186dbb2c5dea30:1",
             "owner": "infrastructure",
             "destination": ".github/workflows/ci.yml",
@@ -1214,6 +1872,13 @@
             "destination": "consumer:vite.config.ts",
             "action": "remove",
             "reason": "Archived consumer source/assets/tests/configuration must leave NGNE after engine and consumer replacement proof; no embedded snapshot remains."
+        },
+        {
+            "id": "file:.github/workflows/ci-baseline.yml",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci-baseline.yml",
+            "action": "retain",
+            "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
         },
         {
             "id": "file:.github/workflows/ci.yml",
