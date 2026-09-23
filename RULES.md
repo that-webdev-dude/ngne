@@ -26,8 +26,11 @@
 
 - Cover non-trivial behavior changes with focused regression tests. Use fixed
   seeds and controlled clocks or promises for deterministic behavior.
-- Keep unit and contract tests in the existing `tests/*.test.ts` harness. Use
-  the existing browser and benchmark harnesses for those concerns.
+- Keep engine unit and contract tests in `tests/*.test.ts` and tooling regression
+  tests in flat `tooling/tests/*.test.ts` files. `npm test` discovers both; nested
+  tooling fixture data is not a test entry point. Typecheck Node tooling with
+  `npm run typecheck:tooling`. Use the existing browser and benchmark harnesses
+  for those concerns.
 - Validate browser-dependent changes in a browser and report the environment
   and anything not tested.
 - For hot-path changes, record relevant before/after measurements, workload,

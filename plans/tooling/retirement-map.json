@@ -1,0 +1,3095 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "migration-retirement",
+    "schemaVersion": 1,
+    "runId": "migration-baseline-7d7585ede1aa25147b423f48c9c7f1339678f280",
+    "rows": [
+        {
+            "id": "ci:.github/workflows/ci.yml:26de2f5b78dca8e7:1",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": [".github/workflows/ci.yml"]
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:3ed7d99d5da3de08:1",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": [".github/workflows/ci.yml"]
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:4f75d69b341a7ab5:1",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": [".github/workflows/ci.yml"]
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:b4b0dbf9d4b45f20:1",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": [".github/workflows/ci.yml"]
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:d6eae703bab3f661:1",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": [".github/workflows/ci.yml"]
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:d7c9d3341c7716bc:1",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": [".github/workflows/ci.yml"]
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:ec3c2f85838d5bed:1",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": [".github/workflows/ci.yml"]
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:fc4c6ccc8ffc97c9:1",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": [".github/workflows/ci.yml"]
+        },
+        {
+            "id": "command:bench:all",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["package.json"]
+        },
+        {
+            "id": "command:bench:content",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["package.json"]
+        },
+        {
+            "id": "command:test:installed",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["package.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:index.html",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:LICENSE",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:package-lock.json",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:package.json",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/animation.json",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/atlas.json",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/chime.wav",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon-atlas.json",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon-environment.png",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon-music.wav",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon.json",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/player.png",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town-atlas.json",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town-environment.png",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town-music.wav",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town.json",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:README.md",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:scripts/check-package.mjs",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/animation.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/content.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/documents.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/env.d.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/loading.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/main.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/room.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/run.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/save.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/session.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/content.test.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/integration.test.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/lifecycle.test.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/ownership.test.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/room.test.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/run-content.test.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/run-room.test.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/run.test.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/save.test.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/session.test.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tsconfig.json",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:vite.config.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "file:benchmarks/browser/browser-baseline.ts",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "file:benchmarks/browser/entry.ts",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/entry.ts"]
+        },
+        {
+            "id": "file:benchmarks/browser/index.html",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/index.html"]
+        },
+        {
+            "id": "file:benchmarks/browser/renderer-fixture.ts",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/renderer-fixture.ts"]
+        },
+        {
+            "id": "file:benchmarks/browser/tsconfig.json",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/tsconfig.json"]
+        },
+        {
+            "id": "file:benchmarks/compact-run.ps1",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/compact-run.ps1"]
+        },
+        {
+            "id": "file:benchmarks/compare-runs.mjs",
+            "decision": "blocked",
+            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/compare-runs.mjs"]
+        },
+        {
+            "id": "file:benchmarks/content/compare.mjs",
+            "decision": "blocked",
+            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/compare.mjs"]
+        },
+        {
+            "id": "file:benchmarks/content/environment.json",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/environment.json"]
+        },
+        {
+            "id": "file:benchmarks/content/fixtures.mjs",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/fixtures.mjs"]
+        },
+        {
+            "id": "file:benchmarks/content/observe.js",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/observe.js"]
+        },
+        {
+            "id": "file:benchmarks/content/policy.json",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/policy.json"]
+        },
+        {
+            "id": "file:benchmarks/content/README.md",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/README.md"]
+        },
+        {
+            "id": "file:benchmarks/content/run.mjs",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "file:benchmarks/cpu/benchmark.ts",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/cpu/benchmark.ts"]
+        },
+        {
+            "id": "file:benchmarks/cpu/churn-gc-parse.mjs",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/cpu/churn-gc-parse.mjs"]
+        },
+        {
+            "id": "file:benchmarks/cpu/churn-schema.ts",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/cpu/churn-schema.ts"]
+        },
+        {
+            "id": "file:benchmarks/README.md",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/README.md"]
+        },
+        {
+            "id": "file:benchmarks/run-all.ps1",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "file:benchmarks/run-results.mjs",
+            "decision": "blocked",
+            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-results.mjs"]
+        },
+        {
+            "id": "file:tests/benchmark-output.test.ts",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/benchmark-output.test.ts"]
+        },
+        {
+            "id": "file:tests/browser-ci.ts",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "file:tests/browser-content-checks.ts",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "file:tests/browser-content-cleanup.test.ts",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-cleanup.test.ts"]
+        },
+        {
+            "id": "file:tests/browser-progression-checks.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-progression-checks.ts"]
+        },
+        {
+            "id": "file:tests/browser-save-checks.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-save-checks.ts"]
+        },
+        {
+            "id": "file:tests/browser-session-checks.ts",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-session-checks.ts"]
+        },
+        {
+            "id": "file:tests/content-accounting.mjs",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "file:tests/content-measurement.test.ts",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-measurement.test.ts"]
+        },
+        {
+            "id": "file:tests/devtools.test.ts",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/devtools.test.ts"]
+        },
+        {
+            "id": "file:tests/fixtures/README.md",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/README.md"]
+        },
+        {
+            "id": "file:tests/fixtures/town-dungeon.json",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json"]
+        },
+        {
+            "id": "file:tests/fixtures/town-dungeon.json.gz",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/fixtures/town-dungeon.json.gz"]
+        },
+        {
+            "id": "file:tests/installed-browser.mjs",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-browser.mjs"]
+        },
+        {
+            "id": "file:tests/installed-content.mjs",
+            "decision": "blocked",
+            "gate": "T2/T3: isolated current package preparation, identities, failure evidence and installed engine coverage; T4 consumer replacement before archive removal.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-content.mjs"]
+        },
+        {
+            "id": "file:tests/runner-cleanup.test.ts",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/runner-cleanup.test.ts"]
+        },
+        {
+            "id": "file:tests/tooling/cleanup.mjs",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/tooling/cleanup.mjs"]
+        },
+        {
+            "id": "file:tests/tooling/devtools.mjs",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["tests/tooling/devtools.mjs"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:--enable-precise-memory-info",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:--host",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:--no-default-browser-check",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:--no-first-run",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:--outDir",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:--port",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:--remote-debugging-port",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:--strictPort",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:--user-data-dir",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:--window-size",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_ALLOCATION_SAMPLING",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_ARTIFACT_DIR",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_BROWSER",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_CDP_PORT",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_CYCLES",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_DURATION_SECONDS",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_EXPECTED_BACKEND",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_EXPECTED_BUILD",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_RETAINED_EVERY_SECONDS",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_SERVE_DIR",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_SERVE_OUT_DIR",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_SNAPSHOTS",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_TRACE",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_URL",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_WARMUP_SECONDS",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "option:benchmarks/compact-run.ps1:-Directory",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/compact-run.ps1"]
+        },
+        {
+            "id": "option:benchmarks/compact-run.ps1:-Node",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/compact-run.ps1"]
+        },
+        {
+            "id": "option:benchmarks/compact-run.ps1:-Path",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/compact-run.ps1"]
+        },
+        {
+            "id": "option:benchmarks/compact-run.ps1:-ResultsScript",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/compact-run.ps1"]
+        },
+        {
+            "id": "option:benchmarks/compact-run.ps1:-RunDirectory",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/compact-run.ps1"]
+        },
+        {
+            "id": "option:benchmarks/compare-runs.mjs:--attention-percent",
+            "decision": "blocked",
+            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/compare-runs.mjs"]
+        },
+        {
+            "id": "option:benchmarks/compare-runs.mjs:--help",
+            "decision": "blocked",
+            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/compare-runs.mjs"]
+        },
+        {
+            "id": "option:benchmarks/compare-runs.mjs:--output",
+            "decision": "blocked",
+            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/compare-runs.mjs"]
+        },
+        {
+            "id": "option:benchmarks/compare-runs.mjs:-h",
+            "decision": "blocked",
+            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/compare-runs.mjs"]
+        },
+        {
+            "id": "option:benchmarks/content/fixtures.mjs:-atlas",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/fixtures.mjs"]
+        },
+        {
+            "id": "option:benchmarks/content/run.mjs:--consumer",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "option:benchmarks/content/run.mjs:--disable-backgrounding-occluded-windows",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "option:benchmarks/content/run.mjs:--disable-default-apps",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "option:benchmarks/content/run.mjs:--explore",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "option:benchmarks/content/run.mjs:--no-first-run",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "option:benchmarks/content/run.mjs:--remote-debugging-port",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "option:benchmarks/content/run.mjs:--user-data-dir",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "option:benchmarks/content/run.mjs:--window-size",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "option:benchmarks/content/run.mjs:NGNE_BROWSER",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "option:benchmarks/cpu/churn-schema.ts:--out",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/cpu/churn-schema.ts"]
+        },
+        {
+            "id": "option:benchmarks/cpu/churn-schema.ts:--profile",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/cpu/churn-schema.ts"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:--expose-gc",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:--import",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:--trace-gc",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:-BaseCdpPort",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:-BaseUrl",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:-Compact",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:-Diagnostics",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:-DurationSeconds",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:-OutputRoot",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:-SkipBuild",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:-WarmupSeconds",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:-Workload",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:NGNE_ALLOCATION_SAMPLING",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:NGNE_ARTIFACT_DIR",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:NGNE_CDP_PORT",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:NGNE_CYCLES",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:NGNE_DURATION_SECONDS",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:NGNE_EXPECTED_BACKEND",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:NGNE_EXPECTED_BUILD",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:NGNE_RETAINED_EVERY_SECONDS",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:NGNE_SERVE_DIR",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:NGNE_SERVE_OUT_DIR",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:NGNE_SNAPSHOTS",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:NGNE_TRACE",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:NGNE_URL",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:benchmarks/run-all.ps1:NGNE_WARMUP_SECONDS",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "option:tests/benchmark-output.test.ts:--out",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/benchmark-output.test.ts"]
+        },
+        {
+            "id": "option:tests/benchmark-output.test.ts:-Command",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/benchmark-output.test.ts"]
+        },
+        {
+            "id": "option:tests/benchmark-output.test.ts:-Compact",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/benchmark-output.test.ts"]
+        },
+        {
+            "id": "option:tests/benchmark-output.test.ts:-ExecutionPolicy",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/benchmark-output.test.ts"]
+        },
+        {
+            "id": "option:tests/benchmark-output.test.ts:-File",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/benchmark-output.test.ts"]
+        },
+        {
+            "id": "option:tests/benchmark-output.test.ts:-NonInteractive",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/benchmark-output.test.ts"]
+        },
+        {
+            "id": "option:tests/benchmark-output.test.ts:-NoProfile",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/benchmark-output.test.ts"]
+        },
+        {
+            "id": "option:tests/benchmark-output.test.ts:-OutputRoot",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/benchmark-output.test.ts"]
+        },
+        {
+            "id": "option:tests/benchmark-output.test.ts:-Workload",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/benchmark-output.test.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--disable-background-timer-throttling",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--disable-backgrounding-occluded-windows",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--disable-default-apps",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--disable-dev-shm-usage",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--disable-renderer-backgrounding",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--disable-vulkan-surface",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--enable-features",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--enable-unsafe-swiftshader",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--enable-unsafe-webgpu",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--force-high-performance-gpu",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--headless",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--host",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--no-first-run",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--no-sandbox",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--outDir",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--port",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--remote-debugging-port",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--strictPort",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--use-angle",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--use-vulkan",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--use-webgpu-adapter",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--user-data-dir",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:--window-size",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:CHROME_BIN",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:GITHUB_STEP_SUMMARY",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:NGNE_BROWSER",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:NGNE_BROWSER_ARTIFACT_DIR",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:NGNE_BROWSER_HEADLESS",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:NGNE_BROWSER_INJECT_CLEANUP_FAILURE",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:NGNE_BROWSER_INJECT_FAILURE",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:NGNE_BROWSER_INJECT_SCREENSHOT_FAILURE",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:NGNE_BROWSER_TIMEOUT_MS",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:NGNE_BROWSER_URL",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:NGNE_CDP_PORT",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:NGNE_CONSUMER_DIST",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:NGNE_CONSUMER_URL",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:NGNE_EXPECT_GPU_VENDOR",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:NGNE_FORCE_HIGH_PERFORMANCE_GPU",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-ci.ts:NGNE_WEBGPU_ADAPTER",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "option:tests/browser-content-checks.ts:NGNE_BROWSER_ARTIFACT_DIR",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "option:tests/installed-browser.mjs:--base",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-browser.mjs"]
+        },
+        {
+            "id": "option:tests/installed-browser.mjs:--host",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-browser.mjs"]
+        },
+        {
+            "id": "option:tests/installed-browser.mjs:--import",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-browser.mjs"]
+        },
+        {
+            "id": "option:tests/installed-browser.mjs:--outDir",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-browser.mjs"]
+        },
+        {
+            "id": "option:tests/installed-browser.mjs:--port",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-browser.mjs"]
+        },
+        {
+            "id": "option:tests/installed-browser.mjs:--strictPort",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-browser.mjs"]
+        },
+        {
+            "id": "option:tests/installed-browser.mjs:NGNE_BROWSER_ARTIFACT_DIR",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-browser.mjs"]
+        },
+        {
+            "id": "option:tests/installed-browser.mjs:NGNE_CONSUMER_DIST",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-browser.mjs"]
+        },
+        {
+            "id": "option:tests/installed-browser.mjs:NGNE_CONSUMER_URL",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-browser.mjs"]
+        },
+        {
+            "id": "option:tests/installed-browser.mjs:NGNE_INSTALLED_BROWSER_DIR",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-browser.mjs"]
+        },
+        {
+            "id": "option:tests/installed-browser.mjs:NGNE_INSTALLED_CONTENT_DIR",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-browser.mjs"]
+        },
+        {
+            "id": "option:tests/installed-content.mjs:--ignore-scripts",
+            "decision": "blocked",
+            "gate": "T2/T3: isolated current package preparation, identities, failure evidence and installed engine coverage; T4 consumer replacement before archive removal.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-content.mjs"]
+        },
+        {
+            "id": "option:tests/installed-content.mjs:--json",
+            "decision": "blocked",
+            "gate": "T2/T3: isolated current package preparation, identities, failure evidence and installed engine coverage; T4 consumer replacement before archive removal.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-content.mjs"]
+        },
+        {
+            "id": "option:tests/installed-content.mjs:--pack-destination",
+            "decision": "blocked",
+            "gate": "T2/T3: isolated current package preparation, identities, failure evidence and installed engine coverage; T4 consumer replacement before archive removal.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-content.mjs"]
+        },
+        {
+            "id": "option:tests/installed-content.mjs:--porcelain",
+            "decision": "blocked",
+            "gate": "T2/T3: isolated current package preparation, identities, failure evidence and installed engine coverage; T4 consumer replacement before archive removal.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-content.mjs"]
+        },
+        {
+            "id": "option:tests/installed-content.mjs:NGNE_INSTALLED_CONTENT_DIR",
+            "decision": "blocked",
+            "gate": "T2/T3: isolated current package preparation, identities, failure evidence and installed engine coverage; T4 consumer replacement before archive removal.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-content.mjs"]
+        },
+        {
+            "id": "option:tests/runner-cleanup.test.ts:-e",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/runner-cleanup.test.ts"]
+        },
+        {
+            "id": "option:tests/tooling/cleanup.mjs:-Command",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/tooling/cleanup.mjs"]
+        },
+        {
+            "id": "option:tests/tooling/cleanup.mjs:-NonInteractive",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/tooling/cleanup.mjs"]
+        },
+        {
+            "id": "option:tests/tooling/cleanup.mjs:-NoProfile",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/tooling/cleanup.mjs"]
+        },
+        {
+            "id": "assertion:benchmarks/content/run.mjs:091b61a1ca8b5888",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "assertion:benchmarks/content/run.mjs:1410b84e3b62b63b",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "assertion:benchmarks/content/run.mjs:1e9f84af52b0a813",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "assertion:benchmarks/content/run.mjs:67faaaa181942925",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "assertion:benchmarks/content/run.mjs:76de8e284bda43ef",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "assertion:benchmarks/content/run.mjs:7c134158702260fc",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "assertion:benchmarks/content/run.mjs:8841b53cdccacdbd",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "assertion:benchmarks/content/run.mjs:917085a395a55548",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "assertion:benchmarks/content/run.mjs:937e58dea4f8dcae",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "assertion:benchmarks/content/run.mjs:a4f2007740e81112",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "assertion:benchmarks/content/run.mjs:ac4c4fd2c93ec296",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "assertion:benchmarks/content/run.mjs:b6b717c6d16ab62c",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "assertion:benchmarks/content/run.mjs:c125f52185a3d859",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "assertion:benchmarks/content/run.mjs:e58e14272f13efa6",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "assertion:benchmarks/content/run.mjs:ee4efc503a718612",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "assertion:tests/benchmark-output.test.ts:4f5bf6273bb13a6c",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/benchmark-output.test.ts"]
+        },
+        {
+            "id": "assertion:tests/benchmark-output.test.ts:501faf1b41a7ec0b",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/benchmark-output.test.ts"]
+        },
+        {
+            "id": "assertion:tests/benchmark-output.test.ts:7a9466df12f588ed",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/benchmark-output.test.ts"]
+        },
+        {
+            "id": "assertion:tests/benchmark-output.test.ts:bba4aff5dbe2a208",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/benchmark-output.test.ts"]
+        },
+        {
+            "id": "assertion:tests/benchmark-output.test.ts:dc7f11e23bdd938e",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/benchmark-output.test.ts"]
+        },
+        {
+            "id": "assertion:tests/benchmark-output.test.ts:e0b86faff6d07d99",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/benchmark-output.test.ts"]
+        },
+        {
+            "id": "assertion:tests/benchmark-output.test.ts:e198157f294c631f",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/benchmark-output.test.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-ci.ts:0acfaa6995ac7b91",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-ci.ts:3af358a6d56de40a",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-ci.ts:46f9e6e7a24cf3a1",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-ci.ts:523488ffad9a0828",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-ci.ts:8bbce617d8dc8bd3",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-ci.ts:9014ac14eb2734c9",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-ci.ts:9230c9279b61e119",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-ci.ts:c8f3d123af37f225",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-ci.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:0a98159c98bf253b",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:186ccab7d0d6301a",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:18e3dfc6dab199f0",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:1cd9bd19f2471367",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:204c54a136ca3d5d",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:23ead21b5936f8ee",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:2c42f37afb9fbe2e",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:2eaa093ca6e87646",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:30ae1f0b25fe05b2",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:321f04e51d44bc3b",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:338407840d49cb3b",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:37b7a077bacf3b76",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:3aa9a20572e3a9b0",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:3c340ae23956f2e3",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:40547c0723c585e3",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:43ab1d79a96bd0a8",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:490d9d601f802e64",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:4a48a22627a7124c",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:52d092191519544e",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:5628298cc62de16b",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:5a2eeaae142b5f82",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:61d56c788758b40d",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:6462395d17fc6805",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:66ceaad8d6bcb3e2",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:72dc0e7ddae70f52",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:73c6263ff3c053e5",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:74f13dd795cfb429",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:791b42cd93d3b9e6",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:7970b6e2f5868e4d",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:7f8f7a09687997ab",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:8f84e9dc6667a950",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:955fb70e0b386035",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:9a649964f7c6d5d7",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:9bd17920af3e3c83",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:9fbc65e915a3afec",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:a3a2c6173c6158ea",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:aa9ef11807a3e0b7",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:aae124a44a50065c",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:b4ce2ac1823e4155",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:b7d906e941d7a11f",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:b96aeb8b974569c2",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:bab9403f5b64024b",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:c182261ed00bf141",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:c7912b54699e7374",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:c8a5b6e088dd6b2c",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:ccd73bd8033b8484",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:d173a5cbe62a8de3",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:d4df2d50a78479d0",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:d8f80effa48c6b32",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:dae9f46b24d2b450",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:db6d7904434aa50a",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:eb821abf8d6c5bee",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:f55835f6f727910c",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:f5f23882fb6226d7",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:f7c942ca2e03c392",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:ff0aa9a91f5f462a",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-content-cleanup.test.ts:641ba3a56cbcdf35",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-cleanup.test.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:09f154e887b0f0b1",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-progression-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:133953d902c12465",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-progression-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:3c5692c040825559",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-progression-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:5165921a695b0d7a",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-progression-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:5c34114d648c3773",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-progression-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:76091f93d807f029",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-progression-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:7d719c4460772a54",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-progression-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:9278295ca5ef9336",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-progression-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:a1014a302817a43a",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-progression-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:f22f4d75d0271ae3",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-progression-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-save-checks.ts:0fcbcb8eb9c20c55",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-save-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-save-checks.ts:12ccf5ceb002975d",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-save-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-save-checks.ts:24834d61a8af40d2",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-save-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-save-checks.ts:268d4b09ace35cc3",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-save-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-save-checks.ts:5c470ffd03e60a8d",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-save-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-save-checks.ts:7018f6bc9310d526",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-save-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-save-checks.ts:9db7539da21458f4",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-save-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-save-checks.ts:ab22a9d2b916a559",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-save-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-save-checks.ts:b06a86bb35393951",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-save-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-save-checks.ts:d7b7caf7525c3974",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-save-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-save-checks.ts:d89d485ef002512c",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-save-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-save-checks.ts:eef8a4076395dcfc",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-save-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-save-checks.ts:f8d9ab05a8e204b4",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-save-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-save-checks.ts:f9c8b0850bea14f7",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-save-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:20e6c600eab72e4e",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-session-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:268cbe84f9bb412b",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-session-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:4216d75d39178ae0",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-session-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:514d2373cc1046fd",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-session-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:7280e545fe31afe9",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-session-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:72aba3563d6635a2",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-session-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:7c42bab78d2f35f6",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-session-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:92a4eec9f5febd6e",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-session-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:96023cc0604cba48",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-session-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:9eff733766e5461c",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-session-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:b3135e03a0e34356",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-session-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:cd12a832bccfd8be",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-session-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:d2edb104111fef67",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-session-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:d5c565b741fd9524",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-session-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:daf8aec89e2508f9",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-session-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:eeb83b00ff6a8933",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-session-checks.ts"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:091407afa4580c7b",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:12ae32cb1ec02d01",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:2129dcf532b39c28",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:2daf9bc711f43db8",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:2eb2722554ecf1ee",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:30b9adb520d21d7a",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:360eba3dea9d2744",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:49dfb2941b09233a",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:4b10bbf473991c71",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:4ccd88c0a3996f8f",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:4ce2c8b6f202c63c",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:61cb0c12efecb606",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:65c49104123a80f0",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:6b2b6bf03dd54cf0",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:78b460ce0f6a97e2",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:987ca7f4b0296235",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:9907411ce31325f1",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:a20578031bdea17f",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:bbdc5ef0f07ff03d",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:bf69390434d26448",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:c52c54c3f665f41f",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:cb09cb75755ca05d",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:e401034611029d0d",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:f0ff8ab3fe1515ab",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:f99fe2eff4c633ea",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:fa23a96004e5a285",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "assertion:tests/content-measurement.test.ts:925595020de2d285",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-measurement.test.ts"]
+        },
+        {
+            "id": "assertion:tests/devtools.test.ts:0a279c84640ac356",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/devtools.test.ts"]
+        },
+        {
+            "id": "assertion:tests/devtools.test.ts:1af1997fc189dd3e",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/devtools.test.ts"]
+        },
+        {
+            "id": "assertion:tests/devtools.test.ts:5b6d89a56f64e569",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/devtools.test.ts"]
+        },
+        {
+            "id": "assertion:tests/devtools.test.ts:61676dee9f22d3c1",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/devtools.test.ts"]
+        },
+        {
+            "id": "assertion:tests/devtools.test.ts:9aa7a7139688d9ac",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/devtools.test.ts"]
+        },
+        {
+            "id": "assertion:tests/devtools.test.ts:c79df5925c66fbe2",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/devtools.test.ts"]
+        },
+        {
+            "id": "assertion:tests/devtools.test.ts:d689beea5425a96a",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/devtools.test.ts"]
+        },
+        {
+            "id": "assertion:tests/devtools.test.ts:e43e05206ed7fe53",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/devtools.test.ts"]
+        },
+        {
+            "id": "assertion:tests/devtools.test.ts:fb676633667d5125",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/devtools.test.ts"]
+        },
+        {
+            "id": "assertion:tests/installed-browser.mjs:1362d7afbc9b74b7",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-browser.mjs"]
+        },
+        {
+            "id": "assertion:tests/installed-browser.mjs:559532ad927252ee",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-browser.mjs"]
+        },
+        {
+            "id": "assertion:tests/installed-browser.mjs:9e3166e38a447fff",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-browser.mjs"]
+        },
+        {
+            "id": "assertion:tests/installed-browser.mjs:f1bc9fa350eeb101",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-browser.mjs"]
+        },
+        {
+            "id": "assertion:tests/installed-content.mjs:091be29ebf729b1e",
+            "decision": "blocked",
+            "gate": "T2/T3: isolated current package preparation, identities, failure evidence and installed engine coverage; T4 consumer replacement before archive removal.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-content.mjs"]
+        },
+        {
+            "id": "assertion:tests/installed-content.mjs:0c7ff2ec4eb657e8",
+            "decision": "blocked",
+            "gate": "T2/T3: isolated current package preparation, identities, failure evidence and installed engine coverage; T4 consumer replacement before archive removal.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-content.mjs"]
+        },
+        {
+            "id": "assertion:tests/installed-content.mjs:25b1f4649ad2c92f",
+            "decision": "blocked",
+            "gate": "T2/T3: isolated current package preparation, identities, failure evidence and installed engine coverage; T4 consumer replacement before archive removal.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-content.mjs"]
+        },
+        {
+            "id": "assertion:tests/installed-content.mjs:31201ec383cd313d",
+            "decision": "blocked",
+            "gate": "T2/T3: isolated current package preparation, identities, failure evidence and installed engine coverage; T4 consumer replacement before archive removal.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-content.mjs"]
+        },
+        {
+            "id": "assertion:tests/installed-content.mjs:4f15faed08cce831",
+            "decision": "blocked",
+            "gate": "T2/T3: isolated current package preparation, identities, failure evidence and installed engine coverage; T4 consumer replacement before archive removal.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-content.mjs"]
+        },
+        {
+            "id": "assertion:tests/installed-content.mjs:6017ac455c859321",
+            "decision": "blocked",
+            "gate": "T2/T3: isolated current package preparation, identities, failure evidence and installed engine coverage; T4 consumer replacement before archive removal.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-content.mjs"]
+        },
+        {
+            "id": "assertion:tests/installed-content.mjs:bae1d8f876be5ef6",
+            "decision": "blocked",
+            "gate": "T2/T3: isolated current package preparation, identities, failure evidence and installed engine coverage; T4 consumer replacement before archive removal.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-content.mjs"]
+        },
+        {
+            "id": "assertion:tests/installed-content.mjs:e1005af643de65b1",
+            "decision": "blocked",
+            "gate": "T2/T3: isolated current package preparation, identities, failure evidence and installed engine coverage; T4 consumer replacement before archive removal.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-content.mjs"]
+        },
+        {
+            "id": "assertion:tests/runner-cleanup.test.ts:3a4d71636e5cfb7e",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/runner-cleanup.test.ts"]
+        },
+        {
+            "id": "assertion:tests/runner-cleanup.test.ts:3b8a424a9e880752",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/runner-cleanup.test.ts"]
+        },
+        {
+            "id": "assertion:tests/runner-cleanup.test.ts:5aa2f73b96024ac3",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/runner-cleanup.test.ts"]
+        },
+        {
+            "id": "assertion:tests/runner-cleanup.test.ts:de5544c0aac4536f",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/runner-cleanup.test.ts"]
+        },
+        {
+            "id": "assertion:tests/runner-cleanup.test.ts:e8779d7a1cc6924c",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/runner-cleanup.test.ts"]
+        },
+        {
+            "id": "assertion:tests/runner-cleanup.test.ts:fca6fc33f4946999",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/runner-cleanup.test.ts"]
+        },
+        {
+            "id": "workload:installed-package",
+            "decision": "blocked",
+            "gate": "T2/T3: isolated current package preparation, identities, failure evidence and installed engine coverage; T4 consumer replacement before archive removal.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-content.mjs"]
+        },
+        {
+            "id": "workload:installed-root-nested",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/installed-browser.mjs"]
+        },
+        {
+            "id": "workload:installed-engine-lifecycle",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "workload:consumer-controls",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "workload:consumer-checkpoint",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-content-checks.ts"]
+        },
+        {
+            "id": "workload:consumer-saves",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-save-checks.ts"]
+        },
+        {
+            "id": "workload:consumer-sessions",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-session-checks.ts"]
+        },
+        {
+            "id": "workload:consumer-progression-races",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["tests/browser-progression-checks.ts"]
+        },
+        {
+            "id": "workload:cpu-ecs",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/cpu/benchmark.ts"]
+        },
+        {
+            "id": "workload:cpu-chaos",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/cpu/benchmark.ts"]
+        },
+        {
+            "id": "workload:cpu-collision-grid",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/cpu/benchmark.ts"]
+        },
+        {
+            "id": "workload:cpu-epoch-traversal",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/cpu/benchmark.ts"]
+        },
+        {
+            "id": "workload:churn-timed",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/cpu/churn-schema.ts"]
+        },
+        {
+            "id": "workload:churn-alloc",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/cpu/churn-schema.ts"]
+        },
+        {
+            "id": "workload:churn-gc",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/cpu/churn-schema.ts"]
+        },
+        {
+            "id": "workload:renderer-grouped",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/renderer-fixture.ts"]
+        },
+        {
+            "id": "workload:renderer-alternating",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/renderer-fixture.ts"]
+        },
+        {
+            "id": "workload:browser-starfall",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "workload:browser-platformer",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "workload:browser-cycles",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "workload:browser-profiler-transport",
+            "decision": "blocked",
+            "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+        },
+        {
+            "id": "workload:content-production-transitions",
+            "decision": "blocked",
+            "gate": "T4: external consumer replacement passes and generic explicit invocation validates evidence; T3 engine replacement also passes before old harness/archive/default dependency removal.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/run.mjs"]
+        },
+        {
+            "id": "workload:content-generated-churn",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/fixtures.mjs"]
+        },
+        {
+            "id": "workload:content-accounting",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["tests/content-accounting.mjs"]
+        },
+        {
+            "id": "workload:content-browser-observer",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/observe.js"]
+        },
+        {
+            "id": "workload:strict-legacy-reader",
+            "decision": "blocked",
+            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/content/compare.mjs"]
+        },
+        {
+            "id": "workload:advisory-legacy-reader",
+            "decision": "blocked",
+            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/compare-runs.mjs"]
+        },
+        {
+            "id": "workload:aggregate-legacy-reader",
+            "decision": "blocked",
+            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-results.mjs"]
+        },
+        {
+            "id": "workload:orchestration-retention",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/run-all.ps1"]
+        },
+        {
+            "id": "workload:compaction-integrity",
+            "decision": "blocked",
+            "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
+            "proof": null,
+            "remainingUsers": ["benchmarks/compact-run.ps1"]
+        }
+    ]
+}

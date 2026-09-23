@@ -13,16 +13,18 @@
         "build": "tsc --noEmit && tsc -p tests/tsconfig.browser.json && tsc -p benchmarks/browser/tsconfig.json && tsc -p tsconfig.lib.json && tsc -p tests/tsconfig.api.json && vite build",
         "build:browser": "vite build --mode browser --outDir dist-browser",
         "typecheck": "tsc --noEmit",
-        "test": "tsx --test tests/*.test.ts",
+        "test": "tsx --test tests/*.test.ts tooling/tests/*.test.ts",
         "test:browser": "tsx tests/browser-ci.ts",
         "bench": "tsx benchmarks/cpu/benchmark.ts",
         "bench:all": "powershell -NoProfile -ExecutionPolicy Bypass -File benchmarks/run-all.ps1",
         "bench:compare": "node benchmarks/compare-runs.mjs",
-        "format": "prettier --write src demo examples tests benchmarks docs .agents .github .vscode \"./*.{ts,md,json,html}\"",
-        "format:check": "prettier --check src demo examples tests benchmarks docs .agents .github .vscode \"./*.{ts,md,json,html}\"",
+        "format": "prettier --write src demo examples tests benchmarks tooling plans docs .agents .github .vscode \"./*.{ts,md,json,html}\"",
+        "format:check": "prettier --check src demo examples tests benchmarks tooling plans docs .agents .github .vscode \"./*.{ts,md,json,html}\"",
         "preview": "vite preview --host 127.0.0.1",
         "bench:content": "node benchmarks/content/run.mjs",
-        "test:installed": "node tests/installed-content.mjs"
+        "test:installed": "node tests/installed-content.mjs",
+        "typecheck:tooling": "tsc -p tooling/tsconfig.node.json",
+        "check:migration": "tsx tooling/commands/check-migration.ts"
     },
     "exports": {
         ".": {
@@ -31,6 +33,7 @@
         }
     },
     "devDependencies": {
+        "@types/node": "24.13.6",
         "@webgpu/types": "0.1.72",
         "prettier": "3.9.6",
         "tsx": "^4.21.0",
