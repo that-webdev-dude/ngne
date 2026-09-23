@@ -28,6 +28,10 @@ jobs:
       - run: npm run typecheck
       - run: npm run build
       - run: npm run build:browser
+      - name: Prepare isolated package evidence
+        run: npm run prepare:package -- --output out/runs/ci-package
+      - name: Verify exact prepared handoff
+        run: npm run check:prepared -- --manifest out/runs/ci-package/evidence/manifest.json
       - name: Build a clean installed content consumer
         run: npm run test:installed
       - name: Install software WebGPU presentation dependencies
@@ -79,6 +83,7 @@ jobs:
         with:
           name: browser-integration
           path: |
+            out/runs/ci-package/evidence/
             .test-output/browser*
             .test-output/installed-content/*.json
             .test-output/installed-content/*.log

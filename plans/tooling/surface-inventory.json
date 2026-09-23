@@ -2380,6 +2380,12 @@
             "label": "needs: verify"
         },
         {
+            "id": "ci:.github/workflows/ci.yml:17aa919041f374de:1",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "run: npm run prepare:package -- --output out/runs/ci-package"
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:1973c3390c1c3fdc:1",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
@@ -2468,6 +2474,12 @@
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
             "label": "- run: npm run typecheck"
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:3c5b503522ae1628:1",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "out/runs/ci-package/evidence/"
         },
         {
             "id": "ci:.github/workflows/ci.yml:3ed7d99d5da3de08:1",
@@ -2662,6 +2674,12 @@
             "label": "jq -e '.status == \"failed\" and ([.cleanup[].status] | all(. == \"passed\"))' .test-output/browser-intentional-failure/results.json"
         },
         {
+            "id": "ci:.github/workflows/ci.yml:9df935b38639c91d:1",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "- name: Verify exact prepared handoff"
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:9eccc2b995a4d911:1",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
@@ -2854,6 +2872,12 @@
             "label": "name: browser-integration"
         },
         {
+            "id": "ci:.github/workflows/ci.yml:d60293ddfdc88f3c:1",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "- name: Prepare isolated package evidence"
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:d6eae703bab3f661:1",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
@@ -2894,6 +2918,12 @@
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
             "label": "NGNE_BROWSER_HEADLESS: 0"
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:defcb9dfad595090:1",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "run: npm run check:prepared -- --manifest out/runs/ci-package/evidence/manifest.json"
         },
         {
             "id": "ci:.github/workflows/ci.yml:e02400c51488e536:1",
@@ -3004,10 +3034,22 @@
             "label": "vite build --mode browser --outDir dist-browser"
         },
         {
+            "id": "command:build:package",
+            "kind": "command",
+            "path": "package.json",
+            "label": "tsx tooling/commands/prepare.ts build"
+        },
+        {
             "id": "command:check:migration",
             "kind": "command",
             "path": "package.json",
             "label": "tsx tooling/commands/check-migration.ts"
+        },
+        {
+            "id": "command:check:prepared",
+            "kind": "command",
+            "path": "package.json",
+            "label": "tsx tooling/commands/prepare.ts verify"
         },
         {
             "id": "command:dev",
@@ -3026,6 +3068,12 @@
             "kind": "command",
             "path": "package.json",
             "label": "prettier --check src demo examples tests benchmarks tooling plans docs .agents .github .vscode \"./*.{ts,md,json,html}\""
+        },
+        {
+            "id": "command:prepare:package",
+            "kind": "command",
+            "path": "package.json",
+            "label": "tsx tooling/commands/prepare.ts prepare"
         },
         {
             "id": "command:preview",
@@ -3748,6 +3796,12 @@
             "label": "tests/state.test.ts"
         },
         {
+            "id": "file:tests/tooling/cleanup.d.mts",
+            "kind": "file",
+            "path": "tests/tooling/cleanup.d.mts",
+            "label": "tests/tooling/cleanup.d.mts"
+        },
+        {
             "id": "file:tests/tooling/cleanup.mjs",
             "kind": "file",
             "path": "tests/tooling/cleanup.mjs",
@@ -3790,6 +3844,60 @@
             "label": "tooling/commands/check-migration.ts"
         },
         {
+            "id": "file:tooling/commands/prepare.ts",
+            "kind": "file",
+            "path": "tooling/commands/prepare.ts",
+            "label": "tooling/commands/prepare.ts"
+        },
+        {
+            "id": "file:tooling/core/fixture.ts",
+            "kind": "file",
+            "path": "tooling/core/fixture.ts",
+            "label": "tooling/core/fixture.ts"
+        },
+        {
+            "id": "file:tooling/core/package.ts",
+            "kind": "file",
+            "path": "tooling/core/package.ts",
+            "label": "tooling/core/package.ts"
+        },
+        {
+            "id": "file:tooling/core/preparation.ts",
+            "kind": "file",
+            "path": "tooling/core/preparation.ts",
+            "label": "tooling/core/preparation.ts"
+        },
+        {
+            "id": "file:tooling/core/process.ts",
+            "kind": "file",
+            "path": "tooling/core/process.ts",
+            "label": "tooling/core/process.ts"
+        },
+        {
+            "id": "file:tooling/core/run.ts",
+            "kind": "file",
+            "path": "tooling/core/run.ts",
+            "label": "tooling/core/run.ts"
+        },
+        {
+            "id": "file:tooling/evidence/identity.ts",
+            "kind": "file",
+            "path": "tooling/evidence/identity.ts",
+            "label": "tooling/evidence/identity.ts"
+        },
+        {
+            "id": "file:tooling/evidence/report.ts",
+            "kind": "file",
+            "path": "tooling/evidence/report.ts",
+            "label": "tooling/evidence/report.ts"
+        },
+        {
+            "id": "file:tooling/evidence/schema.ts",
+            "kind": "file",
+            "path": "tooling/evidence/schema.ts",
+            "label": "tooling/evidence/schema.ts"
+        },
+        {
             "id": "file:tooling/README.md",
             "kind": "file",
             "path": "tooling/README.md",
@@ -3800,6 +3908,12 @@
             "kind": "file",
             "path": "tooling/tests/migration.test.ts",
             "label": "tooling/tests/migration.test.ts"
+        },
+        {
+            "id": "file:tooling/tests/preparation.test.ts",
+            "kind": "file",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "tooling/tests/preparation.test.ts"
         },
         {
             "id": "file:tooling/tsconfig.node.json",
@@ -4720,6 +4834,132 @@
             "label": "GITHUB_STEP_SUMMARY"
         },
         {
+            "id": "option:tooling/commands/prepare.ts:--manifest",
+            "kind": "option",
+            "path": "tooling/commands/prepare.ts",
+            "label": "--manifest"
+        },
+        {
+            "id": "option:tooling/commands/prepare.ts:--output",
+            "kind": "option",
+            "path": "tooling/commands/prepare.ts",
+            "label": "--output"
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--base",
+            "kind": "option",
+            "path": "tooling/core/fixture.ts",
+            "label": "--base"
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--cache",
+            "kind": "option",
+            "path": "tooling/core/fixture.ts",
+            "label": "--cache"
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--config",
+            "kind": "option",
+            "path": "tooling/core/fixture.ts",
+            "label": "--config"
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--ignore-scripts",
+            "kind": "option",
+            "path": "tooling/core/fixture.ts",
+            "label": "--ignore-scripts"
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--input-type",
+            "kind": "option",
+            "path": "tooling/core/fixture.ts",
+            "label": "--input-type"
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--no-audit",
+            "kind": "option",
+            "path": "tooling/core/fixture.ts",
+            "label": "--no-audit"
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--no-fund",
+            "kind": "option",
+            "path": "tooling/core/fixture.ts",
+            "label": "--no-fund"
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--offline",
+            "kind": "option",
+            "path": "tooling/core/fixture.ts",
+            "label": "--offline"
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--outDir",
+            "kind": "option",
+            "path": "tooling/core/fixture.ts",
+            "label": "--outDir"
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--package-lock-only",
+            "kind": "option",
+            "path": "tooling/core/fixture.ts",
+            "label": "--package-lock-only"
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--version",
+            "kind": "option",
+            "path": "tooling/core/fixture.ts",
+            "label": "--version"
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:-e",
+            "kind": "option",
+            "path": "tooling/core/fixture.ts",
+            "label": "-e"
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:-p",
+            "kind": "option",
+            "path": "tooling/core/fixture.ts",
+            "label": "-p"
+        },
+        {
+            "id": "option:tooling/core/package.ts:--cache",
+            "kind": "option",
+            "path": "tooling/core/package.ts",
+            "label": "--cache"
+        },
+        {
+            "id": "option:tooling/core/package.ts:--ignore-scripts",
+            "kind": "option",
+            "path": "tooling/core/package.ts",
+            "label": "--ignore-scripts"
+        },
+        {
+            "id": "option:tooling/core/package.ts:--json",
+            "kind": "option",
+            "path": "tooling/core/package.ts",
+            "label": "--json"
+        },
+        {
+            "id": "option:tooling/core/package.ts:--pack-destination",
+            "kind": "option",
+            "path": "tooling/core/package.ts",
+            "label": "--pack-destination"
+        },
+        {
+            "id": "option:tooling/core/package.ts:-p",
+            "kind": "option",
+            "path": "tooling/core/package.ts",
+            "label": "-p"
+        },
+        {
+            "id": "option:tooling/core/preparation.ts:--porcelain",
+            "kind": "option",
+            "path": "tooling/core/preparation.ts",
+            "label": "--porcelain"
+        },
+        {
             "id": "option:tooling/tests/migration.test.ts:--quiet",
             "kind": "option",
             "path": "tooling/tests/migration.test.ts",
@@ -4742,6 +4982,18 @@
             "kind": "option",
             "path": "tooling/tests/migration.test.ts",
             "label": "NGNE_NEW_OPTION"
+        },
+        {
+            "id": "option:tooling/tests/preparation.test.ts:--input-type",
+            "kind": "option",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "--input-type"
+        },
+        {
+            "id": "option:tooling/tests/preparation.test.ts:-e",
+            "kind": "option",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "-e"
         }
     ],
     "frozenAssertions": [
@@ -9852,6 +10104,102 @@
             "kind": "assertion",
             "path": "tooling/tests/migration.test.ts",
             "label": "\"CI discovery covers repeated steps, conditions, env and multiline commands\""
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:092ee10fa35bb388",
+            "kind": "assertion",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "\"successful execution with failed cleanup never becomes accepted\""
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:0c031f02481cf78d",
+            "kind": "assertion",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "\"extracted identities match legacy content fixtures byte for byte\""
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:10756ee539bd602d",
+            "kind": "assertion",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "`prepared handoff rejects changed ${target} bytes`"
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:2126c42d4fb1fd16",
+            "kind": "assertion",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "\"interrupted and early failed preparations retain readable partial provenance\""
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:38ffa587517175d5",
+            "kind": "assertion",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "\"emission cleaning removes stale engine files while preserving showcase and unrelated outputs\""
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:50cf85ca531c2014",
+            "kind": "assertion",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "\"added installation files and removed evidence payloads invalidate handoff\""
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:5dc5102933de0d8c",
+            "kind": "assertion",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "\"cross-document run mismatch and incomplete preparation cannot be handed off\""
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:69f6a3a6791ec64a",
+            "kind": "assertion",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "\"linked emission and escaping or linked payloads are rejected\""
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:81b0b80b62556b7e",
+            "kind": "assertion",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "\"scenario diagnostics and cleanup failures remain independent and all cleanup runs\""
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:a1d1c18a4c4f7c35",
+            "kind": "assertion",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "\"disposable copy verifies identities first and never edits prepared builds\""
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:af7deda6c69406e0",
+            "kind": "assertion",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "\"policy raw samples and cleanup details survive stage recording and finalization\""
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:d7394e445419d8ba",
+            "kind": "assertion",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "\"failed final evidence writing leaves nonaccepted partial results\""
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:e2969f7fb686a9bf",
+            "kind": "assertion",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "\"budget failure does not erase complete samples or correctness\""
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:f13985c4bd5d48e0",
+            "kind": "assertion",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "\"runtime schemas reject unsupported versions missing fields and inconsistent success\""
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:fb2186570bd5b8ad",
+            "kind": "assertion",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "\"required stages not evaluated cannot produce successful acceptance\""
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:fde68c9a0988e136",
+            "kind": "assertion",
+            "path": "tooling/tests/preparation.test.ts",
+            "label": "\"unique runs retain earlier evidence and reject reused explicit destinations\""
         }
     ],
     "workloads": [
@@ -10046,6 +10394,12 @@
             "kind": "workload",
             "path": "benchmarks/compact-run.ps1",
             "label": "Only successful verified analysis may compact; preserve failed diagnostics, reject symlinks/junctions and targets escaping the owned run."
+        },
+        {
+            "id": "workload:tooling/core/preparation.ts:isolated-package-preparation",
+            "kind": "workload",
+            "path": "tooling/core/preparation.ts",
+            "label": "Clean package emission, npm JSON pack, offline locked isolated install, public declarations/resolution, root and nested builds, verified explicit handoff and independent cleanup evidence."
         }
     ]
 }

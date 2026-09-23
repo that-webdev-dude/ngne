@@ -1,4 +1,4 @@
-# Tooling checks
+# Tooling commands and evidence
 
 Run from the repository root with Node 24 and dependencies installed using `npm ci`:
 
@@ -32,8 +32,86 @@ table using the exported `renderCoverage(inventory, coverage)` function, then ru
 Prettier and the checker. No automatic mapping-approval command is provided.
 
 These checks establish ownership and migration gates. They do not execute the
-planned installed fixture, consumer protocol, benchmarks or evidence exporter.
+consumer protocol, benchmarks or evidence exporter.
 Existing browser, installed-content and benchmark commands still own those
 operations during migration. Their prerequisites and behavior remain documented
 in [repository verification guidance](../README.md), [benchmarks](../benchmarks/README.md)
 and [content measurements](../benchmarks/content/README.md).
+
+## Package preparation
+
+```sh
+npm run build:package
+npm run prepare:package
+npm run prepare:package -- --output out/runs/my-check
+npm run check:prepared -- --manifest out/runs/my-check/evidence/manifest.json
+```
+
+`build:package` cleans only `dist/engine` before compiling the library. It rejects
+linked emission directories and preserves the showcase and other outputs. Do not
+run competing builds against the same checkout concurrently.
+
+`prepare:package` builds the current package and uses the actual filename returned
+by `npm pack --json --ignore-scripts`. It checks required files, hashes every packed
+file, installs in a fresh directory and checks installed bytes against that inventory.
+The small generated probe imports the public package, typechecks against its emitted
+declarations, checks Node resolution, and builds at `/` and `/nested/`. Its explicit
+TypeScript/Vite configs inherit no repository source aliases. This is package/build
+verification; it does not execute browser lifecycle assertions.
+
+The engine has no runtime dependencies. Preparation records a lockfile for the
+selected local tarball, then installs with `npm ci --offline --ignore-scripts`,
+using a run-local cache and no consumer or registry dependency. Adding runtime,
+optional or peer dependencies requires an explicit dependency-policy update.
+Root tooling dependencies must already be installed using the repository lockfile.
+The run records Node/npm/TypeScript versions and fingerprints the root lockfile,
+configuration, runner, evidence modules and existing process-cleanup implementation.
+
+Without `--output`, each invocation creates a timestamp/UUID directory under
+`out/runs`. An explicit destination must not exist, even if empty. Earlier outputs
+are retained. The command prints the exact manifest path; no latest-run discovery
+or fixed fallback is supported. CI prepares once, verifies that handoff, and includes
+the evidence directory in its existing always-uploaded artifact tree.
+
+## Evidence and handoff
+
+`tooling/evidence/schema.ts` owns the shared `ngne-tooling` v1 runtime envelope,
+outcome types and parsers. Every generated evidence JSON has `format`,
+`documentType`, `schemaVersion` and `runId`. npm metadata and lockfiles in the
+disposable working directory retain their native npm schemas.
+
+- `manifest.json`: selection, provenance, observed OS/Node, policy, harness hashes,
+  preparation state, tarball/installed/workload/dependency/build identities.
+- `result.json`: stage progress and independent execution, correctness, budgets,
+  cleanup and evidence outcomes; separate scenario, diagnostic and cleanup failures.
+- `report.md`: projection of those records, including scope limitations.
+- `artifacts.json`: evidence-relative paths, SHA-256 hashes and byte sizes; excludes
+  itself. Logs, package, builds and final records are covered.
+- `stages/<id>/`: command logs and optional namespaced observation/measurement
+  records. Raw samples and policy remain suite-owned and are not transformed.
+
+Manifest payload paths are relative to the run root; artifact paths are relative to
+its `evidence/` directory. References use POSIX separators. Readers reject escaping
+paths, links, missing/added/changed files, unsupported schemas and cross-document
+run IDs. Absolute paths in command log text are diagnostics, not file references.
+
+Initial and stage records are written atomically. Finalization attempts every
+registered cleanup step using the existing process-tree verifier; failure remains
+a failure even after successful checks. Final acceptance is written last, after the
+report and artifact inventory. Interrupted or failed evidence publication remains
+partial and cannot be reused. Required stages must complete with passing correctness;
+budgets are not evaluated during preparation. An over-budget measurement may retain
+complete samples and passing correctness while acceptance fails.
+
+`verifyPrepared(manifestPath)` validates runtime schemas, required evidence,
+cross-document IDs, payload hashes, the tarball, installed files, fixture inputs,
+lockfiles and both builds before reuse. `copyPreparedBuild` performs the same check
+before copying a selected build to a fresh disposable destination for fault injection.
+Keep prepared inputs immutable. The handoff requires its original `work/` installation
+and matching Node version; an archived evidence tree alone cannot resume execution.
+This is integrity checking, not cryptographic authentication of a malicious author.
+
+Failure logs and available payloads remain in the run. Working installations and
+caches are not uploaded by CI. Portable export policies and consumer response
+validation remain separate work; no new browser, compatibility or performance
+claim is implied by package preparation. Existing commands remain active.

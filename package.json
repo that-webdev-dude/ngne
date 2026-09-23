@@ -24,7 +24,10 @@
         "bench:content": "node benchmarks/content/run.mjs",
         "test:installed": "node tests/installed-content.mjs",
         "typecheck:tooling": "tsc -p tooling/tsconfig.node.json",
-        "check:migration": "tsx tooling/commands/check-migration.ts"
+        "check:migration": "tsx tooling/commands/check-migration.ts",
+        "build:package": "tsx tooling/commands/prepare.ts build",
+        "prepare:package": "tsx tooling/commands/prepare.ts prepare",
+        "check:prepared": "tsx tooling/commands/prepare.ts verify"
     },
     "exports": {
         ".": {

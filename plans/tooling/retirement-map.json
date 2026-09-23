@@ -3090,6 +3090,13 @@
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
             "proof": null,
             "remainingUsers": ["benchmarks/compact-run.ps1"]
+        },
+        {
+            "id": "file:tests/tooling/cleanup.d.mts",
+            "decision": "blocked",
+            "gate": "Move the shared cleanup implementation with cross-platform process-tree parity before retiring its declaration boundary.",
+            "proof": null,
+            "remainingUsers": ["tooling/core/process.ts", "tooling/core/run.ts"]
         }
     ]
 }

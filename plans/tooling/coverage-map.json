@@ -82,6 +82,13 @@
             "reason": "Keep required verification and deploy gate; replace embedded consumer stages/default artifacts after T4 coverage passes and integrate new tooling checks incrementally."
         },
         {
+            "id": "ci:.github/workflows/ci.yml:17aa919041f374de:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci.yml",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:1973c3390c1c3fdc:1",
             "owner": "infrastructure",
             "destination": ".github/workflows/ci.yml",
@@ -185,6 +192,13 @@
             "destination": ".github/workflows/ci.yml",
             "action": "retain",
             "reason": "Keep required verification and deploy gate; replace embedded consumer stages/default artifacts after T4 coverage passes and integrate new tooling checks incrementally."
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:3c5b503522ae1628:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci.yml",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
         },
         {
             "id": "ci:.github/workflows/ci.yml:3ed7d99d5da3de08:1",
@@ -411,6 +425,13 @@
             "reason": "Keep required verification and deploy gate; replace embedded consumer stages/default artifacts after T4 coverage passes and integrate new tooling checks incrementally."
         },
         {
+            "id": "ci:.github/workflows/ci.yml:9df935b38639c91d:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci.yml",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:9eccc2b995a4d911:1",
             "owner": "infrastructure",
             "destination": ".github/workflows/ci.yml",
@@ -635,6 +656,13 @@
             "reason": "Keep required verification and deploy gate; replace embedded consumer stages/default artifacts after T4 coverage passes and integrate new tooling checks incrementally."
         },
         {
+            "id": "ci:.github/workflows/ci.yml:d60293ddfdc88f3c:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci.yml",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:d6eae703bab3f661:1",
             "owner": "infrastructure",
             "destination": "tooling/commands/verify.ts",
@@ -682,6 +710,13 @@
             "destination": ".github/workflows/ci.yml",
             "action": "retain",
             "reason": "Keep required verification and deploy gate; replace embedded consumer stages/default artifacts after T4 coverage passes and integrate new tooling checks incrementally."
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:defcb9dfad595090:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci.yml",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
         },
         {
             "id": "ci:.github/workflows/ci.yml:e02400c51488e536:1",
@@ -810,11 +845,25 @@
             "reason": "Keep command/config compatibility while separating package/showcase/browser/tooling targets; existing default consumer command is retired only after replacement gates."
         },
         {
+            "id": "command:build:package",
+            "owner": "infrastructure",
+            "destination": "package.json",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
             "id": "command:check:migration",
             "owner": "infrastructure",
             "destination": "package.json",
             "action": "retain",
             "reason": "Keep command/config compatibility while separating package/showcase/browser/tooling targets; existing default consumer command is retired only after replacement gates."
+        },
+        {
+            "id": "command:check:prepared",
+            "owner": "infrastructure",
+            "destination": "package.json",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
         },
         {
             "id": "command:dev",
@@ -836,6 +885,13 @@
             "destination": "package.json",
             "action": "retain",
             "reason": "Keep command/config compatibility while separating package/showcase/browser/tooling targets; existing default consumer command is retired only after replacement gates."
+        },
+        {
+            "id": "command:prepare:package",
+            "owner": "infrastructure",
+            "destination": "package.json",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
         },
         {
             "id": "command:preview",
@@ -1678,6 +1734,13 @@
             "reason": "Existing engine unit/contract/browser fixture coverage and support remain; do not delete engine tests during tooling migration."
         },
         {
+            "id": "file:tests/tooling/cleanup.d.mts",
+            "owner": "infrastructure",
+            "destination": "tooling/core/process.ts",
+            "action": "migrate",
+            "reason": "Typed boundary to the unchanged shared cleanup owner; migrate with the process implementation after cross-platform parity."
+        },
+        {
             "id": "file:tests/tooling/cleanup.mjs",
             "owner": "infrastructure",
             "destination": "tooling/core/process.ts",
@@ -1727,6 +1790,69 @@
             "reason": "Current migration checker, harness or operating documentation; extend alongside each implementation."
         },
         {
+            "id": "file:tooling/commands/prepare.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/prepare.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "file:tooling/core/fixture.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/core/fixture.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "file:tooling/core/package.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/core/package.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "file:tooling/core/preparation.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/core/preparation.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "file:tooling/core/process.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/core/process.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "file:tooling/core/run.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/core/run.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "file:tooling/evidence/identity.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/evidence/identity.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "file:tooling/evidence/report.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/evidence/report.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "file:tooling/evidence/schema.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/evidence/schema.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
             "id": "file:tooling/README.md",
             "owner": "infrastructure",
             "destination": "tooling/README.md",
@@ -1739,6 +1865,13 @@
             "destination": "tooling/tests/migration.test.ts",
             "action": "retain",
             "reason": "Current migration checker, harness or operating documentation; extend alongside each implementation."
+        },
+        {
+            "id": "file:tooling/tests/preparation.test.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
         },
         {
             "id": "file:tooling/tsconfig.node.json",
@@ -2812,6 +2945,153 @@
             "reason": "Current migration checker, harness or operating documentation; extend alongside each implementation."
         },
         {
+            "id": "option:tooling/commands/prepare.ts:--manifest",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/prepare.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/commands/prepare.ts:--output",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/prepare.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--base",
+            "owner": "infrastructure",
+            "destination": "tooling/core/fixture.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--cache",
+            "owner": "infrastructure",
+            "destination": "tooling/core/fixture.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--config",
+            "owner": "infrastructure",
+            "destination": "tooling/core/fixture.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--ignore-scripts",
+            "owner": "infrastructure",
+            "destination": "tooling/core/fixture.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--input-type",
+            "owner": "infrastructure",
+            "destination": "tooling/core/fixture.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--no-audit",
+            "owner": "infrastructure",
+            "destination": "tooling/core/fixture.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--no-fund",
+            "owner": "infrastructure",
+            "destination": "tooling/core/fixture.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--offline",
+            "owner": "infrastructure",
+            "destination": "tooling/core/fixture.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--outDir",
+            "owner": "infrastructure",
+            "destination": "tooling/core/fixture.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--package-lock-only",
+            "owner": "infrastructure",
+            "destination": "tooling/core/fixture.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:--version",
+            "owner": "infrastructure",
+            "destination": "tooling/core/fixture.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:-e",
+            "owner": "infrastructure",
+            "destination": "tooling/core/fixture.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/fixture.ts:-p",
+            "owner": "infrastructure",
+            "destination": "tooling/core/fixture.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/package.ts:--cache",
+            "owner": "infrastructure",
+            "destination": "tooling/core/package.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/package.ts:--ignore-scripts",
+            "owner": "infrastructure",
+            "destination": "tooling/core/package.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/package.ts:--json",
+            "owner": "infrastructure",
+            "destination": "tooling/core/package.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/package.ts:--pack-destination",
+            "owner": "infrastructure",
+            "destination": "tooling/core/package.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/package.ts:-p",
+            "owner": "infrastructure",
+            "destination": "tooling/core/package.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/core/preparation.ts:--porcelain",
+            "owner": "infrastructure",
+            "destination": "tooling/core/preparation.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
             "id": "option:tooling/tests/migration.test.ts:--quiet",
             "owner": "infrastructure",
             "destination": "tooling/tests/migration.test.ts",
@@ -2838,6 +3118,20 @@
             "destination": "tooling/tests/migration.test.ts",
             "action": "retain",
             "reason": "Current migration checker, harness or operating documentation; extend alongside each implementation."
+        },
+        {
+            "id": "option:tooling/tests/preparation.test.ts:--input-type",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/tests/preparation.test.ts:-e",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
         }
     ],
     "assertions": [
@@ -5878,29 +6172,204 @@
             "destination": "tooling/tests/migration.test.ts",
             "action": "retain",
             "reason": "Current migration checker, harness or operating documentation; extend alongside each implementation."
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:092ee10fa35bb388",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:0c031f02481cf78d",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:10756ee539bd602d",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:2126c42d4fb1fd16",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:38ffa587517175d5",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:50cf85ca531c2014",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:5dc5102933de0d8c",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:69f6a3a6791ec64a",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:81b0b80b62556b7e",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:a1d1c18a4c4f7c35",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:af7deda6c69406e0",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:d7394e445419d8ba",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:e2969f7fb686a9bf",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:f13985c4bd5d48e0",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:fb2186570bd5b8ad",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "assertion:tooling/tests/preparation.test.ts:fde68c9a0988e136",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/preparation.test.ts",
+            "action": "retain",
+            "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
         }
     ],
     "workloads": [
         {
-            "id": "workload:installed-package",
+            "id": "workload:advisory-legacy-reader",
             "owner": "infrastructure",
-            "destination": "tooling/core/package.ts",
+            "destination": "tooling/evidence/compare.ts",
             "action": "migrate",
-            "reason": "Extract package preparation/identity; remove fixed tarball/archive/default consumer and delegate consumer tests/builds through explicit contract."
+            "reason": "Extract bounded legacy strict/advisory readers with fixtures; preserve attention scan separately from controlled acceptance."
         },
         {
-            "id": "workload:installed-root-nested",
+            "id": "workload:aggregate-legacy-reader",
             "owner": "infrastructure",
-            "destination": "tooling/suites/verification/browser/installed.ts",
+            "destination": "tooling/evidence/compare.ts",
             "action": "migrate",
-            "reason": "Preserve root/nested and cleanup gates on engine fixture; explicit external compatibility owns game scenario."
+            "reason": "Extract bounded legacy strict/advisory readers with fixtures; preserve attention scan separately from controlled acceptance."
         },
         {
-            "id": "workload:installed-engine-lifecycle",
+            "id": "workload:browser-cycles",
+            "owner": "infrastructure",
+            "destination": "tooling/core/browser/session.ts",
+            "action": "migrate",
+            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+        },
+        {
+            "id": "workload:browser-engine",
             "owner": "engine",
-            "destination": "tooling/suites/verification/browser/installed.ts",
+            "destination": "tests/browser-validation.ts",
+            "action": "retain",
+            "reason": "Existing engine unit/contract/browser fixture coverage and support remain; do not delete engine tests during tooling migration."
+        },
+        {
+            "id": "workload:browser-platformer",
+            "owner": "infrastructure",
+            "destination": "tooling/core/browser/session.ts",
             "action": "migrate",
-            "reason": "Installed minimal engine fixture must prove these behaviors without any external game files or source alias."
+            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+        },
+        {
+            "id": "workload:browser-profiler-transport",
+            "owner": "infrastructure",
+            "destination": "tooling/core/browser/session.ts",
+            "action": "migrate",
+            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+        },
+        {
+            "id": "workload:browser-starfall",
+            "owner": "infrastructure",
+            "destination": "tooling/core/browser/session.ts",
+            "action": "migrate",
+            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+        },
+        {
+            "id": "workload:churn-alloc",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/cpu/churn-schema.ts",
+            "action": "migrate",
+            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+        },
+        {
+            "id": "workload:churn-gc",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/cpu/churn-schema.ts",
+            "action": "migrate",
+            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+        },
+        {
+            "id": "workload:churn-timed",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/cpu/churn-schema.ts",
+            "action": "migrate",
+            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+        },
+        {
+            "id": "workload:compaction-integrity",
+            "owner": "infrastructure",
+            "destination": "tooling/evidence/export.ts",
+            "action": "migrate",
+            "reason": "Replace PowerShell retention with Node only after integrity, safe pruning, failure retention and export parity."
+        },
+        {
+            "id": "workload:consumer-checkpoint",
+            "owner": "consumer",
+            "destination": "consumer:verification/consumer-checkpoint",
+            "action": "migrate",
+            "reason": "Consumer owns authored game scenario and measurements; require passing external replacement and generic explicit compatibility before retirement."
         },
         {
             "id": "workload:consumer-controls",
@@ -5910,9 +6379,9 @@
             "reason": "Consumer owns authored game scenario and measurements; require passing external replacement and generic explicit compatibility before retirement."
         },
         {
-            "id": "workload:consumer-checkpoint",
+            "id": "workload:consumer-progression-races",
             "owner": "consumer",
-            "destination": "consumer:verification/consumer-checkpoint",
+            "destination": "consumer:verification/consumer-progression-races",
             "action": "migrate",
             "reason": "Consumer owns authored game scenario and measurements; require passing external replacement and generic explicit compatibility before retirement."
         },
@@ -5931,32 +6400,32 @@
             "reason": "Consumer owns authored game scenario and measurements; require passing external replacement and generic explicit compatibility before retirement."
         },
         {
-            "id": "workload:consumer-progression-races",
+            "id": "workload:content-accounting",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "action": "migrate",
+            "reason": "Preserve resource ownership accounting independently of consumer mechanics; baseline changes require measurement."
+        },
+        {
+            "id": "workload:content-browser-observer",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/content/observe.js",
+            "action": "migrate",
+            "reason": "Remove game JSON schemas, seed/defaults, UI/actor assumptions; preserve engine resource method with deterministic engine-owned workload and new baseline."
+        },
+        {
+            "id": "workload:content-generated-churn",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/content/fixtures.mjs",
+            "action": "migrate",
+            "reason": "Remove game JSON schemas, seed/defaults, UI/actor assumptions; preserve engine resource method with deterministic engine-owned workload and new baseline."
+        },
+        {
+            "id": "workload:content-production-transitions",
             "owner": "consumer",
-            "destination": "consumer:verification/consumer-progression-races",
+            "destination": "consumer:verification/content-production-transitions",
             "action": "migrate",
             "reason": "Consumer owns authored game scenario and measurements; require passing external replacement and generic explicit compatibility before retirement."
-        },
-        {
-            "id": "workload:browser-engine",
-            "owner": "engine",
-            "destination": "tests/browser-validation.ts",
-            "action": "retain",
-            "reason": "Existing engine unit/contract/browser fixture coverage and support remain; do not delete engine tests during tooling migration."
-        },
-        {
-            "id": "workload:showcase-browser",
-            "owner": "showcase",
-            "destination": "tests/browser-game-checks.ts",
-            "action": "retain",
-            "reason": "Preserve existing built showcase verification and its deployment relationship."
-        },
-        {
-            "id": "workload:cpu-ecs",
-            "owner": "benchmark",
-            "destination": "tooling/suites/benchmarks/cpu/benchmark.ts",
-            "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
         },
         {
             "id": "workload:cpu-chaos",
@@ -5973,6 +6442,13 @@
             "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
         },
         {
+            "id": "workload:cpu-ecs",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/cpu/benchmark.ts",
+            "action": "migrate",
+            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+        },
+        {
             "id": "workload:cpu-epoch-traversal",
             "owner": "benchmark",
             "destination": "tooling/suites/benchmarks/cpu/benchmark.ts",
@@ -5980,23 +6456,37 @@
             "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
         },
         {
-            "id": "workload:churn-timed",
-            "owner": "benchmark",
-            "destination": "tooling/suites/benchmarks/cpu/churn-schema.ts",
+            "id": "workload:installed-engine-lifecycle",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
             "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+            "reason": "Installed minimal engine fixture must prove these behaviors without any external game files or source alias."
         },
         {
-            "id": "workload:churn-alloc",
-            "owner": "benchmark",
-            "destination": "tooling/suites/benchmarks/cpu/churn-schema.ts",
+            "id": "workload:installed-package",
+            "owner": "infrastructure",
+            "destination": "tooling/core/package.ts",
             "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+            "reason": "Extract package preparation/identity; remove fixed tarball/archive/default consumer and delegate consumer tests/builds through explicit contract."
         },
         {
-            "id": "workload:churn-gc",
+            "id": "workload:installed-root-nested",
+            "owner": "infrastructure",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "migrate",
+            "reason": "Preserve root/nested and cleanup gates on engine fixture; explicit external compatibility owns game scenario."
+        },
+        {
+            "id": "workload:orchestration-retention",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/benchmark.ts",
+            "action": "migrate",
+            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+        },
+        {
+            "id": "workload:renderer-alternating",
             "owner": "benchmark",
-            "destination": "tooling/suites/benchmarks/cpu/churn-schema.ts",
+            "destination": "tooling/suites/benchmarks/browser/renderer-fixture.ts",
             "action": "migrate",
             "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
         },
@@ -6008,67 +6498,11 @@
             "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
         },
         {
-            "id": "workload:renderer-alternating",
-            "owner": "benchmark",
-            "destination": "tooling/suites/benchmarks/browser/renderer-fixture.ts",
-            "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
-        },
-        {
-            "id": "workload:browser-starfall",
-            "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
-            "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
-        },
-        {
-            "id": "workload:browser-platformer",
-            "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
-            "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
-        },
-        {
-            "id": "workload:browser-cycles",
-            "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
-            "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
-        },
-        {
-            "id": "workload:browser-profiler-transport",
-            "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
-            "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
-        },
-        {
-            "id": "workload:content-production-transitions",
-            "owner": "consumer",
-            "destination": "consumer:verification/content-production-transitions",
-            "action": "migrate",
-            "reason": "Consumer owns authored game scenario and measurements; require passing external replacement and generic explicit compatibility before retirement."
-        },
-        {
-            "id": "workload:content-generated-churn",
-            "owner": "benchmark",
-            "destination": "tooling/suites/benchmarks/content/fixtures.mjs",
-            "action": "migrate",
-            "reason": "Remove game JSON schemas, seed/defaults, UI/actor assumptions; preserve engine resource method with deterministic engine-owned workload and new baseline."
-        },
-        {
-            "id": "workload:content-accounting",
-            "owner": "benchmark",
-            "destination": "tooling/suites/benchmarks/content/accounting.ts",
-            "action": "migrate",
-            "reason": "Preserve resource ownership accounting independently of consumer mechanics; baseline changes require measurement."
-        },
-        {
-            "id": "workload:content-browser-observer",
-            "owner": "benchmark",
-            "destination": "tooling/suites/benchmarks/content/observe.js",
-            "action": "migrate",
-            "reason": "Remove game JSON schemas, seed/defaults, UI/actor assumptions; preserve engine resource method with deterministic engine-owned workload and new baseline."
+            "id": "workload:showcase-browser",
+            "owner": "showcase",
+            "destination": "tests/browser-game-checks.ts",
+            "action": "retain",
+            "reason": "Preserve existing built showcase verification and its deployment relationship."
         },
         {
             "id": "workload:strict-legacy-reader",
@@ -6078,32 +6512,11 @@
             "reason": "Extract bounded legacy strict/advisory readers with fixtures; preserve attention scan separately from controlled acceptance."
         },
         {
-            "id": "workload:advisory-legacy-reader",
+            "id": "workload:tooling/core/preparation.ts:isolated-package-preparation",
             "owner": "infrastructure",
-            "destination": "tooling/evidence/compare.ts",
-            "action": "migrate",
-            "reason": "Extract bounded legacy strict/advisory readers with fixtures; preserve attention scan separately from controlled acceptance."
-        },
-        {
-            "id": "workload:aggregate-legacy-reader",
-            "owner": "infrastructure",
-            "destination": "tooling/evidence/compare.ts",
-            "action": "migrate",
-            "reason": "Extract bounded legacy strict/advisory readers with fixtures; preserve attention scan separately from controlled acceptance."
-        },
-        {
-            "id": "workload:orchestration-retention",
-            "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
-            "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
-        },
-        {
-            "id": "workload:compaction-integrity",
-            "owner": "infrastructure",
-            "destination": "tooling/evidence/export.ts",
-            "action": "migrate",
-            "reason": "Replace PowerShell retention with Node only after integrity, safe pruning, failure retention and export parity."
+            "destination": "tooling/core/preparation.ts",
+            "action": "retain",
+            "reason": "Engine-owned preparation workload; no external consumer or browser execution; new baseline required for any future performance claims."
         }
     ]
 }
