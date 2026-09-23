@@ -143,3 +143,13 @@ Full export may add fixture builds, traces and heaps. Declare omissions and thei
 limits; never export dependencies, caches or browser profiles. Preserve failed
 evidence and old outputs. T2 begins this implementation; T8 completes export and
 aggregate delivery. No exporter or new runtime proof is claimed here.
+
+## Interoperability and baseline status
+
+T1b local deliverables are the [consumer command contract](consumer-command-contract.md),
+shared-schema validator/synthetic conformance fixtures and [bounded legacy formats](legacy-formats.md).
+Consumer-owner agreement remains explicitly unresolved. The [CI cost record](ci-cost-baseline.json)
+contains no measured runs yet; the [deployment-disabled baseline procedure](ci-baseline-procedure.md)
+and inactive workflow draft are ready for authorized hosted execution. T1b is incomplete
+until five successful frozen-revision measurements exist. T4 agreement/real conformance
+and T8/T10 measured-cost gates remain in force; no retirement is approved.

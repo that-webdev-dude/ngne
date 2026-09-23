@@ -1,0 +1,52 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "ci-cost-baseline",
+    "schemaVersion": 1,
+    "runId": "frozen-ci-baseline-2026-09-23",
+    "status": "incomplete",
+    "baseline": {
+        "revision": "7d7585ede1aa25147b423f48c9c7f1339678f280",
+        "workflow": ".github/workflows/ci.yml",
+        "workflowSha256": "9d101c1d7765d2d77a6165146061bade177603cdec33aeedf2ae7283a35b580c"
+    },
+    "requiredSuccessfulRuns": 5,
+    "successfulRuns": [],
+    "failedAttempts": [],
+    "medianWallSeconds": null,
+    "proposedMaximumMedianGrowthPercent": 20,
+    "accessCheck": {
+        "date": "2026-09-23",
+        "pullRequestRunsAtFrozenRevision": 0,
+        "scope": "Available GitHub tool queries only the first page of pull-request-triggered runs; not proof of absent dispatch/push history.",
+        "launchCapability": "No workflow-dispatch tool exposed and gh unavailable in PATH. No hosted run attempted."
+    },
+    "blockers": [
+        "Five deliberate successful deployment-disabled hosted verification measurements remain required.",
+        "Publishing the prepared workflow on a non-main remote branch and dispatching it requires external-action authorization and an authenticated dispatch capability."
+    ],
+    "procedure": "ci-baseline-procedure.md",
+    "requiredPerRunFields": [
+        "runId",
+        "attempt",
+        "url",
+        "conclusion",
+        "frozenRevision",
+        "frozenWorkflowSha256",
+        "measurementWorkflowRevision",
+        "measurementWorkflowSha256",
+        "runnerImage",
+        "runnerImageVersion",
+        "nodeVersion",
+        "npmVersion",
+        "browserVersion",
+        "cachePolicy",
+        "cacheHit",
+        "jobStartedAt",
+        "jobCompletedAt",
+        "wallSecondsExcludingQueue",
+        "stages",
+        "artifacts",
+        "artifactBytes"
+    ],
+    "comparisonPolicy": "Keep all attempts and every successful run, including slow successes. Five matched final runs and equivalent-coverage stage mapping are required; rerun baseline if runner/toolchain/cache conditions drift. Relocated consumer work is not an engine speedup."
+}

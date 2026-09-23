@@ -89,12 +89,12 @@ function path(value: unknown): string {
     if (!safePath(p)) throw Error(`Unsafe relative path: ${p}`);
     return p;
 }
-function sha(value: unknown): string {
+export function sha(value: unknown): string {
     const s = string(value);
     if (!/^[a-f0-9]{64}$/.test(s)) throw Error("Invalid SHA-256");
     return s;
 }
-function files(value: unknown): Identities {
+export function files(value: unknown): Identities {
     const entries = Object.entries(object(value));
     if (!entries.length) throw Error("Empty required inventory");
     return Object.fromEntries(entries.map(([p, s]) => [path(p), sha(s)]));

@@ -1,0 +1,12 @@
+[
+    {
+        "workload": "synthetic",
+        "environment": {
+            "adapter": "synthetic"
+        },
+        "visibilityChanges": [],
+        "metrics": {
+            "p95": 1
+        }
+    }
+]

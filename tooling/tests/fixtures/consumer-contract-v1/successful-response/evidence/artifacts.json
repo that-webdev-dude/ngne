@@ -1,0 +1,28 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "artifacts",
+    "schemaVersion": 1,
+    "runId": "conformance-example",
+    "files": [
+        {
+            "path": "manifest.json",
+            "sha256": "4c53ffff81a253af85a280ce589376ceb5e47e0f467205acbe3bea56fd1c2fe5",
+            "bytes": 925
+        },
+        {
+            "path": "package/synthetic.tgz",
+            "sha256": "1ccb8853258c68b3773c7670398b04a04a78bdd295ea11c3d65107524689e94e",
+            "bytes": 23
+        },
+        {
+            "path": "report.md",
+            "sha256": "1843467034e64016ac3b278e4778927ed1f9e3eaae042d60e6f9994ee06e13a5",
+            "bytes": 79
+        },
+        {
+            "path": "result.json",
+            "sha256": "35adaa5278c4727c0f41a9229ba24c4d1668423dc9e1a6776ec6194accb5134e",
+            "bytes": 631
+        }
+    ]
+}

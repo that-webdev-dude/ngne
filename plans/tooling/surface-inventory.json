@@ -3880,10 +3880,22 @@
             "label": "tooling/core/run.ts"
         },
         {
+            "id": "file:tooling/evidence/consumer-contract-v1.ts",
+            "kind": "file",
+            "path": "tooling/evidence/consumer-contract-v1.ts",
+            "label": "tooling/evidence/consumer-contract-v1.ts"
+        },
+        {
             "id": "file:tooling/evidence/identity.ts",
             "kind": "file",
             "path": "tooling/evidence/identity.ts",
             "label": "tooling/evidence/identity.ts"
+        },
+        {
+            "id": "file:tooling/evidence/legacy-format.ts",
+            "kind": "file",
+            "path": "tooling/evidence/legacy-format.ts",
+            "label": "tooling/evidence/legacy-format.ts"
         },
         {
             "id": "file:tooling/evidence/report.ts",
@@ -3902,6 +3914,210 @@
             "kind": "file",
             "path": "tooling/README.md",
             "label": "tooling/README.md"
+        },
+        {
+            "id": "file:tooling/tests/consumer-contract.test.ts",
+            "kind": "file",
+            "path": "tooling/tests/consumer-contract.test.ts",
+            "label": "tooling/tests/consumer-contract.test.ts"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/consumer-contract-v1/cases.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/consumer-contract-v1/cases.json",
+            "label": "tooling/tests/fixtures/consumer-contract-v1/cases.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/consumer-contract-v1/stub.ts",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/consumer-contract-v1/stub.ts",
+            "label": "tooling/tests/fixtures/consumer-contract-v1/stub.ts"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/artifacts.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/artifacts.json",
+            "label": "tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/artifacts.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/manifest.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/manifest.json",
+            "label": "tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/manifest.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/package/synthetic.tgz",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/package/synthetic.tgz",
+            "label": "tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/package/synthetic.tgz"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/report.md",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/report.md",
+            "label": "tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/report.md"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/result.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/result.json",
+            "label": "tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/result.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-compact/analysis.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/benchmark-compact/analysis.json",
+            "label": "tooling/tests/fixtures/legacy/benchmark-compact/analysis.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-compact/manifest.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/benchmark-compact/manifest.json",
+            "label": "tooling/tests/fixtures/legacy/benchmark-compact/manifest.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-consolidated/analysis.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/benchmark-consolidated/analysis.json",
+            "label": "tooling/tests/fixtures/legacy/benchmark-consolidated/analysis.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-consolidated/churn/result.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/benchmark-consolidated/churn/result.json",
+            "label": "tooling/tests/fixtures/legacy/benchmark-consolidated/churn/result.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-consolidated/manifest.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/benchmark-consolidated/manifest.json",
+            "label": "tooling/tests/fixtures/legacy/benchmark-consolidated/manifest.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-missing-analysis/churn/result.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/benchmark-missing-analysis/churn/result.json",
+            "label": "tooling/tests/fixtures/legacy/benchmark-missing-analysis/churn/result.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-missing-analysis/manifest.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/benchmark-missing-analysis/manifest.json",
+            "label": "tooling/tests/fixtures/legacy/benchmark-missing-analysis/manifest.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-per-stage/churn/result.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/benchmark-per-stage/churn/result.json",
+            "label": "tooling/tests/fixtures/legacy/benchmark-per-stage/churn/result.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-per-stage/manifest.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/benchmark-per-stage/manifest.json",
+            "label": "tooling/tests/fixtures/legacy/benchmark-per-stage/manifest.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-tampered-analysis/analysis.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/benchmark-tampered-analysis/analysis.json",
+            "label": "tooling/tests/fixtures/legacy/benchmark-tampered-analysis/analysis.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-tampered-analysis/churn/result.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/benchmark-tampered-analysis/churn/result.json",
+            "label": "tooling/tests/fixtures/legacy/benchmark-tampered-analysis/churn/result.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-tampered-analysis/manifest.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/benchmark-tampered-analysis/manifest.json",
+            "label": "tooling/tests/fixtures/legacy/benchmark-tampered-analysis/manifest.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-cleanup-failed/fixtures.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/content-cleanup-failed/fixtures.json",
+            "label": "tooling/tests/fixtures/legacy/content-cleanup-failed/fixtures.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-cleanup-failed/manifest.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/content-cleanup-failed/manifest.json",
+            "label": "tooling/tests/fixtures/legacy/content-cleanup-failed/manifest.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-cleanup-failed/result.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/content-cleanup-failed/result.json",
+            "label": "tooling/tests/fixtures/legacy/content-cleanup-failed/result.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-cleanup-failed/runs.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/content-cleanup-failed/runs.json",
+            "label": "tooling/tests/fixtures/legacy/content-cleanup-failed/runs.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-missing-tooling/fixtures.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/content-missing-tooling/fixtures.json",
+            "label": "tooling/tests/fixtures/legacy/content-missing-tooling/fixtures.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-missing-tooling/manifest.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/content-missing-tooling/manifest.json",
+            "label": "tooling/tests/fixtures/legacy/content-missing-tooling/manifest.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-missing-tooling/result.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/content-missing-tooling/result.json",
+            "label": "tooling/tests/fixtures/legacy/content-missing-tooling/result.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-missing-tooling/runs.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/content-missing-tooling/runs.json",
+            "label": "tooling/tests/fixtures/legacy/content-missing-tooling/runs.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-valid/fixtures.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/content-valid/fixtures.json",
+            "label": "tooling/tests/fixtures/legacy/content-valid/fixtures.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-valid/manifest.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/content-valid/manifest.json",
+            "label": "tooling/tests/fixtures/legacy/content-valid/manifest.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-valid/result.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/content-valid/result.json",
+            "label": "tooling/tests/fixtures/legacy/content-valid/result.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-valid/runs.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/content-valid/runs.json",
+            "label": "tooling/tests/fixtures/legacy/content-valid/runs.json"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/unsupported.json",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/legacy/unsupported.json",
+            "label": "tooling/tests/fixtures/legacy/unsupported.json"
+        },
+        {
+            "id": "file:tooling/tests/legacy-formats.test.ts",
+            "kind": "file",
+            "path": "tooling/tests/legacy-formats.test.ts",
+            "label": "tooling/tests/legacy-formats.test.ts"
         },
         {
             "id": "file:tooling/tests/migration.test.ts",
@@ -4958,6 +5174,84 @@
             "kind": "option",
             "path": "tooling/core/preparation.ts",
             "label": "--porcelain"
+        },
+        {
+            "id": "option:tooling/tests/consumer-contract.test.ts:--contract-version",
+            "kind": "option",
+            "path": "tooling/tests/consumer-contract.test.ts",
+            "label": "--contract-version"
+        },
+        {
+            "id": "option:tooling/tests/consumer-contract.test.ts:--engine-sha256",
+            "kind": "option",
+            "path": "tooling/tests/consumer-contract.test.ts",
+            "label": "--engine-sha256"
+        },
+        {
+            "id": "option:tooling/tests/consumer-contract.test.ts:--engine-tarball",
+            "kind": "option",
+            "path": "tooling/tests/consumer-contract.test.ts",
+            "label": "--engine-tarball"
+        },
+        {
+            "id": "option:tooling/tests/consumer-contract.test.ts:--import",
+            "kind": "option",
+            "path": "tooling/tests/consumer-contract.test.ts",
+            "label": "--import"
+        },
+        {
+            "id": "option:tooling/tests/consumer-contract.test.ts:--output",
+            "kind": "option",
+            "path": "tooling/tests/consumer-contract.test.ts",
+            "label": "--output"
+        },
+        {
+            "id": "option:tooling/tests/consumer-contract.test.ts:--run-id",
+            "kind": "option",
+            "path": "tooling/tests/consumer-contract.test.ts",
+            "label": "--run-id"
+        },
+        {
+            "id": "option:tooling/tests/fixtures/consumer-contract-v1/stub.ts:--contract-version",
+            "kind": "option",
+            "path": "tooling/tests/fixtures/consumer-contract-v1/stub.ts",
+            "label": "--contract-version"
+        },
+        {
+            "id": "option:tooling/tests/fixtures/consumer-contract-v1/stub.ts:--engine-sha256",
+            "kind": "option",
+            "path": "tooling/tests/fixtures/consumer-contract-v1/stub.ts",
+            "label": "--engine-sha256"
+        },
+        {
+            "id": "option:tooling/tests/fixtures/consumer-contract-v1/stub.ts:--engine-tarball",
+            "kind": "option",
+            "path": "tooling/tests/fixtures/consumer-contract-v1/stub.ts",
+            "label": "--engine-tarball"
+        },
+        {
+            "id": "option:tooling/tests/fixtures/consumer-contract-v1/stub.ts:--output",
+            "kind": "option",
+            "path": "tooling/tests/fixtures/consumer-contract-v1/stub.ts",
+            "label": "--output"
+        },
+        {
+            "id": "option:tooling/tests/fixtures/consumer-contract-v1/stub.ts:--run-id",
+            "kind": "option",
+            "path": "tooling/tests/fixtures/consumer-contract-v1/stub.ts",
+            "label": "--run-id"
+        },
+        {
+            "id": "option:tooling/tests/legacy-formats.test.ts:--input-type",
+            "kind": "option",
+            "path": "tooling/tests/legacy-formats.test.ts",
+            "label": "--input-type"
+        },
+        {
+            "id": "option:tooling/tests/legacy-formats.test.ts:-e",
+            "kind": "option",
+            "path": "tooling/tests/legacy-formats.test.ts",
+            "label": "-e"
         },
         {
             "id": "option:tooling/tests/migration.test.ts:--quiet",
@@ -10008,6 +10302,84 @@
             "kind": "assertion",
             "path": "tooling/commands/check-migration.ts",
             "label": "check(process.cwd())"
+        },
+        {
+            "id": "assertion:tooling/tests/consumer-contract.test.ts:2a627d328e864b18",
+            "kind": "assertion",
+            "path": "tooling/tests/consumer-contract.test.ts",
+            "label": "\"consumer contract rejects unsupported input and mismatched tarball before allocation\""
+        },
+        {
+            "id": "assertion:tooling/tests/consumer-contract.test.ts:4221fc3fe7565407",
+            "kind": "assertion",
+            "path": "tooling/tests/consumer-contract.test.ts",
+            "label": "\"consumer contract checks retained tarball independently of artifact inventory\""
+        },
+        {
+            "id": "assertion:tooling/tests/consumer-contract.test.ts:48b8ec3b3abc6f94",
+            "kind": "assertion",
+            "path": "tooling/tests/consumer-contract.test.ts",
+            "label": "\"consumer contract accepts valid response and rejects reused output without mutation\""
+        },
+        {
+            "id": "assertion:tooling/tests/consumer-contract.test.ts:6fcb762e4b5abaeb",
+            "kind": "assertion",
+            "path": "tooling/tests/consumer-contract.test.ts",
+            "label": "\"consumer contract rejects missing required fields and stage document ID drift\""
+        },
+        {
+            "id": "assertion:tooling/tests/consumer-contract.test.ts:97f9a4d8409a7c7a",
+            "kind": "assertion",
+            "path": "tooling/tests/consumer-contract.test.ts",
+            "label": "\"consumer contract validates failed responses and exit consistency\""
+        },
+        {
+            "id": "assertion:tooling/tests/consumer-contract.test.ts:98ade6d39125133c",
+            "kind": "assertion",
+            "path": "tooling/tests/consumer-contract.test.ts",
+            "label": "`consumer contract rejects ${scenario}`"
+        },
+        {
+            "id": "assertion:tooling/tests/consumer-contract.test.ts:c18341127a46d5cf",
+            "kind": "assertion",
+            "path": "tooling/tests/consumer-contract.test.ts",
+            "label": "\"consumer contract rejects linked payload directories\""
+        },
+        {
+            "id": "assertion:tooling/tests/consumer-contract.test.ts:d0c78e98fed56dbf",
+            "kind": "assertion",
+            "path": "tooling/tests/consumer-contract.test.ts",
+            "label": "\"consumer contract static schema example conforms\""
+        },
+        {
+            "id": "assertion:tooling/tests/consumer-contract.test.ts:f8ba70cc2430e921",
+            "kind": "assertion",
+            "path": "tooling/tests/consumer-contract.test.ts",
+            "label": "\"consumer stub CLI runs independently twice and returns invalid-input status on reuse\""
+        },
+        {
+            "id": "assertion:tooling/tests/legacy-formats.test.ts:04da1aa5d2e8cdf5",
+            "kind": "assertion",
+            "path": "tooling/tests/legacy-formats.test.ts",
+            "label": "\"explicit legacy selection rejects named unsupported formats\""
+        },
+        {
+            "id": "assertion:tooling/tests/legacy-formats.test.ts:08fd2b90224dfe75",
+            "kind": "assertion",
+            "path": "tooling/tests/legacy-formats.test.ts",
+            "label": "\"benchmark legacy per-stage consolidated and compact variants preserve metrics\""
+        },
+        {
+            "id": "assertion:tooling/tests/legacy-formats.test.ts:169d39596c28a5f6",
+            "kind": "assertion",
+            "path": "tooling/tests/legacy-formats.test.ts",
+            "label": "\"content legacy preserves strict acceptance and missing identity rejection\""
+        },
+        {
+            "id": "assertion:tooling/tests/legacy-formats.test.ts:2676bae378970c62",
+            "kind": "assertion",
+            "path": "tooling/tests/legacy-formats.test.ts",
+            "label": "\"benchmark legacy rejects missing and tampered analysis\""
         },
         {
             "id": "assertion:tooling/tests/migration.test.ts:0b039719fb0db412",

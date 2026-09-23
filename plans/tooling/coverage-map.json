@@ -1832,11 +1832,25 @@
             "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
         },
         {
+            "id": "file:tooling/evidence/consumer-contract-v1.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/evidence/consumer-contract-v1.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
             "id": "file:tooling/evidence/identity.ts",
             "owner": "infrastructure",
             "destination": "tooling/evidence/identity.ts",
             "action": "retain",
             "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "file:tooling/evidence/legacy-format.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/evidence/legacy-format.ts",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
         },
         {
             "id": "file:tooling/evidence/report.ts",
@@ -1858,6 +1872,244 @@
             "destination": "tooling/README.md",
             "action": "retain",
             "reason": "Current migration checker, harness or operating documentation; extend alongside each implementation."
+        },
+        {
+            "id": "file:tooling/tests/consumer-contract.test.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/consumer-contract.test.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/consumer-contract-v1/cases.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/consumer-contract-v1/cases.json",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/consumer-contract-v1/stub.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/consumer-contract-v1/stub.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/artifacts.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/artifacts.json",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/manifest.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/manifest.json",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/package/synthetic.tgz",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/package/synthetic.tgz",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/report.md",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/report.md",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/result.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/consumer-contract-v1/successful-response/evidence/result.json",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-compact/analysis.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/benchmark-compact/analysis.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-compact/manifest.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/benchmark-compact/manifest.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-consolidated/analysis.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/benchmark-consolidated/analysis.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-consolidated/churn/result.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/benchmark-consolidated/churn/result.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-consolidated/manifest.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/benchmark-consolidated/manifest.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-missing-analysis/churn/result.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/benchmark-missing-analysis/churn/result.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-missing-analysis/manifest.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/benchmark-missing-analysis/manifest.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-per-stage/churn/result.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/benchmark-per-stage/churn/result.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-per-stage/manifest.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/benchmark-per-stage/manifest.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-tampered-analysis/analysis.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/benchmark-tampered-analysis/analysis.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-tampered-analysis/churn/result.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/benchmark-tampered-analysis/churn/result.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/benchmark-tampered-analysis/manifest.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/benchmark-tampered-analysis/manifest.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-cleanup-failed/fixtures.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/content-cleanup-failed/fixtures.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-cleanup-failed/manifest.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/content-cleanup-failed/manifest.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-cleanup-failed/result.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/content-cleanup-failed/result.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-cleanup-failed/runs.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/content-cleanup-failed/runs.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-missing-tooling/fixtures.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/content-missing-tooling/fixtures.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-missing-tooling/manifest.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/content-missing-tooling/manifest.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-missing-tooling/result.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/content-missing-tooling/result.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-missing-tooling/runs.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/content-missing-tooling/runs.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-valid/fixtures.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/content-valid/fixtures.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-valid/manifest.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/content-valid/manifest.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-valid/result.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/content-valid/result.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/content-valid/runs.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/content-valid/runs.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/legacy/unsupported.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/legacy/unsupported.json",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/legacy-formats.test.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/legacy-formats.test.ts",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
         },
         {
             "id": "file:tooling/tests/migration.test.ts",
@@ -3090,6 +3342,97 @@
             "destination": "tooling/core/preparation.ts",
             "action": "retain",
             "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/tests/consumer-contract.test.ts:--contract-version",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/consumer-contract.test.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "option:tooling/tests/consumer-contract.test.ts:--engine-sha256",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/consumer-contract.test.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "option:tooling/tests/consumer-contract.test.ts:--engine-tarball",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/consumer-contract.test.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "option:tooling/tests/consumer-contract.test.ts:--import",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/consumer-contract.test.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "option:tooling/tests/consumer-contract.test.ts:--output",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/consumer-contract.test.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "option:tooling/tests/consumer-contract.test.ts:--run-id",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/consumer-contract.test.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "option:tooling/tests/fixtures/consumer-contract-v1/stub.ts:--contract-version",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/consumer-contract-v1/stub.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "option:tooling/tests/fixtures/consumer-contract-v1/stub.ts:--engine-sha256",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/consumer-contract-v1/stub.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "option:tooling/tests/fixtures/consumer-contract-v1/stub.ts:--engine-tarball",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/consumer-contract-v1/stub.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "option:tooling/tests/fixtures/consumer-contract-v1/stub.ts:--output",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/consumer-contract-v1/stub.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "option:tooling/tests/fixtures/consumer-contract-v1/stub.ts:--run-id",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/consumer-contract-v1/stub.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "option:tooling/tests/legacy-formats.test.ts:--input-type",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/legacy-formats.test.ts",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "option:tooling/tests/legacy-formats.test.ts:-e",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/legacy-formats.test.ts",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
         },
         {
             "id": "option:tooling/tests/migration.test.ts:--quiet",
@@ -6060,6 +6403,97 @@
             "destination": "tooling/commands/check-migration.ts",
             "action": "retain",
             "reason": "Current migration checker, harness or operating documentation; extend alongside each implementation."
+        },
+        {
+            "id": "assertion:tooling/tests/consumer-contract.test.ts:2a627d328e864b18",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/consumer-contract.test.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "assertion:tooling/tests/consumer-contract.test.ts:4221fc3fe7565407",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/consumer-contract.test.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "assertion:tooling/tests/consumer-contract.test.ts:48b8ec3b3abc6f94",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/consumer-contract.test.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "assertion:tooling/tests/consumer-contract.test.ts:6fcb762e4b5abaeb",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/consumer-contract.test.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "assertion:tooling/tests/consumer-contract.test.ts:97f9a4d8409a7c7a",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/consumer-contract.test.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "assertion:tooling/tests/consumer-contract.test.ts:98ade6d39125133c",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/consumer-contract.test.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "assertion:tooling/tests/consumer-contract.test.ts:c18341127a46d5cf",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/consumer-contract.test.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "assertion:tooling/tests/consumer-contract.test.ts:d0c78e98fed56dbf",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/consumer-contract.test.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "assertion:tooling/tests/consumer-contract.test.ts:f8ba70cc2430e921",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/consumer-contract.test.ts",
+            "action": "retain",
+            "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "assertion:tooling/tests/legacy-formats.test.ts:04da1aa5d2e8cdf5",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/legacy-formats.test.ts",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "assertion:tooling/tests/legacy-formats.test.ts:08fd2b90224dfe75",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/legacy-formats.test.ts",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "assertion:tooling/tests/legacy-formats.test.ts:169d39596c28a5f6",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/legacy-formats.test.ts",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "assertion:tooling/tests/legacy-formats.test.ts:2676bae378970c62",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/legacy-formats.test.ts",
+            "action": "retain",
+            "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
         },
         {
             "id": "assertion:tooling/tests/migration.test.ts:0b039719fb0db412",

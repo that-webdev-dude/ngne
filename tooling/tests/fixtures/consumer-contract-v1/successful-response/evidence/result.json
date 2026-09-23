@@ -1,0 +1,25 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "result",
+    "schemaVersion": 1,
+    "runId": "conformance-example",
+    "execution": "completed",
+    "correctness": "passed",
+    "budgets": "not evaluated",
+    "cleanup": "passed",
+    "evidence": "complete",
+    "stages": [
+        {
+            "id": "synthetic-contract",
+            "required": true,
+            "execution": "completed",
+            "correctness": "passed",
+            "budgets": "not evaluated",
+            "cleanup": "passed",
+            "evidence": "complete"
+        }
+    ],
+    "failures": [],
+    "cleanupRecords": [],
+    "accepted": true
+}

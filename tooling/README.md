@@ -112,6 +112,19 @@ and matching Node version; an archived evidence tree alone cannot resume executi
 This is integrity checking, not cryptographic authentication of a malicious author.
 
 Failure logs and available payloads remain in the run. Working installations and
-caches are not uploaded by CI. Portable export policies and consumer response
-validation remain separate work; no new browser, compatibility or performance
+caches are not uploaded by CI. Portable export policies remain separate work;
+no new browser, compatibility or performance
 claim is implied by package preparation. Existing commands remain active.
+
+## Consumer evidence and legacy fixtures
+
+The [consumer command contract](../plans/tooling/consumer-command-contract.md)
+defines the versioned tarball/hash/output interface. The validator reuses the shared
+schema and checks selected identities, outcomes, exit status and retained payloads.
+Use it on failed responses too, retaining the original consumer failure. The synthetic
+peer and conformance tests run through `npm test`; no real consumer is selected by
+these tests. Consumer-owner agreement and real integration remain unresolved.
+
+[Bounded legacy fixtures](../plans/tooling/legacy-formats.md) preserve both existing
+reader families. Explicit format selection rejects unknown/new formats; existing
+readers retain their strict and advisory semantics. No historical evidence is converted.

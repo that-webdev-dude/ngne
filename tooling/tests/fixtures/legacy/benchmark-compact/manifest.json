@@ -1,0 +1,23 @@
+{
+    "schemaVersion": 2,
+    "status": "passed",
+    "revision": "synthetic",
+    "startedAt": "synthetic",
+    "parameters": {
+        "workload": "churn",
+        "diagnostics": false
+    },
+    "environment": {
+        "machine": "synthetic"
+    },
+    "stages": [
+        {
+            "name": "churn",
+            "kind": "benchmark",
+            "status": "passed"
+        }
+    ],
+    "retention": {
+        "mode": "compact"
+    }
+}

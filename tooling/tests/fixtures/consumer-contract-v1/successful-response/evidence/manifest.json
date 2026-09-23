@@ -1,0 +1,30 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "consumer-manifest",
+    "schemaVersion": 1,
+    "runId": "conformance-example",
+    "contractVersion": 1,
+    "package": {
+        "filename": "synthetic.tgz",
+        "path": "package/synthetic.tgz",
+        "sha256": "1ccb8853258c68b3773c7670398b04a04a78bdd295ea11c3d65107524689e94e"
+    },
+    "installed": {
+        "synthetic.txt": "c0961e909b490d2d63757b7f2e7bef6006d0da0edc1631540c19e08add94481d"
+    },
+    "consumer": {
+        "revision": "synthetic-v1",
+        "source": {
+            "stub.ts": "39631bb5e5dc9326b23f8c00bf43440a84ce711315c6b799de554c56aa04d133"
+        },
+        "lock": {
+            "package-lock.json": "3dbbae694c062e0f3225d77ee7e0f6993d6018ab515afe869d0889cf41e1505f"
+        }
+    },
+    "environment": {
+        "node": "synthetic",
+        "platform": "synthetic",
+        "release": "synthetic",
+        "arch": "synthetic"
+    }
+}

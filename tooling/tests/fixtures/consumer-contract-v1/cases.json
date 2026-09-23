@@ -1,0 +1,16 @@
+{
+    "valid": ["successful-response", "failed-response"],
+    "invalid": [
+        "hash",
+        "version",
+        "run-id",
+        "incomplete",
+        "consumer",
+        "artifact",
+        "escape",
+        "size",
+        "required",
+        "exit"
+    ],
+    "invocation": ["unsupported-version", "mismatched-tarball", "reused-output"]
+}
