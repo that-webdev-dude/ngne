@@ -1,0 +1,424 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "ci-baseline-provenance",
+    "schemaVersion": 1,
+    "runId": "frozen-ci-baseline-2026-09-23",
+    "algorithm": "sha256",
+    "files": [
+        {
+            "path": "35906826416-1/artifacts.json",
+            "bytes": 1058,
+            "sha256": "397f99c495e3bcec675c589c5c046593b065c72f3293c6234961585919a6a215"
+        },
+        {
+            "path": "35906826416-1/diagnostic-browser-cleanup-failure__results.json.gz",
+            "bytes": 4159,
+            "sha256": "9396ac03804c8445697f8fbdd080728749825fbc824095e1c45ab5611cf8414b"
+        },
+        {
+            "path": "35906826416-1/diagnostic-browser-diagnostic-failure__results.json.gz",
+            "bytes": 1023,
+            "sha256": "810ad3a56c3b55189c61d9416a3c92b1ee7538883fa79c0a7da0caf993c1107b"
+        },
+        {
+            "path": "35906826416-1/diagnostic-browser-intentional-failure__results.json.gz",
+            "bytes": 973,
+            "sha256": "279c9e9e2feb9e93f357afef2dcc7deb294d58bf1a7735bb613210092c36fcb6"
+        },
+        {
+            "path": "35906826416-1/diagnostic-browser__results.json.gz",
+            "bytes": 4123,
+            "sha256": "7e6b9359b7b0fac9264d39526d976519e574f515f3c4fffec89ac59eacb81446"
+        },
+        {
+            "path": "35906826416-1/diagnostic-installed-content__browser__orchestration.json.gz",
+            "bytes": 358,
+            "sha256": "19125010a809f1c6523c825e67db964b58272c55ef14170e2befdf86732e9814"
+        },
+        {
+            "path": "35906826416-1/diagnostic-installed-content__browser__root-runner.log.gz",
+            "bytes": 3495,
+            "sha256": "4c482c15b31f8cff49acb6726c95d12e6f54cb0ec771952a875fe3a91618baf3"
+        },
+        {
+            "path": "35906826416-1/diagnostic-installed-content__browser__root__browser.log.gz",
+            "bytes": 252,
+            "sha256": "0044d71c4fb262a936751a86c6ab9ed9fb9b8b08a2079af36e9b5350cc48bb0b"
+        },
+        {
+            "path": "35906826416-1/diagnostic-installed-content__browser__root__results.json.gz",
+            "bytes": 4741,
+            "sha256": "b4730aa0b50ece0a059bcf5aa9a601be7fd027f4b49dfd4f1653e13f5c387bd6"
+        },
+        {
+            "path": "35906826416-1/job-107336482191.log.gz",
+            "bytes": 30001,
+            "sha256": "207302f4ba74e2bba26fa5b3f86dc2bf39da0b3e7b6d7ce78ace13f84902b077"
+        },
+        {
+            "path": "35906826416-1/jobs.json",
+            "bytes": 8416,
+            "sha256": "bfe16dc74bbb0e925cb559ec0335d810eb46e0786470759cfc36525743ef3fd2"
+        },
+        {
+            "path": "35906826416-1/retention.json",
+            "bytes": 2980,
+            "sha256": "d1be45f99d0b3579ae6e1ee386ff191c2a75aae1fb1c847fa82a48de3d0b0080"
+        },
+        {
+            "path": "35906826416-1/run.json",
+            "bytes": 14974,
+            "sha256": "54aa6e169492d9b11d3792bdde66ce97176d8aaef691db726a4b28491c0de353"
+        },
+        {
+            "path": "35906826416-2/artifacts.json",
+            "bytes": 1058,
+            "sha256": "627758066f4add7f43eb26b10d31e857c0ac2a302d2ae08d559234b81df0d365"
+        },
+        {
+            "path": "35906826416-2/job-107337886073.log.gz",
+            "bytes": 30003,
+            "sha256": "a87fb51844885dc877a08c747354e54899ad9423dc1cd12bd6fca27a54a9e29e"
+        },
+        {
+            "path": "35906826416-2/jobs.json",
+            "bytes": 8416,
+            "sha256": "12e4bb6355b0537cd6bd46c3761c7ac68d526299716ce7bee519373b8c1c20b1"
+        },
+        {
+            "path": "35906826416-2/retention.json",
+            "bytes": 668,
+            "sha256": "e968d418d0e216dfe9002cdbb2293f27451eae69cf3f3cb7531f13a5d5bed9e4"
+        },
+        {
+            "path": "35906826416-2/run.json",
+            "bytes": 15058,
+            "sha256": "a38fbc22b16b76847ef49124edb0e21f52bdb68cd302dba4bc3929dc2c193bd0"
+        },
+        {
+            "path": "35906826416-3/artifacts.json",
+            "bytes": 1058,
+            "sha256": "c565b1487f170fb3fe5529d6e1e63f91a674b09067fd88481be9b8676dc90160"
+        },
+        {
+            "path": "35906826416-3/diagnostic-browser-cleanup-failure__results.json.gz",
+            "bytes": 4162,
+            "sha256": "a90c7ab8e83ed2e5ff6e262dcd9138344a93c685ad371010f91fed9bc43fe0cb"
+        },
+        {
+            "path": "35906826416-3/diagnostic-browser-diagnostic-failure__results.json.gz",
+            "bytes": 1022,
+            "sha256": "efc6815104371be801d6d9a7bb05bb81826fabf153ade152ae3ea0c20df9a483"
+        },
+        {
+            "path": "35906826416-3/diagnostic-browser-intentional-failure__results.json.gz",
+            "bytes": 972,
+            "sha256": "280cf085abef2ad865ee711afc23ffdcca1f2a92e17c0ddb27d33c1a6e270a52"
+        },
+        {
+            "path": "35906826416-3/diagnostic-browser__results.json.gz",
+            "bytes": 4121,
+            "sha256": "9574f79b788aab272de9590a7aa71317f6a4c0fb2d9b639311f87b0949a77bae"
+        },
+        {
+            "path": "35906826416-3/diagnostic-installed-content__browser__nested-runner.log.gz",
+            "bytes": 5174,
+            "sha256": "ad295b6b6d45d1d36448eb65acdf5f1d0115081498c9dd224825f9a5ce221692"
+        },
+        {
+            "path": "35906826416-3/diagnostic-installed-content__browser__nested__browser.log.gz",
+            "bytes": 260,
+            "sha256": "abc5ee112f5e2637b910ab1a6a4e7684407b04c0628ed249b350e9b1f2c1eb5a"
+        },
+        {
+            "path": "35906826416-3/diagnostic-installed-content__browser__nested__results.json.gz",
+            "bytes": 6506,
+            "sha256": "ccf13391dd125cfd8435c51821ee0a7549610517021b57ae740360b02bef77e4"
+        },
+        {
+            "path": "35906826416-3/diagnostic-installed-content__browser__orchestration.json.gz",
+            "bytes": 347,
+            "sha256": "59138982884752b3c35188723b32b42a7238c37916208f65fc01fcf9997233df"
+        },
+        {
+            "path": "35906826416-3/diagnostic-installed-content__browser__root-runner.log.gz",
+            "bytes": 5174,
+            "sha256": "ad295b6b6d45d1d36448eb65acdf5f1d0115081498c9dd224825f9a5ce221692"
+        },
+        {
+            "path": "35906826416-3/diagnostic-installed-content__browser__root__browser.log.gz",
+            "bytes": 260,
+            "sha256": "abc5ee112f5e2637b910ab1a6a4e7684407b04c0628ed249b350e9b1f2c1eb5a"
+        },
+        {
+            "path": "35906826416-3/diagnostic-installed-content__browser__root__results.json.gz",
+            "bytes": 6504,
+            "sha256": "c1ca76a4ae86e38246bd5fc7478c6691539ac2598ed9fdf97f7a6bc5e0e26f2a"
+        },
+        {
+            "path": "35906826416-3/job-107338819660.log.gz",
+            "bytes": 30203,
+            "sha256": "5bb8b20f01f3c6e685f91c2c5250d52872a090d0c7909a8182ae80a97fefa665"
+        },
+        {
+            "path": "35906826416-3/jobs.json",
+            "bytes": 8416,
+            "sha256": "4291be4e9b1be45fb545b37a6717965a3c612fa0760913183384b586adab8768"
+        },
+        {
+            "path": "35906826416-3/retention.json",
+            "bytes": 3907,
+            "sha256": "f3fad2fbf793626008cd77d30f7109118c9f867975639b1d48c87efbd0a3681f"
+        },
+        {
+            "path": "35906826416-3/run.json",
+            "bytes": 15058,
+            "sha256": "3cab42091d9e3c0de826bd6a990ded5594741c94ef559777b109878d81659196"
+        },
+        {
+            "path": "35906826416-4/artifacts.json",
+            "bytes": 1058,
+            "sha256": "8631c8284f3c6dcd4b532df5866424d9889cb02c537d67b28dc9f081baeeb172"
+        },
+        {
+            "path": "35906826416-4/diagnostic-browser-cleanup-failure__results.json.gz",
+            "bytes": 4157,
+            "sha256": "fa3b80e3f48d9aa68f76b3024b02574ab5d9a1c3ceed5177621195b1795fb5e3"
+        },
+        {
+            "path": "35906826416-4/diagnostic-browser-diagnostic-failure__results.json.gz",
+            "bytes": 1022,
+            "sha256": "e943bf62788dedd783149f20dfd93040b2cf579047d51ec0aa7b24641da7be0d"
+        },
+        {
+            "path": "35906826416-4/diagnostic-browser-intentional-failure__results.json.gz",
+            "bytes": 972,
+            "sha256": "c2d8da96e139027968ccea005c25562746d250672784cc0fc708c30f2a5bb4d9"
+        },
+        {
+            "path": "35906826416-4/diagnostic-browser__results.json.gz",
+            "bytes": 4122,
+            "sha256": "c6ee07c82980afe0d6765996dd0319b6ddb108eec19fd4feb6f487be679da6a3"
+        },
+        {
+            "path": "35906826416-4/diagnostic-installed-content__browser__nested-runner.log.gz",
+            "bytes": 5174,
+            "sha256": "ad295b6b6d45d1d36448eb65acdf5f1d0115081498c9dd224825f9a5ce221692"
+        },
+        {
+            "path": "35906826416-4/diagnostic-installed-content__browser__nested__browser.log.gz",
+            "bytes": 260,
+            "sha256": "abc5ee112f5e2637b910ab1a6a4e7684407b04c0628ed249b350e9b1f2c1eb5a"
+        },
+        {
+            "path": "35906826416-4/diagnostic-installed-content__browser__nested__results.json.gz",
+            "bytes": 6500,
+            "sha256": "008e0767a44b578fde14aa2aa1847b8396062d32c4a7e6f3279de9fff857787f"
+        },
+        {
+            "path": "35906826416-4/diagnostic-installed-content__browser__orchestration.json.gz",
+            "bytes": 346,
+            "sha256": "977b87f3909a37dad125c9ef5dd37708d4ad13cc2024b97810e4e762c76ee44b"
+        },
+        {
+            "path": "35906826416-4/diagnostic-installed-content__browser__root-runner.log.gz",
+            "bytes": 5174,
+            "sha256": "ad295b6b6d45d1d36448eb65acdf5f1d0115081498c9dd224825f9a5ce221692"
+        },
+        {
+            "path": "35906826416-4/diagnostic-installed-content__browser__root__browser.log.gz",
+            "bytes": 260,
+            "sha256": "abc5ee112f5e2637b910ab1a6a4e7684407b04c0628ed249b350e9b1f2c1eb5a"
+        },
+        {
+            "path": "35906826416-4/diagnostic-installed-content__browser__root__results.json.gz",
+            "bytes": 6500,
+            "sha256": "b923b24f42028cdf9e8f12e91886815cf00bf99da03a35b88150b8e7ba6cc449"
+        },
+        {
+            "path": "35906826416-4/job-107340052044.log.gz",
+            "bytes": 30096,
+            "sha256": "5d59e87a6254802ccc352d1b52d9a346cf21ffb9472c42a52d0eca0da646a3ba"
+        },
+        {
+            "path": "35906826416-4/jobs.json",
+            "bytes": 8416,
+            "sha256": "9985efe90bbeafa4f548d9ddc2a4d7497dc69cd7c1f06a1858416cea4e6d0a72"
+        },
+        {
+            "path": "35906826416-4/retention.json",
+            "bytes": 3907,
+            "sha256": "563d15365ec69f65dd77b639c5f29d169f191151fe4ae8cc459781e794666a04"
+        },
+        {
+            "path": "35906826416-4/run.json",
+            "bytes": 15058,
+            "sha256": "6de5bbadad3a0f0a933f52b19b7688ce2acaed746a2ecfa4371cf2fae8910489"
+        },
+        {
+            "path": "35906826416-5/artifacts.json",
+            "bytes": 1058,
+            "sha256": "f6bce5f85d5fbfa4ed3afaeb4dceea7b6a878725711d0904c497e35e700fc926"
+        },
+        {
+            "path": "35906826416-5/diagnostic-browser-cleanup-failure__results.json.gz",
+            "bytes": 4158,
+            "sha256": "bc767d9dc69f8be79204d7883a0ca3fc815a29a9a3b94857f0042ffdedafa402"
+        },
+        {
+            "path": "35906826416-5/diagnostic-browser-diagnostic-failure__results.json.gz",
+            "bytes": 1020,
+            "sha256": "ebe960343b875fe3f21a14107ee27d8ee699bedc8bc3817c1c20121c80bb5b12"
+        },
+        {
+            "path": "35906826416-5/diagnostic-browser-intentional-failure__results.json.gz",
+            "bytes": 974,
+            "sha256": "0f9deb1f1ff204c0d67f78762a763c538875e801888be22823c91da24d6879f1"
+        },
+        {
+            "path": "35906826416-5/diagnostic-browser__results.json.gz",
+            "bytes": 4121,
+            "sha256": "07107bc618f90ace445e0c2b78fb9e296c620e570b7f958c0c77a3d4b9905151"
+        },
+        {
+            "path": "35906826416-5/diagnostic-installed-content__browser__nested-runner.log.gz",
+            "bytes": 5174,
+            "sha256": "ad295b6b6d45d1d36448eb65acdf5f1d0115081498c9dd224825f9a5ce221692"
+        },
+        {
+            "path": "35906826416-5/diagnostic-installed-content__browser__nested__browser.log.gz",
+            "bytes": 260,
+            "sha256": "abc5ee112f5e2637b910ab1a6a4e7684407b04c0628ed249b350e9b1f2c1eb5a"
+        },
+        {
+            "path": "35906826416-5/diagnostic-installed-content__browser__nested__results.json.gz",
+            "bytes": 6497,
+            "sha256": "c7f378237016dff1069c24d158ecc54e5c8e24473540279dbdd9da427c810755"
+        },
+        {
+            "path": "35906826416-5/diagnostic-installed-content__browser__orchestration.json.gz",
+            "bytes": 346,
+            "sha256": "5f7ddcd14f92784fd2d5887c9291adeb54a20a850b04aecc25f6b24ff8abc9d1"
+        },
+        {
+            "path": "35906826416-5/diagnostic-installed-content__browser__root-runner.log.gz",
+            "bytes": 5174,
+            "sha256": "ad295b6b6d45d1d36448eb65acdf5f1d0115081498c9dd224825f9a5ce221692"
+        },
+        {
+            "path": "35906826416-5/diagnostic-installed-content__browser__root__browser.log.gz",
+            "bytes": 260,
+            "sha256": "abc5ee112f5e2637b910ab1a6a4e7684407b04c0628ed249b350e9b1f2c1eb5a"
+        },
+        {
+            "path": "35906826416-5/diagnostic-installed-content__browser__root__results.json.gz",
+            "bytes": 6498,
+            "sha256": "af1443a595fa0fea895b7f8a60bc035ededed3da7e2c67ca89127f9146f9280b"
+        },
+        {
+            "path": "35906826416-5/job-107341165025.log.gz",
+            "bytes": 30097,
+            "sha256": "71cfdf690e7ef354f2f0f92895cb925a01976c7cf5f1f05db15cae9389f05f65"
+        },
+        {
+            "path": "35906826416-5/jobs.json",
+            "bytes": 8416,
+            "sha256": "00eee6a3d9e53d6993af685c3689ab4c751e99ca6d846d3dc2a7cf5967684178"
+        },
+        {
+            "path": "35906826416-5/retention.json",
+            "bytes": 3907,
+            "sha256": "ef15b72552a8bc612d7b4d31c65183e1e3af2f61168f5a6b739c40ae13afcfd8"
+        },
+        {
+            "path": "35906826416-5/run.json",
+            "bytes": 15058,
+            "sha256": "81120dcfd2c476a29fae40d947f77fde15b56e7cf8fd910ac1b49d9d38ecad43"
+        },
+        {
+            "path": "35906826416-6/artifacts.json",
+            "bytes": 1058,
+            "sha256": "347269d4fd44b9c576a2314d55cfc8d0dd77b938bdba284fcf918f197a9e01eb"
+        },
+        {
+            "path": "35906826416-6/diagnostic-browser-cleanup-failure__results.json.gz",
+            "bytes": 4159,
+            "sha256": "db7890df3557ed8d88d6d0d51ca4c9defa9615ca7b3c06614da11b00379e965e"
+        },
+        {
+            "path": "35906826416-6/diagnostic-browser-diagnostic-failure__results.json.gz",
+            "bytes": 1020,
+            "sha256": "1d3583546f402a9f8348715ed15d330ab6b39581f21602f63331e0018864d566"
+        },
+        {
+            "path": "35906826416-6/diagnostic-browser-intentional-failure__results.json.gz",
+            "bytes": 973,
+            "sha256": "063ece08229bef9c297caea7c0359a040cb6b7d69b5ee4ede49ea47739a81551"
+        },
+        {
+            "path": "35906826416-6/diagnostic-browser__results.json.gz",
+            "bytes": 4121,
+            "sha256": "cbcdae93ef4fde94a70778213a22b021d6bad14b2eeb5c0d29907dec6dad89b6"
+        },
+        {
+            "path": "35906826416-6/diagnostic-installed-content__browser__nested-runner.log.gz",
+            "bytes": 5174,
+            "sha256": "ad295b6b6d45d1d36448eb65acdf5f1d0115081498c9dd224825f9a5ce221692"
+        },
+        {
+            "path": "35906826416-6/diagnostic-installed-content__browser__nested__browser.log.gz",
+            "bytes": 260,
+            "sha256": "abc5ee112f5e2637b910ab1a6a4e7684407b04c0628ed249b350e9b1f2c1eb5a"
+        },
+        {
+            "path": "35906826416-6/diagnostic-installed-content__browser__nested__results.json.gz",
+            "bytes": 6501,
+            "sha256": "9a87c50213a5eb5d4e8906dab7863cae2a0ed0a8b8c6c5f91be3e66d4965746a"
+        },
+        {
+            "path": "35906826416-6/diagnostic-installed-content__browser__orchestration.json.gz",
+            "bytes": 346,
+            "sha256": "b2596b8830ffbcf02f150e5810ac12776bdb8b4ae4f745aaab3fc385289d9838"
+        },
+        {
+            "path": "35906826416-6/diagnostic-installed-content__browser__root-runner.log.gz",
+            "bytes": 5174,
+            "sha256": "ad295b6b6d45d1d36448eb65acdf5f1d0115081498c9dd224825f9a5ce221692"
+        },
+        {
+            "path": "35906826416-6/diagnostic-installed-content__browser__root__browser.log.gz",
+            "bytes": 260,
+            "sha256": "abc5ee112f5e2637b910ab1a6a4e7684407b04c0628ed249b350e9b1f2c1eb5a"
+        },
+        {
+            "path": "35906826416-6/diagnostic-installed-content__browser__root__results.json.gz",
+            "bytes": 6501,
+            "sha256": "4e0fbf07fa45cfe6a1bf08eaaef827342c4770169f65ee67f3c1df39ccb81bf3"
+        },
+        {
+            "path": "35906826416-6/job-107342258516.log.gz",
+            "bytes": 30103,
+            "sha256": "cde38d6ff5f94af60d883205caa03ca567a071ef99bae71deb9203a6c705bfc3"
+        },
+        {
+            "path": "35906826416-6/jobs.json",
+            "bytes": 8416,
+            "sha256": "b196471c82d7eb1e0ae8f55e901626400093d8a0feaa524f41f58368781c1a85"
+        },
+        {
+            "path": "35906826416-6/retention.json",
+            "bytes": 3907,
+            "sha256": "8d356db706685734781d27504c70a9a4cf5d1f4c3935a9c7938914f80a76c321"
+        },
+        {
+            "path": "35906826416-6/run.json",
+            "bytes": 15058,
+            "sha256": "d9f29c9aa42574d38855761e3d15f902a6b7029af6a884225675e34185326373"
+        },
+        {
+            "path": "README.md",
+            "bytes": 4404,
+            "sha256": "32cda688be26e950912f1bfbc3d587e5dedb2b40b91e5bcdf39d5112b82f8b79"
+        }
+    ]
+}

@@ -1,0 +1,199 @@
+{
+    "total_count": 1,
+    "jobs": [
+        {
+            "id": 107337886073,
+            "run_id": 35906826416,
+            "workflow_name": "Measure frozen verification baseline",
+            "head_branch": "tooling/t1a-coverage-ownership",
+            "run_url": "https://api.github.com/repos/that-webdev-dude/ngne/actions/runs/35906826416",
+            "run_attempt": 2,
+            "node_id": "CR_kwDOUR5xE88AAAAY_dYpeQ",
+            "head_sha": "1ffd3f7aee03bd06444ef7669ae0999468c95495",
+            "url": "https://api.github.com/repos/that-webdev-dude/ngne/actions/jobs/107337886073",
+            "html_url": "https://github.com/that-webdev-dude/ngne/actions/runs/35906826416/job/107337886073",
+            "status": "completed",
+            "conclusion": "success",
+            "created_at": "2026-09-23T19:07:57Z",
+            "started_at": "2026-09-23T19:07:59Z",
+            "completed_at": "2026-09-23T19:10:04Z",
+            "name": "verify",
+            "steps": [
+                {
+                    "name": "Set up job",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 1,
+                    "started_at": "2026-09-23T19:08:00Z",
+                    "completed_at": "2026-09-23T19:08:01Z"
+                },
+                {
+                    "name": "Run actions/checkout@v4",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 2,
+                    "started_at": "2026-09-23T19:08:01Z",
+                    "completed_at": "2026-09-23T19:08:03Z"
+                },
+                {
+                    "name": "Run actions/setup-node@v4",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 3,
+                    "started_at": "2026-09-23T19:08:03Z",
+                    "completed_at": "2026-09-23T19:08:04Z"
+                },
+                {
+                    "name": "Record measured environment",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 4,
+                    "started_at": "2026-09-23T19:08:04Z",
+                    "completed_at": "2026-09-23T19:08:06Z"
+                },
+                {
+                    "name": "Run npm ci",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 5,
+                    "started_at": "2026-09-23T19:08:06Z",
+                    "completed_at": "2026-09-23T19:08:07Z"
+                },
+                {
+                    "name": "Run npm run format:check",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 6,
+                    "started_at": "2026-09-23T19:08:07Z",
+                    "completed_at": "2026-09-23T19:08:09Z"
+                },
+                {
+                    "name": "Run npm test",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 7,
+                    "started_at": "2026-09-23T19:08:09Z",
+                    "completed_at": "2026-09-23T19:08:19Z"
+                },
+                {
+                    "name": "Run npm run typecheck",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 8,
+                    "started_at": "2026-09-23T19:08:19Z",
+                    "completed_at": "2026-09-23T19:08:21Z"
+                },
+                {
+                    "name": "Run npm run build",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 9,
+                    "started_at": "2026-09-23T19:08:21Z",
+                    "completed_at": "2026-09-23T19:08:25Z"
+                },
+                {
+                    "name": "Run npm run build:browser",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 10,
+                    "started_at": "2026-09-23T19:08:25Z",
+                    "completed_at": "2026-09-23T19:08:26Z"
+                },
+                {
+                    "name": "Build a clean installed content consumer",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 11,
+                    "started_at": "2026-09-23T19:08:26Z",
+                    "completed_at": "2026-09-23T19:08:32Z"
+                },
+                {
+                    "name": "Install software WebGPU presentation dependencies",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 12,
+                    "started_at": "2026-09-23T19:08:32Z",
+                    "completed_at": "2026-09-23T19:08:42Z"
+                },
+                {
+                    "name": "Demonstrate browser assertion failure detection",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 13,
+                    "started_at": "2026-09-23T19:08:42Z",
+                    "completed_at": "2026-09-23T19:08:53Z"
+                },
+                {
+                    "name": "Preserve assertion and screenshot failures through cleanup",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 14,
+                    "started_at": "2026-09-23T19:08:53Z",
+                    "completed_at": "2026-09-23T19:08:54Z"
+                },
+                {
+                    "name": "Reject successful validation when cleanup fails",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 15,
+                    "started_at": "2026-09-23T19:08:54Z",
+                    "completed_at": "2026-09-23T19:09:02Z"
+                },
+                {
+                    "name": "Run WebGPU browser integration",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 16,
+                    "started_at": "2026-09-23T19:09:02Z",
+                    "completed_at": "2026-09-23T19:09:11Z"
+                },
+                {
+                    "name": "Run installed content at root and nested bases",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 17,
+                    "started_at": "2026-09-23T19:09:11Z",
+                    "completed_at": "2026-09-23T19:10:00Z"
+                },
+                {
+                    "name": "Upload browser integration artifacts",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 18,
+                    "started_at": "2026-09-23T19:10:00Z",
+                    "completed_at": "2026-09-23T19:10:01Z"
+                },
+                {
+                    "name": "Post Run actions/setup-node@v4",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 35,
+                    "started_at": "2026-09-23T19:10:01Z",
+                    "completed_at": "2026-09-23T19:10:01Z"
+                },
+                {
+                    "name": "Post Run actions/checkout@v4",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 36,
+                    "started_at": "2026-09-23T19:10:01Z",
+                    "completed_at": "2026-09-23T19:10:02Z"
+                },
+                {
+                    "name": "Complete job",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 37,
+                    "started_at": "2026-09-23T19:10:02Z",
+                    "completed_at": "2026-09-23T19:10:02Z"
+                }
+            ],
+            "check_run_url": "https://api.github.com/repos/that-webdev-dude/ngne/check-runs/107337886073",
+            "labels": ["ubuntu-latest"],
+            "runner_id": 1000000096,
+            "runner_name": "GitHub Actions 1000000096",
+            "runner_group_id": 0,
+            "runner_group_name": "GitHub Actions"
+        }
+    ]
+}

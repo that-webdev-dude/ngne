@@ -1,0 +1,63 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "ci-baseline-retention",
+    "schemaVersion": 1,
+    "runId": "actions-35906826416-attempt-1",
+    "artifactId": 10771482150,
+    "recordedBytes": 1227250,
+    "archiveSha256": "15dc2e502082ecc8bf5b1f03bc47416f453dc08b2266e731f6712641faadb396",
+    "localArchiveRetained": true,
+    "retainedDiagnostics": [
+        {
+            "sourcePath": "browser/results.json",
+            "path": "diagnostic-browser__results.json.gz",
+            "sourceBytes": 24406,
+            "sourceSha256": "7a42443936549e5f428c7ba17d343cc4a569c0009d2264fa4020ea16cbba7d19"
+        },
+        {
+            "sourcePath": "browser-cleanup-failure/results.json",
+            "path": "diagnostic-browser-cleanup-failure__results.json.gz",
+            "sourceBytes": 24569,
+            "sourceSha256": "fc995117cd50c20a31ad0647b69c99862853535b44ce2215a39e65ef2e800b01"
+        },
+        {
+            "sourcePath": "browser-diagnostic-failure/results.json",
+            "path": "diagnostic-browser-diagnostic-failure__results.json.gz",
+            "sourceBytes": 2486,
+            "sourceSha256": "397c8064ef1fff8f53adbb49f5b682f4429dce6892ed401407e4353fff632a01"
+        },
+        {
+            "sourcePath": "browser-intentional-failure/results.json",
+            "path": "diagnostic-browser-intentional-failure__results.json.gz",
+            "sourceBytes": 2390,
+            "sourceSha256": "9b64b0ead4af18dfdd3e886da9dc45402dde4704ebc89e01a911691298adb7a7"
+        },
+        {
+            "sourcePath": "installed-content/browser/orchestration.json",
+            "path": "diagnostic-installed-content__browser__orchestration.json.gz",
+            "sourceBytes": 711,
+            "sourceSha256": "05a5b59208b0242f3ddced652cda2523015203c235963a49e73ffb2c4e5666f2"
+        },
+        {
+            "sourcePath": "installed-content/browser/root/browser.log",
+            "path": "diagnostic-installed-content__browser__root__browser.log.gz",
+            "sourceBytes": 809,
+            "sourceSha256": "941167e7de6d1a785510ea533d18c538e883f25bd8697e4154dc1c43e60f4e27"
+        },
+        {
+            "sourcePath": "installed-content/browser/root/results.json",
+            "path": "diagnostic-installed-content__browser__root__results.json.gz",
+            "sourceBytes": 27191,
+            "sourceSha256": "09806cfbf4fac32fffae8fecb022b9313bbd184a908742310e6e8724e863283c"
+        },
+        {
+            "sourcePath": "installed-content/browser/root-runner.log",
+            "path": "diagnostic-installed-content__browser__root-runner.log.gz",
+            "sourceBytes": 15105,
+            "sourceSha256": "d111ceef296e65a371cc6bd6d4df0ab62cf0a4f3a6a70c4f0eae41a510e6c90b"
+        }
+    ],
+    "omissions": [
+        "Full ZIP is retained only under ignored local .test-output/t1b-hosted. Committed evidence retains selected raw results and runner diagnostics; generated consumer builds, vendor packages and screenshots are omitted."
+    ]
+}

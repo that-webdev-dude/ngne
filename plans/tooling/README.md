@@ -21,16 +21,21 @@ from that revision, rather than trusting an editable count. It also records
 current surfaces introduced during adoption. T2 must not replace this baseline
 with its changed working tree.
 
-T1b must deliberately measure five successful verification runs at that frozen
-revision, with deployment disabled. No hosted timings or consumer-owner agreement
-are asserted by these planning records. Record failed attempts, runner/toolchain/
-browser/cache conditions, run IDs, absolute stage and wall durations, and artifact
-bytes. The frozen workflow deploys on main, so use an isolated non-main ref or a
-controlled workflow invocation that disables deployment; document any wrapper and
-its relation to the frozen workflow. Do not launch it on main. T1b remains
-incomplete until the five measurements exist. Final acceptance needs five matched
-runs and the proposed median growth budget of at most 20%, with explicit stage
-mapping for relocated consumer checks.
+T1b recorded five deliberate successful complete hosted measurements at that frozen
+revision, with deployment disabled, plus 1 retained failed attempt. The
+[CI cost record](ci-cost-baseline.json) contains per-stage and queue-excluded wall
+durations, runner/toolchain/browser/cache provenance and artifact identities/bytes.
+The median is **161 seconds**. [Raw provenance](ci-baseline-evidence/README.md)
+records a lost successful-attempt ZIP and the retained logs/metadata; no payload
+inspection is claimed for that attempt.
+
+The baseline spans multiple hosted environment versions. Final acceptance still
+needs five matched final runs, the proposed median growth budget of at most 20%,
+and an explicit stage map for relocated consumer checks. Match recorded conditions
+or remeasure the frozen baseline under final conditions; do not discard slow
+successful runs or treat consumer removal as an engine speedup. The baseline is
+historical workload evidence, not validation of later tooling. Consumer-owner
+agreement remains unresolved.
 
 ## Inventory and review method
 
@@ -146,10 +151,11 @@ aggregate delivery. No exporter or new runtime proof is claimed here.
 
 ## Interoperability and baseline status
 
-T1b local deliverables are the [consumer command contract](consumer-command-contract.md),
-shared-schema validator/synthetic conformance fixtures and [bounded legacy formats](legacy-formats.md).
-Consumer-owner agreement remains explicitly unresolved. The [CI cost record](ci-cost-baseline.json)
-contains no measured runs yet; the [deployment-disabled baseline procedure](ci-baseline-procedure.md)
-and inactive workflow draft are ready for authorized hosted execution. T1b is incomplete
-until five successful frozen-revision measurements exist. T4 agreement/real conformance
-and T8/T10 measured-cost gates remain in force; no retirement is approved.
+T1b is complete: the [consumer command contract](consumer-command-contract.md),
+shared-schema validator/synthetic conformance fixtures, [bounded legacy formats](legacy-formats.md)
+and [five measured baseline executions](ci-cost-baseline.json) are delivered.
+Consumer-owner agreement remains explicitly unresolved; T4 still requires agreement
+and real conformance. The [deployment-disabled measurement workflow](../../.github/workflows/ci-baseline.yml)
+is published on the existing feature branch. Its scoped automatic trigger does not
+run on a main merge; the ordinary verification/deployment workflow is unchanged.
+T8/T10 matching, coverage and budget gates remain in force; no retirement is approved.
