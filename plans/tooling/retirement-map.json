@@ -3097,6 +3097,13 @@
             "gate": "Move the shared cleanup implementation with cross-platform process-tree parity before retiring its declaration boundary.",
             "proof": null,
             "remainingUsers": ["tooling/core/process.ts", "tooling/core/run.ts"]
+        },
+        {
+            "id": "file:tests/tooling/devtools.d.mts",
+            "decision": "blocked",
+            "gate": "Shared browser session/transport migration with large-frame and cleanup parity before retiring this declaration boundary.",
+            "proof": null,
+            "remainingUsers": ["tooling/suites/verification/browser/installed.ts"]
         }
     ]
 }

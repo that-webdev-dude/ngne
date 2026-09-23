@@ -4,11 +4,38 @@ import { identities, verifyIdentities } from "../evidence/identity.js";
 import type { Prepared, Tree } from "../evidence/schema.js";
 import { command, npmPath } from "./process.js";
 import type { Run } from "./run.js";
+import ts from "typescript";
+import { resolve } from "node:path";
+
+/** Check the actual TypeScript resolver, not just a textual import or runtime lookup. */
+export function verifyDeclarationResolution(app: string): void {
+    const config = ts.readConfigFile(join(app, "tsconfig.json"), ts.sys.readFile);
+    if (
+        config.error ||
+        config.config.extends ||
+        config.config.compilerOptions?.paths ||
+        config.config.compilerOptions?.baseUrl
+    )
+        throw Error("Installed fixture must not inherit source aliases");
+    const parsed = ts.parseJsonConfigFileContent(config.config, ts.sys, app);
+    const resolved = ts.resolveModuleName(
+        "ngne",
+        join(app, "index.ts"),
+        parsed.options,
+        ts.sys,
+    ).resolvedModule;
+    if (
+        !resolved ||
+        resolve(resolved.resolvedFileName) !==
+            resolve(app, "../node_modules/ngne/dist/engine/index.d.ts")
+    )
+        throw Error("Declarations resolved outside isolated installation");
+}
 
 const json = (path: string, value: unknown): void =>
     writeFileSync(path, JSON.stringify(value, null, 2) + "\n");
 
-/** Minimal package-boundary build probe; lifecycle/browser assertions belong to installed verification. */
+/** Install the authored engine-only fixture against the exact packed package. */
 export async function installFixture(
     run: Run,
     repository: string,
@@ -45,14 +72,10 @@ export async function installFixture(
     await npm("lock", ["install", "--package-lock-only"]);
     await npm("install", ["ci"]);
     verifyIdentities(join(installation, "node_modules/ngne"), pkg.files);
-    mkdirSync(app);
-    writeFileSync(
-        join(app, "index.ts"),
-        'import { clamp } from "ngne";\ndocument.body.textContent = String(clamp(2, 0, 1));\n',
-    );
-    writeFileSync(
-        join(app, "index.html"),
-        '<!doctype html><html><head><title>NGNE package probe</title></head><body><script type="module" src="./index.ts"></script></body></html>\n',
+    cpSync(join(repository, "tooling/fixtures/installed-engine"), app, { recursive: true });
+    cpSync(
+        join(repository, "node_modules/@webgpu/types/dist/index.d.ts"),
+        join(app, "platform.d.ts"),
     );
     json(join(app, "tsconfig.json"), {
         compilerOptions: {
@@ -65,11 +88,43 @@ export async function installFixture(
             types: [],
             lib: ["ES2022", "DOM"],
         },
-        files: ["index.ts"],
+        files: ["index.ts", "api-misuse.ts", "platform.d.ts"],
     });
     writeFileSync(
         join(app, "vite.config.mjs"),
-        "export default { build: { emptyOutDir: false } };\n",
+        `import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
+const app = fileURLToPath(new URL('.', import.meta.url)).replaceAll('\\\\', '/');
+const installed = resolve(app, '../node_modules/ngne').replaceAll('\\\\', '/') + '/';
+export default { build: { emptyOutDir: false, assetsInlineLimit: 0 }, plugins: [{
+    name: 'installed-boundary',
+    moduleParsed(info) {
+        const id = info.id.replaceAll('\\\\', '/');
+        if (!id.startsWith('\\0') && !id.startsWith(app) && !id.startsWith(installed))
+            throw Error('Module outside installed fixture: ' + id);
+    }
+}] };
+`,
+    );
+    verifyDeclarationResolution(app);
+    json(join(app, "tsconfig.api.json"), {
+        compilerOptions: {
+            target: "ES2022",
+            module: "NodeNext",
+            moduleResolution: "NodeNext",
+            strict: true,
+            noEmit: true,
+            types: [],
+            lib: ["ES2022", "DOM"],
+        },
+        files: ["api-misuse.ts"],
+    });
+    await command(
+        run,
+        "public-declarations",
+        process.execPath,
+        [join(repository, "node_modules/typescript/bin/tsc"), "-p", join(app, "tsconfig.api.json")],
+        installation,
     );
     await command(
         run,

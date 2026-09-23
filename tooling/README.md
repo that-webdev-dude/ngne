@@ -54,7 +54,7 @@ run competing builds against the same checkout concurrently.
 `prepare:package` builds the current package and uses the actual filename returned
 by `npm pack --json --ignore-scripts`. It checks required files, hashes every packed
 file, installs in a fresh directory and checks installed bytes against that inventory.
-The small generated probe imports the public package, typechecks against its emitted
+The authored engine fixture imports the public package, typechecks against its emitted
 declarations, checks Node resolution, and builds at `/` and `/nested/`. Its explicit
 TypeScript/Vite configs inherit no repository source aliases. This is package/build
 verification; it does not execute browser lifecycle assertions.
@@ -128,3 +128,32 @@ these tests. Consumer-owner agreement and real integration remain unresolved.
 [Bounded legacy fixtures](../plans/tooling/legacy-formats.md) preserve both existing
 reader families. Explicit format selection rejects unknown/new formats; existing
 readers retain their strict and advisory semantics. No historical evidence is converted.
+
+## Installed engine verification
+
+`npm run verify:installed` prepares the current package, then runs the engine-owned
+fixture at `/` and `/nested/`. It requires Chrome (`NGNE_BROWSER` or `CHROME_BIN`
+can select its executable) and WebGPU. `NGNE_WEBGPU_ADAPTER=swiftshader` selects
+software evidence; on Linux use the Vulkan/Xvfb prerequisites in CI. Set
+`NGNE_BROWSER_HEADLESS=0` for a visible browser.
+
+`npm run verify:installed -- --manifest <exact evidence/manifest.json>` reuses a
+verified preparation. There is no latest-run lookup. Each standalone invocation owns
+one fresh run directory, with package preparation under `preparation/` and browser
+results under `evidence/`. The immutable preparation has its own result and artifact
+inventory. The verification policy records its run ID, manifest hash and package
+hash. Explicit manifest reuse keeps that preparation in its original location.
+Browser mutation uses verified disposable build copies.
+
+The readable fixture is in `tooling/fixtures/installed-engine`. Its emitted-package
+declaration compilation includes API misuse checks and fixture-owned platform
+instrumentation. TypeScript resolution rejects inherited configuration/source
+aliases, runtime resolution checks the installed entry point, and Vite rejects
+modules outside the isolated app and package. PNG and WAV resources remain external
+build assets. No consumer checkout, archive or game schema is loaded.
+
+Evidence includes assertion IDs, output RMS samples, actual device identities,
+submission counts, browser version/flags and process-tree cleanup. These are
+automated browser observations, not manual visual/audible approval. Asset byte
+accounting is not process/driver memory. Existing consumer migration checks remain
+active; this command makes no consumer-compatibility claim.

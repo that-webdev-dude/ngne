@@ -663,6 +663,13 @@
             "reason": "Explicit frozen-revision hosted measurements with deployment disabled; feature-branch/file-only bootstrap trigger, manual full reruns, and separate artifacts per attempt. Never a default engine acceptance or deployment gate."
         },
         {
+            "id": "ci:.github/workflows/ci.yml:0207b2c2c9f95a3a:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci.yml",
+            "action": "retain",
+            "reason": "Installed verification orchestration, isolated resolution, deterministic regression or CI integration; retains existing migration commands and deployment relationship."
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:02186dbb2c5dea30:1",
             "owner": "infrastructure",
             "destination": ".github/workflows/ci.yml",
@@ -738,6 +745,13 @@
             "destination": ".github/workflows/ci.yml",
             "action": "retain",
             "reason": "Keep required verification and deploy gate; replace embedded consumer stages/default artifacts after T4 coverage passes and integrate new tooling checks incrementally."
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:11f84a80cc143c84:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci.yml",
+            "action": "retain",
+            "reason": "Installed verification orchestration, isolated resolution, deterministic regression or CI integration; retains existing migration commands and deployment relationship."
         },
         {
             "id": "ci:.github/workflows/ci.yml:17aa919041f374de:1",
@@ -1069,6 +1083,13 @@
             "reason": "Keep required verification and deploy gate; replace embedded consumer stages/default artifacts after T4 coverage passes and integrate new tooling checks incrementally."
         },
         {
+            "id": "ci:.github/workflows/ci.yml:8db700617f195949:6",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci.yml",
+            "action": "retain",
+            "reason": "Installed verification orchestration, isolated resolution, deterministic regression or CI integration; retains existing migration commands and deployment relationship."
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:91552f0fb0c7c67f:1",
             "owner": "infrastructure",
             "destination": ".github/workflows/ci.yml",
@@ -1258,6 +1279,13 @@
             "reason": "Keep required verification and deploy gate; replace embedded consumer stages/default artifacts after T4 coverage passes and integrate new tooling checks incrementally."
         },
         {
+            "id": "ci:.github/workflows/ci.yml:cc1d5a35cd508d27:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci.yml",
+            "action": "retain",
+            "reason": "Installed verification orchestration, isolated resolution, deterministic regression or CI integration; retains existing migration commands and deployment relationship."
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:d080186a22723377:1",
             "owner": "infrastructure",
             "destination": ".github/workflows/ci.yml",
@@ -1291,6 +1319,13 @@
             "destination": ".github/workflows/ci.yml",
             "action": "retain",
             "reason": "Keep required verification and deploy gate; replace embedded consumer stages/default artifacts after T4 coverage passes and integrate new tooling checks incrementally."
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:d080186a22723377:6",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci.yml",
+            "action": "retain",
+            "reason": "Installed verification orchestration, isolated resolution, deterministic regression or CI integration; retains existing migration commands and deployment relationship."
         },
         {
             "id": "ci:.github/workflows/ci.yml:d0fb26b90aa51510:1",
@@ -1368,6 +1403,13 @@
             "destination": ".github/workflows/ci.yml",
             "action": "retain",
             "reason": "Keep required verification and deploy gate; replace embedded consumer stages/default artifacts after T4 coverage passes and integrate new tooling checks incrementally."
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:da6f8d99c2f91e58:6",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci.yml",
+            "action": "retain",
+            "reason": "Installed verification orchestration, isolated resolution, deterministic regression or CI integration; retains existing migration commands and deployment relationship."
         },
         {
             "id": "ci:.github/workflows/ci.yml:defcb9dfad595090:1",
@@ -1592,6 +1634,13 @@
             "destination": "package.json",
             "action": "retain",
             "reason": "Keep command/config compatibility while separating package/showcase/browser/tooling targets; existing default consumer command is retired only after replacement gates."
+        },
+        {
+            "id": "command:verify:installed",
+            "owner": "infrastructure",
+            "destination": "package.json",
+            "action": "retain",
+            "reason": "Installed verification orchestration, isolated resolution, deterministic regression or CI integration; retains existing migration commands and deployment relationship."
         },
         {
             "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:index.html",
@@ -2413,6 +2462,13 @@
             "reason": "Extract proven lifecycle into shared session infrastructure; preserve owned cleanup, no replay and large profiler wire capability before retirement."
         },
         {
+            "id": "file:tests/tooling/devtools.d.mts",
+            "owner": "infrastructure",
+            "destination": "tooling/core/browser/transport.ts",
+            "action": "migrate",
+            "reason": "Temporary accurate type boundary over existing DevTools transport; retire only with session/transport parity."
+        },
+        {
             "id": "file:tests/tooling/devtools.mjs",
             "owner": "infrastructure",
             "destination": "tooling/core/browser/transport.ts",
@@ -2462,6 +2518,13 @@
             "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
         },
         {
+            "id": "file:tooling/commands/verify.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/verify.ts",
+            "action": "retain",
+            "reason": "Installed verification orchestration, isolated resolution, deterministic regression or CI integration; retains existing migration commands and deployment relationship."
+        },
+        {
             "id": "file:tooling/core/fixture.ts",
             "owner": "infrastructure",
             "destination": "tooling/core/fixture.ts",
@@ -2495,6 +2558,13 @@
             "destination": "tooling/core/run.ts",
             "action": "retain",
             "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "file:tooling/core/server.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/core/server.ts",
+            "action": "retain",
+            "reason": "Installed verification orchestration, isolated resolution, deterministic regression or CI integration; retains existing migration commands and deployment relationship."
         },
         {
             "id": "file:tooling/evidence/consumer-contract-v1.ts",
@@ -2532,11 +2602,60 @@
             "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
         },
         {
+            "id": "file:tooling/fixtures/installed-engine/api-misuse.ts",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/api-misuse.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "file:tooling/fixtures/installed-engine/index.html",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.html",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "file:tooling/fixtures/installed-engine/index.ts",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "file:tooling/fixtures/installed-engine/observe.ts",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/observe.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "file:tooling/fixtures/installed-engine/tile.png",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/tile.png",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "file:tooling/fixtures/installed-engine/tone.wav",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/tone.wav",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
             "id": "file:tooling/README.md",
             "owner": "infrastructure",
             "destination": "tooling/README.md",
             "action": "retain",
             "reason": "Current migration checker, harness or operating documentation; extend alongside each implementation."
+        },
+        {
+            "id": "file:tooling/suites/verification/browser/installed.ts",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
         },
         {
             "id": "file:tooling/tests/consumer-contract.test.ts",
@@ -2768,6 +2887,13 @@
             "destination": "tooling/tests/fixtures/legacy/unsupported.json",
             "action": "retain",
             "reason": "Bounded synthetic legacy formats and current-reader regression evidence; no historical conversion or retirement approval."
+        },
+        {
+            "id": "file:tooling/tests/installed.test.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/installed.test.ts",
+            "action": "retain",
+            "reason": "Installed verification orchestration, isolated resolution, deterministic regression or CI integration; retains existing migration commands and deployment relationship."
         },
         {
             "id": "file:tooling/tests/legacy-formats.test.ts",
@@ -3876,6 +4002,13 @@
             "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
         },
         {
+            "id": "option:tooling/commands/verify.ts:--manifest",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/verify.ts",
+            "action": "retain",
+            "reason": "Installed verification orchestration, isolated resolution, deterministic regression or CI integration; retains existing migration commands and deployment relationship."
+        },
+        {
             "id": "option:tooling/core/fixture.ts:--base",
             "owner": "infrastructure",
             "destination": "tooling/core/fixture.ts",
@@ -4007,6 +4140,153 @@
             "destination": "tooling/core/preparation.ts",
             "action": "retain",
             "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--disable-background-timer-throttling",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--disable-default-apps",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--disable-dev-shm-usage",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--disable-renderer-backgrounding",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--disable-vulkan-surface",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--enable-features",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--enable-unsafe-swiftshader",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--enable-unsafe-webgpu",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--headless",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--no-first-run",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--no-sandbox",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--remote-debugging-port",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--use-angle",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--use-vulkan",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--use-webgpu-adapter",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--user-data-dir",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--window-size",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:CHROME_BIN",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:NGNE_BROWSER",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:NGNE_BROWSER_HEADLESS",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:NGNE_WEBGPU_ADAPTER",
+            "owner": "engine",
+            "destination": "tooling/suites/verification/browser/installed.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
         },
         {
             "id": "option:tooling/tests/consumer-contract.test.ts:--contract-version",
@@ -4461,9 +4741,9 @@
         {
             "id": "assertion:tests/browser-content-checks.ts:0a98159c98bf253b",
             "owner": "engine",
-            "destination": "tooling/suites/verification/browser/installed.ts",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
             "action": "migrate",
-            "reason": "Preserve generic engine behavior in minimal installed fixture; consumer owns authored scenario and must pass its external replacement before old game harness removal."
+            "reason": "Engine concern replacement: replacement-plays-new-scope / fresh replacementRms. See installed-engine-coverage.md and docs/evidence/installed-engine.json for passing root/nested observations. Consumer-specific context remains in the original scenario; retirement stays blocked."
         },
         {
             "id": "assertion:tests/browser-content-checks.ts:186ccab7d0d6301a",
@@ -4475,9 +4755,9 @@
         {
             "id": "assertion:tests/browser-content-checks.ts:18e3dfc6dab199f0",
             "owner": "engine",
-            "destination": "tooling/suites/verification/browser/installed.ts",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
             "action": "migrate",
-            "reason": "Preserve generic engine behavior in minimal installed fixture; consumer owns authored scenario and must pass its external replacement before old game harness removal."
+            "reason": "Engine concern replacement: image-upload-ready-before-mount. See installed-engine-coverage.md and docs/evidence/installed-engine.json for passing root/nested observations. Consumer-specific context remains in the original scenario; retirement stays blocked."
         },
         {
             "id": "assertion:tests/browser-content-checks.ts:1cd9bd19f2471367",
@@ -4517,9 +4797,9 @@
         {
             "id": "assertion:tests/browser-content-checks.ts:30ae1f0b25fe05b2",
             "owner": "engine",
-            "destination": "tooling/suites/verification/browser/installed.ts",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
             "action": "migrate",
-            "reason": "Preserve generic engine behavior in minimal installed fixture; consumer owns authored scenario and must pass its external replacement before old game harness removal."
+            "reason": "Engine concern replacement: no-unexpected-diagnostics. See installed-engine-coverage.md and docs/evidence/installed-engine.json for passing root/nested observations. Consumer-specific context remains in the original scenario; retirement stays blocked."
         },
         {
             "id": "assertion:tests/browser-content-checks.ts:321f04e51d44bc3b",
@@ -4566,23 +4846,23 @@
         {
             "id": "assertion:tests/browser-content-checks.ts:43ab1d79a96bd0a8",
             "owner": "engine",
-            "destination": "tooling/suites/verification/browser/installed.ts",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
             "action": "migrate",
-            "reason": "Preserve generic engine behavior in minimal installed fixture; consumer owns authored scenario and must pass its external replacement before old game harness removal."
+            "reason": "Engine concern replacement: failed-recovery-is-terminal-and-reported. See installed-engine-coverage.md and docs/evidence/installed-engine.json for passing root/nested observations. Consumer-specific context remains in the original scenario; retirement stays blocked."
         },
         {
             "id": "assertion:tests/browser-content-checks.ts:490d9d601f802e64",
             "owner": "engine",
-            "destination": "tooling/suites/verification/browser/installed.ts",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
             "action": "migrate",
-            "reason": "Preserve generic engine behavior in minimal installed fixture; consumer owns authored scenario and must pass its external replacement before old game harness removal."
+            "reason": "Engine concern replacement: recovered-frame-submits. See installed-engine-coverage.md and docs/evidence/installed-engine.json for passing root/nested observations. Consumer-specific context remains in the original scenario; retirement stays blocked."
         },
         {
             "id": "assertion:tests/browser-content-checks.ts:4a48a22627a7124c",
             "owner": "engine",
-            "destination": "tooling/suites/verification/browser/installed.ts",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
             "action": "migrate",
-            "reason": "Preserve generic engine behavior in minimal installed fixture; consumer owns authored scenario and must pass its external replacement before old game harness removal."
+            "reason": "Engine concern replacement: candidate-release-preserves-survivor. See installed-engine-coverage.md and docs/evidence/installed-engine.json for passing root/nested observations. Consumer-specific context remains in the original scenario; retirement stays blocked."
         },
         {
             "id": "assertion:tests/browser-content-checks.ts:52d092191519544e",
@@ -4615,9 +4895,9 @@
         {
             "id": "assertion:tests/browser-content-checks.ts:6462395d17fc6805",
             "owner": "engine",
-            "destination": "tooling/suites/verification/browser/installed.ts",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
             "action": "migrate",
-            "reason": "Preserve generic engine behavior in minimal installed fixture; consumer owns authored scenario and must pass its external replacement before old game harness removal."
+            "reason": "Engine concern replacement: external-image-texels-present. See installed-engine-coverage.md and docs/evidence/installed-engine.json for passing root/nested observations. Consumer-specific context remains in the original scenario; retirement stays blocked."
         },
         {
             "id": "assertion:tests/browser-content-checks.ts:66ceaad8d6bcb3e2",
@@ -4671,23 +4951,23 @@
         {
             "id": "assertion:tests/browser-content-checks.ts:8f84e9dc6667a950",
             "owner": "engine",
-            "destination": "tooling/suites/verification/browser/installed.ts",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
             "action": "migrate",
-            "reason": "Preserve generic engine behavior in minimal installed fixture; consumer owns authored scenario and must pass its external replacement before old game harness removal."
+            "reason": "Engine concern replacement: delayed-image-cannot-publish-or-mount. See installed-engine-coverage.md and docs/evidence/installed-engine.json for passing root/nested observations. Consumer-specific context remains in the original scenario; retirement stays blocked."
         },
         {
             "id": "assertion:tests/browser-content-checks.ts:955fb70e0b386035",
             "owner": "engine",
-            "destination": "tooling/suites/verification/browser/installed.ts",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
             "action": "migrate",
-            "reason": "Preserve generic engine behavior in minimal installed fixture; consumer owns authored scenario and must pass its external replacement before old game harness removal."
+            "reason": "Engine concern replacement: recovery-preserves-simulation. See installed-engine-coverage.md and docs/evidence/installed-engine.json for passing root/nested observations. Consumer-specific context remains in the original scenario; retirement stays blocked."
         },
         {
             "id": "assertion:tests/browser-content-checks.ts:9a649964f7c6d5d7",
             "owner": "engine",
-            "destination": "tooling/suites/verification/browser/installed.ts",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
             "action": "migrate",
-            "reason": "Preserve generic engine behavior in minimal installed fixture; consumer owns authored scenario and must pass its external replacement before old game harness removal."
+            "reason": "Engine concern replacement: recovery-cancellation-preserves-mounted-owner. See installed-engine-coverage.md and docs/evidence/installed-engine.json for passing root/nested observations. Consumer-specific context remains in the original scenario; retirement stays blocked."
         },
         {
             "id": "assertion:tests/browser-content-checks.ts:9bd17920af3e3c83",
@@ -4699,9 +4979,9 @@
         {
             "id": "assertion:tests/browser-content-checks.ts:9fbc65e915a3afec",
             "owner": "engine",
-            "destination": "tooling/suites/verification/browser/installed.ts",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
             "action": "migrate",
-            "reason": "Preserve generic engine behavior in minimal installed fixture; consumer owns authored scenario and must pass its external replacement before old game harness removal."
+            "reason": "Engine concern replacement: leased-working-set-protected-from-retention. See installed-engine-coverage.md and docs/evidence/installed-engine.json for passing root/nested observations. Consumer-specific context remains in the original scenario; retirement stays blocked."
         },
         {
             "id": "assertion:tests/browser-content-checks.ts:a3a2c6173c6158ea",
@@ -4734,9 +5014,9 @@
         {
             "id": "assertion:tests/browser-content-checks.ts:b7d906e941d7a11f",
             "owner": "engine",
-            "destination": "tooling/suites/verification/browser/installed.ts",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
             "action": "migrate",
-            "reason": "Preserve generic engine behavior in minimal installed fixture; consumer owns authored scenario and must pass its external replacement before old game harness removal."
+            "reason": "Engine concern replacement: replacement-unmounts-old-owner. See installed-engine-coverage.md and docs/evidence/installed-engine.json for passing root/nested observations. Consumer-specific context remains in the original scenario; retirement stays blocked."
         },
         {
             "id": "assertion:tests/browser-content-checks.ts:b96aeb8b974569c2",
@@ -4762,9 +5042,9 @@
         {
             "id": "assertion:tests/browser-content-checks.ts:c7912b54699e7374",
             "owner": "engine",
-            "destination": "tooling/suites/verification/browser/installed.ts",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
             "action": "migrate",
-            "reason": "Preserve generic engine behavior in minimal installed fixture; consumer owns authored scenario and must pass its external replacement before old game harness removal."
+            "reason": "Engine concern replacement: decoded-clip-produces-output / firstRms. See installed-engine-coverage.md and docs/evidence/installed-engine.json for passing root/nested observations. Consumer-specific context remains in the original scenario; retirement stays blocked."
         },
         {
             "id": "assertion:tests/browser-content-checks.ts:c8a5b6e088dd6b2c",
@@ -4783,9 +5063,9 @@
         {
             "id": "assertion:tests/browser-content-checks.ts:d173a5cbe62a8de3",
             "owner": "engine",
-            "destination": "tooling/suites/verification/browser/installed.ts",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
             "action": "migrate",
-            "reason": "Preserve generic engine behavior in minimal installed fixture; consumer owns authored scenario and must pass its external replacement before old game harness removal."
+            "reason": "Engine concern replacement: replacement-plays-new-scope / replacementRms. See installed-engine-coverage.md and docs/evidence/installed-engine.json for passing root/nested observations. Consumer-specific context remains in the original scenario; retirement stays blocked."
         },
         {
             "id": "assertion:tests/browser-content-checks.ts:d4df2d50a78479d0",
@@ -4797,9 +5077,9 @@
         {
             "id": "assertion:tests/browser-content-checks.ts:d8f80effa48c6b32",
             "owner": "engine",
-            "destination": "tooling/suites/verification/browser/installed.ts",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
             "action": "migrate",
-            "reason": "Preserve generic engine behavior in minimal installed fixture; consumer owns authored scenario and must pass its external replacement before old game harness removal."
+            "reason": "Engine concern replacement: recovered-image-texels-present. See installed-engine-coverage.md and docs/evidence/installed-engine.json for passing root/nested observations. Consumer-specific context remains in the original scenario; retirement stays blocked."
         },
         {
             "id": "assertion:tests/browser-content-checks.ts:dae9f46b24d2b450",
@@ -4811,9 +5091,9 @@
         {
             "id": "assertion:tests/browser-content-checks.ts:db6d7904434aa50a",
             "owner": "engine",
-            "destination": "tooling/suites/verification/browser/installed.ts",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
             "action": "migrate",
-            "reason": "Preserve generic engine behavior in minimal installed fixture; consumer owns authored scenario and must pass its external replacement before old game harness removal."
+            "reason": "Engine concern replacement: recovered-image-texels-present. See installed-engine-coverage.md and docs/evidence/installed-engine.json for passing root/nested observations. Consumer-specific context remains in the original scenario; retirement stays blocked."
         },
         {
             "id": "assertion:tests/browser-content-checks.ts:eb821abf8d6c5bee",
@@ -7070,6 +7350,237 @@
             "reason": "Current migration checker, harness or operating documentation; extend alongside each implementation."
         },
         {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:0669524e971c20b7",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:1149461e0db4ee59",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:138d54755f1af488",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:1725ff8c3c78cfa5",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:22804e2e133aacff",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:252794c84ba8ada7",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:2542ba3616e7ee0e",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:25f3681824ca0a10",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:3aa9b2e3bd29aa1e",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:3cb013ac387515f1",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:4a560d17ab689098",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:4a969524222bd798",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:4d52847aa8953a54",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:4e1dddfec2e01f9a",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:51d17d16e749893a",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:5b6d8bb86b796c40",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:5c6d7fe0abed5edd",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:65cbf75741b8f1e9",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:66be7910eadee389",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:69d17d13b52ab391",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:73cf339a17987351",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:a734ee44e0cc1c3b",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:b19ef734948442b9",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:b7643d223df07b39",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:bb13cfbeb9f99124",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:c4d2beeb4feb0b38",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:d22a51b139cd119b",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:db3e97da62ed01e1",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:dd4216473212bd09",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:ddf560f4de1ced7c",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:e2b94cbe0b947931",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:f60c09d20cddc2d6",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:ff3499bca249ca3a",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
             "id": "assertion:tooling/tests/consumer-contract.test.ts:2a627d328e864b18",
             "owner": "infrastructure",
             "destination": "tooling/tests/consumer-contract.test.ts",
@@ -7131,6 +7642,34 @@
             "destination": "tooling/tests/consumer-contract.test.ts",
             "action": "retain",
             "reason": "Shared-schema consumer protocol validation and synthetic conformance only; no real consumer agreement or execution is implied."
+        },
+        {
+            "id": "assertion:tooling/tests/installed.test.ts:09bce73240a7e054",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/installed.test.ts",
+            "action": "retain",
+            "reason": "Installed verification orchestration, isolated resolution, deterministic regression or CI integration; retains existing migration commands and deployment relationship."
+        },
+        {
+            "id": "assertion:tooling/tests/installed.test.ts:afcf78cd46ea5aa9",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/installed.test.ts",
+            "action": "retain",
+            "reason": "Installed verification orchestration, isolated resolution, deterministic regression or CI integration; retains existing migration commands and deployment relationship."
+        },
+        {
+            "id": "assertion:tooling/tests/installed.test.ts:da2d674d7649f589",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/installed.test.ts",
+            "action": "retain",
+            "reason": "Installed verification orchestration, isolated resolution, deterministic regression or CI integration; retains existing migration commands and deployment relationship."
+        },
+        {
+            "id": "assertion:tooling/tests/installed.test.ts:df38a81bca58b2aa",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/installed.test.ts",
+            "action": "retain",
+            "reason": "Installed verification orchestration, isolated resolution, deterministic regression or CI integration; retains existing migration commands and deployment relationship."
         },
         {
             "id": "assertion:tooling/tests/legacy-formats.test.ts:04da1aa5d2e8cdf5",
@@ -7616,6 +8155,13 @@
             "destination": "tooling/core/preparation.ts",
             "action": "retain",
             "reason": "Engine-owned preparation workload; no external consumer or browser execution; new baseline required for any future performance claims."
+        },
+        {
+            "id": "workload:installed-engine-browser",
+            "owner": "engine",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "action": "retain",
+            "reason": "Standalone installed verification, independent of consumer artifacts. See installed-engine-coverage.md for assertion correspondence and evidence limits."
         }
     ]
 }

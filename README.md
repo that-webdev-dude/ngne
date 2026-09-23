@@ -67,9 +67,14 @@ Positions are sprite centers in logical pixels; `dt` is seconds. See the [runnab
 NGNE is not published to npm. Build this checkout to obtain ESM modules and declarations in `dist/engine/`; the entry point is `dist/engine/index.js`. The demo and hello example consume that same package entry point, and the build checks forbidden API usage against the emitted declarations.
 
 `npm run build:package` builds only the library with clean emission. For a fresh
-tarball, isolated installation, declaration check and root/nested probe builds, use
+tarball, isolated installation, declaration check and root/nested fixture builds, use
 `npm run prepare:package`. See [tooling commands and evidence](tooling/README.md)
 for output selection and verified manifest reuse.
+
+`npm run verify:installed` prepares and verifies the engine-only fixture against
+the installed package at root and nested URL bases. It needs Chrome/WebGPU and no
+consumer checkout or snapshot. See [installed verification](tooling/README.md#installed-engine-verification)
+for prerequisites and evidence limits.
 
 ## Verify
 

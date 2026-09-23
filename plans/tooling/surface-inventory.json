@@ -2878,6 +2878,12 @@
             "label": "cache: npm"
         },
         {
+            "id": "ci:.github/workflows/ci.yml:0207b2c2c9f95a3a:1",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "out/runs/*-installed-*/evidence/"
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:02186dbb2c5dea30:1",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
@@ -2942,6 +2948,12 @@
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
             "label": "needs: verify"
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:11f84a80cc143c84:1",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "run: xvfb-run -a npm run verify:installed -- --manifest out/runs/ci-package/evidence/manifest.json"
         },
         {
             "id": "ci:.github/workflows/ci.yml:17aa919041f374de:1",
@@ -3226,6 +3238,12 @@
             "label": "env:"
         },
         {
+            "id": "ci:.github/workflows/ci.yml:8db700617f195949:6",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "env:"
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:91552f0fb0c7c67f:1",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
@@ -3388,6 +3406,12 @@
             "label": "id-token: write"
         },
         {
+            "id": "ci:.github/workflows/ci.yml:cc1d5a35cd508d27:1",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "- name: Verify installed engine at root and nested bases"
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:d080186a22723377:1",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
@@ -3413,6 +3437,12 @@
         },
         {
             "id": "ci:.github/workflows/ci.yml:d080186a22723377:5",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "NGNE_WEBGPU_ADAPTER: swiftshader"
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:d080186a22723377:6",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
             "label": "NGNE_WEBGPU_ADAPTER: swiftshader"
@@ -3479,6 +3509,12 @@
         },
         {
             "id": "ci:.github/workflows/ci.yml:da6f8d99c2f91e58:5",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "NGNE_BROWSER_HEADLESS: 0"
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:da6f8d99c2f91e58:6",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
             "label": "NGNE_BROWSER_HEADLESS: 0"
@@ -3674,6 +3710,12 @@
             "kind": "command",
             "path": "package.json",
             "label": "tsc -p tooling/tsconfig.node.json"
+        },
+        {
+            "id": "command:verify:installed",
+            "kind": "command",
+            "path": "package.json",
+            "label": "tsx tooling/commands/verify.ts"
         },
         {
             "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:index.html",
@@ -4378,6 +4420,12 @@
             "label": "tests/tooling/cleanup.mjs"
         },
         {
+            "id": "file:tests/tooling/devtools.d.mts",
+            "kind": "file",
+            "path": "tests/tooling/devtools.d.mts",
+            "label": "tests/tooling/devtools.d.mts"
+        },
+        {
             "id": "file:tests/tooling/devtools.mjs",
             "kind": "file",
             "path": "tests/tooling/devtools.mjs",
@@ -4420,6 +4468,12 @@
             "label": "tooling/commands/prepare.ts"
         },
         {
+            "id": "file:tooling/commands/verify.ts",
+            "kind": "file",
+            "path": "tooling/commands/verify.ts",
+            "label": "tooling/commands/verify.ts"
+        },
+        {
             "id": "file:tooling/core/fixture.ts",
             "kind": "file",
             "path": "tooling/core/fixture.ts",
@@ -4448,6 +4502,12 @@
             "kind": "file",
             "path": "tooling/core/run.ts",
             "label": "tooling/core/run.ts"
+        },
+        {
+            "id": "file:tooling/core/server.ts",
+            "kind": "file",
+            "path": "tooling/core/server.ts",
+            "label": "tooling/core/server.ts"
         },
         {
             "id": "file:tooling/evidence/consumer-contract-v1.ts",
@@ -4480,10 +4540,52 @@
             "label": "tooling/evidence/schema.ts"
         },
         {
+            "id": "file:tooling/fixtures/installed-engine/api-misuse.ts",
+            "kind": "file",
+            "path": "tooling/fixtures/installed-engine/api-misuse.ts",
+            "label": "tooling/fixtures/installed-engine/api-misuse.ts"
+        },
+        {
+            "id": "file:tooling/fixtures/installed-engine/index.html",
+            "kind": "file",
+            "path": "tooling/fixtures/installed-engine/index.html",
+            "label": "tooling/fixtures/installed-engine/index.html"
+        },
+        {
+            "id": "file:tooling/fixtures/installed-engine/index.ts",
+            "kind": "file",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "tooling/fixtures/installed-engine/index.ts"
+        },
+        {
+            "id": "file:tooling/fixtures/installed-engine/observe.ts",
+            "kind": "file",
+            "path": "tooling/fixtures/installed-engine/observe.ts",
+            "label": "tooling/fixtures/installed-engine/observe.ts"
+        },
+        {
+            "id": "file:tooling/fixtures/installed-engine/tile.png",
+            "kind": "file",
+            "path": "tooling/fixtures/installed-engine/tile.png",
+            "label": "tooling/fixtures/installed-engine/tile.png"
+        },
+        {
+            "id": "file:tooling/fixtures/installed-engine/tone.wav",
+            "kind": "file",
+            "path": "tooling/fixtures/installed-engine/tone.wav",
+            "label": "tooling/fixtures/installed-engine/tone.wav"
+        },
+        {
             "id": "file:tooling/README.md",
             "kind": "file",
             "path": "tooling/README.md",
             "label": "tooling/README.md"
+        },
+        {
+            "id": "file:tooling/suites/verification/browser/installed.ts",
+            "kind": "file",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "tooling/suites/verification/browser/installed.ts"
         },
         {
             "id": "file:tooling/tests/consumer-contract.test.ts",
@@ -4682,6 +4784,12 @@
             "kind": "file",
             "path": "tooling/tests/fixtures/legacy/unsupported.json",
             "label": "tooling/tests/fixtures/legacy/unsupported.json"
+        },
+        {
+            "id": "file:tooling/tests/installed.test.ts",
+            "kind": "file",
+            "path": "tooling/tests/installed.test.ts",
+            "label": "tooling/tests/installed.test.ts"
         },
         {
             "id": "file:tooling/tests/legacy-formats.test.ts",
@@ -5632,6 +5740,12 @@
             "label": "--output"
         },
         {
+            "id": "option:tooling/commands/verify.ts:--manifest",
+            "kind": "option",
+            "path": "tooling/commands/verify.ts",
+            "label": "--manifest"
+        },
+        {
             "id": "option:tooling/core/fixture.ts:--base",
             "kind": "option",
             "path": "tooling/core/fixture.ts",
@@ -5744,6 +5858,132 @@
             "kind": "option",
             "path": "tooling/core/preparation.ts",
             "label": "--porcelain"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--disable-background-timer-throttling",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "--disable-background-timer-throttling"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--disable-default-apps",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "--disable-default-apps"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--disable-dev-shm-usage",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "--disable-dev-shm-usage"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--disable-renderer-backgrounding",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "--disable-renderer-backgrounding"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--disable-vulkan-surface",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "--disable-vulkan-surface"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--enable-features",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "--enable-features"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--enable-unsafe-swiftshader",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "--enable-unsafe-swiftshader"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--enable-unsafe-webgpu",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "--enable-unsafe-webgpu"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--headless",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "--headless"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--no-first-run",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "--no-first-run"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--no-sandbox",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "--no-sandbox"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--remote-debugging-port",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "--remote-debugging-port"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--use-angle",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "--use-angle"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--use-vulkan",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "--use-vulkan"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--use-webgpu-adapter",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "--use-webgpu-adapter"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--user-data-dir",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "--user-data-dir"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:--window-size",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "--window-size"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:CHROME_BIN",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "CHROME_BIN"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:NGNE_BROWSER",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "NGNE_BROWSER"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:NGNE_BROWSER_HEADLESS",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "NGNE_BROWSER_HEADLESS"
+        },
+        {
+            "id": "option:tooling/suites/verification/browser/installed.ts:NGNE_WEBGPU_ADAPTER",
+            "kind": "option",
+            "path": "tooling/suites/verification/browser/installed.ts",
+            "label": "NGNE_WEBGPU_ADAPTER"
         },
         {
             "id": "option:tooling/tests/consumer-contract.test.ts:--contract-version",
@@ -10874,6 +11114,204 @@
             "label": "check(process.cwd())"
         },
         {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:0669524e971c20b7",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"disposal-releases-all-owners\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:1149461e0db4ee59",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"disposal-closes-audio\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:138d54755f1af488",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"cancelled-image-never-registers\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:1725ff8c3c78cfa5",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"stop-disables-frames-and-audio\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:22804e2e133aacff",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"decoded-audio-buffer\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:252794c84ba8ada7",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"image-upload-ready-before-mount\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:2542ba3616e7ee0e",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"recovery-restores-live-source\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:25f3681824ca0a10",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"cold-preparation-does-not-unlock-audio\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:3aa9b2e3bd29aa1e",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"replacement-unmounts-old-owner\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:3cb013ac387515f1",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"delayed-image-cannot-publish-or-mount\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:4a560d17ab689098",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"failed-renderer-disposal-releases-sources\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:4a969524222bd798",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"candidate-release-preserves-survivor\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:4d52847aa8953a54",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"no-unexpected-diagnostics\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:4e1dddfec2e01f9a",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"leased-working-set-protected-from-retention\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:51d17d16e749893a",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"failed-load-can-explicitly-retry\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:5b6d8bb86b796c40",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"recovery-cancellation-preserves-mounted-owner\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:5c6d7fe0abed5edd",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"overlapping-candidates-share-upload\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:65cbf75741b8f1e9",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"stopped-recovery-does-not-schedule\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:66be7910eadee389",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"failed-preparation-releases-claims\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:69d17d13b52ab391",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"external-assets-use-selected-base\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:73cf339a17987351",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"ordinary-browser-frame-submits-sprite\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:a734ee44e0cc1c3b",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"late-cancelled-load-disposed-once\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:b19ef734948442b9",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"failed-recovery-is-terminal-and-reported\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:b7643d223df07b39",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "check(id, rejected)"
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:bb13cfbeb9f99124",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"recovered-image-texels-present\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:c4d2beeb4feb0b38",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"external-image-texels-present\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:d22a51b139cd119b",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"recovery-preserves-simulation\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:db3e97da62ed01e1",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"replacement-plays-new-scope\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:dd4216473212bd09",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"recovered-frame-submits\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:ddf560f4de1ced7c",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"decoded-clip-produces-output\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:e2b94cbe0b947931",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"resume-retains-mounted-scene\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:f60c09d20cddc2d6",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"cold-preparation-does-not-mount-or-schedule\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:ff3499bca249ca3a",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"disposal-destroys-late-device-and-releases-assets\""
+        },
+        {
             "id": "assertion:tooling/tests/consumer-contract.test.ts:2a627d328e864b18",
             "kind": "assertion",
             "path": "tooling/tests/consumer-contract.test.ts",
@@ -10926,6 +11364,30 @@
             "kind": "assertion",
             "path": "tooling/tests/consumer-contract.test.ts",
             "label": "\"consumer stub CLI runs independently twice and returns invalid-input status on reuse\""
+        },
+        {
+            "id": "assertion:tooling/tests/installed.test.ts:09bce73240a7e054",
+            "kind": "assertion",
+            "path": "tooling/tests/installed.test.ts",
+            "label": "\"installed declarations reject aliases, inherited configuration and source fallback\""
+        },
+        {
+            "id": "assertion:tooling/tests/installed.test.ts:afcf78cd46ea5aa9",
+            "kind": "assertion",
+            "path": "tooling/tests/installed.test.ts",
+            "label": "\"installed server enforces nested base without source or SPA fallback and closes\""
+        },
+        {
+            "id": "assertion:tooling/tests/installed.test.ts:da2d674d7649f589",
+            "kind": "assertion",
+            "path": "tooling/tests/installed.test.ts",
+            "label": "\"browser observation retains early failures and rejects malformed reports\""
+        },
+        {
+            "id": "assertion:tooling/tests/installed.test.ts:df38a81bca58b2aa",
+            "kind": "assertion",
+            "path": "tooling/tests/installed.test.ts",
+            "label": "\"invalid exact preparation fails before browser startup and retains a terminal result\""
         },
         {
             "id": "assertion:tooling/tests/legacy-formats.test.ts:04da1aa5d2e8cdf5",
@@ -11342,6 +11804,12 @@
             "kind": "workload",
             "path": "tooling/core/preparation.ts",
             "label": "Clean package emission, npm JSON pack, offline locked isolated install, public declarations/resolution, root and nested builds, verified explicit handoff and independent cleanup evidence."
+        },
+        {
+            "id": "workload:installed-engine-browser",
+            "kind": "workload",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "Engine-owned installed public-package lifecycle, root/nested external assets, recovery, resource ownership and audio output"
         }
     ]
 }

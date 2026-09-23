@@ -159,3 +159,11 @@ and real conformance. The [deployment-disabled measurement workflow](../../.gith
 is published on the existing feature branch. Its scoped automatic trigger does not
 run on a main merge; the ordinary verification/deployment workflow is unchanged.
 T8/T10 matching, coverage and budget gates remain in force; no retirement is approved.
+
+## Installed engine verification status
+
+T3 introduces `npm run verify:installed` and an engine-owned installed fixture.
+See [coverage correspondence](installed-engine-coverage.md) and the
+[dated local evidence](../../docs/evidence/installed-engine.json). Existing consumer
+migration checks remain active. T5 browser-session consolidation is next; T4 still
+requires consumer-owner agreement and real explicitly selected conformance.

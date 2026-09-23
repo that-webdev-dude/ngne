@@ -9,5 +9,11 @@
         "noEmit": true,
         "skipLibCheck": true
     },
-    "include": ["commands/**/*.ts", "core/**/*.ts", "evidence/**/*.ts", "tests/*.test.ts"]
+    "include": [
+        "commands/**/*.ts",
+        "core/**/*.ts",
+        "evidence/**/*.ts",
+        "tests/*.test.ts",
+        "suites/**/*.ts"
+    ]
 }

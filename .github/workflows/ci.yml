@@ -36,6 +36,11 @@ jobs:
         run: npm run test:installed
       - name: Install software WebGPU presentation dependencies
         run: sudo apt-get update && sudo apt-get install -y libvulkan1 mesa-vulkan-drivers xvfb xauth
+      - name: Verify installed engine at root and nested bases
+        env:
+          NGNE_BROWSER_HEADLESS: 0
+          NGNE_WEBGPU_ADAPTER: swiftshader
+        run: xvfb-run -a npm run verify:installed -- --manifest out/runs/ci-package/evidence/manifest.json
       - name: Demonstrate browser assertion failure detection
         env:
           NGNE_BROWSER_HEADLESS: 0
@@ -84,6 +89,7 @@ jobs:
           name: browser-integration
           path: |
             out/runs/ci-package/evidence/
+            out/runs/*-installed-*/evidence/
             .test-output/browser*
             .test-output/installed-content/*.json
             .test-output/installed-content/*.log
