@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { execFileSync } from "node:child_process";
 import {
     cpSync,
     existsSync,
@@ -13,7 +12,6 @@ import {
 } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
-import { pathToFileURL } from "node:url";
 import { Run, atomic } from "../core/run.js";
 import { cleanEmission } from "../core/package.js";
 import { copyPreparedBuild, verifyPrepared } from "../core/preparation.js";
@@ -128,21 +126,22 @@ test("extracted identities match legacy content fixtures byte for byte", (t) => 
     mkdirSync(join(root, "nested"));
     writeFileSync(join(root, "nested/b.bin"), Buffer.from([0, 1, 128, 255]));
     writeFileSync(join(root, "a.txt"), "content\r\n");
-    const legacy = execFileSync(
-        process.execPath,
-        [
-            "--input-type=module",
-            "-e",
-            `import { identities } from ${JSON.stringify(pathToFileURL(resolve("benchmarks/content/fixtures.mjs")).href)}; console.log(JSON.stringify(identities(${JSON.stringify(root)})));`,
-        ],
-        { encoding: "utf8" },
-    );
-    assert.deepEqual(identities(root), JSON.parse(legacy));
+    // Frozen independently computed SHA-256 bytes preserve the original extraction oracle.
+    assert.deepEqual(identities(root), {
+        "a.txt": "fc06f48221d98ad6106c3845b33a2a41152482ab9e697f736ad26db4853fa657",
+        "nested/b.bin": "0ff830e8c68aca18063bce54c3191d5c116a2dfe33249538b252746cb777ef10",
+    });
 });
 
 test("policy raw samples and cleanup details survive stage recording and finalization", async (t) => {
     const run = new Run(temporary(t), "extraction");
-    const policy = read(resolve("benchmarks/content/policy.json"));
+    const policy = {
+        version: 1,
+        repetitions: 3,
+        warmup: 12,
+        retention: { maxEntries: 3, maxBytes: 1048576 },
+        budgets: { p95Ms: 500 },
+    };
     const samples = [
         { ms: 12.5, from: "first", to: "second", resources: { voices: 1 } },
         { ms: 9.25, from: "second", to: "first" },

@@ -6,7 +6,6 @@ import { runWithCleanup, ownProcess } from "./tooling/cleanup.mjs";
 import { type ChildProcess } from "node:child_process";
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { checkInstalledContent } from "./browser-content-checks.js";
 
 interface ValidationState {
     status: "idle" | "running" | "passed" | "failed";
@@ -155,16 +154,6 @@ failures.push(
             await recordRenderingDevices("Starfall");
             await checkPlatformer();
             await recordRenderingDevices("platformer");
-            if (process.env.NGNE_CONSUMER_URL && process.env.NGNE_CONSUMER_DIST) {
-                await checkInstalledContent(
-                    cdp,
-                    process.env.NGNE_CONSUMER_URL,
-                    process.env.NGNE_CONSUMER_DIST,
-                    passed,
-                    () => recordRenderingDevices("installed content controlled recovery"),
-                );
-                await recordRenderingDevices("installed content slice");
-            }
             if (consoleMessages.some((message) => /^(error|exception):/i.test(message)))
                 throw new Error("Browser console reported an error or uncaught exception");
         },

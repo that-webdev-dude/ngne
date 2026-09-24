@@ -1,0 +1,614 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "migration-replacement-proof",
+    "schemaVersion": 1,
+    "runId": "consumer-retirement-2026-09-24-9c1eabd09399",
+    "status": "passed",
+    "coverageIds": [
+        "file:tests/content-accounting.mjs",
+        "assertion:tests/content-accounting.mjs:091407afa4580c7b",
+        "assertion:tests/content-accounting.mjs:12ae32cb1ec02d01",
+        "assertion:tests/content-accounting.mjs:2129dcf532b39c28",
+        "assertion:tests/content-accounting.mjs:2daf9bc711f43db8",
+        "assertion:tests/content-accounting.mjs:2eb2722554ecf1ee",
+        "assertion:tests/content-accounting.mjs:30b9adb520d21d7a",
+        "assertion:tests/content-accounting.mjs:360eba3dea9d2744",
+        "assertion:tests/content-accounting.mjs:49dfb2941b09233a",
+        "assertion:tests/content-accounting.mjs:4b10bbf473991c71",
+        "assertion:tests/content-accounting.mjs:4ccd88c0a3996f8f",
+        "assertion:tests/content-accounting.mjs:4ce2c8b6f202c63c",
+        "assertion:tests/content-accounting.mjs:61cb0c12efecb606",
+        "assertion:tests/content-accounting.mjs:65c49104123a80f0",
+        "assertion:tests/content-accounting.mjs:6b2b6bf03dd54cf0",
+        "assertion:tests/content-accounting.mjs:78b460ce0f6a97e2",
+        "assertion:tests/content-accounting.mjs:987ca7f4b0296235",
+        "assertion:tests/content-accounting.mjs:9907411ce31325f1",
+        "assertion:tests/content-accounting.mjs:a20578031bdea17f",
+        "assertion:tests/content-accounting.mjs:bbdc5ef0f07ff03d",
+        "assertion:tests/content-accounting.mjs:bf69390434d26448",
+        "assertion:tests/content-accounting.mjs:c52c54c3f665f41f",
+        "assertion:tests/content-accounting.mjs:cb09cb75755ca05d",
+        "assertion:tests/content-accounting.mjs:e401034611029d0d",
+        "assertion:tests/content-accounting.mjs:f0ff8ab3fe1515ab",
+        "assertion:tests/content-accounting.mjs:f99fe2eff4c633ea",
+        "assertion:tests/content-accounting.mjs:fa23a96004e5a285",
+        "workload:content-accounting"
+    ],
+    "destination": "tooling/suites/benchmarks/content/accounting.ts",
+    "reviewedBy": "Codex exact-obligation review under user-authorized consumer retirement",
+    "evidence": "docs/evidence/consumer-retirement.json",
+    "obligations": [
+        {
+            "id": "file:tests/content-accounting.mjs",
+            "source": {
+                "id": "file:tests/content-accounting.mjs",
+                "kind": "file",
+                "path": "tests/content-accounting.mjs",
+                "label": "tests/content-accounting.mjs"
+            },
+            "label": "tests/content-accounting.mjs",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:091407afa4580c7b",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:091407afa4580c7b",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(r.uploads, 0)"
+            },
+            "label": "assert.equal(r.uploads, 0)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:091407afa4580c7b",
+                "label": "assert.equal(r.uploads, 0)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(r.uploads, 0)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:12ae32cb1ec02d01",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:12ae32cb1ec02d01",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "\"\""
+            },
+            "label": "\"\"",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:12ae32cb1ec02d01",
+                "label": "\"\"",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "\"\"",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:2129dcf532b39c28",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:2129dcf532b39c28",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(a.cleanupFailures, 0)"
+            },
+            "label": "assert.equal(a.cleanupFailures, 0)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:2129dcf532b39c28",
+                "label": "assert.equal(a.cleanupFailures, 0)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(a.cleanupFailures, 0)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:2daf9bc711f43db8",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:2daf9bc711f43db8",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(sample.bitmaps, 2)"
+            },
+            "label": "assert.equal(sample.bitmaps, 2)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:2daf9bc711f43db8",
+                "label": "assert.equal(sample.bitmaps, 2)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(sample.bitmaps, 2)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:2eb2722554ecf1ee",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:2eb2722554ecf1ee",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(a.unknownSizes, 1)"
+            },
+            "label": "assert.equal(a.unknownSizes, 1)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:2eb2722554ecf1ee",
+                "label": "assert.equal(a.unknownSizes, 1)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(a.unknownSizes, 1)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:30b9adb520d21d7a",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:30b9adb520d21d7a",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(sample.contexts, 0)"
+            },
+            "label": "assert.equal(sample.contexts, 0)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:30b9adb520d21d7a",
+                "label": "assert.equal(sample.contexts, 0)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(sample.contexts, 0)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:360eba3dea9d2744",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:360eba3dea9d2744",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "\"visible\""
+            },
+            "label": "\"visible\"",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:360eba3dea9d2744",
+                "label": "\"visible\"",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "\"visible\"",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:49dfb2941b09233a",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:49dfb2941b09233a",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(a.loaded, 4)"
+            },
+            "label": "assert.equal(a.loaded, 4)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:49dfb2941b09233a",
+                "label": "assert.equal(a.loaded, 4)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(a.loaded, 4)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:4b10bbf473991c71",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:4b10bbf473991c71",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(sample.voices, 1)"
+            },
+            "label": "assert.equal(sample.voices, 1)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:4b10bbf473991c71",
+                "label": "assert.equal(sample.voices, 1)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(sample.voices, 1)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:4ccd88c0a3996f8f",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:4ccd88c0a3996f8f",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(a.loading, 0)"
+            },
+            "label": "assert.equal(a.loading, 0)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:4ccd88c0a3996f8f",
+                "label": "assert.equal(a.loading, 0)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(a.loading, 0)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:4ce2c8b6f202c63c",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:4ce2c8b6f202c63c",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(sample.contexts, 1)"
+            },
+            "label": "assert.equal(sample.contexts, 1)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:4ce2c8b6f202c63c",
+                "label": "assert.equal(sample.contexts, 1)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(sample.contexts, 1)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:61cb0c12efecb606",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:61cb0c12efecb606",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(r.sources, 2)"
+            },
+            "label": "assert.equal(r.sources, 2)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:61cb0c12efecb606",
+                "label": "assert.equal(r.sources, 2)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(r.sources, 2)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:65c49104123a80f0",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:65c49104123a80f0",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(a.protectedOverBudget, true)"
+            },
+            "label": "assert.equal(a.protectedOverBudget, true)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:65c49104123a80f0",
+                "label": "assert.equal(a.protectedOverBudget, true)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(a.protectedOverBudget, true)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:6b2b6bf03dd54cf0",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:6b2b6bf03dd54cf0",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(a.leased, 4)"
+            },
+            "label": "assert.equal(a.leased, 4)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:6b2b6bf03dd54cf0",
+                "label": "assert.equal(a.leased, 4)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(a.leased, 4)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:78b460ce0f6a97e2",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:78b460ce0f6a97e2",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(sample.voices, 0)"
+            },
+            "label": "assert.equal(sample.voices, 0)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:78b460ce0f6a97e2",
+                "label": "assert.equal(sample.voices, 0)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(sample.voices, 0)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:987ca7f4b0296235",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:987ca7f4b0296235",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(a.unleased, 0)"
+            },
+            "label": "assert.equal(a.unleased, 0)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:987ca7f4b0296235",
+                "label": "assert.equal(a.unleased, 0)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(a.unleased, 0)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:9907411ce31325f1",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:9907411ce31325f1",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(sample.diagnostics.renderer[field], 0, field)"
+            },
+            "label": "assert.equal(sample.diagnostics.renderer[field], 0, field)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:9907411ce31325f1",
+                "label": "assert.equal(sample.diagnostics.renderer[field], 0, field)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(sample.diagnostics.renderer[field], 0, field)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:a20578031bdea17f",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:a20578031bdea17f",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.deepEqual(a.claims, { external: 0, scene: 4, dependency: 0, renderer: 2 })"
+            },
+            "label": "assert.deepEqual(a.claims, { external: 0, scene: 4, dependency: 0, renderer: 2 })",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:a20578031bdea17f",
+                "label": "assert.deepEqual(a.claims, { external: 0, scene: 4, dependency: 0, renderer: 2 })",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.deepEqual(a.claims, { external: 0, scene: 4, dependency: 0, renderer: 2, })",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:bbdc5ef0f07ff03d",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:bbdc5ef0f07ff03d",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(sample.bitmaps, 0)"
+            },
+            "label": "assert.equal(sample.bitmaps, 0)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:bbdc5ef0f07ff03d",
+                "label": "assert.equal(sample.bitmaps, 0)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(sample.bitmaps, 0)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:bf69390434d26448",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:bf69390434d26448",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(r.textures, 3)"
+            },
+            "label": "assert.equal(r.textures, 3)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:bf69390434d26448",
+                "label": "assert.equal(r.textures, 3)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(r.textures, 3)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:c52c54c3f665f41f",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:c52c54c3f665f41f",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(r.manualReplacements, 0)"
+            },
+            "label": "assert.equal(r.manualReplacements, 0)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:c52c54c3f665f41f",
+                "label": "assert.equal(r.manualReplacements, 0)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(r.manualReplacements, 0)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:cb09cb75755ca05d",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:cb09cb75755ca05d",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(sample.textures, 0)"
+            },
+            "label": "assert.equal(sample.textures, 0)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:cb09cb75755ca05d",
+                "label": "assert.equal(sample.textures, 0)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(sample.textures, 0)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:e401034611029d0d",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:e401034611029d0d",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(r.consumers, 2)"
+            },
+            "label": "assert.equal(r.consumers, 2)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:e401034611029d0d",
+                "label": "assert.equal(r.consumers, 2)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(r.consumers, 2)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:f0ff8ab3fe1515ab",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:f0ff8ab3fe1515ab",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(value, 0)"
+            },
+            "label": "assert.equal(value, 0)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:f0ff8ab3fe1515ab",
+                "label": "assert.equal(value, 0)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(value, 0)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:f99fe2eff4c633ea",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:f99fe2eff4c633ea",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(a[field], 0, field)"
+            },
+            "label": "assert.equal(a[field], 0, field)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:f99fe2eff4c633ea",
+                "label": "assert.equal(a[field], 0, field)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(a[field], 0, field)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "assertion:tests/content-accounting.mjs:fa23a96004e5a285",
+            "source": {
+                "id": "assertion:tests/content-accounting.mjs:fa23a96004e5a285",
+                "kind": "assertion",
+                "path": "tests/content-accounting.mjs",
+                "label": "assert.equal(sample.textures, 3)"
+            },
+            "label": "assert.equal(sample.textures, 3)",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null,
+            "exactReview": {
+                "id": "assertion:tests/content-accounting.mjs:fa23a96004e5a285",
+                "label": "assert.equal(sample.textures, 3)",
+                "destination": "consumer:verification/measurements/accounting.mjs",
+                "consumerSourceSHA256": "d349e5edd71a387f0e506bf64fee995d07423623d5fd9050d76b7eb313072ac0",
+                "replacement": "assert.equal(sample.textures, 3)",
+                "evidence": "docs/evidence/consumer-integration.json records.measurements; complete 3 repetitions of production and churn with budgetPass=true and cleanup passed. Engine accounting correspondence separately retains all engine resource invariants."
+            }
+        },
+        {
+            "id": "workload:content-accounting",
+            "source": {
+                "id": "workload:content-accounting",
+                "kind": "workload",
+                "path": "tests/content-accounting.mjs",
+                "label": "Scene/renderer leases, sources/textures/uploads/decoded ownership and cancellation/disposal checkpoints; distinguish resource counts from heap or driver memory."
+            },
+            "label": "Scene/renderer leases, sources/textures/uploads/decoded ownership and cancellation/disposal checkpoints; distinguish resource counts from heap or driver memory.",
+            "destination": "tooling/suites/benchmarks/content/accounting.ts",
+            "proof": "assertMounted/assertDisposed preserve loaded/leased/claims, unknownSizes, protectedOverBudget, sources/consumers/textures/uploads/manualReplacements, voices/contexts/bitmaps, visibility/errors and terminal zeros. Engine and consumer full measurements passed.",
+            "mixed": null
+        }
+    ]
+}

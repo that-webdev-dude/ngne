@@ -1,6 +1,10 @@
 # Consumer command contract v1
 
-Status: NGNE executable contract fixed for integration. **Consumer-owner agreement unresolved.** No real consumer conformance or repository changes are claimed. Consumer integration cannot complete until agreement and a real explicitly selected consumer run are recorded.
+Status: NGNE executable contract fixed for integration. **Consumer-owner agreement authorized on 2026-09-24**, including the documented checkout inventory policy and edits to the explicitly selected `C:/Users/jfabi/Documents/Projects/tests/ngne-town-dungeon` checkout. With separate consumer-only commit approval, revision `c04cf1d013a57773a59a601ff0994f5e6bee1864` passed real conformance through the generic runner and existing validator. See [recorded evidence and limits](../../docs/evidence/consumer-integration.md). Engine resource replacements now have [separate recorded evidence](../../docs/evidence/engine-content.md); exact assertion retirement and default CI separation are recorded in [consumer retirement evidence](../../docs/evidence/consumer-retirement.md).
+
+NGNE now provides explicit clean-checkout invocation; see [compatibility usage](../../tooling/README.md#consumer-evidence-and-legacy-fixtures)
+for selection, source/lock inventory policy, preparation reuse and evidence retention.
+Owner agreement does not waive passing replacement coverage or authorize premature retirement.
 
 ```text
 npm run verify:engine -- --contract-version 1 --engine-tarball <absolute-path> --engine-sha256 <sha256> --output <new-absolute-run-directory> --run-id <id>

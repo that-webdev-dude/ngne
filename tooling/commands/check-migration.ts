@@ -303,6 +303,7 @@ function validateMapping(row: Mapping): void {
         benchmark: [
             "tooling/suites/benchmarks/",
             "tooling/fixtures/rendering/",
+            "tooling/fixtures/content-engine/",
             "tooling/profiles/",
         ],
         showcase: ["demo/", "examples/", "tests/"],

@@ -35,7 +35,7 @@ and an explicit stage map for relocated consumer checks. Match recorded conditio
 or remeasure the frozen baseline under final conditions; do not discard slow
 successful runs or treat consumer removal as an engine speedup. The baseline is
 historical workload evidence, not validation of later tooling. Consumer-owner
-agreement remains unresolved.
+agreement and passing real pinned conformance are recorded in the consumer command contract.
 
 ## Inventory and review method
 
@@ -72,9 +72,9 @@ the corresponding consumer checks pass. Game-specific source and configuration
 must leave active NGNE paths even when some embedded assertions have engine
 owners. The file row's retirement gate covers all of its assertion obligations.
 
-`tests/fixtures/town-dungeon.json` and its archive are active consumer fixtures,
-not historical exclusions. Their removal waits for engine and external-consumer
-replacement proof. `benchmarks/evidence/*` are explicit historical exclusions
+`tests/fixtures/town-dungeon.json` and its archive were consumer fixtures,
+not historical exclusions. Their removal has passed exact engine and external-consumer
+replacement gates. `benchmarks/evidence/*` are explicit historical exclusions
 whose bytes must survive later relocation under `docs/evidence/`. Other existing
 evidence under `docs/evidence/` stays intact and outside executable discovery.
 
@@ -110,7 +110,8 @@ stable semantic IDs and new baselines when their inputs or methods change.
 
 ## Command compatibility and required checks
 
-Existing npm aliases and runner options remain active. `bench:compare` stays an
+Migrated aliases and retired consumer options are documented in the tooling guide.
+`bench:compare` stays an
 advisory scan: default attention threshold 10%, compatibility warnings, problems,
 metric direction, regressions/improvements and scan-result precedence are retained.
 It is not an acceptance gate or statistical significance claim. The content
@@ -120,13 +121,12 @@ historical documents receive no conversion adapters.
 
 CI requires formatting, both test directories, root and tooling typechecks,
 migration checking, existing builds, browser fault injections, browser integration
-and installed root/nested validation. Existing Town/Dungeon archive execution and
-its consumer checks remain required migration coverage in the current workflow;
-T1a does not prematurely remove or disguise that dependency. T4 replaces it with
-the agreed generic explicit invocation during migration and removes external
-consumer stages from default engine commands/CI after replacements pass.
+and installed root/nested validation. Consumer-owned checks passed through the
+generic explicitly selected invocation before the embedded archive and default
+consumer stages were retired. Default commands and CI now require only engine
+inputs; the frozen baseline workflow remains a separate historical measurement.
 Benchmarks and full diagnostic exports remain explicit operations, not ordinary
-CI prerequisites. Unselected future compatibility makes no claim; once selected,
+CI prerequisites. Unselected compatibility makes no claim; once selected,
 it must fail on missing prerequisites, bad evidence, scenario or cleanup failures.
 
 ## Environment and export policy
@@ -154,19 +154,22 @@ aggregate delivery. No exporter or new runtime proof is claimed here.
 T1b is complete: the [consumer command contract](consumer-command-contract.md),
 shared-schema validator/synthetic conformance fixtures, [bounded legacy formats](legacy-formats.md)
 and [five measured baseline executions](ci-cost-baseline.json) are delivered.
-Consumer-owner agreement remains explicitly unresolved; T4 still requires agreement
-and real conformance. The [deployment-disabled measurement workflow](../../.github/workflows/ci-baseline.yml)
+Consumer-owner agreement and real pinned conformance are recorded in the contract;
+T4's exact retirement/default-CI separation and independent executions have passed.
+The [deployment-disabled measurement workflow](../../.github/workflows/ci-baseline.yml)
 is published on the existing feature branch. Its scoped automatic trigger does not
-run on a main merge; the ordinary verification/deployment workflow is unchanged.
-T8/T10 matching, coverage and budget gates remain in force; no retirement is approved.
+run on a main merge. Ordinary verification retains the deployment dependency while
+removing consumer stages. T8/T10 matching, coverage and budget gates remain in force;
+only the 258 reviewed consumer-separation obligations are approved for retirement.
 
 ## Installed engine verification status
 
 T3 introduces `npm run verify:installed` and an engine-owned installed fixture.
 See [coverage correspondence](installed-engine-coverage.md) and the
-[dated local evidence](../../docs/evidence/installed-engine.json). Existing consumer
-migration checks remain active. T5 browser-session consolidation is delivered below; T4 still
-requires consumer-owner agreement and real explicitly selected conformance.
+[dated local evidence](../../docs/evidence/installed-engine.json). The later
+[retirement evidence](../../docs/evidence/consumer-retirement.md) records expanded
+engine assertions and final consumer-free executions. T5 browser-session consolidation
+is delivered below; consumer checks now execute only when explicitly selected.
 
 ## Browser infrastructure status
 
@@ -179,5 +182,15 @@ the measured revision, environments, raw selected records and limits. Linux exec
 is configured in CI but was not available locally. This does not waive final hosted
 coverage/cost acceptance or consumer migration gates.
 
-Next is T4, whose consumer-owner agreement and real selected conformance remain
-required. No consumer-specific scenario or archived fixture is retired here.
+T4 has owner agreement and passing pinned real consumer conformance. Embedded
+consumer execution is retired after exact assertion/workload review; see
+[consumer retirement evidence](../../docs/evidence/consumer-retirement.md).
+Ordinary verification/default CI are engine-only, while compatibility requires
+explicit checkout and revision selection. Historical status paragraphs above
+describe the earlier adoption and migration stages.
+
+Next is T6: Migrate engine benchmarks and replace PowerShell orchestration.
+Only its engine resource workload portion was advanced to unblock retirement.
+Strict/candidate comparator implementation belongs to T7. Final hosted coverage,
+matched cost measurements, environment profiles and remaining retirement gates
+are not waived. Operational usage belongs in the [tooling guide](../../tooling/README.md).

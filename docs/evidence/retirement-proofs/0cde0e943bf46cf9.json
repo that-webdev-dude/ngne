@@ -1,0 +1,224 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "migration-replacement-proof",
+    "schemaVersion": 1,
+    "runId": "consumer-retirement-2026-09-24-0cde0e943bf4",
+    "status": "passed",
+    "coverageIds": [
+        "file:tests/installed-content.mjs",
+        "option:tests/installed-content.mjs:--ignore-scripts",
+        "option:tests/installed-content.mjs:--json",
+        "option:tests/installed-content.mjs:--pack-destination",
+        "option:tests/installed-content.mjs:--porcelain",
+        "option:tests/installed-content.mjs:NGNE_INSTALLED_CONTENT_DIR",
+        "assertion:tests/installed-content.mjs:091be29ebf729b1e",
+        "assertion:tests/installed-content.mjs:0c7ff2ec4eb657e8",
+        "assertion:tests/installed-content.mjs:25b1f4649ad2c92f",
+        "assertion:tests/installed-content.mjs:31201ec383cd313d",
+        "assertion:tests/installed-content.mjs:4f15faed08cce831",
+        "assertion:tests/installed-content.mjs:6017ac455c859321",
+        "assertion:tests/installed-content.mjs:bae1d8f876be5ef6",
+        "assertion:tests/installed-content.mjs:e1005af643de65b1",
+        "workload:installed-package"
+    ],
+    "destination": "tooling/core/preparation.ts",
+    "reviewedBy": "Codex exact-obligation review under user-authorized consumer retirement",
+    "evidence": "docs/evidence/consumer-retirement.json",
+    "obligations": [
+        {
+            "id": "file:tests/installed-content.mjs",
+            "source": {
+                "id": "file:tests/installed-content.mjs",
+                "kind": "file",
+                "path": "tests/installed-content.mjs",
+                "label": "tests/installed-content.mjs"
+            },
+            "label": "tests/installed-content.mjs",
+            "destination": "tooling/core/preparation.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        },
+        {
+            "id": "option:tests/installed-content.mjs:--ignore-scripts",
+            "source": {
+                "id": "option:tests/installed-content.mjs:--ignore-scripts",
+                "kind": "option",
+                "path": "tests/installed-content.mjs",
+                "label": "--ignore-scripts"
+            },
+            "label": "--ignore-scripts",
+            "destination": "tooling/core/preparation.ts",
+            "proof": "Runner capability now owned by the named destination; original consumer runner retains its measurement options, and independent engine full runs exercise discovery, flags, evidence and cleanup.",
+            "mixed": null
+        },
+        {
+            "id": "option:tests/installed-content.mjs:--json",
+            "source": {
+                "id": "option:tests/installed-content.mjs:--json",
+                "kind": "option",
+                "path": "tests/installed-content.mjs",
+                "label": "--json"
+            },
+            "label": "--json",
+            "destination": "tooling/core/preparation.ts",
+            "proof": "Runner capability now owned by the named destination; original consumer runner retains its measurement options, and independent engine full runs exercise discovery, flags, evidence and cleanup.",
+            "mixed": null
+        },
+        {
+            "id": "option:tests/installed-content.mjs:--pack-destination",
+            "source": {
+                "id": "option:tests/installed-content.mjs:--pack-destination",
+                "kind": "option",
+                "path": "tests/installed-content.mjs",
+                "label": "--pack-destination"
+            },
+            "label": "--pack-destination",
+            "destination": "tooling/core/preparation.ts",
+            "proof": "Runner capability now owned by the named destination; original consumer runner retains its measurement options, and independent engine full runs exercise discovery, flags, evidence and cleanup.",
+            "mixed": null
+        },
+        {
+            "id": "option:tests/installed-content.mjs:--porcelain",
+            "source": {
+                "id": "option:tests/installed-content.mjs:--porcelain",
+                "kind": "option",
+                "path": "tests/installed-content.mjs",
+                "label": "--porcelain"
+            },
+            "label": "--porcelain",
+            "destination": "tooling/core/preparation.ts",
+            "proof": "Runner capability now owned by the named destination; original consumer runner retains its measurement options, and independent engine full runs exercise discovery, flags, evidence and cleanup.",
+            "mixed": null
+        },
+        {
+            "id": "option:tests/installed-content.mjs:NGNE_INSTALLED_CONTENT_DIR",
+            "source": {
+                "id": "option:tests/installed-content.mjs:NGNE_INSTALLED_CONTENT_DIR",
+                "kind": "option",
+                "path": "tests/installed-content.mjs",
+                "label": "NGNE_INSTALLED_CONTENT_DIR"
+            },
+            "label": "NGNE_INSTALLED_CONTENT_DIR",
+            "destination": "tooling/core/preparation.ts",
+            "proof": "Runner capability now owned by the named destination; original consumer runner retains its measurement options, and independent engine full runs exercise discovery, flags, evidence and cleanup.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/installed-content.mjs:091be29ebf729b1e",
+            "source": {
+                "id": "assertion:tests/installed-content.mjs:091be29ebf729b1e",
+                "kind": "assertion",
+                "path": "tests/installed-content.mjs",
+                "label": "assert.equal(pack.length, 1)"
+            },
+            "label": "assert.equal(pack.length, 1)",
+            "destination": "tooling/core/preparation.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/installed-content.mjs:0c7ff2ec4eb657e8",
+            "source": {
+                "id": "assertion:tests/installed-content.mjs:0c7ff2ec4eb657e8",
+                "kind": "assertion",
+                "path": "tests/installed-content.mjs",
+                "label": "assert(pack[0].files.some((file) => file.path === \"dist/engine/index.d.ts\"))"
+            },
+            "label": "assert(pack[0].files.some((file) => file.path === \"dist/engine/index.d.ts\"))",
+            "destination": "tooling/core/preparation.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/installed-content.mjs:25b1f4649ad2c92f",
+            "source": {
+                "id": "assertion:tests/installed-content.mjs:25b1f4649ad2c92f",
+                "kind": "assertion",
+                "path": "tests/installed-content.mjs",
+                "label": "assert.deepEqual(Object.keys(files).sort(), Object.keys(fixture.files).sort())"
+            },
+            "label": "assert.deepEqual(Object.keys(files).sort(), Object.keys(fixture.files).sort())",
+            "destination": "tooling/core/preparation.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/installed-content.mjs:31201ec383cd313d",
+            "source": {
+                "id": "assertion:tests/installed-content.mjs:31201ec383cd313d",
+                "kind": "assertion",
+                "path": "tests/installed-content.mjs",
+                "label": "assert(pack[0].files.some((file) => file.path === \"dist/engine/index.js\"))"
+            },
+            "label": "assert(pack[0].files.some((file) => file.path === \"dist/engine/index.js\"))",
+            "destination": "tooling/core/preparation.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/installed-content.mjs:4f15faed08cce831",
+            "source": {
+                "id": "assertion:tests/installed-content.mjs:4f15faed08cce831",
+                "kind": "assertion",
+                "path": "tests/installed-content.mjs",
+                "label": "\"Run through npm run test:installed\""
+            },
+            "label": "\"Run through npm run test:installed\"",
+            "destination": "tooling/core/preparation.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/installed-content.mjs:6017ac455c859321",
+            "source": {
+                "id": "assertion:tests/installed-content.mjs:6017ac455c859321",
+                "kind": "assertion",
+                "path": "tests/installed-content.mjs",
+                "label": "assert( /^[a-zA-Z0-9_./-]+$/.test(name) && !name.startsWith(\"/\") && !name.split(\"/\").includes(\"..\"), )"
+            },
+            "label": "assert( /^[a-zA-Z0-9_./-]+$/.test(name) && !name.startsWith(\"/\") && !name.split(\"/\").includes(\"..\"), )",
+            "destination": "tooling/core/preparation.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/installed-content.mjs:bae1d8f876be5ef6",
+            "source": {
+                "id": "assertion:tests/installed-content.mjs:bae1d8f876be5ef6",
+                "kind": "assertion",
+                "path": "tests/installed-content.mjs",
+                "label": "assert.equal(sha256(archive), fixture.archiveSHA256)"
+            },
+            "label": "assert.equal(sha256(archive), fixture.archiveSHA256)",
+            "destination": "tooling/core/preparation.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/installed-content.mjs:e1005af643de65b1",
+            "source": {
+                "id": "assertion:tests/installed-content.mjs:e1005af643de65b1",
+                "kind": "assertion",
+                "path": "tests/installed-content.mjs",
+                "label": "assert.equal(sha256(bytes), fixture.files[name], name)"
+            },
+            "label": "assert.equal(sha256(bytes), fixture.files[name], name)",
+            "destination": "tooling/core/preparation.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        },
+        {
+            "id": "workload:installed-package",
+            "source": {
+                "id": "workload:installed-package",
+                "kind": "workload",
+                "path": "tests/installed-content.mjs",
+                "label": "Current archive install: archive integrity, public JS/declarations, isolated npm install/ci, consumer unit checks, root/nested builds and package check; split engine packaging from consumer acceptance."
+            },
+            "label": "Current archive install: archive integrity, public JS/declarations, isolated npm install/ci, consumer unit checks, root/nested builds and package check; split engine packaging from consumer acceptance.",
+            "destination": "tooling/core/preparation.ts",
+            "proof": "Fresh package emission, required entry/declarations, isolated offline lock/install, public API misuse, installed runtime/type resolution and root/nested build identities; consumer tests moved to verify:engine.",
+            "mixed": null
+        }
+    ]
+}

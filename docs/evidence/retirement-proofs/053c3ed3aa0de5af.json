@@ -1,0 +1,266 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "migration-replacement-proof",
+    "schemaVersion": 1,
+    "runId": "consumer-retirement-2026-09-24-053c3ed3aa0d",
+    "status": "passed",
+    "coverageIds": [
+        "file:tests/browser-session-checks.ts",
+        "assertion:tests/browser-session-checks.ts:20e6c600eab72e4e",
+        "assertion:tests/browser-session-checks.ts:268cbe84f9bb412b",
+        "assertion:tests/browser-session-checks.ts:4216d75d39178ae0",
+        "assertion:tests/browser-session-checks.ts:514d2373cc1046fd",
+        "assertion:tests/browser-session-checks.ts:7280e545fe31afe9",
+        "assertion:tests/browser-session-checks.ts:72aba3563d6635a2",
+        "assertion:tests/browser-session-checks.ts:7c42bab78d2f35f6",
+        "assertion:tests/browser-session-checks.ts:92a4eec9f5febd6e",
+        "assertion:tests/browser-session-checks.ts:96023cc0604cba48",
+        "assertion:tests/browser-session-checks.ts:9eff733766e5461c",
+        "assertion:tests/browser-session-checks.ts:b3135e03a0e34356",
+        "assertion:tests/browser-session-checks.ts:cd12a832bccfd8be",
+        "assertion:tests/browser-session-checks.ts:d2edb104111fef67",
+        "assertion:tests/browser-session-checks.ts:d5c565b741fd9524",
+        "assertion:tests/browser-session-checks.ts:daf8aec89e2508f9",
+        "assertion:tests/browser-session-checks.ts:eeb83b00ff6a8933",
+        "workload:consumer-sessions"
+    ],
+    "destination": "consumer:verification/browser-session-checks.ts",
+    "reviewedBy": "Codex exact-obligation review under user-authorized consumer retirement",
+    "evidence": "docs/evidence/consumer-retirement.json",
+    "obligations": [
+        {
+            "id": "file:tests/browser-session-checks.ts",
+            "source": {
+                "id": "file:tests/browser-session-checks.ts",
+                "kind": "file",
+                "path": "tests/browser-session-checks.ts",
+                "label": "tests/browser-session-checks.ts"
+            },
+            "label": "tests/browser-session-checks.ts",
+            "destination": "consumer:verification/browser-session-checks.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:20e6c600eab72e4e",
+            "source": {
+                "id": "assertion:tests/browser-session-checks.ts:20e6c600eab72e4e",
+                "kind": "assertion",
+                "path": "tests/browser-session-checks.ts",
+                "label": "\"Tab reaches Start as the first available keyboard action\""
+            },
+            "label": "\"Tab reaches Start as the first available keyboard action\"",
+            "destination": "consumer:verification/browser-session-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-session-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:268cbe84f9bb412b",
+            "source": {
+                "id": "assertion:tests/browser-session-checks.ts:268cbe84f9bb412b",
+                "kind": "assertion",
+                "path": "tests/browser-session-checks.ts",
+                "label": "\"New Game invalidates loading/ready work and repeated activation leaves one fresh session\""
+            },
+            "label": "\"New Game invalidates loading/ready work and repeated activation leaves one fresh session\"",
+            "destination": "consumer:verification/browser-session-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-session-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:4216d75d39178ae0",
+            "source": {
+                "id": "assertion:tests/browser-session-checks.ts:4216d75d39178ae0",
+                "kind": "assertion",
+                "path": "tests/browser-session-checks.ts",
+                "label": "\"keyboard-only Tab/Enter Start mounts once and focuses the canvas\""
+            },
+            "label": "\"keyboard-only Tab/Enter Start mounts once and focuses the canvas\"",
+            "destination": "consumer:verification/browser-session-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-session-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:514d2373cc1046fd",
+            "source": {
+                "id": "assertion:tests/browser-session-checks.ts:514d2373cc1046fd",
+                "kind": "assertion",
+                "path": "tests/browser-session-checks.ts",
+                "label": "\"menu New Game retires selection handlers: another New Game leaves exactly one running session\""
+            },
+            "label": "\"menu New Game retires selection handlers: another New Game leaves exactly one running session\"",
+            "destination": "consumer:verification/browser-session-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-session-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:7280e545fe31afe9",
+            "source": {
+                "id": "assertion:tests/browser-session-checks.ts:7280e545fe31afe9",
+                "kind": "assertion",
+                "path": "tests/browser-session-checks.ts",
+                "label": "\"missing save offers Start without creating a simulation or automatic save\""
+            },
+            "label": "\"missing save offers Start without creating a simulation or automatic save\"",
+            "destination": "consumer:verification/browser-session-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-session-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:72aba3563d6635a2",
+            "source": {
+                "id": "assertion:tests/browser-session-checks.ts:72aba3563d6635a2",
+                "kind": "assertion",
+                "path": "tests/browser-session-checks.ts",
+                "label": "\"keyboard New Game starts from pause without a tick and creates fresh live/saved progress and canvas focus\""
+            },
+            "label": "\"keyboard New Game starts from pause without a tick and creates fresh live/saved progress and canvas focus\"",
+            "destination": "consumer:verification/browser-session-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-session-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:7c42bab78d2f35f6",
+            "source": {
+                "id": "assertion:tests/browser-session-checks.ts:7c42bab78d2f35f6",
+                "kind": "assertion",
+                "path": "tests/browser-session-checks.ts",
+                "label": "\"keyboard Continue initializes once without an existing tick and restores canvas focus\""
+            },
+            "label": "\"keyboard Continue initializes once without an existing tick and restores canvas focus\"",
+            "destination": "consumer:verification/browser-session-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-session-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:92a4eec9f5febd6e",
+            "source": {
+                "id": "assertion:tests/browser-session-checks.ts:92a4eec9f5febd6e",
+                "kind": "assertion",
+                "path": "tests/browser-session-checks.ts",
+                "label": "\"keyboard navigation on UI neither moves the player nor triggers E travel\""
+            },
+            "label": "\"keyboard navigation on UI neither moves the player nor triggers E travel\"",
+            "destination": "consumer:verification/browser-session-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-session-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:96023cc0604cba48",
+            "source": {
+                "id": "assertion:tests/browser-session-checks.ts:96023cc0604cba48",
+                "kind": "assertion",
+                "path": "tests/browser-session-checks.ts",
+                "label": "\"menu reset failure retains saved bytes and leaves Continue available without creating a game\""
+            },
+            "label": "\"menu reset failure retains saved bytes and leaves Continue available without creating a game\"",
+            "destination": "consumer:verification/browser-session-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-session-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:9eff733766e5461c",
+            "source": {
+                "id": "assertion:tests/browser-session-checks.ts:9eff733766e5461c",
+                "kind": "assertion",
+                "path": "tests/browser-session-checks.ts",
+                "label": "\"the session created by menu New Game releases its device on the next New Game\""
+            },
+            "label": "\"the session created by menu New Game releases its device on the next New Game\"",
+            "destination": "consumer:verification/browser-session-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-session-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:b3135e03a0e34356",
+            "source": {
+                "id": "assertion:tests/browser-session-checks.ts:b3135e03a0e34356",
+                "kind": "assertion",
+                "path": "tests/browser-session-checks.ts",
+                "label": "\"paused session accurately guards gameplay with no running tick\""
+            },
+            "label": "\"paused session accurately guards gameplay with no running tick\"",
+            "destination": "consumer:verification/browser-session-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-session-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:cd12a832bccfd8be",
+            "source": {
+                "id": "assertion:tests/browser-session-checks.ts:cd12a832bccfd8be",
+                "kind": "assertion",
+                "path": "tests/browser-session-checks.ts",
+                "label": "\"New Game disposes old audio and leaves only fresh scene ownership\""
+            },
+            "label": "\"New Game disposes old audio and leaves only fresh scene ownership\"",
+            "destination": "consumer:verification/browser-session-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-session-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:d2edb104111fef67",
+            "source": {
+                "id": "assertion:tests/browser-session-checks.ts:d2edb104111fef67",
+                "kind": "assertion",
+                "path": "tests/browser-session-checks.ts",
+                "label": "\"loading session guards repeated Start, Continue and travel while no tick runs\""
+            },
+            "label": "\"loading session guards repeated Start, Continue and travel while no tick runs\"",
+            "destination": "consumer:verification/browser-session-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-session-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:d5c565b741fd9524",
+            "source": {
+                "id": "assertion:tests/browser-session-checks.ts:d5c565b741fd9524",
+                "kind": "assertion",
+                "path": "tests/browser-session-checks.ts",
+                "label": "\"reload offers Continue before starting simulation\""
+            },
+            "label": "\"reload offers Continue before starting simulation\"",
+            "destination": "consumer:verification/browser-session-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-session-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:daf8aec89e2508f9",
+            "source": {
+                "id": "assertion:tests/browser-session-checks.ts:daf8aec89e2508f9",
+                "kind": "assertion",
+                "path": "tests/browser-session-checks.ts",
+                "label": "\"New Game reset failure preserves completed session and saved bytes, with explicit failure\""
+            },
+            "label": "\"New Game reset failure preserves completed session and saved bytes, with explicit failure\"",
+            "destination": "consumer:verification/browser-session-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-session-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-session-checks.ts:eeb83b00ff6a8933",
+            "source": {
+                "id": "assertion:tests/browser-session-checks.ts:eeb83b00ff6a8933",
+                "kind": "assertion",
+                "path": "tests/browser-session-checks.ts",
+                "label": "\"keyboard Travel and repeated/conflicting clicks mount exactly one destination\""
+            },
+            "label": "\"keyboard Travel and repeated/conflicting clicks mount exactly one destination\"",
+            "destination": "consumer:verification/browser-session-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-session-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "workload:consumer-sessions",
+            "source": {
+                "id": "workload:consumer-sessions",
+                "kind": "workload",
+                "path": "tests/browser-session-checks.ts",
+                "label": "Start/Continue/New Game, reset failures, menu/active state and old session device/claim disposal."
+            },
+            "label": "Start/Continue/New Game, reset failures, menu/active state and old session device/claim disposal.",
+            "destination": "consumer:verification/browser-session-checks.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        }
+    ]
+}

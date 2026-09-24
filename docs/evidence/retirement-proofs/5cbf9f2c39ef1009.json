@@ -1,0 +1,925 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "migration-replacement-proof",
+    "schemaVersion": 1,
+    "runId": "consumer-retirement-2026-09-24-5cbf9f2c39ef",
+    "status": "passed",
+    "coverageIds": [
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:index.html",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:LICENSE",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:package-lock.json",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:package.json",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/animation.json",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/atlas.json",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/chime.wav",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon-atlas.json",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon-environment.png",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon-music.wav",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon.json",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/player.png",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town-atlas.json",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town-environment.png",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town-music.wav",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town.json",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:README.md",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:scripts/check-package.mjs",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:src/animation.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:src/content.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:src/documents.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:src/env.d.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:src/loading.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:src/main.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:src/room.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:src/run.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:src/save.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:src/session.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/content.test.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/integration.test.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/lifecycle.test.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/ownership.test.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/room.test.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/run-content.test.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/run-room.test.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/run.test.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/save.test.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/session.test.ts",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:tsconfig.json",
+        "consumer-snapshot:tests/fixtures/town-dungeon.json:vite.config.ts",
+        "file:tests/fixtures/README.md",
+        "file:tests/fixtures/town-dungeon.json",
+        "file:tests/fixtures/town-dungeon.json.gz"
+    ],
+    "destination": "consumer:verification/verify-engine.ts",
+    "reviewedBy": "Codex exact-obligation review under user-authorized consumer retirement",
+    "evidence": "docs/evidence/consumer-retirement.json",
+    "obligations": [
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:index.html",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:index.html",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "index.html SHA256 f8a77208404e73c716c407ae1d7b023a2c0dd8a3854968d191cf8b308d842dc4"
+            },
+            "label": "index.html SHA256 f8a77208404e73c716c407ae1d7b023a2c0dd8a3854968d191cf8b308d842dc4",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:index.html",
+                "path": "index.html",
+                "selectedConsumerSHA256": "f8a77208404e73c716c407ae1d7b023a2c0dd8a3854968d191cf8b308d842dc4",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:LICENSE",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:LICENSE",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "LICENSE SHA256 267aed9fab02e34166e807f5051d05bf0eb6039e341f5bd39610cebca1f377ed"
+            },
+            "label": "LICENSE SHA256 267aed9fab02e34166e807f5051d05bf0eb6039e341f5bd39610cebca1f377ed",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:LICENSE",
+                "path": "LICENSE",
+                "selectedConsumerSHA256": "267aed9fab02e34166e807f5051d05bf0eb6039e341f5bd39610cebca1f377ed",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:package-lock.json",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:package-lock.json",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "package-lock.json SHA256 2c764a80305edcd3abb0e9275015d92d30fe3d5b73e557c2d195c8c722ade701"
+            },
+            "label": "package-lock.json SHA256 2c764a80305edcd3abb0e9275015d92d30fe3d5b73e557c2d195c8c722ade701",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:package-lock.json",
+                "path": "package-lock.json",
+                "selectedConsumerSHA256": "5ef101971e65a301961cc52386e992dbe474d523e6c1b5c020fb43de45bb6fd1",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:package.json",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:package.json",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "package.json SHA256 dc0466b32d2cd547c202898d102b1535def5cd574541ff5736dab76d8a26a196"
+            },
+            "label": "package.json SHA256 dc0466b32d2cd547c202898d102b1535def5cd574541ff5736dab76d8a26a196",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:package.json",
+                "path": "package.json",
+                "selectedConsumerSHA256": "c1f889d4910a727569ce4adbdd3251aa6ca3e821faea42de268bf2b4e546eee3",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/animation.json",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/animation.json",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "public/content/animation.json SHA256 62b11f01177927c53a5f90df4ac0735630e59a6213298a5d02c073a2a87848e4"
+            },
+            "label": "public/content/animation.json SHA256 62b11f01177927c53a5f90df4ac0735630e59a6213298a5d02c073a2a87848e4",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/animation.json",
+                "path": "public/content/animation.json",
+                "selectedConsumerSHA256": "62b11f01177927c53a5f90df4ac0735630e59a6213298a5d02c073a2a87848e4",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/atlas.json",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/atlas.json",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "public/content/atlas.json SHA256 b3e24245e75499ab7347583005e77fe38e8552253872cfe83476547593cc404e"
+            },
+            "label": "public/content/atlas.json SHA256 b3e24245e75499ab7347583005e77fe38e8552253872cfe83476547593cc404e",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/atlas.json",
+                "path": "public/content/atlas.json",
+                "selectedConsumerSHA256": "b3e24245e75499ab7347583005e77fe38e8552253872cfe83476547593cc404e",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/chime.wav",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/chime.wav",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "public/content/chime.wav SHA256 ee9b507464a02df222414d1ba39f17e28dba516fab5fd7a554b07e837ce46ef9"
+            },
+            "label": "public/content/chime.wav SHA256 ee9b507464a02df222414d1ba39f17e28dba516fab5fd7a554b07e837ce46ef9",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/chime.wav",
+                "path": "public/content/chime.wav",
+                "selectedConsumerSHA256": "ee9b507464a02df222414d1ba39f17e28dba516fab5fd7a554b07e837ce46ef9",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon-atlas.json",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon-atlas.json",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "public/content/dungeon-atlas.json SHA256 19169793a301774b35a4e334fc7cc9ebdb98a5e1780ae51865e7ea1bd96d05a5"
+            },
+            "label": "public/content/dungeon-atlas.json SHA256 19169793a301774b35a4e334fc7cc9ebdb98a5e1780ae51865e7ea1bd96d05a5",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon-atlas.json",
+                "path": "public/content/dungeon-atlas.json",
+                "selectedConsumerSHA256": "19169793a301774b35a4e334fc7cc9ebdb98a5e1780ae51865e7ea1bd96d05a5",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon-environment.png",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon-environment.png",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "public/content/dungeon-environment.png SHA256 db97b7d414e1ad36ceed9dc6b3b078127ed215af10ffca958c83567937c10f8f"
+            },
+            "label": "public/content/dungeon-environment.png SHA256 db97b7d414e1ad36ceed9dc6b3b078127ed215af10ffca958c83567937c10f8f",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon-environment.png",
+                "path": "public/content/dungeon-environment.png",
+                "selectedConsumerSHA256": "db97b7d414e1ad36ceed9dc6b3b078127ed215af10ffca958c83567937c10f8f",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon-music.wav",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon-music.wav",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "public/content/dungeon-music.wav SHA256 ff4f4a9cac77fae3bee739082b01583663afd88f5bbcbdc8a6f674f039f02c40"
+            },
+            "label": "public/content/dungeon-music.wav SHA256 ff4f4a9cac77fae3bee739082b01583663afd88f5bbcbdc8a6f674f039f02c40",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon-music.wav",
+                "path": "public/content/dungeon-music.wav",
+                "selectedConsumerSHA256": "ff4f4a9cac77fae3bee739082b01583663afd88f5bbcbdc8a6f674f039f02c40",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon.json",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon.json",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "public/content/dungeon.json SHA256 182a7c7569be27c4f0e27f88b8ff3984c8164eeed0c06e1a77d22696d6a46391"
+            },
+            "label": "public/content/dungeon.json SHA256 182a7c7569be27c4f0e27f88b8ff3984c8164eeed0c06e1a77d22696d6a46391",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon.json",
+                "path": "public/content/dungeon.json",
+                "selectedConsumerSHA256": "182a7c7569be27c4f0e27f88b8ff3984c8164eeed0c06e1a77d22696d6a46391",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/player.png",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/player.png",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "public/content/player.png SHA256 f017c12aa48da6d2c2b6465ba4133ecca792157233aff5d9049818e1ab34be3e"
+            },
+            "label": "public/content/player.png SHA256 f017c12aa48da6d2c2b6465ba4133ecca792157233aff5d9049818e1ab34be3e",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/player.png",
+                "path": "public/content/player.png",
+                "selectedConsumerSHA256": "f017c12aa48da6d2c2b6465ba4133ecca792157233aff5d9049818e1ab34be3e",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town-atlas.json",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town-atlas.json",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "public/content/town-atlas.json SHA256 e75cfbb2984ee1c42f4cdf2250f7252f7d953b7fc0e45f0e6582249568c9cf75"
+            },
+            "label": "public/content/town-atlas.json SHA256 e75cfbb2984ee1c42f4cdf2250f7252f7d953b7fc0e45f0e6582249568c9cf75",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town-atlas.json",
+                "path": "public/content/town-atlas.json",
+                "selectedConsumerSHA256": "e75cfbb2984ee1c42f4cdf2250f7252f7d953b7fc0e45f0e6582249568c9cf75",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town-environment.png",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town-environment.png",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "public/content/town-environment.png SHA256 1a479ece70896e71984eeee8afbcc5102ebd8d345f0fc060a63479631bb72452"
+            },
+            "label": "public/content/town-environment.png SHA256 1a479ece70896e71984eeee8afbcc5102ebd8d345f0fc060a63479631bb72452",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town-environment.png",
+                "path": "public/content/town-environment.png",
+                "selectedConsumerSHA256": "1a479ece70896e71984eeee8afbcc5102ebd8d345f0fc060a63479631bb72452",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town-music.wav",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town-music.wav",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "public/content/town-music.wav SHA256 9c585957540fa51e497982886fd4360bf3b7c226971ba6268492abe2f87f2d18"
+            },
+            "label": "public/content/town-music.wav SHA256 9c585957540fa51e497982886fd4360bf3b7c226971ba6268492abe2f87f2d18",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town-music.wav",
+                "path": "public/content/town-music.wav",
+                "selectedConsumerSHA256": "9c585957540fa51e497982886fd4360bf3b7c226971ba6268492abe2f87f2d18",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town.json",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town.json",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "public/content/town.json SHA256 74b319e2faa18369357489f3f247849dcaf76931a3d54b898cb47ead1832c596"
+            },
+            "label": "public/content/town.json SHA256 74b319e2faa18369357489f3f247849dcaf76931a3d54b898cb47ead1832c596",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town.json",
+                "path": "public/content/town.json",
+                "selectedConsumerSHA256": "74b319e2faa18369357489f3f247849dcaf76931a3d54b898cb47ead1832c596",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:README.md",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:README.md",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "README.md SHA256 4b5c3f9e717b672f284d5cbeed6c4aed87532a765814f449f4a7e31e51931d88"
+            },
+            "label": "README.md SHA256 4b5c3f9e717b672f284d5cbeed6c4aed87532a765814f449f4a7e31e51931d88",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:README.md",
+                "path": "README.md",
+                "selectedConsumerSHA256": "0a4b2f569e512964229603d9d8c4974f03df6810cf4d81a34fffc0b3f43a5e4e",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:scripts/check-package.mjs",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:scripts/check-package.mjs",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "scripts/check-package.mjs SHA256 52d103cc6d4fe6981b1b03564f621174ab69388b729e6691acb73b296f0a1404"
+            },
+            "label": "scripts/check-package.mjs SHA256 52d103cc6d4fe6981b1b03564f621174ab69388b729e6691acb73b296f0a1404",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:scripts/check-package.mjs",
+                "path": "scripts/check-package.mjs",
+                "selectedConsumerSHA256": "52d103cc6d4fe6981b1b03564f621174ab69388b729e6691acb73b296f0a1404",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/animation.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/animation.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "src/animation.ts SHA256 3ef29fa594952d932ed28589b58473db2b3172cc96621b2615c7d37e1caa1847"
+            },
+            "label": "src/animation.ts SHA256 3ef29fa594952d932ed28589b58473db2b3172cc96621b2615c7d37e1caa1847",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/animation.ts",
+                "path": "src/animation.ts",
+                "selectedConsumerSHA256": "3ef29fa594952d932ed28589b58473db2b3172cc96621b2615c7d37e1caa1847",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/content.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/content.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "src/content.ts SHA256 47ccac54c290b8034d479f5e20090dc0e4e941d32a7fd6d135836f6aa11ab197"
+            },
+            "label": "src/content.ts SHA256 47ccac54c290b8034d479f5e20090dc0e4e941d32a7fd6d135836f6aa11ab197",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/content.ts",
+                "path": "src/content.ts",
+                "selectedConsumerSHA256": "47ccac54c290b8034d479f5e20090dc0e4e941d32a7fd6d135836f6aa11ab197",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/documents.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/documents.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "src/documents.ts SHA256 f83876dbade1a1deed8f12cb0b16c773c702f328e63d35e50fc1945f6e632003"
+            },
+            "label": "src/documents.ts SHA256 f83876dbade1a1deed8f12cb0b16c773c702f328e63d35e50fc1945f6e632003",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/documents.ts",
+                "path": "src/documents.ts",
+                "selectedConsumerSHA256": "f83876dbade1a1deed8f12cb0b16c773c702f328e63d35e50fc1945f6e632003",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/env.d.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/env.d.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "src/env.d.ts SHA256 ce77949f14df9d67544b04212995d462bc8189ecf4a767a89238363df6d269f2"
+            },
+            "label": "src/env.d.ts SHA256 ce77949f14df9d67544b04212995d462bc8189ecf4a767a89238363df6d269f2",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/env.d.ts",
+                "path": "src/env.d.ts",
+                "selectedConsumerSHA256": "ce77949f14df9d67544b04212995d462bc8189ecf4a767a89238363df6d269f2",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/loading.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/loading.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "src/loading.ts SHA256 bfdf7089c88c6d61728ec44aae0e2d2f77638035441b8adce5ecd42f4896d326"
+            },
+            "label": "src/loading.ts SHA256 bfdf7089c88c6d61728ec44aae0e2d2f77638035441b8adce5ecd42f4896d326",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/loading.ts",
+                "path": "src/loading.ts",
+                "selectedConsumerSHA256": "bfdf7089c88c6d61728ec44aae0e2d2f77638035441b8adce5ecd42f4896d326",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/main.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/main.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "src/main.ts SHA256 fdc3655f7688c36d5b318a2f6865cb0fe11f36fdeead22fa2d14a85315132933"
+            },
+            "label": "src/main.ts SHA256 fdc3655f7688c36d5b318a2f6865cb0fe11f36fdeead22fa2d14a85315132933",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/main.ts",
+                "path": "src/main.ts",
+                "selectedConsumerSHA256": "fdc3655f7688c36d5b318a2f6865cb0fe11f36fdeead22fa2d14a85315132933",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/room.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/room.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "src/room.ts SHA256 55aad23caac100e6902311c83a6dfde5a5c3e1f48b3320bea561a1ac147bb80d"
+            },
+            "label": "src/room.ts SHA256 55aad23caac100e6902311c83a6dfde5a5c3e1f48b3320bea561a1ac147bb80d",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/room.ts",
+                "path": "src/room.ts",
+                "selectedConsumerSHA256": "55aad23caac100e6902311c83a6dfde5a5c3e1f48b3320bea561a1ac147bb80d",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/run.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/run.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "src/run.ts SHA256 8acae22f16f3f56da70698e7976c44047076bf138efa8bfa2b4d41b6708a454c"
+            },
+            "label": "src/run.ts SHA256 8acae22f16f3f56da70698e7976c44047076bf138efa8bfa2b4d41b6708a454c",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/run.ts",
+                "path": "src/run.ts",
+                "selectedConsumerSHA256": "8acae22f16f3f56da70698e7976c44047076bf138efa8bfa2b4d41b6708a454c",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/save.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/save.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "src/save.ts SHA256 2725d6c15c2992cab1c0c3ab7bde8bbf4dd9c9bcc7162b8ec22306f7f240bc0b"
+            },
+            "label": "src/save.ts SHA256 2725d6c15c2992cab1c0c3ab7bde8bbf4dd9c9bcc7162b8ec22306f7f240bc0b",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/save.ts",
+                "path": "src/save.ts",
+                "selectedConsumerSHA256": "2725d6c15c2992cab1c0c3ab7bde8bbf4dd9c9bcc7162b8ec22306f7f240bc0b",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/session.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/session.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "src/session.ts SHA256 e3380378b9e89cb2c1e98cb0c625c6f9508bd959036c08c3e9ec97659aa18810"
+            },
+            "label": "src/session.ts SHA256 e3380378b9e89cb2c1e98cb0c625c6f9508bd959036c08c3e9ec97659aa18810",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/session.ts",
+                "path": "src/session.ts",
+                "selectedConsumerSHA256": "e3380378b9e89cb2c1e98cb0c625c6f9508bd959036c08c3e9ec97659aa18810",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/content.test.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/content.test.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "tests/content.test.ts SHA256 4f7dad7d28f14efed2f397722adf8963e55805c374a0e5ce2fea1ba8532f59b8"
+            },
+            "label": "tests/content.test.ts SHA256 4f7dad7d28f14efed2f397722adf8963e55805c374a0e5ce2fea1ba8532f59b8",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/content.test.ts",
+                "path": "tests/content.test.ts",
+                "selectedConsumerSHA256": "4f7dad7d28f14efed2f397722adf8963e55805c374a0e5ce2fea1ba8532f59b8",
+                "passingTests": [
+                    "\"loader shares immutable animation and image definitions across rooms; rejects unknown actor clip\"",
+                    "\"room rejects invalid version, actor placement and wall bounds\"",
+                    "\"animation boundaries, independent actors, exact loops and terminal completion\"",
+                    "\"reject versions, dimensions, bounds, duplicate frames, unsupported packing and pivots\"",
+                    "\"external fixtures resolve under root and nested bases; definitions freeze recursively\"",
+                    "\"reject URL escape, absolute URLs, protocols, queries and encoded traversal\"",
+                    "\"invalid JSON and HTTP failures are clear; corrected content retries with fresh fetch\"",
+                    "\"reject animation version, units, missing references and nonintegral timing\""
+                ]
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/integration.test.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/integration.test.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "tests/integration.test.ts SHA256 6ff815dac37245e853a689840997480ab93c5eced74a06430a47c008ca554c82"
+            },
+            "label": "tests/integration.test.ts SHA256 6ff815dac37245e853a689840997480ab93c5eced74a06430a47c008ca554c82",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/integration.test.ts",
+                "path": "tests/integration.test.ts",
+                "selectedConsumerSHA256": "6ff815dac37245e853a689840997480ab93c5eced74a06430a47c008ca554c82",
+                "passingTests": [
+                    "\"installed preparation overlaps cancellation, late decoded completion and transition without releasing the survivor\"",
+                    "\"environment dependency failure/correction and incompatible identity cannot poison shared actor definitions\""
+                ]
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/lifecycle.test.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/lifecycle.test.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "tests/lifecycle.test.ts SHA256 dbfee9cd1b1cadcefd37fdac88657a8c3eadceb17010ffd9194712c36f80df4f"
+            },
+            "label": "tests/lifecycle.test.ts SHA256 dbfee9cd1b1cadcefd37fdac88657a8c3eadceb17010ffd9194712c36f80df4f",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/lifecycle.test.ts",
+                "path": "tests/lifecycle.test.ts",
+                "selectedConsumerSHA256": "dbfee9cd1b1cadcefd37fdac88657a8c3eadceb17010ffd9194712c36f80df4f",
+                "passingTests": [
+                    "\"installed shared leases survive another request cancellation and dispose once\"",
+                    "`late rejection after ${departure} cannot overwrite current mailbox status`",
+                    "\"installed Game preserves running scene on failed preparation and rejects foreign candidates\"",
+                    "\"initial failure remains retryable; deliberate retry succeeds; cancel ready releases once\"",
+                    "\"owner departure prevents activation; cancellation cannot release another ready owner\"",
+                    "\"abandoned and superseded completions release only their own handle\"",
+                    "\"checkpoint request deduplicates pending/ready/activating work and releases abandoned generations\""
+                ]
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/ownership.test.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/ownership.test.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "tests/ownership.test.ts SHA256 ae37b1b28f91f7d49253620354e58449a04179e2ca33897452a60d5f95c1901d"
+            },
+            "label": "tests/ownership.test.ts SHA256 ae37b1b28f91f7d49253620354e58449a04179e2ca33897452a60d5f95c1901d",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/ownership.test.ts",
+                "path": "tests/ownership.test.ts",
+                "selectedConsumerSHA256": "ae37b1b28f91f7d49253620354e58449a04179e2ca33897452a60d5f95c1901d",
+                "passingTests": [
+                    "\"final cancellation aborts pending documents promptly; late ignored-abort completion cannot poison retry\"",
+                    "\"partial resolution rejects missing, malformed, cyclic and conflicting references; corrected content retries\"",
+                    "\"document claims release once and old failed claims cannot erase a replacement\"",
+                    "\"duplicate roots deduplicate every JSON request and immutable scene snapshot\"",
+                    "\"two real room roots share pending documents and stable leaf definitions with independent cancellation\""
+                ]
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/room.test.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/room.test.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "tests/room.test.ts SHA256 a5fd1db3930607de6359a9b80bbbbd65d2d58ac10e52020b008781cae9708b30"
+            },
+            "label": "tests/room.test.ts SHA256 a5fd1db3930607de6359a9b80bbbbd65d2d58ac10e52020b008781cae9708b30",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/room.test.ts",
+                "path": "tests/room.test.ts",
+                "selectedConsumerSHA256": "a5fd1db3930607de6359a9b80bbbbd65d2d58ac10e52020b008781cae9708b30",
+                "passingTests": [
+                    "\"wall contact permits tangency, blocks penetration, and constrains room edges\"",
+                    "\"decoded image mismatch rejects before preparation and closes rejected bitmap\"",
+                    "\"real installed scene owns independent actor state; rendering does not advance playback\""
+                ]
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/run-content.test.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/run-content.test.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "tests/run-content.test.ts SHA256 0db8c8f65308c71340a94ceb6b605f4b42bc005465c2e997bd8857e8f7ea5343"
+            },
+            "label": "tests/run-content.test.ts SHA256 0db8c8f65308c71340a94ceb6b605f4b42bc005465c2e997bd8857e8f7ea5343",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/run-content.test.ts",
+                "path": "tests/run-content.test.ts",
+                "selectedConsumerSHA256": "0db8c8f65308c71340a94ceb6b605f4b42bc005465c2e997bd8857e8f7ea5343",
+                "passingTests": [
+                    "\"authored facts validate and freeze independently of display names and deployment base\"",
+                    "\"reject missing or malformed room IDs and invalid or duplicate item/door facts\""
+                ]
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/run-room.test.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/run-room.test.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "tests/run-room.test.ts SHA256 469b5706f559ad9db3d4347e87d9f03abea19ca9bea8cae6f63a8b2007b10a9e"
+            },
+            "label": "tests/run-room.test.ts SHA256 469b5706f559ad9db3d4347e87d9f03abea19ca9bea8cae6f63a8b2007b10a9e",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/run-room.test.ts",
+                "path": "tests/run-room.test.ts",
+                "selectedConsumerSHA256": "469b5706f559ad9db3d4347e87d9f03abea19ca9bea8cae6f63a8b2007b10a9e",
+                "passingTests": [
+                    "\"Town's same-named item cannot collect the Dungeon objective\"",
+                    "\"dead runs ignore contact collection\"",
+                    "`private mount failure at ${boundary} commits facts and releases only the failed room`",
+                    "\"committed unlock removes a door's collision on the following update\"",
+                    "\"authored route collects once, returns empty-handed safely, completes in Town and survives revisits\"",
+                    "\"failed mount preserves committed facts; surviving room refreshes and later retry reconstructs them\"",
+                    "\"hazard uses exact contact ticks, resets exposure on exit and kills on the third hit\"",
+                    "\"contact collection commits before replacement setup; checkpoint rollback restores the authored relic\"",
+                    "\"completed results remain complete and are immune to hazard damage\"",
+                    "`delayed ${outcome} preserves collected progress and a playable owner until deliberate retry`",
+                    "`late ${reject ? \"rejection\" : \"success\"} after owner departure cannot overwrite current progress or retry status`",
+                    "\"preparation/mount failures preserve a blocked usable retry state and release failed ownership\"",
+                    "\"replacement setup sees final tick facts; revisits rebuild items/doors and transient resources\"",
+                    "\"retry restores latest capture, rolls back later facts and reconstructs every transient\"",
+                    "\"Town checkpoint captures on entry, never while staying inside, and captures again on return\"",
+                    "\"repeated death/retry cycles retain one scene and release every departed scope\""
+                ]
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/run.test.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/run.test.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "tests/run.test.ts SHA256 d5d9f39a495dcbe11f515714cef971ebd583a3ac69453a4e98d100efa9984cba"
+            },
+            "label": "tests/run.test.ts SHA256 d5d9f39a495dcbe11f515714cef971ebd583a3ac69453a4e98d100efa9984cba",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/run.test.ts",
+                "path": "tests/run.test.ts",
+                "selectedConsumerSHA256": "d5d9f39a495dcbe11f515714cef971ebd583a3ac69453a4e98d100efa9984cba",
+                "passingTests": [
+                    "\"capture position in command order determines which facts survive restoration\"",
+                    "\"fresh state is deterministic, with separate live and checkpoint data\"",
+                    "\"installed state capability enforces update dispatch, copies payloads and commits FIFO\"",
+                    "\"authored identities are room scoped and collection, unlock and completion are idempotent\"",
+                    "\"checkpoint isolation, death, rollback and fresh reset are deterministic\""
+                ]
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/save.test.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/save.test.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "tests/save.test.ts SHA256 1ce36b6b1ea105a42b2795047fd9b17abc541b220b0702972fb9147175ba1806"
+            },
+            "label": "tests/save.test.ts SHA256 1ce36b6b1ea105a42b2795047fd9b17abc541b220b0702972fb9147175ba1806",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/save.test.ts",
+                "path": "tests/save.test.ts",
+                "selectedConsumerSHA256": "1ce36b6b1ea105a42b2795047fd9b17abc541b220b0702972fb9147175ba1806",
+                "passingTests": [
+                    "\"validated continue precedes initialization; unavailable content cannot accept restored facts\"",
+                    "\"strict decoding rejects invalid fields, versions, identities, duplicates and contradictory facts\"",
+                    "\"reset failure is distinct and preserves session/save; successful reset touches only its slot\"",
+                    "\"installed commit timing excludes queued/live facts; capture precedes completion and survives failed mount\"",
+                    "\"checkpoint and completion round trips preserve only authored data, including room-scoped doors\"",
+                    "\"missing, malformed, unsupported and read failures fall back without replacing stored bytes\"",
+                    "\"write failures retain old save, deduplicate attempts and recover through deliberate saving\""
+                ]
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/session.test.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/session.test.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "tests/session.test.ts SHA256 81edf58ad58f2052cec70f7a00515e3767f2a608c27482aee4de1570fa08ae39"
+            },
+            "label": "tests/session.test.ts SHA256 81edf58ad58f2052cec70f7a00515e3767f2a608c27482aee4de1570fa08ae39",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/session.test.ts",
+                "path": "tests/session.test.ts",
+                "selectedConsumerSHA256": "81edf58ad58f2052cec70f7a00515e3767f2a608c27482aee4de1570fa08ae39",
+                "passingTests": [
+                    "\"reset retires automatic observation and a fresh owner cannot save the old result\"",
+                    "\"cold, paused and dead sessions expose host actions without requiring a tick\"",
+                    "\"loading and ready work reject repeat travel/retry but can be cancelled or replaced\"",
+                    "\"host lifecycle conflicts and terminal failure reject every session action\""
+                ]
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tsconfig.json",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tsconfig.json",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "tsconfig.json SHA256 0000a3ac577d89ad2e0189e9752e0f9b82a916c902eb829535480b898d804d8b"
+            },
+            "label": "tsconfig.json SHA256 0000a3ac577d89ad2e0189e9752e0f9b82a916c902eb829535480b898d804d8b",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tsconfig.json",
+                "path": "tsconfig.json",
+                "selectedConsumerSHA256": "0000a3ac577d89ad2e0189e9752e0f9b82a916c902eb829535480b898d804d8b",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:vite.config.ts",
+            "source": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:vite.config.ts",
+                "kind": "consumer-snapshot",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "vite.config.ts SHA256 3731fd8f7c402aad5fc89f44916d6ef2bc666720667915449695759a9e45b7dc"
+            },
+            "label": "vite.config.ts SHA256 3731fd8f7c402aad5fc89f44916d6ef2bc666720667915449695759a9e45b7dc",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "Consumer-owned tracked input is inventoried in pinned v1 consumer manifest; verify:engine installs the selected tarball and passes tests, package closure and root/nested browser builds without using this snapshot.",
+            "mixed": null,
+            "exactReview": {
+                "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:vite.config.ts",
+                "path": "vite.config.ts",
+                "selectedConsumerSHA256": "3731fd8f7c402aad5fc89f44916d6ef2bc666720667915449695759a9e45b7dc",
+                "passingTests": []
+            }
+        },
+        {
+            "id": "file:tests/fixtures/README.md",
+            "source": {
+                "id": "file:tests/fixtures/README.md",
+                "kind": "file",
+                "path": "tests/fixtures/README.md",
+                "label": "tests/fixtures/README.md"
+            },
+            "label": "tests/fixtures/README.md",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        },
+        {
+            "id": "file:tests/fixtures/town-dungeon.json",
+            "source": {
+                "id": "file:tests/fixtures/town-dungeon.json",
+                "kind": "file",
+                "path": "tests/fixtures/town-dungeon.json",
+                "label": "tests/fixtures/town-dungeon.json"
+            },
+            "label": "tests/fixtures/town-dungeon.json",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        },
+        {
+            "id": "file:tests/fixtures/town-dungeon.json.gz",
+            "source": {
+                "id": "file:tests/fixtures/town-dungeon.json.gz",
+                "kind": "file",
+                "path": "tests/fixtures/town-dungeon.json.gz",
+                "label": "tests/fixtures/town-dungeon.json.gz"
+            },
+            "label": "tests/fixtures/town-dungeon.json.gz",
+            "destination": "consumer:verification/verify-engine.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        }
+    ]
+}

@@ -1,0 +1,70 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "migration-replacement-proof",
+    "schemaVersion": 1,
+    "runId": "consumer-retirement-2026-09-24-f9b947091a34",
+    "status": "passed",
+    "coverageIds": [
+        "option:tests/browser-ci.ts:NGNE_CONSUMER_DIST",
+        "option:tests/browser-ci.ts:NGNE_CONSUMER_URL",
+        "option:tests/installed-browser.mjs:NGNE_CONSUMER_DIST",
+        "option:tests/installed-browser.mjs:NGNE_CONSUMER_URL"
+    ],
+    "destination": "tooling/commands/compatibility.ts",
+    "reviewedBy": "Codex exact-obligation review under user-authorized consumer retirement",
+    "evidence": "docs/evidence/consumer-retirement.json",
+    "obligations": [
+        {
+            "id": "option:tests/browser-ci.ts:NGNE_CONSUMER_DIST",
+            "source": {
+                "id": "option:tests/browser-ci.ts:NGNE_CONSUMER_DIST",
+                "kind": "option",
+                "path": "tests/browser-ci.ts",
+                "label": "NGNE_CONSUMER_DIST"
+            },
+            "label": "NGNE_CONSUMER_DIST",
+            "destination": "tooling/commands/compatibility.ts",
+            "proof": "Default game selection removed. Generic verify:compatibility requires explicit clean checkout and full revision, with passing synthetic and real conformance.",
+            "mixed": null
+        },
+        {
+            "id": "option:tests/browser-ci.ts:NGNE_CONSUMER_URL",
+            "source": {
+                "id": "option:tests/browser-ci.ts:NGNE_CONSUMER_URL",
+                "kind": "option",
+                "path": "tests/browser-ci.ts",
+                "label": "NGNE_CONSUMER_URL"
+            },
+            "label": "NGNE_CONSUMER_URL",
+            "destination": "tooling/commands/compatibility.ts",
+            "proof": "Default game selection removed. Generic verify:compatibility requires explicit clean checkout and full revision, with passing synthetic and real conformance.",
+            "mixed": null
+        },
+        {
+            "id": "option:tests/installed-browser.mjs:NGNE_CONSUMER_DIST",
+            "source": {
+                "id": "option:tests/installed-browser.mjs:NGNE_CONSUMER_DIST",
+                "kind": "option",
+                "path": "tests/installed-browser.mjs",
+                "label": "NGNE_CONSUMER_DIST"
+            },
+            "label": "NGNE_CONSUMER_DIST",
+            "destination": "tooling/commands/compatibility.ts",
+            "proof": "Default game selection removed. Generic verify:compatibility requires explicit clean checkout and full revision, with passing synthetic and real conformance.",
+            "mixed": null
+        },
+        {
+            "id": "option:tests/installed-browser.mjs:NGNE_CONSUMER_URL",
+            "source": {
+                "id": "option:tests/installed-browser.mjs:NGNE_CONSUMER_URL",
+                "kind": "option",
+                "path": "tests/installed-browser.mjs",
+                "label": "NGNE_CONSUMER_URL"
+            },
+            "label": "NGNE_CONSUMER_URL",
+            "destination": "tooling/commands/compatibility.ts",
+            "proof": "Default game selection removed. Generic verify:compatibility requires explicit clean checkout and full revision, with passing synthetic and real conformance.",
+            "mixed": null
+        }
+    ]
+}

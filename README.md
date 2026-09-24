@@ -92,17 +92,14 @@ During development, `/validation.html` exercises real WebGPU pixels, batching, c
 
 For hardware verification, set `NGNE_BROWSER_HEADLESS=0` and `NGNE_EXPECT_GPU_VENDOR=intel` or `nvidia`; a different or fallback adapter fails the run. On Windows, `NGNE_FORCE_HIGH_PERFORMANCE_GPU=1` requests Chrome's discrete GPU. Results record the browser version, launch flags and devices used for GPU submissions and canvas configuration. Use `NGNE_BROWSER_ARTIFACT_DIR` to retain separate runs. Physical controls, audible output and normal background-tab behavior still require manual checks; the automated harness emulates focus and disables background throttling.
 
-The optional installed Town/Dungeon check uses `NGNE_CONSUMER_URL` for its running
-production preview and `NGNE_CONSUMER_DIST` for the matching local build directory.
-Set both before `npm run test:browser`. The engine harness gates image readiness,
-checks playback/movement and owner-safe retries, and injects controlled device loss
-into the installed production page without consumer hooks. It temporarily corrupts
-only built room JSON and restores it on completion; use a disposable build and
-rebuild after an interrupted run. The consumer README owns authoring and setup.
-`npm run test:installed` builds a clean consumer installation from the
-[pinned consumer fixture](tests/fixtures/README.md). CI exercises its root and
-nested production builds with SwiftShader. The [artifact evidence matrix](docs/evidence/installed-content.md)
-separates executed results from pending hosted or device gates.
+Consumer acceptance is explicitly selected with
+`npm run verify:compatibility -- --consumer <checkout> --revision <full-commit>`.
+It requires a conforming consumer-owned command and validates its pinned source,
+selected package and returned evidence. See [compatibility usage](tooling/README.md#consumer-evidence-and-legacy-fixtures).
+Ordinary verification and CI require no consumer. `test:installed` is an alias
+for engine-only `verify:installed`; `bench:content -- --explore` is an alias
+for the [engine resource workload](tooling/suites/benchmarks/content/README.md).
+Historical consumer results remain under [evidence](docs/evidence/README.md).
 
 The browser and content runners share internal DevTools request ownership. A request
 has a finite deadline and is never replayed; timeout does not cancel browser work.

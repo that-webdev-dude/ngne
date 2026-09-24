@@ -32,8 +32,6 @@ jobs:
         run: npm run prepare:package -- --output out/runs/ci-package
       - name: Verify exact prepared handoff
         run: npm run check:prepared -- --manifest out/runs/ci-package/evidence/manifest.json
-      - name: Build a clean installed content consumer
-        run: npm run test:installed
       - name: Install software WebGPU presentation dependencies
         run: sudo apt-get update && sudo apt-get install -y libvulkan1 mesa-vulkan-drivers xvfb xauth
       - name: Verify large browser replies and profiler streams
@@ -79,11 +77,6 @@ jobs:
           NGNE_BROWSER_HEADLESS: 0
           NGNE_WEBGPU_ADAPTER: swiftshader
         run: xvfb-run -a npm run test:browser
-      - name: Run installed content at root and nested bases
-        env:
-          NGNE_BROWSER_HEADLESS: 0
-          NGNE_WEBGPU_ADAPTER: swiftshader
-        run: xvfb-run -a node tests/installed-browser.mjs
       - name: Upload browser integration artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -94,12 +87,6 @@ jobs:
             out/runs/*-installed-*/evidence/
             out/runs/*-browser-transport-*/evidence/
             .test-output/browser*
-            .test-output/installed-content/*.json
-            .test-output/installed-content/*.log
-            .test-output/installed-content/browser/
-            .test-output/installed-content/consumer/vendor/
-            .test-output/installed-content/consumer/dist/
-            .test-output/installed-content/consumer/dist-nested/
           include-hidden-files: true
           if-no-files-found: warn
       - name: Upload showcase

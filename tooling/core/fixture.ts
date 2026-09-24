@@ -40,6 +40,10 @@ export async function installFixture(
     run: Run,
     repository: string,
     pkg: Prepared["package"],
+    fixture: { source: string; files: string[] } = {
+        source: join(repository, "tooling/fixtures/installed-engine"),
+        files: ["index.ts", "api-misuse.ts"],
+    },
 ): Promise<Prepared> {
     const installation = join(run.root, "work/installation"),
         app = join(installation, "app");
@@ -72,7 +76,11 @@ export async function installFixture(
     await npm("lock", ["install", "--package-lock-only"]);
     await npm("install", ["ci"]);
     verifyIdentities(join(installation, "node_modules/ngne"), pkg.files);
-    cpSync(join(repository, "tooling/fixtures/installed-engine"), app, { recursive: true });
+    cpSync(fixture.source, app, { recursive: true });
+    cpSync(
+        join(repository, "tooling/fixtures/installed-engine/api-misuse.ts"),
+        join(app, "api-misuse.ts"),
+    );
     cpSync(
         join(repository, "node_modules/@webgpu/types/dist/index.d.ts"),
         join(app, "platform.d.ts"),
@@ -88,7 +96,7 @@ export async function installFixture(
             types: [],
             lib: ["ES2022", "DOM"],
         },
-        files: ["index.ts", "api-misuse.ts", "platform.d.ts"],
+        files: [...new Set([...fixture.files, "api-misuse.ts", "platform.d.ts"])],
     });
     writeFileSync(
         join(app, "vite.config.mjs"),

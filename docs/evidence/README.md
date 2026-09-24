@@ -19,7 +19,9 @@ the [guide](../guide.md) owns usage. Preserve recorded manifests, archives, pack
 and hashes when editing explanatory documentation. New executions produce separate
 evidence; they do not retroactively refresh these results.
 
-For reproduction, use the [installed fixture instructions](../../tests/fixtures/README.md),
+For reproduction, use the [installed fixture instructions](retired-content/installed-fixture-procedure.md),
 [browser harness instructions](../../README.md#verify) and
-[content measurement procedure](../../benchmarks/content/README.md). Consult the
+[content measurement procedure](retired-content/measurement-procedure.md). Consult the
 recorded report for its exact root/nested setup, device distinctions and limitations.
+
+See [consumer retirement](consumer-retirement.md) for later coverage correspondence and engine-only command ownership. The reproduction links above describe historical procedures.

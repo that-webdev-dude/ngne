@@ -128,6 +128,8 @@ export async function installed(
                 const client = cdp;
                 await client.send("Runtime.enable");
                 await client.send("Page.enable");
+                await client.send("Emulation.setFocusEmulationEnabled", { enabled: true });
+                run.manifest.policy.focusEmulation = true;
                 client.on("Runtime.exceptionThrown", (value) =>
                     appendFileSync(
                         join(run.evidence, "exceptions.log"),

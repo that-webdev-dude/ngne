@@ -4,8 +4,9 @@ The engine-only fixture is [index.ts](../../tooling/fixtures/installed-engine/in
 The workflow is [installed.ts](../../tooling/suites/verification/browser/installed.ts).
 The [recorded local evidence](../../docs/evidence/installed-engine.json) contains the
 actual root/nested observations, package/workload identities and cleanup outcomes.
-This is replacement evidence for the engine concerns below, not permission to
-delete the source scenarios. All retirement gates remain blocked.
+The original engine correspondence below is supplemented by the exact executed
+retirement review linked at the end. Approved and blocked gates remain explicit
+in the retirement map.
 
 | Existing engine concern in `tests/browser-content-checks.ts`                   | Installed fixture observation IDs                                                                                                                                                                                     |
 | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -30,15 +31,24 @@ malformed browser reports, invalid preparation and nested-server containment.
 Existing preparation regressions retain tamper, incomplete evidence, disposable
 copy, failure independence and cleanup rejection coverage.
 
-The original consumer scenarios remain executable and unchanged. Their authored
+The original consumer scenarios now execute in consumer-owned verification. Their authored
 JSON validation, loading UI, room-specific counts, distinct environment art,
 animation, controls, candidate-slot travel policies, saves and progression are not
 replaced by this minimal fixture. Engine unit/browser contract tests also remain
 active. The frozen assertion IDs and their retirement gates are preserved;
-consumer migration must establish its own precise coverage before deleting mixed
-scenarios. Runtime assertion counts do not establish equivalence.
+the exact retirement proof names the consumer counterpart for every removed mixed
+scenario. Runtime assertion counts do not establish equivalence.
 
 Recorded runs are Windows Chrome/SwiftShader evidence. They establish neither
 physical-GPU validation, manual audible/visual approval nor a hosted Linux pass.
 The old frozen-workload recovery timeout remains a historical unresolved failure;
 these controlled fixture results do not establish its cause or repair it.
+
+## Consumer retirement update
+
+The remaining mixed assertion correspondences and consumer retirement review are
+recorded in [consumer retirement evidence](../../docs/evidence/consumer-retirement.md).
+Its machine record names each original obligation, exact passing observations/tests,
+consumer counterpart and remaining limits. Embedded consumer execution has been
+removed from ordinary verification and default CI. Earlier statements above describe
+the pre-retirement stage; frozen obligations and comparator-specific gates survive.

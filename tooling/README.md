@@ -33,10 +33,10 @@ Prettier and the checker. No automatic mapping-approval command is provided.
 
 These checks establish ownership and migration gates. They do not execute the
 consumer protocol, benchmarks or evidence exporter.
-Existing browser, installed-content and benchmark commands still own those
+Existing browser and benchmark commands still own those
 operations during migration. Their prerequisites and behavior remain documented
 in [repository verification guidance](../README.md), [benchmarks](../benchmarks/README.md)
-and [content measurements](../benchmarks/content/README.md).
+and [engine resource measurements](suites/benchmarks/content/README.md).
 
 ## Package preparation
 
@@ -123,7 +123,37 @@ defines the versioned tarball/hash/output interface. The validator reuses the sh
 schema and checks selected identities, outcomes, exit status and retained payloads.
 Use it on failed responses too, retaining the original consumer failure. The synthetic
 peer and conformance tests run through `npm test`; no real consumer is selected by
-these tests. Consumer-owner agreement and real integration remain unresolved.
+these tests. Owner agreement is recorded in the contract; [pinned real integration](../docs/evidence/consumer-integration.md)
+has passed. Remaining replacement and retirement gates still apply.
+
+`npm run verify:compatibility -- --consumer <checkout> --revision <full-commit>`
+explicitly selects a consumer. Checkout mode requires a clean Git root, a full
+commit matching HEAD, and tracked `package.json` and `package-lock.json`. The
+consumer reports every tracked file except `package-lock.json` in its source
+inventory and that lockfile in its lock inventory, hashing working-tree bytes.
+Ignored dependencies/build outputs are not source inputs; the consumer owns and
+documents their prerequisites. Submodules and linked source files are unsupported.
+There is no checkout discovery, fetch, install into the consumer workspace, or
+game-specific adapter. The consumer must already implement the v1 command.
+
+Standalone compatibility prepares the current engine package. `--manifest <exact
+evidence/manifest.json>` reuses a verified preparation; `--output <new-directory>`
+selects a fresh parent run outside the consumer checkout. The parent records caller
+revision/changes, validator/fixture hashes, pinned consumer inputs and a separate
+child run ID. `consumer/` retains the child's raw evidence; `evidence/` inventories
+parent logs and observations, including the returned manifest/result/inventory.
+Keep both directories and any referenced preparation when retaining the full run;
+the parent evidence directory alone is not a complete consumer evidence export.
+
+The runner invokes the exact npm contract with a ten-minute command deadline,
+terminates/verifies its owned process tree, and validates every response, including
+nonzero exits or missing/partial publication. Timeout does not imply cancellation;
+termination and cleanup are required. It preserves command failures alongside
+validation errors and rechecks consumer/package inputs after execution. Cleanup,
+input drift and evidence errors fail acceptance. Ordinary commands and default CI
+select only engine verification. No consumer is fetched, discovered or required.
+Consumer acceptance and game measurements belong to the explicitly supplied
+consumer. Synthetic runner tests do not establish real integration.
 
 [Bounded legacy fixtures](../plans/tooling/legacy-formats.md) preserve both existing
 reader families. Explicit format selection rejects unknown/new formats; existing
@@ -155,8 +185,23 @@ build assets. No consumer checkout, archive or game schema is loaded.
 Evidence includes assertion IDs, output RMS samples, actual device identities,
 submission counts, browser version/flags and process-tree cleanup. These are
 automated browser observations, not manual visual/audible approval. Asset byte
-accounting is not process/driver memory. Existing consumer migration checks remain
-active; this command makes no consumer-compatibility claim.
+accounting is not process/driver memory. Focus is emulated for deterministic keyboard
+delivery, as in the main browser harness; normal focus/background behavior still
+requires manual validation. This command makes no consumer-compatibility claim.
+
+`npm run test:installed` aliases this engine-only command. The former consumer URL
+and build-directory environment options have been retired; use explicit generic
+compatibility for consumer acceptance.
+
+## Engine resource measurements
+
+`npm run bench:engine-content -- --explore` (also `bench:content -- --explore`) prepares and installs the current
+engine package and runs deterministic generated asset churn without consumer
+inputs. It uses the shared installer, run lifecycle and browser session. See the
+[workload procedure](suites/benchmarks/content/README.md) for sampling, ownership
+checks, prerequisites, exact-manifest reuse and evidence. Measurements remain
+explicit; verification does not select them. This new workload has no established
+performance budgets or controlled baseline; headless runs are capability evidence.
 
 ## Browser sessions and protocol checks
 
@@ -190,7 +235,7 @@ directory. These checks establish protocol capability, not performance, physical
 rendering or manual audible/visual approval. Full snapshots/traces from this check
 are omitted; their validated byte/node/event counts and raw sampling are retained.
 
-The legacy browser and content benchmarks remain headed by default. `NGNE_BROWSER_HEADLESS=1`
+The legacy browser benchmark remains headed by default. `NGNE_BROWSER_HEADLESS=1`
 is an explicit capability-smoke mode and is recorded in its flags; its results
 must not be substituted for visible physical-GPU performance baselines. Benchmark
 artifacts are retained separately from the disposable browser profile. Failed

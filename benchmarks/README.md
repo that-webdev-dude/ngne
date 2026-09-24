@@ -2,9 +2,12 @@
 
 Run from the repository root in PowerShell. Keep benchmark Chrome windows visible.
 
-For installed Town/Dungeon transitions and distinct-content eviction, use
-[`npm.cmd run bench:content`](content/README.md). Its frozen policy, exact ownership
-checks, raw samples and retained-heap criteria are independent of `bench:all`.
+For installed engine resource churn, use
+[`npm.cmd run bench:content -- --explore`](../tooling/suites/benchmarks/content/README.md).
+This aliases `bench:engine-content` and prepares its own engine package. Game
+transition measurements are consumer-owned; no sibling checkout is selected.
+The legacy [content comparator](content/compare.mjs) remains available for retained
+old-format runs with its strict identity and cleanup gates.
 
 ## Run
 

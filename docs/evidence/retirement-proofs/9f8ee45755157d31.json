@@ -1,0 +1,26 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "migration-replacement-proof",
+    "schemaVersion": 1,
+    "runId": "consumer-retirement-2026-09-24-9f8ee4575515",
+    "status": "passed",
+    "coverageIds": ["command:test:installed"],
+    "destination": "tooling/commands/verify.ts",
+    "reviewedBy": "Codex exact-obligation review under user-authorized consumer retirement",
+    "evidence": "docs/evidence/consumer-retirement.json",
+    "obligations": [
+        {
+            "id": "command:test:installed",
+            "source": {
+                "id": "command:test:installed",
+                "kind": "command",
+                "path": "package.json",
+                "label": "tsx tooling/commands/verify.ts"
+            },
+            "label": "tsx tooling/commands/verify.ts",
+            "destination": "tooling/commands/verify.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        }
+    ]
+}

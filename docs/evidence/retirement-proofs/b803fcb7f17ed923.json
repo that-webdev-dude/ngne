@@ -1,0 +1,154 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "migration-replacement-proof",
+    "schemaVersion": 1,
+    "runId": "consumer-retirement-2026-09-24-b803fcb7f17e",
+    "status": "passed",
+    "coverageIds": [
+        "ci:.github/workflows/ci.yml:26de2f5b78dca8e7:1",
+        "ci:.github/workflows/ci.yml:3ed7d99d5da3de08:1",
+        "ci:.github/workflows/ci.yml:4f75d69b341a7ab5:1",
+        "ci:.github/workflows/ci.yml:513327fe62c7241e:1",
+        "ci:.github/workflows/ci.yml:b49c63ffde6aa1af:1",
+        "ci:.github/workflows/ci.yml:b4b0dbf9d4b45f20:1",
+        "ci:.github/workflows/ci.yml:d6eae703bab3f661:1",
+        "ci:.github/workflows/ci.yml:d7c9d3341c7716bc:1",
+        "ci:.github/workflows/ci.yml:ec3c2f85838d5bed:1",
+        "ci:.github/workflows/ci.yml:fc4c6ccc8ffc97c9:1"
+    ],
+    "destination": ".github/workflows/ci.yml",
+    "reviewedBy": "Codex exact-obligation review under user-authorized consumer retirement",
+    "evidence": "docs/evidence/consumer-retirement.json",
+    "obligations": [
+        {
+            "id": "ci:.github/workflows/ci.yml:26de2f5b78dca8e7:1",
+            "source": {
+                "id": "ci:.github/workflows/ci.yml:26de2f5b78dca8e7:1",
+                "kind": "ci",
+                "path": ".github/workflows/ci.yml",
+                "label": ".test-output/installed-content/consumer/dist/"
+            },
+            "label": ".test-output/installed-content/consumer/dist/",
+            "destination": ".github/workflows/ci.yml",
+            "proof": "Default consumer stage/artifact upload retired after exact consumer and engine proofs. Existing engine preparation, browser fault injection, root/nested installed and deployment dependency remain in ci.yml.",
+            "mixed": null
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:3ed7d99d5da3de08:1",
+            "source": {
+                "id": "ci:.github/workflows/ci.yml:3ed7d99d5da3de08:1",
+                "kind": "ci",
+                "path": ".github/workflows/ci.yml",
+                "label": "- name: Build a clean installed content consumer"
+            },
+            "label": "- name: Build a clean installed content consumer",
+            "destination": ".github/workflows/ci.yml",
+            "proof": "Default consumer stage/artifact upload retired after exact consumer and engine proofs. Existing engine preparation, browser fault injection, root/nested installed and deployment dependency remain in ci.yml.",
+            "mixed": null
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:4f75d69b341a7ab5:1",
+            "source": {
+                "id": "ci:.github/workflows/ci.yml:4f75d69b341a7ab5:1",
+                "kind": "ci",
+                "path": ".github/workflows/ci.yml",
+                "label": ".test-output/installed-content/*.json"
+            },
+            "label": ".test-output/installed-content/*.json",
+            "destination": ".github/workflows/ci.yml",
+            "proof": "Default consumer stage/artifact upload retired after exact consumer and engine proofs. Existing engine preparation, browser fault injection, root/nested installed and deployment dependency remain in ci.yml.",
+            "mixed": null
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:513327fe62c7241e:1",
+            "source": {
+                "id": "ci:.github/workflows/ci.yml:513327fe62c7241e:1",
+                "kind": "ci",
+                "path": ".github/workflows/ci.yml",
+                "label": "run: npm run test:installed"
+            },
+            "label": "run: npm run test:installed",
+            "destination": ".github/workflows/ci.yml",
+            "proof": "Default consumer stage/artifact upload retired after exact consumer and engine proofs. Existing engine preparation, browser fault injection, root/nested installed and deployment dependency remain in ci.yml.",
+            "mixed": null
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:b49c63ffde6aa1af:1",
+            "source": {
+                "id": "ci:.github/workflows/ci.yml:b49c63ffde6aa1af:1",
+                "kind": "ci",
+                "path": ".github/workflows/ci.yml",
+                "label": "- name: Run installed content at root and nested bases"
+            },
+            "label": "- name: Run installed content at root and nested bases",
+            "destination": ".github/workflows/ci.yml",
+            "proof": "Default consumer stage/artifact upload retired after exact consumer and engine proofs. Existing engine preparation, browser fault injection, root/nested installed and deployment dependency remain in ci.yml.",
+            "mixed": null
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:b4b0dbf9d4b45f20:1",
+            "source": {
+                "id": "ci:.github/workflows/ci.yml:b4b0dbf9d4b45f20:1",
+                "kind": "ci",
+                "path": ".github/workflows/ci.yml",
+                "label": ".test-output/installed-content/browser/"
+            },
+            "label": ".test-output/installed-content/browser/",
+            "destination": ".github/workflows/ci.yml",
+            "proof": "Default consumer stage/artifact upload retired after exact consumer and engine proofs. Existing engine preparation, browser fault injection, root/nested installed and deployment dependency remain in ci.yml.",
+            "mixed": null
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:d6eae703bab3f661:1",
+            "source": {
+                "id": "ci:.github/workflows/ci.yml:d6eae703bab3f661:1",
+                "kind": "ci",
+                "path": ".github/workflows/ci.yml",
+                "label": ".test-output/installed-content/consumer/vendor/"
+            },
+            "label": ".test-output/installed-content/consumer/vendor/",
+            "destination": ".github/workflows/ci.yml",
+            "proof": "Default consumer stage/artifact upload retired after exact consumer and engine proofs. Existing engine preparation, browser fault injection, root/nested installed and deployment dependency remain in ci.yml.",
+            "mixed": null
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:d7c9d3341c7716bc:1",
+            "source": {
+                "id": "ci:.github/workflows/ci.yml:d7c9d3341c7716bc:1",
+                "kind": "ci",
+                "path": ".github/workflows/ci.yml",
+                "label": "run: xvfb-run -a node tests/installed-browser.mjs"
+            },
+            "label": "run: xvfb-run -a node tests/installed-browser.mjs",
+            "destination": ".github/workflows/ci.yml",
+            "proof": "Default consumer stage/artifact upload retired after exact consumer and engine proofs. Existing engine preparation, browser fault injection, root/nested installed and deployment dependency remain in ci.yml.",
+            "mixed": null
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:ec3c2f85838d5bed:1",
+            "source": {
+                "id": "ci:.github/workflows/ci.yml:ec3c2f85838d5bed:1",
+                "kind": "ci",
+                "path": ".github/workflows/ci.yml",
+                "label": ".test-output/installed-content/consumer/dist-nested/"
+            },
+            "label": ".test-output/installed-content/consumer/dist-nested/",
+            "destination": ".github/workflows/ci.yml",
+            "proof": "Default consumer stage/artifact upload retired after exact consumer and engine proofs. Existing engine preparation, browser fault injection, root/nested installed and deployment dependency remain in ci.yml.",
+            "mixed": null
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:fc4c6ccc8ffc97c9:1",
+            "source": {
+                "id": "ci:.github/workflows/ci.yml:fc4c6ccc8ffc97c9:1",
+                "kind": "ci",
+                "path": ".github/workflows/ci.yml",
+                "label": ".test-output/installed-content/*.log"
+            },
+            "label": ".test-output/installed-content/*.log",
+            "destination": ".github/workflows/ci.yml",
+            "proof": "Default consumer stage/artifact upload retired after exact consumer and engine proofs. Existing engine preparation, browser fault injection, root/nested installed and deployment dependency remain in ci.yml.",
+            "mixed": null
+        }
+    ]
+}

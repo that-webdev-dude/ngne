@@ -52,10 +52,14 @@ async function run() {
     const platform = observe();
     const canvas = document.querySelector("canvas")!;
     const callbacks = new Map<number, FrameRequestCallback>();
+    const revokedDiagnostics: string[] = [];
+    let testingRevocation = false;
     let next = 0,
         now = 1000,
         mounted = 0,
-        unmounted = 0;
+        unmounted = 0,
+        ticks = 0,
+        movement = 0;
     const host = new BrowserGame({
         canvas,
         width: 64,
@@ -64,7 +68,8 @@ async function run() {
         state: {},
         transition: (state) => state,
         assetRetention: { maxEntries: 0 },
-        diagnostic: (error) => state.failures.push(failure(error)),
+        diagnostic: (error) =>
+            (testingRevocation ? revokedDiagnostics : state.failures).push(failure(error)),
         scheduler: {
             request(callback) {
                 callbacks.set(++next, callback);
@@ -92,9 +97,9 @@ async function run() {
     const image = imageAsset("tile", new URL("./tile.png", import.meta.url).href);
     const audio = audioAsset("tone", new URL("./tone.wav", import.meta.url).href);
     let replacement: PreparedScene | undefined;
-    const scene = (id: string): SceneDefinition => ({
+    const scene = (id: string, texture = image): SceneDefinition => ({
         id,
-        assets: [image, audio],
+        assets: [texture, audio],
         setup(s) {
             mounted++;
             const clip = s.assets.get("tone");
@@ -106,7 +111,9 @@ async function run() {
                 unmounted++;
             });
             let started = false;
-            s.system(({ scenes }) => {
+            s.system(({ scenes, input }) => {
+                ticks++;
+                if (input.held.includes("KeyD")) movement++;
                 if (!started) {
                     scope.play({ buffer: clip, loop: true });
                     started = true;
@@ -118,7 +125,7 @@ async function run() {
                 }
             });
             s.render((frame) =>
-                frame.sprite({ x: 32, y: 32, width: 48, height: 48, texture: image.id }),
+                frame.sprite({ x: 32, y: 32, width: 48, height: 48, texture: texture.id }),
             );
         },
     });
@@ -256,7 +263,85 @@ async function run() {
         await until(() => platform.rms() > 0.001, "first audio output");
         state.samples.firstRms = platform.rms();
         check("decoded-clip-produces-output", platform.voices.length === 1);
+        check("unlocked-voice-loops", platform.voices[0].source.loop);
+        await host.audio.unlock();
+        step();
+        check("repeated-unlock-preserves-one-voice", platform.voices.length === 1);
+        canvas.focus();
+        canvas.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyD", bubbles: true }));
+        step();
+        const heldMovement = movement,
+            heldTicks = ticks;
+        const button = document.createElement("button");
+        document.body.append(button);
+        button.focus();
+        step();
+        step();
+        check(
+            "focus-loss-releases-input-without-stopping-simulation",
+            heldMovement > 0 &&
+                movement === heldMovement &&
+                ticks > heldTicks &&
+                host.game.lifecycle === "Running" &&
+                platform.voices[0].stops === 0,
+        );
+        button.remove();
+        const revoked = await host.game.prepare(scene("revoked"), { key: "revoked" });
+        await host.stop();
+        const stoppedTicks = ticks;
+        step();
+        check(
+            "stop-revokes-ready-candidate-preserves-mounted-claims",
+            host.game.assets.inspect().claims.scene === 2 &&
+                host.renderer!.inspect().consumers === 1,
+        );
+        check(
+            "pause-retains-simulation-and-suspends-audio",
+            ticks === stoppedTicks && platform.contexts[0].state === "suspended",
+        );
+        await host.start();
+        replacement = revoked;
+        testingRevocation = true;
+        step();
+        step();
+        testingRevocation = false;
+        state.samples.revokedDiagnostics = revokedDiagnostics;
+        check(
+            "revoked-candidate-reports-exact-diagnostic",
+            revokedDiagnostics.length === 1 &&
+                revokedDiagnostics[0].includes("Scene candidate is stale, consumed, or foreign"),
+        );
+        check(
+            "resume-cannot-mount-revoked-candidate",
+            mounted === 1 && host.game.scenes[0].definition === "first",
+        );
+        check(
+            "resume-advances-state-with-existing-voice",
+            ticks > stoppedTicks &&
+                platform.contexts[0].state === "running" &&
+                platform.voices.length === 1,
+        );
+        const failedTicks = ticks;
+        await rejects(
+            host.game.prepare(
+                {
+                    id: "failed-destination",
+                    assets: [missing],
+                    setup() {
+                        throw Error("partial mount");
+                    },
+                },
+                { key: "failed-destination" },
+            ),
+            "destination-failure-rejects-without-partial-mount",
+        );
+        step();
+        check(
+            "failed-destination-preserves-running-scene",
+            mounted === 1 && ticks > failedTicks && host.game.scenes[0].definition === "first",
+        );
         replacement = await host.game.prepare(scene("second"), { key: "second" });
+        check("explicit-fresh-retry-waits-for-simulation-commit", mounted === 1);
         step();
         step();
         check(
@@ -293,6 +378,51 @@ async function run() {
             "recovered-image-texels-present",
             recoveredPixel[1] > recoveredPixel[0] && recoveredPixel[3] === 255,
         );
+        // Different external image payloads share one audio asset across two scene owners.
+        const alternate = imageAsset("alternate", new URL("./alternate.png", import.meta.url).href);
+        const alternateScene = scene("alternate", alternate);
+        replacement = await host.game.prepare(alternateScene, { key: "alternate" });
+        check(
+            "overlap-counts-distinct-images-and-shared-assets",
+            host.game.assets.inspect().claims.scene === 4 &&
+                host.renderer!.inspect().sources === 2 &&
+                host.renderer!.inspect().consumers === 2,
+        );
+        step();
+        step();
+        const alternatePixel = pixel();
+        state.samples.alternatePixel = alternatePixel;
+        check(
+            "replacement-presents-distinct-external-pixels",
+            alternatePixel[0] > alternatePixel[1] && alternatePixel[3] === 255,
+        );
+        replacement = await host.game.prepare(scene("return"), { key: "return" });
+        step();
+        step();
+        check("return-transition-presents-shared-image", pixel()[1] > pixel()[0]);
+        const heldReplacement = platform.holdNextDevice();
+        platform.devices.at(-1)!.destroy();
+        await heldReplacement.waiting;
+        const pendingReplacement = host.game.prepare(scene("after-recovery"), {
+            key: "after-recovery",
+        });
+        check(
+            "pending-recovery-preserves-mounted-scene",
+            host.game.scenes[0].definition === "return",
+        );
+        heldReplacement.release();
+        replacement = await pendingReplacement;
+        check(
+            "recovered-preparation-waits-for-commit",
+            host.game.scenes[0].definition === "return",
+        );
+        step();
+        step();
+        check(
+            "recovered-preparation-mounts-on-commit",
+            host.game.scenes[0].definition === "after-recovery",
+        );
+        const mountedBeforeStop = mounted;
         await host.stop();
         check(
             "stop-disables-frames-and-audio",
@@ -322,11 +452,14 @@ async function run() {
         check("stopped-recovery-does-not-schedule", callbacks.size === 0);
         check(
             "recovery-cancellation-preserves-mounted-owner",
-            host.renderer!.inspect().consumers === 1 && mounted === 2,
+            host.renderer!.inspect().consumers === 1 && mounted === mountedBeforeStop,
         );
         await host.start();
         step();
-        check("resume-retains-mounted-scene", mounted === 2 && callbacks.size === 1);
+        check(
+            "resume-retains-mounted-scene",
+            mounted === mountedBeforeStop && callbacks.size === 1,
+        );
         state.environment = {
             userAgent: navigator.userAgent,
             visibility: document.visibilityState,
@@ -350,7 +483,7 @@ async function run() {
             host.game.assets.inspect().loaded === 0 &&
                 host.renderer!.inspect().sources === 0 &&
                 callbacks.size === 0 &&
-                unmounted === 2,
+                unmounted === mounted,
         );
         check(
             "disposal-closes-audio",

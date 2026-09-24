@@ -1,0 +1,84 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "migration-replacement-proof",
+    "schemaVersion": 1,
+    "runId": "consumer-retirement-2026-09-24-a3bef72d0f72",
+    "status": "passed",
+    "coverageIds": [
+        "file:tests/browser-content-checks.ts",
+        "option:tests/browser-content-checks.ts:NGNE_BROWSER_ARTIFACT_DIR",
+        "assertion:tests/browser-content-checks.ts:791b42cd93d3b9e6",
+        "assertion:tests/browser-content-checks.ts:aae124a44a50065c",
+        "assertion:tests/browser-content-checks.ts:c182261ed00bf141"
+    ],
+    "destination": "tooling/suites/compatibility/consumer.ts",
+    "reviewedBy": "Codex exact-obligation review under user-authorized consumer retirement",
+    "evidence": "docs/evidence/consumer-retirement.json",
+    "obligations": [
+        {
+            "id": "file:tests/browser-content-checks.ts",
+            "source": {
+                "id": "file:tests/browser-content-checks.ts",
+                "kind": "file",
+                "path": "tests/browser-content-checks.ts",
+                "label": "tests/browser-content-checks.ts"
+            },
+            "label": "tests/browser-content-checks.ts",
+            "destination": "tooling/suites/compatibility/consumer.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        },
+        {
+            "id": "option:tests/browser-content-checks.ts:NGNE_BROWSER_ARTIFACT_DIR",
+            "source": {
+                "id": "option:tests/browser-content-checks.ts:NGNE_BROWSER_ARTIFACT_DIR",
+                "kind": "option",
+                "path": "tests/browser-content-checks.ts",
+                "label": "NGNE_BROWSER_ARTIFACT_DIR"
+            },
+            "label": "NGNE_BROWSER_ARTIFACT_DIR",
+            "destination": "tooling/suites/compatibility/consumer.ts",
+            "proof": "Runner capability now owned by the named destination; original consumer runner retains its measurement options, and independent engine full runs exercise discovery, flags, evidence and cleanup.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:791b42cd93d3b9e6",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:791b42cd93d3b9e6",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "assert(condition, message)"
+            },
+            "label": "assert(condition, message)",
+            "destination": "tooling/suites/compatibility/consumer.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:aae124a44a50065c",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:aae124a44a50065c",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "`Installed content: ${message}`"
+            },
+            "label": "`Installed content: ${message}`",
+            "destination": "tooling/suites/compatibility/consumer.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:c182261ed00bf141",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:c182261ed00bf141",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "assert( result && typeof result === \"object\" && \"data\" in result && typeof result.data === \"string\", )"
+            },
+            "label": "assert( result && typeof result === \"object\" && \"data\" in result && typeof result.data === \"string\", )",
+            "destination": "tooling/suites/compatibility/consumer.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        }
+    ]
+}

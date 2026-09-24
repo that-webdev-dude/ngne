@@ -3004,12 +3004,6 @@
             "label": "if NGNE_BROWSER_INJECT_CLEANUP_FAILURE=1 NGNE_BROWSER_ARTIFACT_DIR=.test-output/browser-cleanup-failure xvfb-run -a npm run test:browser; then"
         },
         {
-            "id": "ci:.github/workflows/ci.yml:26de2f5b78dca8e7:1",
-            "kind": "ci",
-            "path": ".github/workflows/ci.yml",
-            "label": ".test-output/installed-content/consumer/dist/"
-        },
-        {
             "id": "ci:.github/workflows/ci.yml:2acaf51d4461b0b8:1",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
@@ -3058,12 +3052,6 @@
             "label": "out/runs/ci-package/evidence/"
         },
         {
-            "id": "ci:.github/workflows/ci.yml:3ed7d99d5da3de08:1",
-            "kind": "ci",
-            "path": ".github/workflows/ci.yml",
-            "label": "- name: Build a clean installed content consumer"
-        },
-        {
             "id": "ci:.github/workflows/ci.yml:4566f09aa6c9f3c1:1",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
@@ -3110,18 +3098,6 @@
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
             "label": "- run: npm test"
-        },
-        {
-            "id": "ci:.github/workflows/ci.yml:4f75d69b341a7ab5:1",
-            "kind": "ci",
-            "path": ".github/workflows/ci.yml",
-            "label": ".test-output/installed-content/*.json"
-        },
-        {
-            "id": "ci:.github/workflows/ci.yml:513327fe62c7241e:1",
-            "kind": "ci",
-            "path": ".github/workflows/ci.yml",
-            "label": "run: npm run test:installed"
         },
         {
             "id": "ci:.github/workflows/ci.yml:55eae2c25cb95ab6:1",
@@ -3250,12 +3226,6 @@
             "label": "env:"
         },
         {
-            "id": "ci:.github/workflows/ci.yml:8db700617f195949:6",
-            "kind": "ci",
-            "path": ".github/workflows/ci.yml",
-            "label": "env:"
-        },
-        {
             "id": "ci:.github/workflows/ci.yml:91552f0fb0c7c67f:1",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
@@ -3326,18 +3296,6 @@
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
             "label": "pull_request:"
-        },
-        {
-            "id": "ci:.github/workflows/ci.yml:b49c63ffde6aa1af:1",
-            "kind": "ci",
-            "path": ".github/workflows/ci.yml",
-            "label": "- name: Run installed content at root and nested bases"
-        },
-        {
-            "id": "ci:.github/workflows/ci.yml:b4b0dbf9d4b45f20:1",
-            "kind": "ci",
-            "path": ".github/workflows/ci.yml",
-            "label": ".test-output/installed-content/browser/"
         },
         {
             "id": "ci:.github/workflows/ci.yml:b4bdc848109722a3:1",
@@ -3454,12 +3412,6 @@
             "label": "NGNE_WEBGPU_ADAPTER: swiftshader"
         },
         {
-            "id": "ci:.github/workflows/ci.yml:d080186a22723377:6",
-            "kind": "ci",
-            "path": ".github/workflows/ci.yml",
-            "label": "NGNE_WEBGPU_ADAPTER: swiftshader"
-        },
-        {
             "id": "ci:.github/workflows/ci.yml:d0fb26b90aa51510:1",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
@@ -3482,18 +3434,6 @@
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
             "label": "- name: Prepare isolated package evidence"
-        },
-        {
-            "id": "ci:.github/workflows/ci.yml:d6eae703bab3f661:1",
-            "kind": "ci",
-            "path": ".github/workflows/ci.yml",
-            "label": ".test-output/installed-content/consumer/vendor/"
-        },
-        {
-            "id": "ci:.github/workflows/ci.yml:d7c9d3341c7716bc:1",
-            "kind": "ci",
-            "path": ".github/workflows/ci.yml",
-            "label": "run: xvfb-run -a node tests/installed-browser.mjs"
         },
         {
             "id": "ci:.github/workflows/ci.yml:da6f8d99c2f91e58:1",
@@ -3526,12 +3466,6 @@
             "label": "NGNE_BROWSER_HEADLESS: 0"
         },
         {
-            "id": "ci:.github/workflows/ci.yml:da6f8d99c2f91e58:6",
-            "kind": "ci",
-            "path": ".github/workflows/ci.yml",
-            "label": "NGNE_BROWSER_HEADLESS: 0"
-        },
-        {
             "id": "ci:.github/workflows/ci.yml:defcb9dfad595090:1",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
@@ -3554,12 +3488,6 @@
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
             "label": "if-no-files-found: warn"
-        },
-        {
-            "id": "ci:.github/workflows/ci.yml:ec3c2f85838d5bed:1",
-            "kind": "ci",
-            "path": ".github/workflows/ci.yml",
-            "label": ".test-output/installed-content/consumer/dist-nested/"
         },
         {
             "id": "ci:.github/workflows/ci.yml:ef14c75971df094e:1",
@@ -3598,12 +3526,6 @@
             "label": "include-hidden-files: true"
         },
         {
-            "id": "ci:.github/workflows/ci.yml:fc4c6ccc8ffc97c9:1",
-            "kind": "ci",
-            "path": ".github/workflows/ci.yml",
-            "label": ".test-output/installed-content/*.log"
-        },
-        {
             "id": "ci:.github/workflows/ci.yml:fc8135fd1264162a:1",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
@@ -3637,7 +3559,13 @@
             "id": "command:bench:content",
             "kind": "command",
             "path": "package.json",
-            "label": "node benchmarks/content/run.mjs"
+            "label": "tsx tooling/commands/benchmark.ts"
+        },
+        {
+            "id": "command:bench:engine-content",
+            "kind": "command",
+            "path": "package.json",
+            "label": "tsx tooling/commands/benchmark.ts"
         },
         {
             "id": "command:build",
@@ -3721,7 +3649,7 @@
             "id": "command:test:installed",
             "kind": "command",
             "path": "package.json",
-            "label": "node tests/installed-content.mjs"
+            "label": "tsx tooling/commands/verify.ts"
         },
         {
             "id": "command:typecheck",
@@ -3736,250 +3664,16 @@
             "label": "tsc -p tooling/tsconfig.node.json"
         },
         {
+            "id": "command:verify:compatibility",
+            "kind": "command",
+            "path": "package.json",
+            "label": "tsx tooling/commands/compatibility.ts"
+        },
+        {
             "id": "command:verify:installed",
             "kind": "command",
             "path": "package.json",
             "label": "tsx tooling/commands/verify.ts"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:index.html",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "index.html SHA256 f8a77208404e73c716c407ae1d7b023a2c0dd8a3854968d191cf8b308d842dc4"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:LICENSE",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "LICENSE SHA256 267aed9fab02e34166e807f5051d05bf0eb6039e341f5bd39610cebca1f377ed"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:package-lock.json",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "package-lock.json SHA256 2c764a80305edcd3abb0e9275015d92d30fe3d5b73e557c2d195c8c722ade701"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:package.json",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "package.json SHA256 dc0466b32d2cd547c202898d102b1535def5cd574541ff5736dab76d8a26a196"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/animation.json",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "public/content/animation.json SHA256 62b11f01177927c53a5f90df4ac0735630e59a6213298a5d02c073a2a87848e4"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/atlas.json",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "public/content/atlas.json SHA256 b3e24245e75499ab7347583005e77fe38e8552253872cfe83476547593cc404e"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/chime.wav",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "public/content/chime.wav SHA256 ee9b507464a02df222414d1ba39f17e28dba516fab5fd7a554b07e837ce46ef9"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon-atlas.json",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "public/content/dungeon-atlas.json SHA256 19169793a301774b35a4e334fc7cc9ebdb98a5e1780ae51865e7ea1bd96d05a5"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon-environment.png",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "public/content/dungeon-environment.png SHA256 db97b7d414e1ad36ceed9dc6b3b078127ed215af10ffca958c83567937c10f8f"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon-music.wav",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "public/content/dungeon-music.wav SHA256 ff4f4a9cac77fae3bee739082b01583663afd88f5bbcbdc8a6f674f039f02c40"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/dungeon.json",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "public/content/dungeon.json SHA256 182a7c7569be27c4f0e27f88b8ff3984c8164eeed0c06e1a77d22696d6a46391"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/player.png",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "public/content/player.png SHA256 f017c12aa48da6d2c2b6465ba4133ecca792157233aff5d9049818e1ab34be3e"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town-atlas.json",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "public/content/town-atlas.json SHA256 e75cfbb2984ee1c42f4cdf2250f7252f7d953b7fc0e45f0e6582249568c9cf75"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town-environment.png",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "public/content/town-environment.png SHA256 1a479ece70896e71984eeee8afbcc5102ebd8d345f0fc060a63479631bb72452"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town-music.wav",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "public/content/town-music.wav SHA256 9c585957540fa51e497982886fd4360bf3b7c226971ba6268492abe2f87f2d18"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:public/content/town.json",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "public/content/town.json SHA256 74b319e2faa18369357489f3f247849dcaf76931a3d54b898cb47ead1832c596"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:README.md",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "README.md SHA256 4b5c3f9e717b672f284d5cbeed6c4aed87532a765814f449f4a7e31e51931d88"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:scripts/check-package.mjs",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "scripts/check-package.mjs SHA256 52d103cc6d4fe6981b1b03564f621174ab69388b729e6691acb73b296f0a1404"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/animation.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "src/animation.ts SHA256 3ef29fa594952d932ed28589b58473db2b3172cc96621b2615c7d37e1caa1847"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/content.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "src/content.ts SHA256 47ccac54c290b8034d479f5e20090dc0e4e941d32a7fd6d135836f6aa11ab197"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/documents.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "src/documents.ts SHA256 f83876dbade1a1deed8f12cb0b16c773c702f328e63d35e50fc1945f6e632003"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/env.d.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "src/env.d.ts SHA256 ce77949f14df9d67544b04212995d462bc8189ecf4a767a89238363df6d269f2"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/loading.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "src/loading.ts SHA256 bfdf7089c88c6d61728ec44aae0e2d2f77638035441b8adce5ecd42f4896d326"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/main.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "src/main.ts SHA256 fdc3655f7688c36d5b318a2f6865cb0fe11f36fdeead22fa2d14a85315132933"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/room.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "src/room.ts SHA256 55aad23caac100e6902311c83a6dfde5a5c3e1f48b3320bea561a1ac147bb80d"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/run.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "src/run.ts SHA256 8acae22f16f3f56da70698e7976c44047076bf138efa8bfa2b4d41b6708a454c"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/save.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "src/save.ts SHA256 2725d6c15c2992cab1c0c3ab7bde8bbf4dd9c9bcc7162b8ec22306f7f240bc0b"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:src/session.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "src/session.ts SHA256 e3380378b9e89cb2c1e98cb0c625c6f9508bd959036c08c3e9ec97659aa18810"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/content.test.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "tests/content.test.ts SHA256 4f7dad7d28f14efed2f397722adf8963e55805c374a0e5ce2fea1ba8532f59b8"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/integration.test.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "tests/integration.test.ts SHA256 6ff815dac37245e853a689840997480ab93c5eced74a06430a47c008ca554c82"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/lifecycle.test.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "tests/lifecycle.test.ts SHA256 dbfee9cd1b1cadcefd37fdac88657a8c3eadceb17010ffd9194712c36f80df4f"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/ownership.test.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "tests/ownership.test.ts SHA256 ae37b1b28f91f7d49253620354e58449a04179e2ca33897452a60d5f95c1901d"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/room.test.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "tests/room.test.ts SHA256 a5fd1db3930607de6359a9b80bbbbd65d2d58ac10e52020b008781cae9708b30"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/run-content.test.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "tests/run-content.test.ts SHA256 0db8c8f65308c71340a94ceb6b605f4b42bc005465c2e997bd8857e8f7ea5343"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/run-room.test.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "tests/run-room.test.ts SHA256 469b5706f559ad9db3d4347e87d9f03abea19ca9bea8cae6f63a8b2007b10a9e"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/run.test.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "tests/run.test.ts SHA256 d5d9f39a495dcbe11f515714cef971ebd583a3ac69453a4e98d100efa9984cba"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/save.test.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "tests/save.test.ts SHA256 1ce36b6b1ea105a42b2795047fd9b17abc541b220b0702972fb9147175ba1806"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tests/session.test.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "tests/session.test.ts SHA256 81edf58ad58f2052cec70f7a00515e3767f2a608c27482aee4de1570fa08ae39"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:tsconfig.json",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "tsconfig.json SHA256 0000a3ac577d89ad2e0189e9752e0f9b82a916c902eb829535480b898d804d8b"
-        },
-        {
-            "id": "consumer-snapshot:tests/fixtures/town-dungeon.json:vite.config.ts",
-            "kind": "consumer-snapshot",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "vite.config.ts SHA256 3731fd8f7c402aad5fc89f44916d6ef2bc666720667915449695759a9e45b7dc"
         },
         {
             "id": "file:.github/workflows/ci-baseline.yml",
@@ -4052,42 +3746,6 @@
             "kind": "file",
             "path": "benchmarks/content/compare.mjs",
             "label": "benchmarks/content/compare.mjs"
-        },
-        {
-            "id": "file:benchmarks/content/environment.json",
-            "kind": "file",
-            "path": "benchmarks/content/environment.json",
-            "label": "benchmarks/content/environment.json"
-        },
-        {
-            "id": "file:benchmarks/content/fixtures.mjs",
-            "kind": "file",
-            "path": "benchmarks/content/fixtures.mjs",
-            "label": "benchmarks/content/fixtures.mjs"
-        },
-        {
-            "id": "file:benchmarks/content/observe.js",
-            "kind": "file",
-            "path": "benchmarks/content/observe.js",
-            "label": "benchmarks/content/observe.js"
-        },
-        {
-            "id": "file:benchmarks/content/policy.json",
-            "kind": "file",
-            "path": "benchmarks/content/policy.json",
-            "label": "benchmarks/content/policy.json"
-        },
-        {
-            "id": "file:benchmarks/content/README.md",
-            "kind": "file",
-            "path": "benchmarks/content/README.md",
-            "label": "benchmarks/content/README.md"
-        },
-        {
-            "id": "file:benchmarks/content/run.mjs",
-            "kind": "file",
-            "path": "benchmarks/content/run.mjs",
-            "label": "benchmarks/content/run.mjs"
         },
         {
             "id": "file:benchmarks/cpu/benchmark.ts",
@@ -4192,12 +3850,6 @@
             "label": "tests/browser-ci.ts"
         },
         {
-            "id": "file:tests/browser-content-checks.ts",
-            "kind": "file",
-            "path": "tests/browser-content-checks.ts",
-            "label": "tests/browser-content-checks.ts"
-        },
-        {
             "id": "file:tests/browser-content-cleanup.test.ts",
             "kind": "file",
             "path": "tests/browser-content-cleanup.test.ts",
@@ -4240,12 +3892,6 @@
             "label": "tests/browser-lifecycle-checks.ts"
         },
         {
-            "id": "file:tests/browser-progression-checks.ts",
-            "kind": "file",
-            "path": "tests/browser-progression-checks.ts",
-            "label": "tests/browser-progression-checks.ts"
-        },
-        {
             "id": "file:tests/browser-recovery-checks.ts",
             "kind": "file",
             "path": "tests/browser-recovery-checks.ts",
@@ -4258,18 +3904,6 @@
             "label": "tests/browser-retention-checks.ts"
         },
         {
-            "id": "file:tests/browser-save-checks.ts",
-            "kind": "file",
-            "path": "tests/browser-save-checks.ts",
-            "label": "tests/browser-save-checks.ts"
-        },
-        {
-            "id": "file:tests/browser-session-checks.ts",
-            "kind": "file",
-            "path": "tests/browser-session-checks.ts",
-            "label": "tests/browser-session-checks.ts"
-        },
-        {
             "id": "file:tests/browser-validation.ts",
             "kind": "file",
             "path": "tests/browser-validation.ts",
@@ -4280,12 +3914,6 @@
             "kind": "file",
             "path": "tests/browser-webgpu-checks.ts",
             "label": "tests/browser-webgpu-checks.ts"
-        },
-        {
-            "id": "file:tests/content-accounting.mjs",
-            "kind": "file",
-            "path": "tests/content-accounting.mjs",
-            "label": "tests/content-accounting.mjs"
         },
         {
             "id": "file:tests/content-churn.test.ts",
@@ -4324,24 +3952,6 @@
             "label": "tests/engine.test.ts"
         },
         {
-            "id": "file:tests/fixtures/README.md",
-            "kind": "file",
-            "path": "tests/fixtures/README.md",
-            "label": "tests/fixtures/README.md"
-        },
-        {
-            "id": "file:tests/fixtures/town-dungeon.json",
-            "kind": "file",
-            "path": "tests/fixtures/town-dungeon.json",
-            "label": "tests/fixtures/town-dungeon.json"
-        },
-        {
-            "id": "file:tests/fixtures/town-dungeon.json.gz",
-            "kind": "file",
-            "path": "tests/fixtures/town-dungeon.json.gz",
-            "label": "tests/fixtures/town-dungeon.json.gz"
-        },
-        {
             "id": "file:tests/frame-layout.test.ts",
             "kind": "file",
             "path": "tests/frame-layout.test.ts",
@@ -4370,18 +3980,6 @@
             "kind": "file",
             "path": "tests/image-readiness.test.ts",
             "label": "tests/image-readiness.test.ts"
-        },
-        {
-            "id": "file:tests/installed-browser.mjs",
-            "kind": "file",
-            "path": "tests/installed-browser.mjs",
-            "label": "tests/installed-browser.mjs"
-        },
-        {
-            "id": "file:tests/installed-content.mjs",
-            "kind": "file",
-            "path": "tests/installed-content.mjs",
-            "label": "tests/installed-content.mjs"
         },
         {
             "id": "file:tests/interpolation-scenario.ts",
@@ -4480,6 +4078,12 @@
             "label": "tests/webgpu-renderer.test.ts"
         },
         {
+            "id": "file:tooling/commands/benchmark.ts",
+            "kind": "file",
+            "path": "tooling/commands/benchmark.ts",
+            "label": "tooling/commands/benchmark.ts"
+        },
+        {
             "id": "file:tooling/commands/check-browser-transport.ts",
             "kind": "file",
             "path": "tooling/commands/check-browser-transport.ts",
@@ -4490,6 +4094,12 @@
             "kind": "file",
             "path": "tooling/commands/check-migration.ts",
             "label": "tooling/commands/check-migration.ts"
+        },
+        {
+            "id": "file:tooling/commands/compatibility.ts",
+            "kind": "file",
+            "path": "tooling/commands/compatibility.ts",
+            "label": "tooling/commands/compatibility.ts"
         },
         {
             "id": "file:tooling/commands/prepare.ts",
@@ -4582,6 +4192,30 @@
             "label": "tooling/evidence/schema.ts"
         },
         {
+            "id": "file:tooling/fixtures/content-engine/index.html",
+            "kind": "file",
+            "path": "tooling/fixtures/content-engine/index.html",
+            "label": "tooling/fixtures/content-engine/index.html"
+        },
+        {
+            "id": "file:tooling/fixtures/content-engine/index.ts",
+            "kind": "file",
+            "path": "tooling/fixtures/content-engine/index.ts",
+            "label": "tooling/fixtures/content-engine/index.ts"
+        },
+        {
+            "id": "file:tooling/fixtures/content-engine/observe.ts",
+            "kind": "file",
+            "path": "tooling/fixtures/content-engine/observe.ts",
+            "label": "tooling/fixtures/content-engine/observe.ts"
+        },
+        {
+            "id": "file:tooling/fixtures/installed-engine/alternate.png",
+            "kind": "file",
+            "path": "tooling/fixtures/installed-engine/alternate.png",
+            "label": "tooling/fixtures/installed-engine/alternate.png"
+        },
+        {
             "id": "file:tooling/fixtures/installed-engine/api-misuse.ts",
             "kind": "file",
             "path": "tooling/fixtures/installed-engine/api-misuse.ts",
@@ -4624,6 +4258,42 @@
             "label": "tooling/README.md"
         },
         {
+            "id": "file:tooling/suites/benchmarks/content/accounting.ts",
+            "kind": "file",
+            "path": "tooling/suites/benchmarks/content/accounting.ts",
+            "label": "tooling/suites/benchmarks/content/accounting.ts"
+        },
+        {
+            "id": "file:tooling/suites/benchmarks/content/fixtures.ts",
+            "kind": "file",
+            "path": "tooling/suites/benchmarks/content/fixtures.ts",
+            "label": "tooling/suites/benchmarks/content/fixtures.ts"
+        },
+        {
+            "id": "file:tooling/suites/benchmarks/content/measurement.ts",
+            "kind": "file",
+            "path": "tooling/suites/benchmarks/content/measurement.ts",
+            "label": "tooling/suites/benchmarks/content/measurement.ts"
+        },
+        {
+            "id": "file:tooling/suites/benchmarks/content/README.md",
+            "kind": "file",
+            "path": "tooling/suites/benchmarks/content/README.md",
+            "label": "tooling/suites/benchmarks/content/README.md"
+        },
+        {
+            "id": "file:tooling/suites/benchmarks/content/run.ts",
+            "kind": "file",
+            "path": "tooling/suites/benchmarks/content/run.ts",
+            "label": "tooling/suites/benchmarks/content/run.ts"
+        },
+        {
+            "id": "file:tooling/suites/compatibility.ts",
+            "kind": "file",
+            "path": "tooling/suites/compatibility.ts",
+            "label": "tooling/suites/compatibility.ts"
+        },
+        {
             "id": "file:tooling/suites/verification/browser/installed.ts",
             "kind": "file",
             "path": "tooling/suites/verification/browser/installed.ts",
@@ -4636,10 +4306,22 @@
             "label": "tooling/tests/browser-session.test.ts"
         },
         {
+            "id": "file:tooling/tests/compatibility.test.ts",
+            "kind": "file",
+            "path": "tooling/tests/compatibility.test.ts",
+            "label": "tooling/tests/compatibility.test.ts"
+        },
+        {
             "id": "file:tooling/tests/consumer-contract.test.ts",
             "kind": "file",
             "path": "tooling/tests/consumer-contract.test.ts",
             "label": "tooling/tests/consumer-contract.test.ts"
+        },
+        {
+            "id": "file:tooling/tests/content-engine.test.ts",
+            "kind": "file",
+            "path": "tooling/tests/content-engine.test.ts",
+            "label": "tooling/tests/content-engine.test.ts"
         },
         {
             "id": "file:tooling/tests/fixtures/consumer-contract-v1/cases.json",
@@ -5098,78 +4780,6 @@
             "label": "-h"
         },
         {
-            "id": "option:benchmarks/content/fixtures.mjs:-atlas",
-            "kind": "option",
-            "path": "benchmarks/content/fixtures.mjs",
-            "label": "-atlas"
-        },
-        {
-            "id": "option:benchmarks/content/run.mjs:--consumer",
-            "kind": "option",
-            "path": "benchmarks/content/run.mjs",
-            "label": "--consumer"
-        },
-        {
-            "id": "option:benchmarks/content/run.mjs:--disable-backgrounding-occluded-windows",
-            "kind": "option",
-            "path": "benchmarks/content/run.mjs",
-            "label": "--disable-backgrounding-occluded-windows"
-        },
-        {
-            "id": "option:benchmarks/content/run.mjs:--disable-default-apps",
-            "kind": "option",
-            "path": "benchmarks/content/run.mjs",
-            "label": "--disable-default-apps"
-        },
-        {
-            "id": "option:benchmarks/content/run.mjs:--explore",
-            "kind": "option",
-            "path": "benchmarks/content/run.mjs",
-            "label": "--explore"
-        },
-        {
-            "id": "option:benchmarks/content/run.mjs:--headless",
-            "kind": "option",
-            "path": "benchmarks/content/run.mjs",
-            "label": "--headless"
-        },
-        {
-            "id": "option:benchmarks/content/run.mjs:--no-first-run",
-            "kind": "option",
-            "path": "benchmarks/content/run.mjs",
-            "label": "--no-first-run"
-        },
-        {
-            "id": "option:benchmarks/content/run.mjs:--remote-debugging-port",
-            "kind": "option",
-            "path": "benchmarks/content/run.mjs",
-            "label": "--remote-debugging-port"
-        },
-        {
-            "id": "option:benchmarks/content/run.mjs:--user-data-dir",
-            "kind": "option",
-            "path": "benchmarks/content/run.mjs",
-            "label": "--user-data-dir"
-        },
-        {
-            "id": "option:benchmarks/content/run.mjs:--window-size",
-            "kind": "option",
-            "path": "benchmarks/content/run.mjs",
-            "label": "--window-size"
-        },
-        {
-            "id": "option:benchmarks/content/run.mjs:NGNE_BROWSER",
-            "kind": "option",
-            "path": "benchmarks/content/run.mjs",
-            "label": "NGNE_BROWSER"
-        },
-        {
-            "id": "option:benchmarks/content/run.mjs:NGNE_BROWSER_HEADLESS",
-            "kind": "option",
-            "path": "benchmarks/content/run.mjs",
-            "label": "NGNE_BROWSER_HEADLESS"
-        },
-        {
             "id": "option:benchmarks/cpu/churn-schema.ts:--out",
             "kind": "option",
             "path": "benchmarks/cpu/churn-schema.ts",
@@ -5596,18 +5206,6 @@
             "label": "NGNE_CDP_PORT"
         },
         {
-            "id": "option:tests/browser-ci.ts:NGNE_CONSUMER_DIST",
-            "kind": "option",
-            "path": "tests/browser-ci.ts",
-            "label": "NGNE_CONSUMER_DIST"
-        },
-        {
-            "id": "option:tests/browser-ci.ts:NGNE_CONSUMER_URL",
-            "kind": "option",
-            "path": "tests/browser-ci.ts",
-            "label": "NGNE_CONSUMER_URL"
-        },
-        {
             "id": "option:tests/browser-ci.ts:NGNE_EXPECT_GPU_VENDOR",
             "kind": "option",
             "path": "tests/browser-ci.ts",
@@ -5624,108 +5222,6 @@
             "kind": "option",
             "path": "tests/browser-ci.ts",
             "label": "NGNE_WEBGPU_ADAPTER"
-        },
-        {
-            "id": "option:tests/browser-content-checks.ts:NGNE_BROWSER_ARTIFACT_DIR",
-            "kind": "option",
-            "path": "tests/browser-content-checks.ts",
-            "label": "NGNE_BROWSER_ARTIFACT_DIR"
-        },
-        {
-            "id": "option:tests/installed-browser.mjs:--base",
-            "kind": "option",
-            "path": "tests/installed-browser.mjs",
-            "label": "--base"
-        },
-        {
-            "id": "option:tests/installed-browser.mjs:--host",
-            "kind": "option",
-            "path": "tests/installed-browser.mjs",
-            "label": "--host"
-        },
-        {
-            "id": "option:tests/installed-browser.mjs:--import",
-            "kind": "option",
-            "path": "tests/installed-browser.mjs",
-            "label": "--import"
-        },
-        {
-            "id": "option:tests/installed-browser.mjs:--outDir",
-            "kind": "option",
-            "path": "tests/installed-browser.mjs",
-            "label": "--outDir"
-        },
-        {
-            "id": "option:tests/installed-browser.mjs:--port",
-            "kind": "option",
-            "path": "tests/installed-browser.mjs",
-            "label": "--port"
-        },
-        {
-            "id": "option:tests/installed-browser.mjs:--strictPort",
-            "kind": "option",
-            "path": "tests/installed-browser.mjs",
-            "label": "--strictPort"
-        },
-        {
-            "id": "option:tests/installed-browser.mjs:NGNE_BROWSER_ARTIFACT_DIR",
-            "kind": "option",
-            "path": "tests/installed-browser.mjs",
-            "label": "NGNE_BROWSER_ARTIFACT_DIR"
-        },
-        {
-            "id": "option:tests/installed-browser.mjs:NGNE_CONSUMER_DIST",
-            "kind": "option",
-            "path": "tests/installed-browser.mjs",
-            "label": "NGNE_CONSUMER_DIST"
-        },
-        {
-            "id": "option:tests/installed-browser.mjs:NGNE_CONSUMER_URL",
-            "kind": "option",
-            "path": "tests/installed-browser.mjs",
-            "label": "NGNE_CONSUMER_URL"
-        },
-        {
-            "id": "option:tests/installed-browser.mjs:NGNE_INSTALLED_BROWSER_DIR",
-            "kind": "option",
-            "path": "tests/installed-browser.mjs",
-            "label": "NGNE_INSTALLED_BROWSER_DIR"
-        },
-        {
-            "id": "option:tests/installed-browser.mjs:NGNE_INSTALLED_CONTENT_DIR",
-            "kind": "option",
-            "path": "tests/installed-browser.mjs",
-            "label": "NGNE_INSTALLED_CONTENT_DIR"
-        },
-        {
-            "id": "option:tests/installed-content.mjs:--ignore-scripts",
-            "kind": "option",
-            "path": "tests/installed-content.mjs",
-            "label": "--ignore-scripts"
-        },
-        {
-            "id": "option:tests/installed-content.mjs:--json",
-            "kind": "option",
-            "path": "tests/installed-content.mjs",
-            "label": "--json"
-        },
-        {
-            "id": "option:tests/installed-content.mjs:--pack-destination",
-            "kind": "option",
-            "path": "tests/installed-content.mjs",
-            "label": "--pack-destination"
-        },
-        {
-            "id": "option:tests/installed-content.mjs:--porcelain",
-            "kind": "option",
-            "path": "tests/installed-content.mjs",
-            "label": "--porcelain"
-        },
-        {
-            "id": "option:tests/installed-content.mjs:NGNE_INSTALLED_CONTENT_DIR",
-            "kind": "option",
-            "path": "tests/installed-content.mjs",
-            "label": "NGNE_INSTALLED_CONTENT_DIR"
         },
         {
             "id": "option:tests/runner-cleanup.test.ts:-e",
@@ -5750,6 +5246,30 @@
             "kind": "option",
             "path": "tests/tooling/cleanup.mjs",
             "label": "-NoProfile"
+        },
+        {
+            "id": "option:tooling/commands/benchmark.ts:--explore",
+            "kind": "option",
+            "path": "tooling/commands/benchmark.ts",
+            "label": "--explore"
+        },
+        {
+            "id": "option:tooling/commands/benchmark.ts:--manifest",
+            "kind": "option",
+            "path": "tooling/commands/benchmark.ts",
+            "label": "--manifest"
+        },
+        {
+            "id": "option:tooling/commands/benchmark.ts:--output",
+            "kind": "option",
+            "path": "tooling/commands/benchmark.ts",
+            "label": "--output"
+        },
+        {
+            "id": "option:tooling/commands/benchmark.ts:--smoke",
+            "kind": "option",
+            "path": "tooling/commands/benchmark.ts",
+            "label": "--smoke"
         },
         {
             "id": "option:tooling/commands/check-browser-transport.ts:--headless",
@@ -5816,6 +5336,30 @@
             "kind": "option",
             "path": "tooling/commands/check-migration.ts",
             "label": "GITHUB_STEP_SUMMARY"
+        },
+        {
+            "id": "option:tooling/commands/compatibility.ts:--consumer",
+            "kind": "option",
+            "path": "tooling/commands/compatibility.ts",
+            "label": "--consumer"
+        },
+        {
+            "id": "option:tooling/commands/compatibility.ts:--manifest",
+            "kind": "option",
+            "path": "tooling/commands/compatibility.ts",
+            "label": "--manifest"
+        },
+        {
+            "id": "option:tooling/commands/compatibility.ts:--output",
+            "kind": "option",
+            "path": "tooling/commands/compatibility.ts",
+            "label": "--output"
+        },
+        {
+            "id": "option:tooling/commands/compatibility.ts:--revision",
+            "kind": "option",
+            "path": "tooling/commands/compatibility.ts",
+            "label": "--revision"
         },
         {
             "id": "option:tooling/commands/prepare.ts:--manifest",
@@ -5974,6 +5518,126 @@
             "label": "--porcelain"
         },
         {
+            "id": "option:tooling/suites/benchmarks/content/run.ts:--disable-background-timer-throttling",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/content/run.ts",
+            "label": "--disable-background-timer-throttling"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/content/run.ts:--disable-backgrounding-occluded-windows",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/content/run.ts",
+            "label": "--disable-backgrounding-occluded-windows"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/content/run.ts:--disable-default-apps",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/content/run.ts",
+            "label": "--disable-default-apps"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/content/run.ts:--disable-dev-shm-usage",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/content/run.ts",
+            "label": "--disable-dev-shm-usage"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/content/run.ts:--disable-renderer-backgrounding",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/content/run.ts",
+            "label": "--disable-renderer-backgrounding"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/content/run.ts:--enable-precise-memory-info",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/content/run.ts",
+            "label": "--enable-precise-memory-info"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/content/run.ts:--headless",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/content/run.ts",
+            "label": "--headless"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/content/run.ts:--no-first-run",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/content/run.ts",
+            "label": "--no-first-run"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/content/run.ts:--no-sandbox",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/content/run.ts",
+            "label": "--no-sandbox"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/content/run.ts:--window-size",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/content/run.ts",
+            "label": "--window-size"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/content/run.ts:NGNE_BROWSER_HEADLESS",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/content/run.ts",
+            "label": "NGNE_BROWSER_HEADLESS"
+        },
+        {
+            "id": "option:tooling/suites/compatibility.ts:--contract-version",
+            "kind": "option",
+            "path": "tooling/suites/compatibility.ts",
+            "label": "--contract-version"
+        },
+        {
+            "id": "option:tooling/suites/compatibility.ts:--engine-sha256",
+            "kind": "option",
+            "path": "tooling/suites/compatibility.ts",
+            "label": "--engine-sha256"
+        },
+        {
+            "id": "option:tooling/suites/compatibility.ts:--engine-tarball",
+            "kind": "option",
+            "path": "tooling/suites/compatibility.ts",
+            "label": "--engine-tarball"
+        },
+        {
+            "id": "option:tooling/suites/compatibility.ts:--output",
+            "kind": "option",
+            "path": "tooling/suites/compatibility.ts",
+            "label": "--output"
+        },
+        {
+            "id": "option:tooling/suites/compatibility.ts:--porcelain",
+            "kind": "option",
+            "path": "tooling/suites/compatibility.ts",
+            "label": "--porcelain"
+        },
+        {
+            "id": "option:tooling/suites/compatibility.ts:--run-id",
+            "kind": "option",
+            "path": "tooling/suites/compatibility.ts",
+            "label": "--run-id"
+        },
+        {
+            "id": "option:tooling/suites/compatibility.ts:--show-toplevel",
+            "kind": "option",
+            "path": "tooling/suites/compatibility.ts",
+            "label": "--show-toplevel"
+        },
+        {
+            "id": "option:tooling/suites/compatibility.ts:--untracked-files",
+            "kind": "option",
+            "path": "tooling/suites/compatibility.ts",
+            "label": "--untracked-files"
+        },
+        {
+            "id": "option:tooling/suites/compatibility.ts:-z",
+            "kind": "option",
+            "path": "tooling/suites/compatibility.ts",
+            "label": "-z"
+        },
+        {
             "id": "option:tooling/suites/verification/browser/installed.ts:--disable-background-timer-throttling",
             "kind": "option",
             "path": "tooling/suites/verification/browser/installed.ts",
@@ -6106,6 +5770,36 @@
             "label": "-e"
         },
         {
+            "id": "option:tooling/tests/compatibility.test.ts:--output",
+            "kind": "option",
+            "path": "tooling/tests/compatibility.test.ts",
+            "label": "--output"
+        },
+        {
+            "id": "option:tooling/tests/compatibility.test.ts:--quiet",
+            "kind": "option",
+            "path": "tooling/tests/compatibility.test.ts",
+            "label": "--quiet"
+        },
+        {
+            "id": "option:tooling/tests/compatibility.test.ts:--run-id",
+            "kind": "option",
+            "path": "tooling/tests/compatibility.test.ts",
+            "label": "--run-id"
+        },
+        {
+            "id": "option:tooling/tests/compatibility.test.ts:-c",
+            "kind": "option",
+            "path": "tooling/tests/compatibility.test.ts",
+            "label": "-c"
+        },
+        {
+            "id": "option:tooling/tests/compatibility.test.ts:-m",
+            "kind": "option",
+            "path": "tooling/tests/compatibility.test.ts",
+            "label": "-m"
+        },
+        {
             "id": "option:tooling/tests/consumer-contract.test.ts:--contract-version",
             "kind": "option",
             "path": "tooling/tests/consumer-contract.test.ts",
@@ -6206,18 +5900,6 @@
             "kind": "option",
             "path": "tooling/tests/migration.test.ts",
             "label": "NGNE_NEW_OPTION"
-        },
-        {
-            "id": "option:tooling/tests/preparation.test.ts:--input-type",
-            "kind": "option",
-            "path": "tooling/tests/preparation.test.ts",
-            "label": "--input-type"
-        },
-        {
-            "id": "option:tooling/tests/preparation.test.ts:-e",
-            "kind": "option",
-            "path": "tooling/tests/preparation.test.ts",
-            "label": "-e"
         }
     ],
     "frozenAssertions": [
@@ -8726,96 +8408,6 @@
     ],
     "assertions": [
         {
-            "id": "assertion:benchmarks/content/run.mjs:091b61a1ca8b5888",
-            "kind": "assertion",
-            "path": "benchmarks/content/run.mjs",
-            "label": "assert.equal(distinct.size, policy.distinctRooms)"
-        },
-        {
-            "id": "assertion:benchmarks/content/run.mjs:1410b84e3b62b63b",
-            "kind": "assertion",
-            "path": "benchmarks/content/run.mjs",
-            "label": "\"browser target available\""
-        },
-        {
-            "id": "assertion:benchmarks/content/run.mjs:1e9f84af52b0a813",
-            "kind": "assertion",
-            "path": "benchmarks/content/run.mjs",
-            "label": "\"CHECK COMPARABILITY: browser\""
-        },
-        {
-            "id": "assertion:benchmarks/content/run.mjs:67faaaa181942925",
-            "kind": "assertion",
-            "path": "benchmarks/content/run.mjs",
-            "label": "assert(!run.visibilityChanges.includes(\"hidden\"))"
-        },
-        {
-            "id": "assertion:benchmarks/content/run.mjs:76de8e284bda43ef",
-            "kind": "assertion",
-            "path": "benchmarks/content/run.mjs",
-            "label": "assert.equal(after.room, before.room)"
-        },
-        {
-            "id": "assertion:benchmarks/content/run.mjs:7c134158702260fc",
-            "kind": "assertion",
-            "path": "benchmarks/content/run.mjs",
-            "label": "\"evicted environments decode again on revisits\""
-        },
-        {
-            "id": "assertion:benchmarks/content/run.mjs:8841b53cdccacdbd",
-            "kind": "assertion",
-            "path": "benchmarks/content/run.mjs",
-            "label": "assert.equal(run.environment.gpu[0].isFallbackAdapter, false)"
-        },
-        {
-            "id": "assertion:benchmarks/content/run.mjs:917085a395a55548",
-            "kind": "assertion",
-            "path": "benchmarks/content/run.mjs",
-            "label": "assert(run.distinctDecodedBytes > policy.retention.maxBytes)"
-        },
-        {
-            "id": "assertion:benchmarks/content/run.mjs:937e58dea4f8dcae",
-            "kind": "assertion",
-            "path": "benchmarks/content/run.mjs",
-            "label": "assert.equal(sample.to, expected)"
-        },
-        {
-            "id": "assertion:benchmarks/content/run.mjs:a4f2007740e81112",
-            "kind": "assertion",
-            "path": "benchmarks/content/run.mjs",
-            "label": "assert.equal(after.closed, before.closed + 1)"
-        },
-        {
-            "id": "assertion:benchmarks/content/run.mjs:ac4c4fd2c93ec296",
-            "kind": "assertion",
-            "path": "benchmarks/content/run.mjs",
-            "label": "\"CHECK COMPARABILITY: GPU/viewport\""
-        },
-        {
-            "id": "assertion:benchmarks/content/run.mjs:b6b717c6d16ab62c",
-            "kind": "assertion",
-            "path": "benchmarks/content/run.mjs",
-            "label": "\"CHECK COMPARABILITY: OS\""
-        },
-        {
-            "id": "assertion:benchmarks/content/run.mjs:c125f52185a3d859",
-            "kind": "assertion",
-            "path": "benchmarks/content/run.mjs",
-            "label": "\"predefined latency and retained heap criteria\""
-        },
-        {
-            "id": "assertion:benchmarks/content/run.mjs:e58e14272f13efa6",
-            "kind": "assertion",
-            "path": "benchmarks/content/run.mjs",
-            "label": "assert( !/swiftshader|warp|llvmpipe|basic render/i.test( JSON.stringify(run.environment.gpu), ), )"
-        },
-        {
-            "id": "assertion:benchmarks/content/run.mjs:ee4efc503a718612",
-            "kind": "assertion",
-            "path": "benchmarks/content/run.mjs",
-            "label": "assert.equal(run.environment.gpu.length, 1)"
-        },
-        {
             "id": "assertion:tests/asset-retention.test.ts:35688855a58b49b9",
             "kind": "assertion",
             "path": "tests/asset-retention.test.ts",
@@ -8994,342 +8586,6 @@
             "kind": "assertion",
             "path": "tests/browser-ci.ts",
             "label": "\"Starfall built path starts a flight\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:0a98159c98bf253b",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"ordinary Town-to-Dungeon transition produces fresh output without another unlock gesture\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:186ccab7d0d6301a",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "`retry cycle ${cycle}: restore commits before fresh Town setup and resets transients`"
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:18e3dfc6dab199f0",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"initial production scene activates after image readiness\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:1cd9bd19f2471367",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"destination presents distinct external environment atlas pixels\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:204c54a136ca3d5d",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"failed checkpoint preparation retains dead facts, four claims and deliberate retry\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:23ead21b5936f8ee",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"pause abandons a ready destination and keeps only mounted ownership\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:2c42f37afb9fbe2e",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"disposal during recovery destroys late replacement and releases all scene ownership\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:2eaa093ca6e87646",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"production rooms contain a player and three independently animated companions\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:30ae1f0b25fe05b2",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"controlled recovery produces no consumer error\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:321f04e51d44bc3b",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"failed destination preserves room and exposes deliberate retry\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:338407840d49cb3b",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"resume advances retained state and resumes the existing music voice\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:37b7a077bacf3b76",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "`Installed content: retry cycle ${cycle}: fresh Town music has nonzero destination-input signal (not a listening check)`"
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:3aa9a20572e3a9b0",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"dead player presents opaque red feedback\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:3c340ae23956f2e3",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"non-loop companion completes in production simulation\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:40547c0723c585e3",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"normal focus loss clears held movement while simulation and effect keep running\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:43ab1d79a96bd0a8",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"terminal recovery failure reports an error without frame-driven device retries\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:490d9d601f802e64",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"installed production slice submits through replacement device\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:4a48a22627a7124c",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"abandoned preparation releases only its own image consumers\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:52d092191519544e",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"cancelled ready checkpoint releases candidate and keeps the dead owner blocked\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:5628298cc62de16b",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"corrected initial content retries successfully after cancellation\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:5a2eeaae142b5f82",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"completed consumer exposes required session, checkpoint and persistence controls\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:61d56c788758b40d",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"recovery preparation preserves the mounted room\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:6462395d17fc6805",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"exported atlas presents opaque green player texels\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:66ceaad8d6bcb3e2",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"corrected destination retry activates at simulation commit\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:72dc0e7ddae70f52",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "`retry cycle ${cycle}: visible death and distinct actionable checkpoint control`"
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:73c6263ff3c053e5",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"audio unlock starts one looping room track\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:74f13dd795cfb429",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"initial invalid JSON publishes no partial scene and allows retry\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:791b42cd93d3b9e6",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "assert(condition, message)"
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:7970b6e2f5868e4d",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"transition prepared during recovery mounts after replacement readiness\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:7f8f7a09687997ab",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"repeated unlock does not duplicate room music\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:8f84e9dc6667a950",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"delayed image decode prevents initial activation and shows loading\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:955fb70e0b386035",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"controlled loss does not mutate actor state without a tick\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:9a649964f7c6d5d7",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"cancelled transition during recovery preserves the surviving consumer\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:9bd17920af3e3c83",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"deliberate retry after pause prepares a fresh destination\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:9fbc65e915a3afec",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"active room protects four scene claims and two renderer claims above the three-entry budget\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:a3a2c6173c6158ea",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"ready destination and surviving room own eight scene claims, three unique images and four image consumers\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:aa9ef11807a3e0b7",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"explicit pause preserves scene state and suspends audio\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:aae124a44a50065c",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "`Installed content: ${message}`"
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:b4ce2ac1823e4155",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "`retry cycle ${cycle}: departing claims and audio voices release exactly once`"
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:b7d906e941d7a11f",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"committed destination reclaims old ownership and replaces music exactly once\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:b96aeb8b974569c2",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "`retry cycle ${cycle}: dead movement, travel, actors and effects remain blocked`"
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:bab9403f5b64024b",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"focused movement advances simulation-owned position\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:c182261ed00bf141",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "assert( result && typeof result === \"object\" && \"data\" in result && typeof result.data === \"string\", )"
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:c7912b54699e7374",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"Installed content: Town music produces a nonzero signal at the destination input\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:c8a5b6e088dd6b2c",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"consumer wall collision stops the player\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:ccd73bd8033b8484",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"return transition keeps shared images usable\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:d173a5cbe62a8de3",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"Installed content: Dungeon music produces a nonzero signal at the destination input\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:d4df2d50a78479d0",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"initial cancellation does not activate stale preparation\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:d8f80effa48c6b32",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"exported player texels survive recovery\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:dae9f46b24d2b450",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"authored relic is collected before checkpoint rollback\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:db6d7904434aa50a",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"Installed content: exported player texels survive controlled recovery\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:eb821abf8d6c5bee",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "`retry cycle ${cycle}: rolled-back relic reconstructs`"
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:f55835f6f727910c",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"surviving room remains playable during failure\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:f5f23882fb6226d7",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"resume cannot consume the destination revoked by stop\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:f7c942ca2e03c392",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "\"shared animation has independent actor playback\""
-        },
-        {
-            "id": "assertion:tests/browser-content-checks.ts:ff0aa9a91f5f462a",
-            "kind": "assertion",
-            "path": "tests/browser-content-checks.ts",
-            "label": "`retry cycle ${cycle}: duplicate requests retain only one candidate`"
         },
         {
             "id": "assertion:tests/browser-content-cleanup.test.ts:641ba3a56cbcdf35",
@@ -9632,66 +8888,6 @@
             "label": "\"dispose during cold startup completion never enables frames\""
         },
         {
-            "id": "assertion:tests/browser-progression-checks.ts:09f154e887b0f0b1",
-            "kind": "assertion",
-            "path": "tests/browser-progression-checks.ts",
-            "label": "\"checkpoint and completion commit and save despite failed outgoing private mount\""
-        },
-        {
-            "id": "assertion:tests/browser-progression-checks.ts:133953d902c12465",
-            "kind": "assertion",
-            "path": "tests/browser-progression-checks.ts",
-            "label": "\"corrected retry mounts Town before completion dispatch\""
-        },
-        {
-            "id": "assertion:tests/browser-progression-checks.ts:3c5692c040825559",
-            "kind": "assertion",
-            "path": "tests/browser-progression-checks.ts",
-            "label": "\"failed JSON destination preserves already committed collection and mounted ownership\""
-        },
-        {
-            "id": "assertion:tests/browser-progression-checks.ts:5165921a695b0d7a",
-            "kind": "assertion",
-            "path": "tests/browser-progression-checks.ts",
-            "label": "`cancelled destination ignores late JSON ${fail ? \"rejection\" : \"success\"} and retains progress/audio`"
-        },
-        {
-            "id": "assertion:tests/browser-progression-checks.ts:5c34114d648c3773",
-            "kind": "assertion",
-            "path": "tests/browser-progression-checks.ts",
-            "label": "`New Game ignores old late JSON ${fail ? \"rejection\" : \"success\"} without overwriting fresh status, save or ownership`"
-        },
-        {
-            "id": "assertion:tests/browser-progression-checks.ts:76091f93d807f029",
-            "kind": "assertion",
-            "path": "tests/browser-progression-checks.ts",
-            "label": "\"deliberate retry retains one reward, one scene and one playing voice\""
-        },
-        {
-            "id": "assertion:tests/browser-progression-checks.ts:7d719c4460772a54",
-            "kind": "assertion",
-            "path": "tests/browser-progression-checks.ts",
-            "label": "`progression races: ${label}`"
-        },
-        {
-            "id": "assertion:tests/browser-progression-checks.ts:9278295ca5ef9336",
-            "kind": "assertion",
-            "path": "tests/browser-progression-checks.ts",
-            "label": "\"failed mount leaves movement usable and refreshes committed item presentation\""
-        },
-        {
-            "id": "assertion:tests/browser-progression-checks.ts:a1014a302817a43a",
-            "kind": "assertion",
-            "path": "tests/browser-progression-checks.ts",
-            "label": "\"authored player is one tick outside relic contact\""
-        },
-        {
-            "id": "assertion:tests/browser-progression-checks.ts:f22f4d75d0271ae3",
-            "kind": "assertion",
-            "path": "tests/browser-progression-checks.ts",
-            "label": "\"collection commits before failed private Town mount; old scene, claims and one voice survive\""
-        },
-        {
             "id": "assertion:tests/browser-recovery-checks.ts:07c8014ad9c5772c",
             "kind": "assertion",
             "path": "tests/browser-recovery-checks.ts",
@@ -9768,186 +8964,6 @@
             "kind": "assertion",
             "path": "tests/browser-retention-checks.ts",
             "label": "\"retention fixture renders decoded image pixels\""
-        },
-        {
-            "id": "assertion:tests/browser-save-checks.ts:0fcbcb8eb9c20c55",
-            "kind": "assertion",
-            "path": "tests/browser-save-checks.ts",
-            "label": "\"invalid/unsupported save visibly falls back without overwriting rejected data\""
-        },
-        {
-            "id": "assertion:tests/browser-save-checks.ts:12ccf5ceb002975d",
-            "kind": "assertion",
-            "path": "tests/browser-save-checks.ts",
-            "label": "\"real reload preserves completed result and visible completion\""
-        },
-        {
-            "id": "assertion:tests/browser-save-checks.ts:24834d61a8af40d2",
-            "kind": "assertion",
-            "path": "tests/browser-save-checks.ts",
-            "label": "\"deliberate retry reports success only after storage accepts completion\""
-        },
-        {
-            "id": "assertion:tests/browser-save-checks.ts:268d4b09ace35cc3",
-            "kind": "assertion",
-            "path": "tests/browser-save-checks.ts",
-            "label": "\"controlled storage read failure leaves a visible playable fallback\""
-        },
-        {
-            "id": "assertion:tests/browser-save-checks.ts:5c470ffd03e60a8d",
-            "kind": "assertion",
-            "path": "tests/browser-save-checks.ts",
-            "label": "\"deliberate save replaces invalid data with accepted current checkpoint\""
-        },
-        {
-            "id": "assertion:tests/browser-save-checks.ts:7018f6bc9310d526",
-            "kind": "assertion",
-            "path": "tests/browser-save-checks.ts",
-            "label": "\"invalid save fallback remains playable\""
-        },
-        {
-            "id": "assertion:tests/browser-save-checks.ts:9db7539da21458f4",
-            "kind": "assertion",
-            "path": "tests/browser-save-checks.ts",
-            "label": "\"real same-origin reload restores checkpoint and reconstructs full-health Town\""
-        },
-        {
-            "id": "assertion:tests/browser-save-checks.ts:ab22a9d2b916a559",
-            "kind": "assertion",
-            "path": "tests/browser-save-checks.ts",
-            "label": "\"write failure leaves in-session movement usable\""
-        },
-        {
-            "id": "assertion:tests/browser-save-checks.ts:b06a86bb35393951",
-            "kind": "assertion",
-            "path": "tests/browser-save-checks.ts",
-            "label": "\"reload rolls back live collection and reconstructs the relic\""
-        },
-        {
-            "id": "assertion:tests/browser-save-checks.ts:d7b7caf7525c3974",
-            "kind": "assertion",
-            "path": "tests/browser-save-checks.ts",
-            "label": "\"continued completion reconstructs the collected relic as absent\""
-        },
-        {
-            "id": "assertion:tests/browser-save-checks.ts:d89d485ef002512c",
-            "kind": "assertion",
-            "path": "tests/browser-save-checks.ts",
-            "label": "\"save projection excludes post-checkpoint relic collection\""
-        },
-        {
-            "id": "assertion:tests/browser-save-checks.ts:eef8a4076395dcfc",
-            "kind": "assertion",
-            "path": "tests/browser-save-checks.ts",
-            "label": "\"controlled completion write failure preserves old save and current completed session\""
-        },
-        {
-            "id": "assertion:tests/browser-save-checks.ts:f8d9ab05a8e204b4",
-            "kind": "assertion",
-            "path": "tests/browser-save-checks.ts",
-            "label": "\"Town captures before completing and persists both committed facts\""
-        },
-        {
-            "id": "assertion:tests/browser-save-checks.ts:f9c8b0850bea14f7",
-            "kind": "assertion",
-            "path": "tests/browser-save-checks.ts",
-            "label": "\"recovered write survives another real reload\""
-        },
-        {
-            "id": "assertion:tests/browser-session-checks.ts:20e6c600eab72e4e",
-            "kind": "assertion",
-            "path": "tests/browser-session-checks.ts",
-            "label": "\"Tab reaches Start as the first available keyboard action\""
-        },
-        {
-            "id": "assertion:tests/browser-session-checks.ts:268cbe84f9bb412b",
-            "kind": "assertion",
-            "path": "tests/browser-session-checks.ts",
-            "label": "\"New Game invalidates loading/ready work and repeated activation leaves one fresh session\""
-        },
-        {
-            "id": "assertion:tests/browser-session-checks.ts:4216d75d39178ae0",
-            "kind": "assertion",
-            "path": "tests/browser-session-checks.ts",
-            "label": "\"keyboard-only Tab/Enter Start mounts once and focuses the canvas\""
-        },
-        {
-            "id": "assertion:tests/browser-session-checks.ts:514d2373cc1046fd",
-            "kind": "assertion",
-            "path": "tests/browser-session-checks.ts",
-            "label": "\"menu New Game retires selection handlers: another New Game leaves exactly one running session\""
-        },
-        {
-            "id": "assertion:tests/browser-session-checks.ts:7280e545fe31afe9",
-            "kind": "assertion",
-            "path": "tests/browser-session-checks.ts",
-            "label": "\"missing save offers Start without creating a simulation or automatic save\""
-        },
-        {
-            "id": "assertion:tests/browser-session-checks.ts:72aba3563d6635a2",
-            "kind": "assertion",
-            "path": "tests/browser-session-checks.ts",
-            "label": "\"keyboard New Game starts from pause without a tick and creates fresh live/saved progress and canvas focus\""
-        },
-        {
-            "id": "assertion:tests/browser-session-checks.ts:7c42bab78d2f35f6",
-            "kind": "assertion",
-            "path": "tests/browser-session-checks.ts",
-            "label": "\"keyboard Continue initializes once without an existing tick and restores canvas focus\""
-        },
-        {
-            "id": "assertion:tests/browser-session-checks.ts:92a4eec9f5febd6e",
-            "kind": "assertion",
-            "path": "tests/browser-session-checks.ts",
-            "label": "\"keyboard navigation on UI neither moves the player nor triggers E travel\""
-        },
-        {
-            "id": "assertion:tests/browser-session-checks.ts:96023cc0604cba48",
-            "kind": "assertion",
-            "path": "tests/browser-session-checks.ts",
-            "label": "\"menu reset failure retains saved bytes and leaves Continue available without creating a game\""
-        },
-        {
-            "id": "assertion:tests/browser-session-checks.ts:9eff733766e5461c",
-            "kind": "assertion",
-            "path": "tests/browser-session-checks.ts",
-            "label": "\"the session created by menu New Game releases its device on the next New Game\""
-        },
-        {
-            "id": "assertion:tests/browser-session-checks.ts:b3135e03a0e34356",
-            "kind": "assertion",
-            "path": "tests/browser-session-checks.ts",
-            "label": "\"paused session accurately guards gameplay with no running tick\""
-        },
-        {
-            "id": "assertion:tests/browser-session-checks.ts:cd12a832bccfd8be",
-            "kind": "assertion",
-            "path": "tests/browser-session-checks.ts",
-            "label": "\"New Game disposes old audio and leaves only fresh scene ownership\""
-        },
-        {
-            "id": "assertion:tests/browser-session-checks.ts:d2edb104111fef67",
-            "kind": "assertion",
-            "path": "tests/browser-session-checks.ts",
-            "label": "\"loading session guards repeated Start, Continue and travel while no tick runs\""
-        },
-        {
-            "id": "assertion:tests/browser-session-checks.ts:d5c565b741fd9524",
-            "kind": "assertion",
-            "path": "tests/browser-session-checks.ts",
-            "label": "\"reload offers Continue before starting simulation\""
-        },
-        {
-            "id": "assertion:tests/browser-session-checks.ts:daf8aec89e2508f9",
-            "kind": "assertion",
-            "path": "tests/browser-session-checks.ts",
-            "label": "\"New Game reset failure preserves completed session and saved bytes, with explicit failure\""
-        },
-        {
-            "id": "assertion:tests/browser-session-checks.ts:eeb83b00ff6a8933",
-            "kind": "assertion",
-            "path": "tests/browser-session-checks.ts",
-            "label": "\"keyboard Travel and repeated/conflicting clicks mount exactly one destination\""
         },
         {
             "id": "assertion:tests/browser-validation.ts:0465bd7f92f07b07",
@@ -10080,162 +9096,6 @@
             "kind": "assertion",
             "path": "tests/browser-webgpu-checks.ts",
             "label": "\"WebGPU reuses grown buffers and uploads only active instances\""
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:091407afa4580c7b",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(r.uploads, 0)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:12ae32cb1ec02d01",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "\"\""
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:2129dcf532b39c28",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(a.cleanupFailures, 0)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:2daf9bc711f43db8",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(sample.bitmaps, 2)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:2eb2722554ecf1ee",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(a.unknownSizes, 1)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:30b9adb520d21d7a",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(sample.contexts, 0)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:360eba3dea9d2744",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "\"visible\""
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:49dfb2941b09233a",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(a.loaded, 4)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:4b10bbf473991c71",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(sample.voices, 1)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:4ccd88c0a3996f8f",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(a.loading, 0)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:4ce2c8b6f202c63c",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(sample.contexts, 1)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:61cb0c12efecb606",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(r.sources, 2)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:65c49104123a80f0",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(a.protectedOverBudget, true)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:6b2b6bf03dd54cf0",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(a.leased, 4)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:78b460ce0f6a97e2",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(sample.voices, 0)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:987ca7f4b0296235",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(a.unleased, 0)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:9907411ce31325f1",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(sample.diagnostics.renderer[field], 0, field)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:a20578031bdea17f",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.deepEqual(a.claims, { external: 0, scene: 4, dependency: 0, renderer: 2 })"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:bbdc5ef0f07ff03d",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(sample.bitmaps, 0)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:bf69390434d26448",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(r.textures, 3)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:c52c54c3f665f41f",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(r.manualReplacements, 0)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:cb09cb75755ca05d",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(sample.textures, 0)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:e401034611029d0d",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(r.consumers, 2)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:f0ff8ab3fe1515ab",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(value, 0)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:f99fe2eff4c633ea",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(a[field], 0, field)"
-        },
-        {
-            "id": "assertion:tests/content-accounting.mjs:fa23a96004e5a285",
-            "kind": "assertion",
-            "path": "tests/content-accounting.mjs",
-            "label": "assert.equal(sample.textures, 3)"
         },
         {
             "id": "assertion:tests/content-churn.test.ts:1ba0d5e9f29fb3e5",
@@ -10668,78 +9528,6 @@
             "kind": "assertion",
             "path": "tests/image-readiness.test.ts",
             "label": "\"synchronous copy failures balance scopes and manual replacements preserve the prior texture\""
-        },
-        {
-            "id": "assertion:tests/installed-browser.mjs:1362d7afbc9b74b7",
-            "kind": "assertion",
-            "path": "tests/installed-browser.mjs",
-            "label": "`${base} browser runner failed; see ${base}-runner.log`"
-        },
-        {
-            "id": "assertion:tests/installed-browser.mjs:559532ad927252ee",
-            "kind": "assertion",
-            "path": "tests/installed-browser.mjs",
-            "label": "\"passed\""
-        },
-        {
-            "id": "assertion:tests/installed-browser.mjs:9e3166e38a447fff",
-            "kind": "assertion",
-            "path": "tests/installed-browser.mjs",
-            "label": "assert.deepEqual( manifest.fixture, JSON.parse(readFileSync(\"tests/fixtures/town-dungeon.json\", \"utf8\")), )"
-        },
-        {
-            "id": "assertion:tests/installed-browser.mjs:f1bc9fa350eeb101",
-            "kind": "assertion",
-            "path": "tests/installed-browser.mjs",
-            "label": "`${base} preview readiness timeout`"
-        },
-        {
-            "id": "assertion:tests/installed-content.mjs:091be29ebf729b1e",
-            "kind": "assertion",
-            "path": "tests/installed-content.mjs",
-            "label": "assert.equal(pack.length, 1)"
-        },
-        {
-            "id": "assertion:tests/installed-content.mjs:0c7ff2ec4eb657e8",
-            "kind": "assertion",
-            "path": "tests/installed-content.mjs",
-            "label": "assert(pack[0].files.some((file) => file.path === \"dist/engine/index.d.ts\"))"
-        },
-        {
-            "id": "assertion:tests/installed-content.mjs:25b1f4649ad2c92f",
-            "kind": "assertion",
-            "path": "tests/installed-content.mjs",
-            "label": "assert.deepEqual(Object.keys(files).sort(), Object.keys(fixture.files).sort())"
-        },
-        {
-            "id": "assertion:tests/installed-content.mjs:31201ec383cd313d",
-            "kind": "assertion",
-            "path": "tests/installed-content.mjs",
-            "label": "assert(pack[0].files.some((file) => file.path === \"dist/engine/index.js\"))"
-        },
-        {
-            "id": "assertion:tests/installed-content.mjs:4f15faed08cce831",
-            "kind": "assertion",
-            "path": "tests/installed-content.mjs",
-            "label": "\"Run through npm run test:installed\""
-        },
-        {
-            "id": "assertion:tests/installed-content.mjs:6017ac455c859321",
-            "kind": "assertion",
-            "path": "tests/installed-content.mjs",
-            "label": "assert( /^[a-zA-Z0-9_./-]+$/.test(name) && !name.startsWith(\"/\") && !name.split(\"/\").includes(\"..\"), )"
-        },
-        {
-            "id": "assertion:tests/installed-content.mjs:bae1d8f876be5ef6",
-            "kind": "assertion",
-            "path": "tests/installed-content.mjs",
-            "label": "assert.equal(sha256(archive), fixture.archiveSHA256)"
-        },
-        {
-            "id": "assertion:tests/installed-content.mjs:e1005af643de65b1",
-            "kind": "assertion",
-            "path": "tests/installed-content.mjs",
-            "label": "assert.equal(sha256(bytes), fixture.files[name], name)"
         },
         {
             "id": "assertion:tests/interpolation-scenario.ts:249df0e9e611793d",
@@ -11324,6 +10112,12 @@
             "label": "\"delayed-image-cannot-publish-or-mount\""
         },
         {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:466bc4f4217cd7b1",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"resume-advances-state-with-existing-voice\""
+        },
+        {
             "id": "assertion:tooling/fixtures/installed-engine/index.ts:4a560d17ab689098",
             "kind": "assertion",
             "path": "tooling/fixtures/installed-engine/index.ts",
@@ -11354,6 +10148,12 @@
             "label": "\"failed-load-can-explicitly-retry\""
         },
         {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:52aa63079a361e40",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"revoked-candidate-reports-exact-diagnostic\""
+        },
+        {
             "id": "assertion:tooling/fixtures/installed-engine/index.ts:5b6d8bb86b796c40",
             "kind": "assertion",
             "path": "tooling/fixtures/installed-engine/index.ts",
@@ -11364,6 +10164,18 @@
             "kind": "assertion",
             "path": "tooling/fixtures/installed-engine/index.ts",
             "label": "\"overlapping-candidates-share-upload\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:5d918866eebc4534",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"replacement-presents-distinct-external-pixels\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:5fd9bcfa6d12450c",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"pause-retains-simulation-and-suspends-audio\""
         },
         {
             "id": "assertion:tooling/fixtures/installed-engine/index.ts:65cbf75741b8f1e9",
@@ -11384,16 +10196,58 @@
             "label": "\"external-assets-use-selected-base\""
         },
         {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:6f74ac1108809e77",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"explicit-fresh-retry-waits-for-simulation-commit\""
+        },
+        {
             "id": "assertion:tooling/fixtures/installed-engine/index.ts:73cf339a17987351",
             "kind": "assertion",
             "path": "tooling/fixtures/installed-engine/index.ts",
             "label": "\"ordinary-browser-frame-submits-sprite\""
         },
         {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:74dddc8b87bbb400",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"overlap-counts-distinct-images-and-shared-assets\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:78011a97bc239419",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"repeated-unlock-preserves-one-voice\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:8ba4bb3674358ec1",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"resume-cannot-mount-revoked-candidate\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:8bb337f2f2666c24",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"pending-recovery-preserves-mounted-scene\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:91f525ef61e0dcd7",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"focus-loss-releases-input-without-stopping-simulation\""
+        },
+        {
             "id": "assertion:tooling/fixtures/installed-engine/index.ts:a734ee44e0cc1c3b",
             "kind": "assertion",
             "path": "tooling/fixtures/installed-engine/index.ts",
             "label": "\"late-cancelled-load-disposed-once\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:aae073251e839479",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"stop-revokes-ready-candidate-preserves-mounted-claims\""
         },
         {
             "id": "assertion:tooling/fixtures/installed-engine/index.ts:b19ef734948442b9",
@@ -11432,10 +10286,22 @@
             "label": "\"replacement-plays-new-scope\""
         },
         {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:dd256c2d0135a7c5",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"unlocked-voice-loops\""
+        },
+        {
             "id": "assertion:tooling/fixtures/installed-engine/index.ts:dd4216473212bd09",
             "kind": "assertion",
             "path": "tooling/fixtures/installed-engine/index.ts",
             "label": "\"recovered-frame-submits\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:dd6f5e213428d648",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"failed-destination-preserves-running-scene\""
         },
         {
             "id": "assertion:tooling/fixtures/installed-engine/index.ts:ddf560f4de1ced7c",
@@ -11450,6 +10316,24 @@
             "label": "\"resume-retains-mounted-scene\""
         },
         {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:eb1ca07190adfe67",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"recovered-preparation-waits-for-commit\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:f160480e512aa0fe",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"return-transition-presents-shared-image\""
+        },
+        {
+            "id": "assertion:tooling/fixtures/installed-engine/index.ts:f3e8259060c3f9d2",
+            "kind": "assertion",
+            "path": "tooling/fixtures/installed-engine/index.ts",
+            "label": "\"recovered-preparation-mounts-on-commit\""
+        },
+        {
             "id": "assertion:tooling/fixtures/installed-engine/index.ts:f60c09d20cddc2d6",
             "kind": "assertion",
             "path": "tooling/fixtures/installed-engine/index.ts",
@@ -11460,6 +10344,12 @@
             "kind": "assertion",
             "path": "tooling/fixtures/installed-engine/index.ts",
             "label": "\"disposal-destroys-late-device-and-releases-assets\""
+        },
+        {
+            "id": "assertion:tooling/suites/benchmarks/content/run.ts:59b053b71c43eab4",
+            "kind": "assertion",
+            "path": "tooling/suites/benchmarks/content/run.ts",
+            "label": "verify()"
         },
         {
             "id": "assertion:tooling/tests/browser-session.test.ts:0493a67b4503fc85",
@@ -11496,6 +10386,30 @@
             "kind": "assertion",
             "path": "tooling/tests/browser-session.test.ts",
             "label": "\"session attempts all cleanup resources and preserves independent failures\""
+        },
+        {
+            "id": "assertion:tooling/tests/compatibility.test.ts:00884759202e64ef",
+            "kind": "assertion",
+            "path": "tooling/tests/compatibility.test.ts",
+            "label": "\"compatibility rejects invalid preparation before consumer execution and checkout-owned outputs\""
+        },
+        {
+            "id": "assertion:tooling/tests/compatibility.test.ts:362adb8164c1c082",
+            "kind": "assertion",
+            "path": "tooling/tests/compatibility.test.ts",
+            "label": "\"compatibility selects unrelated synthetic consumers and retains separate successful runs\""
+        },
+        {
+            "id": "assertion:tooling/tests/compatibility.test.ts:50d0bf71508e0348",
+            "kind": "assertion",
+            "path": "tooling/tests/compatibility.test.ts",
+            "label": "\"compatibility preserves nonzero failures and rejects zero-exit identity drift and input mutation\""
+        },
+        {
+            "id": "assertion:tooling/tests/compatibility.test.ts:bab6c98505886a86",
+            "kind": "assertion",
+            "path": "tooling/tests/compatibility.test.ts",
+            "label": "\"consumer selection rejects missing pins, dirty inputs and nested checkout paths\""
         },
         {
             "id": "assertion:tooling/tests/consumer-contract.test.ts:2a627d328e864b18",
@@ -11550,6 +10464,30 @@
             "kind": "assertion",
             "path": "tooling/tests/consumer-contract.test.ts",
             "label": "\"consumer stub CLI runs independently twice and returns invalid-input status on reuse\""
+        },
+        {
+            "id": "assertion:tooling/tests/content-engine.test.ts:27cc420bc0f2f697",
+            "kind": "assertion",
+            "path": "tooling/tests/content-engine.test.ts",
+            "label": "\"generated engine images are deterministic distinct complete PNG payloads\""
+        },
+        {
+            "id": "assertion:tooling/tests/content-engine.test.ts:86837bf83dcbbab6",
+            "kind": "assertion",
+            "path": "tooling/tests/content-engine.test.ts",
+            "label": "\"engine benchmark rejects missing preparation and reused output without selecting a fallback\""
+        },
+        {
+            "id": "assertion:tooling/tests/content-engine.test.ts:b14805451afa77e1",
+            "kind": "assertion",
+            "path": "tooling/tests/content-engine.test.ts",
+            "label": "\"engine measurement validation rejects truncated reordered failed and fallback results\""
+        },
+        {
+            "id": "assertion:tooling/tests/content-engine.test.ts:d6fe4e0940f6d075",
+            "kind": "assertion",
+            "path": "tooling/tests/content-engine.test.ts",
+            "label": "\"engine resource oracle rejects lost claims leaks hidden runs and diagnostics\""
         },
         {
             "id": "assertion:tooling/tests/installed.test.ts:09bce73240a7e054",

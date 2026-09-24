@@ -1,0 +1,822 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "migration-replacement-proof",
+    "schemaVersion": 1,
+    "runId": "consumer-retirement-2026-09-24-1c1488b73b62",
+    "status": "passed",
+    "coverageIds": [
+        "assertion:tests/browser-content-checks.ts:0a98159c98bf253b",
+        "assertion:tests/browser-content-checks.ts:18e3dfc6dab199f0",
+        "assertion:tests/browser-content-checks.ts:1cd9bd19f2471367",
+        "assertion:tests/browser-content-checks.ts:23ead21b5936f8ee",
+        "assertion:tests/browser-content-checks.ts:2c42f37afb9fbe2e",
+        "assertion:tests/browser-content-checks.ts:30ae1f0b25fe05b2",
+        "assertion:tests/browser-content-checks.ts:321f04e51d44bc3b",
+        "assertion:tests/browser-content-checks.ts:338407840d49cb3b",
+        "assertion:tests/browser-content-checks.ts:40547c0723c585e3",
+        "assertion:tests/browser-content-checks.ts:43ab1d79a96bd0a8",
+        "assertion:tests/browser-content-checks.ts:490d9d601f802e64",
+        "assertion:tests/browser-content-checks.ts:4a48a22627a7124c",
+        "assertion:tests/browser-content-checks.ts:5628298cc62de16b",
+        "assertion:tests/browser-content-checks.ts:61d56c788758b40d",
+        "assertion:tests/browser-content-checks.ts:6462395d17fc6805",
+        "assertion:tests/browser-content-checks.ts:66ceaad8d6bcb3e2",
+        "assertion:tests/browser-content-checks.ts:73c6263ff3c053e5",
+        "assertion:tests/browser-content-checks.ts:74f13dd795cfb429",
+        "assertion:tests/browser-content-checks.ts:7970b6e2f5868e4d",
+        "assertion:tests/browser-content-checks.ts:7f8f7a09687997ab",
+        "assertion:tests/browser-content-checks.ts:8f84e9dc6667a950",
+        "assertion:tests/browser-content-checks.ts:955fb70e0b386035",
+        "assertion:tests/browser-content-checks.ts:9a649964f7c6d5d7",
+        "assertion:tests/browser-content-checks.ts:9bd17920af3e3c83",
+        "assertion:tests/browser-content-checks.ts:9fbc65e915a3afec",
+        "assertion:tests/browser-content-checks.ts:a3a2c6173c6158ea",
+        "assertion:tests/browser-content-checks.ts:aa9ef11807a3e0b7",
+        "assertion:tests/browser-content-checks.ts:b7d906e941d7a11f",
+        "assertion:tests/browser-content-checks.ts:c7912b54699e7374",
+        "assertion:tests/browser-content-checks.ts:ccd73bd8033b8484",
+        "assertion:tests/browser-content-checks.ts:d173a5cbe62a8de3",
+        "assertion:tests/browser-content-checks.ts:d4df2d50a78479d0",
+        "assertion:tests/browser-content-checks.ts:d8f80effa48c6b32",
+        "assertion:tests/browser-content-checks.ts:db6d7904434aa50a",
+        "assertion:tests/browser-content-checks.ts:f55835f6f727910c",
+        "assertion:tests/browser-content-checks.ts:f5f23882fb6226d7",
+        "workload:installed-engine-lifecycle"
+    ],
+    "destination": "tooling/fixtures/installed-engine/index.ts",
+    "reviewedBy": "Codex exact-obligation review under user-authorized consumer retirement",
+    "evidence": "docs/evidence/consumer-retirement.json",
+    "obligations": [
+        {
+            "id": "assertion:tests/browser-content-checks.ts:0a98159c98bf253b",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:0a98159c98bf253b",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"ordinary Town-to-Dungeon transition produces fresh output without another unlock gesture\""
+            },
+            "label": "\"ordinary Town-to-Dungeon transition produces fresh output without another unlock gesture\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:0a98159c98bf253b",
+                "label": "\"ordinary Town-to-Dungeon transition produces fresh output without another unlock gesture\"",
+                "owner": "engine",
+                "observations": ["replacement-plays-new-scope"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:18e3dfc6dab199f0",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:18e3dfc6dab199f0",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"initial production scene activates after image readiness\""
+            },
+            "label": "\"initial production scene activates after image readiness\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:18e3dfc6dab199f0",
+                "label": "\"initial production scene activates after image readiness\"",
+                "owner": "engine",
+                "observations": ["image-upload-ready-before-mount"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:1cd9bd19f2471367",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:1cd9bd19f2471367",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"destination presents distinct external environment atlas pixels\""
+            },
+            "label": "\"destination presents distinct external environment atlas pixels\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:1cd9bd19f2471367",
+                "label": "\"destination presents distinct external environment atlas pixels\"",
+                "owner": "engine",
+                "observations": ["replacement-presents-distinct-external-pixels"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:23ead21b5936f8ee",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:23ead21b5936f8ee",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"pause abandons a ready destination and keeps only mounted ownership\""
+            },
+            "label": "\"pause abandons a ready destination and keeps only mounted ownership\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:23ead21b5936f8ee",
+                "label": "\"pause abandons a ready destination and keeps only mounted ownership\"",
+                "owner": "engine",
+                "observations": ["stop-revokes-ready-candidate-preserves-mounted-claims"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:2c42f37afb9fbe2e",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:2c42f37afb9fbe2e",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"disposal during recovery destroys late replacement and releases all scene ownership\""
+            },
+            "label": "\"disposal during recovery destroys late replacement and releases all scene ownership\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:2c42f37afb9fbe2e",
+                "label": "\"disposal during recovery destroys late replacement and releases all scene ownership\"",
+                "owner": "engine",
+                "observations": ["disposal-destroys-late-device-and-releases-assets"],
+                "tests": [
+                    "tests/content-ownership.test.ts: recovery during preparation preserves simulation and claim ownership through dispose"
+                ],
+                "limits": "Real browser proves disposal of pending acquisition; deterministic recovery-specific test proves mounted-owner release during replacement. Identical consumer browser assertion proves actual late replacement disposal."
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:30ae1f0b25fe05b2",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:30ae1f0b25fe05b2",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"controlled recovery produces no consumer error\""
+            },
+            "label": "\"controlled recovery produces no consumer error\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:30ae1f0b25fe05b2",
+                "label": "\"controlled recovery produces no consumer error\"",
+                "owner": "engine",
+                "observations": ["no-unexpected-diagnostics"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:321f04e51d44bc3b",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:321f04e51d44bc3b",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"failed destination preserves room and exposes deliberate retry\""
+            },
+            "label": "\"failed destination preserves room and exposes deliberate retry\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:321f04e51d44bc3b",
+                "label": "\"failed destination preserves room and exposes deliberate retry\"",
+                "owner": "engine",
+                "observations": [
+                    "destination-failure-rejects-without-partial-mount",
+                    "failed-destination-preserves-running-scene",
+                    "explicit-fresh-retry-waits-for-simulation-commit"
+                ],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:338407840d49cb3b",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:338407840d49cb3b",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"resume advances retained state and resumes the existing music voice\""
+            },
+            "label": "\"resume advances retained state and resumes the existing music voice\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:338407840d49cb3b",
+                "label": "\"resume advances retained state and resumes the existing music voice\"",
+                "owner": "engine",
+                "observations": ["resume-advances-state-with-existing-voice"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:40547c0723c585e3",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:40547c0723c585e3",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"normal focus loss clears held movement while simulation and effect keep running\""
+            },
+            "label": "\"normal focus loss clears held movement while simulation and effect keep running\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:40547c0723c585e3",
+                "label": "\"normal focus loss clears held movement while simulation and effect keep running\"",
+                "owner": "engine",
+                "observations": ["focus-loss-releases-input-without-stopping-simulation"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:43ab1d79a96bd0a8",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:43ab1d79a96bd0a8",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"terminal recovery failure reports an error without frame-driven device retries\""
+            },
+            "label": "\"terminal recovery failure reports an error without frame-driven device retries\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:43ab1d79a96bd0a8",
+                "label": "\"terminal recovery failure reports an error without frame-driven device retries\"",
+                "owner": "engine",
+                "observations": ["failed-recovery-is-terminal-and-reported"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:490d9d601f802e64",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:490d9d601f802e64",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"installed production slice submits through replacement device\""
+            },
+            "label": "\"installed production slice submits through replacement device\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:490d9d601f802e64",
+                "label": "\"installed production slice submits through replacement device\"",
+                "owner": "engine",
+                "observations": ["recovered-frame-submits"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:4a48a22627a7124c",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:4a48a22627a7124c",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"abandoned preparation releases only its own image consumers\""
+            },
+            "label": "\"abandoned preparation releases only its own image consumers\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:4a48a22627a7124c",
+                "label": "\"abandoned preparation releases only its own image consumers\"",
+                "owner": "engine",
+                "observations": ["candidate-release-preserves-survivor"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:5628298cc62de16b",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:5628298cc62de16b",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"corrected initial content retries successfully after cancellation\""
+            },
+            "label": "\"corrected initial content retries successfully after cancellation\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:5628298cc62de16b",
+                "label": "\"corrected initial content retries successfully after cancellation\"",
+                "owner": "engine",
+                "observations": [
+                    "cancelled-image-never-registers",
+                    "ordinary-browser-frame-submits-sprite"
+                ],
+                "tests": [
+                    "tests/content-ownership.test.ts: final upload cancellation releases acquired claims, rejects stale completion and permits explicit retry"
+                ],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:61d56c788758b40d",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:61d56c788758b40d",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"recovery preparation preserves the mounted room\""
+            },
+            "label": "\"recovery preparation preserves the mounted room\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:61d56c788758b40d",
+                "label": "\"recovery preparation preserves the mounted room\"",
+                "owner": "engine",
+                "observations": ["pending-recovery-preserves-mounted-scene"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:6462395d17fc6805",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:6462395d17fc6805",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"exported atlas presents opaque green player texels\""
+            },
+            "label": "\"exported atlas presents opaque green player texels\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:6462395d17fc6805",
+                "label": "\"exported atlas presents opaque green player texels\"",
+                "owner": "engine",
+                "observations": ["external-image-texels-present"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:66ceaad8d6bcb3e2",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:66ceaad8d6bcb3e2",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"corrected destination retry activates at simulation commit\""
+            },
+            "label": "\"corrected destination retry activates at simulation commit\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:66ceaad8d6bcb3e2",
+                "label": "\"corrected destination retry activates at simulation commit\"",
+                "owner": "engine",
+                "observations": [
+                    "explicit-fresh-retry-waits-for-simulation-commit",
+                    "replacement-unmounts-old-owner"
+                ],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:73c6263ff3c053e5",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:73c6263ff3c053e5",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"audio unlock starts one looping room track\""
+            },
+            "label": "\"audio unlock starts one looping room track\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:73c6263ff3c053e5",
+                "label": "\"audio unlock starts one looping room track\"",
+                "owner": "engine",
+                "observations": ["unlocked-voice-loops", "decoded-clip-produces-output"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:74f13dd795cfb429",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:74f13dd795cfb429",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"initial invalid JSON publishes no partial scene and allows retry\""
+            },
+            "label": "\"initial invalid JSON publishes no partial scene and allows retry\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:74f13dd795cfb429",
+                "label": "\"initial invalid JSON publishes no partial scene and allows retry\"",
+                "owner": "engine",
+                "observations": [
+                    "failed-asset-preparation-rejects",
+                    "failed-preparation-releases-claims",
+                    "failed-load-can-explicitly-retry",
+                    "cold-preparation-does-not-mount-or-schedule"
+                ],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:7970b6e2f5868e4d",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:7970b6e2f5868e4d",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"transition prepared during recovery mounts after replacement readiness\""
+            },
+            "label": "\"transition prepared during recovery mounts after replacement readiness\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:7970b6e2f5868e4d",
+                "label": "\"transition prepared during recovery mounts after replacement readiness\"",
+                "owner": "engine",
+                "observations": [
+                    "pending-recovery-preserves-mounted-scene",
+                    "recovered-preparation-waits-for-commit",
+                    "recovered-preparation-mounts-on-commit"
+                ],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:7f8f7a09687997ab",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:7f8f7a09687997ab",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"repeated unlock does not duplicate room music\""
+            },
+            "label": "\"repeated unlock does not duplicate room music\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:7f8f7a09687997ab",
+                "label": "\"repeated unlock does not duplicate room music\"",
+                "owner": "engine",
+                "observations": ["repeated-unlock-preserves-one-voice"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:8f84e9dc6667a950",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:8f84e9dc6667a950",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"delayed image decode prevents initial activation and shows loading\""
+            },
+            "label": "\"delayed image decode prevents initial activation and shows loading\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:8f84e9dc6667a950",
+                "label": "\"delayed image decode prevents initial activation and shows loading\"",
+                "owner": "engine",
+                "observations": ["delayed-image-cannot-publish-or-mount"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:955fb70e0b386035",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:955fb70e0b386035",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"controlled loss does not mutate actor state without a tick\""
+            },
+            "label": "\"controlled loss does not mutate actor state without a tick\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:955fb70e0b386035",
+                "label": "\"controlled loss does not mutate actor state without a tick\"",
+                "owner": "engine",
+                "observations": ["recovery-preserves-simulation"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:9a649964f7c6d5d7",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:9a649964f7c6d5d7",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"cancelled transition during recovery preserves the surviving consumer\""
+            },
+            "label": "\"cancelled transition during recovery preserves the surviving consumer\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:9a649964f7c6d5d7",
+                "label": "\"cancelled transition during recovery preserves the surviving consumer\"",
+                "owner": "engine",
+                "observations": ["recovery-cancellation-preserves-mounted-owner"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:9bd17920af3e3c83",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:9bd17920af3e3c83",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"deliberate retry after pause prepares a fresh destination\""
+            },
+            "label": "\"deliberate retry after pause prepares a fresh destination\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:9bd17920af3e3c83",
+                "label": "\"deliberate retry after pause prepares a fresh destination\"",
+                "owner": "engine",
+                "observations": [
+                    "resume-cannot-mount-revoked-candidate",
+                    "explicit-fresh-retry-waits-for-simulation-commit",
+                    "replacement-unmounts-old-owner"
+                ],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:9fbc65e915a3afec",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:9fbc65e915a3afec",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"active room protects four scene claims and two renderer claims above the three-entry budget\""
+            },
+            "label": "\"active room protects four scene claims and two renderer claims above the three-entry budget\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:9fbc65e915a3afec",
+                "label": "\"active room protects four scene claims and two renderer claims above the three-entry budget\"",
+                "owner": "engine",
+                "observations": ["leased-working-set-protected-from-retention"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:a3a2c6173c6158ea",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:a3a2c6173c6158ea",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"ready destination and surviving room own eight scene claims, three unique images and four image consumers\""
+            },
+            "label": "\"ready destination and surviving room own eight scene claims, three unique images and four image consumers\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:a3a2c6173c6158ea",
+                "label": "\"ready destination and surviving room own eight scene claims, three unique images and four image consumers\"",
+                "owner": "engine",
+                "observations": [
+                    "overlap-counts-distinct-images-and-shared-assets",
+                    "overlapping-candidates-share-upload",
+                    "candidate-release-preserves-survivor"
+                ],
+                "tests": [],
+                "limits": "Engine fixture checks exact ownership for its smaller two-asset scenes (four scene claims, two distinct sources and consumers, shared audio); eight/three/four authored-game counts remain asserted unchanged by consumer."
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:aa9ef11807a3e0b7",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:aa9ef11807a3e0b7",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"explicit pause preserves scene state and suspends audio\""
+            },
+            "label": "\"explicit pause preserves scene state and suspends audio\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:aa9ef11807a3e0b7",
+                "label": "\"explicit pause preserves scene state and suspends audio\"",
+                "owner": "engine",
+                "observations": ["pause-retains-simulation-and-suspends-audio"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:b7d906e941d7a11f",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:b7d906e941d7a11f",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"committed destination reclaims old ownership and replaces music exactly once\""
+            },
+            "label": "\"committed destination reclaims old ownership and replaces music exactly once\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:b7d906e941d7a11f",
+                "label": "\"committed destination reclaims old ownership and replaces music exactly once\"",
+                "owner": "engine",
+                "observations": ["replacement-unmounts-old-owner"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:c7912b54699e7374",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:c7912b54699e7374",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"Installed content: Town music produces a nonzero signal at the destination input\""
+            },
+            "label": "\"Installed content: Town music produces a nonzero signal at the destination input\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:c7912b54699e7374",
+                "label": "\"Installed content: Town music produces a nonzero signal at the destination input\"",
+                "owner": "engine",
+                "observations": ["decoded-clip-produces-output"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:ccd73bd8033b8484",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:ccd73bd8033b8484",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"return transition keeps shared images usable\""
+            },
+            "label": "\"return transition keeps shared images usable\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:ccd73bd8033b8484",
+                "label": "\"return transition keeps shared images usable\"",
+                "owner": "engine",
+                "observations": ["return-transition-presents-shared-image"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:d173a5cbe62a8de3",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:d173a5cbe62a8de3",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"Installed content: Dungeon music produces a nonzero signal at the destination input\""
+            },
+            "label": "\"Installed content: Dungeon music produces a nonzero signal at the destination input\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:d173a5cbe62a8de3",
+                "label": "\"Installed content: Dungeon music produces a nonzero signal at the destination input\"",
+                "owner": "engine",
+                "observations": ["replacement-plays-new-scope"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:d4df2d50a78479d0",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:d4df2d50a78479d0",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"initial cancellation does not activate stale preparation\""
+            },
+            "label": "\"initial cancellation does not activate stale preparation\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:d4df2d50a78479d0",
+                "label": "\"initial cancellation does not activate stale preparation\"",
+                "owner": "engine",
+                "observations": [
+                    "cancelled-preparation-rejects",
+                    "cancelled-image-never-registers",
+                    "late-cancelled-load-disposed-once"
+                ],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:d8f80effa48c6b32",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:d8f80effa48c6b32",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"exported player texels survive recovery\""
+            },
+            "label": "\"exported player texels survive recovery\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:d8f80effa48c6b32",
+                "label": "\"exported player texels survive recovery\"",
+                "owner": "engine",
+                "observations": ["recovered-image-texels-present"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:db6d7904434aa50a",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:db6d7904434aa50a",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"Installed content: exported player texels survive controlled recovery\""
+            },
+            "label": "\"Installed content: exported player texels survive controlled recovery\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:db6d7904434aa50a",
+                "label": "\"Installed content: exported player texels survive controlled recovery\"",
+                "owner": "engine",
+                "observations": ["recovered-image-texels-present"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:f55835f6f727910c",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:f55835f6f727910c",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"surviving room remains playable during failure\""
+            },
+            "label": "\"surviving room remains playable during failure\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:f55835f6f727910c",
+                "label": "\"surviving room remains playable during failure\"",
+                "owner": "engine",
+                "observations": ["failed-destination-preserves-running-scene"],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:f5f23882fb6226d7",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:f5f23882fb6226d7",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"resume cannot consume the destination revoked by stop\""
+            },
+            "label": "\"resume cannot consume the destination revoked by stop\"",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:f5f23882fb6226d7",
+                "label": "\"resume cannot consume the destination revoked by stop\"",
+                "owner": "engine",
+                "observations": [
+                    "resume-cannot-mount-revoked-candidate",
+                    "revoked-candidate-reports-exact-diagnostic"
+                ],
+                "tests": [],
+                "limits": null
+            }
+        },
+        {
+            "id": "workload:installed-engine-lifecycle",
+            "source": {
+                "id": "workload:installed-engine-lifecycle",
+                "kind": "workload",
+                "path": "tests/browser-content-checks.ts",
+                "label": "Installed image readiness, cancellation/retry, ownership retention, audio unlock/output/transitions, device recovery and disposal; minimal engine fixture must preserve generic coverage."
+            },
+            "label": "Installed image readiness, cancellation/retry, ownership retention, audio unlock/output/transitions, device recovery and disposal; minimal engine fixture must preserve generic coverage.",
+            "destination": "tooling/fixtures/installed-engine/index.ts",
+            "proof": "Every mixed assertion is enumerated in mixed[] with exact named passing observations/tests; identical consumer checks also passed.",
+            "mixed": null
+        }
+    ]
+}

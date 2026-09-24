@@ -1,0 +1,182 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "migration-replacement-proof",
+    "schemaVersion": 1,
+    "runId": "consumer-retirement-2026-09-24-3637e109caad",
+    "status": "passed",
+    "coverageIds": [
+        "file:tests/browser-progression-checks.ts",
+        "assertion:tests/browser-progression-checks.ts:09f154e887b0f0b1",
+        "assertion:tests/browser-progression-checks.ts:133953d902c12465",
+        "assertion:tests/browser-progression-checks.ts:3c5692c040825559",
+        "assertion:tests/browser-progression-checks.ts:5165921a695b0d7a",
+        "assertion:tests/browser-progression-checks.ts:5c34114d648c3773",
+        "assertion:tests/browser-progression-checks.ts:76091f93d807f029",
+        "assertion:tests/browser-progression-checks.ts:7d719c4460772a54",
+        "assertion:tests/browser-progression-checks.ts:9278295ca5ef9336",
+        "assertion:tests/browser-progression-checks.ts:a1014a302817a43a",
+        "assertion:tests/browser-progression-checks.ts:f22f4d75d0271ae3",
+        "workload:consumer-progression-races"
+    ],
+    "destination": "consumer:verification/browser-progression-checks.ts",
+    "reviewedBy": "Codex exact-obligation review under user-authorized consumer retirement",
+    "evidence": "docs/evidence/consumer-retirement.json",
+    "obligations": [
+        {
+            "id": "file:tests/browser-progression-checks.ts",
+            "source": {
+                "id": "file:tests/browser-progression-checks.ts",
+                "kind": "file",
+                "path": "tests/browser-progression-checks.ts",
+                "label": "tests/browser-progression-checks.ts"
+            },
+            "label": "tests/browser-progression-checks.ts",
+            "destination": "consumer:verification/browser-progression-checks.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:09f154e887b0f0b1",
+            "source": {
+                "id": "assertion:tests/browser-progression-checks.ts:09f154e887b0f0b1",
+                "kind": "assertion",
+                "path": "tests/browser-progression-checks.ts",
+                "label": "\"checkpoint and completion commit and save despite failed outgoing private mount\""
+            },
+            "label": "\"checkpoint and completion commit and save despite failed outgoing private mount\"",
+            "destination": "consumer:verification/browser-progression-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-progression-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:133953d902c12465",
+            "source": {
+                "id": "assertion:tests/browser-progression-checks.ts:133953d902c12465",
+                "kind": "assertion",
+                "path": "tests/browser-progression-checks.ts",
+                "label": "\"corrected retry mounts Town before completion dispatch\""
+            },
+            "label": "\"corrected retry mounts Town before completion dispatch\"",
+            "destination": "consumer:verification/browser-progression-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-progression-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:3c5692c040825559",
+            "source": {
+                "id": "assertion:tests/browser-progression-checks.ts:3c5692c040825559",
+                "kind": "assertion",
+                "path": "tests/browser-progression-checks.ts",
+                "label": "\"failed JSON destination preserves already committed collection and mounted ownership\""
+            },
+            "label": "\"failed JSON destination preserves already committed collection and mounted ownership\"",
+            "destination": "consumer:verification/browser-progression-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-progression-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:5165921a695b0d7a",
+            "source": {
+                "id": "assertion:tests/browser-progression-checks.ts:5165921a695b0d7a",
+                "kind": "assertion",
+                "path": "tests/browser-progression-checks.ts",
+                "label": "`cancelled destination ignores late JSON ${fail ? \"rejection\" : \"success\"} and retains progress/audio`"
+            },
+            "label": "`cancelled destination ignores late JSON ${fail ? \"rejection\" : \"success\"} and retains progress/audio`",
+            "destination": "consumer:verification/browser-progression-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-progression-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:5c34114d648c3773",
+            "source": {
+                "id": "assertion:tests/browser-progression-checks.ts:5c34114d648c3773",
+                "kind": "assertion",
+                "path": "tests/browser-progression-checks.ts",
+                "label": "`New Game ignores old late JSON ${fail ? \"rejection\" : \"success\"} without overwriting fresh status, save or ownership`"
+            },
+            "label": "`New Game ignores old late JSON ${fail ? \"rejection\" : \"success\"} without overwriting fresh status, save or ownership`",
+            "destination": "consumer:verification/browser-progression-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-progression-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:76091f93d807f029",
+            "source": {
+                "id": "assertion:tests/browser-progression-checks.ts:76091f93d807f029",
+                "kind": "assertion",
+                "path": "tests/browser-progression-checks.ts",
+                "label": "\"deliberate retry retains one reward, one scene and one playing voice\""
+            },
+            "label": "\"deliberate retry retains one reward, one scene and one playing voice\"",
+            "destination": "consumer:verification/browser-progression-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-progression-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:7d719c4460772a54",
+            "source": {
+                "id": "assertion:tests/browser-progression-checks.ts:7d719c4460772a54",
+                "kind": "assertion",
+                "path": "tests/browser-progression-checks.ts",
+                "label": "`progression races: ${label}`"
+            },
+            "label": "`progression races: ${label}`",
+            "destination": "consumer:verification/browser-progression-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-progression-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:9278295ca5ef9336",
+            "source": {
+                "id": "assertion:tests/browser-progression-checks.ts:9278295ca5ef9336",
+                "kind": "assertion",
+                "path": "tests/browser-progression-checks.ts",
+                "label": "\"failed mount leaves movement usable and refreshes committed item presentation\""
+            },
+            "label": "\"failed mount leaves movement usable and refreshes committed item presentation\"",
+            "destination": "consumer:verification/browser-progression-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-progression-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:a1014a302817a43a",
+            "source": {
+                "id": "assertion:tests/browser-progression-checks.ts:a1014a302817a43a",
+                "kind": "assertion",
+                "path": "tests/browser-progression-checks.ts",
+                "label": "\"authored player is one tick outside relic contact\""
+            },
+            "label": "\"authored player is one tick outside relic contact\"",
+            "destination": "consumer:verification/browser-progression-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-progression-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-progression-checks.ts:f22f4d75d0271ae3",
+            "source": {
+                "id": "assertion:tests/browser-progression-checks.ts:f22f4d75d0271ae3",
+                "kind": "assertion",
+                "path": "tests/browser-progression-checks.ts",
+                "label": "\"collection commits before failed private Town mount; old scene, claims and one voice survive\""
+            },
+            "label": "\"collection commits before failed private Town mount; old scene, claims and one voice survive\"",
+            "destination": "consumer:verification/browser-progression-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-progression-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "workload:consumer-progression-races",
+            "source": {
+                "id": "workload:consumer-progression-races",
+                "kind": "workload",
+                "path": "tests/browser-progression-checks.ts",
+                "label": "Relic collection versus private mount failure, retry failure, late preparation and checkpoint rollback."
+            },
+            "label": "Relic collection versus private mount failure, retry failure, late preparation and checkpoint rollback.",
+            "destination": "consumer:verification/browser-progression-checks.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        }
+    ]
+}

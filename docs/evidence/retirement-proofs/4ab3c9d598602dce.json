@@ -1,0 +1,288 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "migration-replacement-proof",
+    "schemaVersion": 1,
+    "runId": "consumer-retirement-2026-09-24-4ab3c9d59860",
+    "status": "passed",
+    "coverageIds": [
+        "assertion:tests/browser-content-checks.ts:186ccab7d0d6301a",
+        "assertion:tests/browser-content-checks.ts:204c54a136ca3d5d",
+        "assertion:tests/browser-content-checks.ts:2eaa093ca6e87646",
+        "assertion:tests/browser-content-checks.ts:37b7a077bacf3b76",
+        "assertion:tests/browser-content-checks.ts:3aa9a20572e3a9b0",
+        "assertion:tests/browser-content-checks.ts:3c340ae23956f2e3",
+        "assertion:tests/browser-content-checks.ts:52d092191519544e",
+        "assertion:tests/browser-content-checks.ts:5a2eeaae142b5f82",
+        "assertion:tests/browser-content-checks.ts:72dc0e7ddae70f52",
+        "assertion:tests/browser-content-checks.ts:b4ce2ac1823e4155",
+        "assertion:tests/browser-content-checks.ts:b96aeb8b974569c2",
+        "assertion:tests/browser-content-checks.ts:bab9403f5b64024b",
+        "assertion:tests/browser-content-checks.ts:c8a5b6e088dd6b2c",
+        "assertion:tests/browser-content-checks.ts:dae9f46b24d2b450",
+        "assertion:tests/browser-content-checks.ts:eb821abf8d6c5bee",
+        "assertion:tests/browser-content-checks.ts:f7c942ca2e03c392",
+        "assertion:tests/browser-content-checks.ts:ff0aa9a91f5f462a",
+        "workload:consumer-checkpoint",
+        "workload:consumer-controls"
+    ],
+    "destination": "consumer:verification/browser-content-checks.ts",
+    "reviewedBy": "Codex exact-obligation review under user-authorized consumer retirement",
+    "evidence": "docs/evidence/consumer-retirement.json",
+    "obligations": [
+        {
+            "id": "assertion:tests/browser-content-checks.ts:186ccab7d0d6301a",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:186ccab7d0d6301a",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "`retry cycle ${cycle}: restore commits before fresh Town setup and resets transients`"
+            },
+            "label": "`retry cycle ${cycle}: restore commits before fresh Town setup and resets transients`",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:204c54a136ca3d5d",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:204c54a136ca3d5d",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"failed checkpoint preparation retains dead facts, four claims and deliberate retry\""
+            },
+            "label": "\"failed checkpoint preparation retains dead facts, four claims and deliberate retry\"",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:2eaa093ca6e87646",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:2eaa093ca6e87646",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"production rooms contain a player and three independently animated companions\""
+            },
+            "label": "\"production rooms contain a player and three independently animated companions\"",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:37b7a077bacf3b76",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:37b7a077bacf3b76",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "`Installed content: retry cycle ${cycle}: fresh Town music has nonzero destination-input signal (not a listening check)`"
+            },
+            "label": "`Installed content: retry cycle ${cycle}: fresh Town music has nonzero destination-input signal (not a listening check)`",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:3aa9a20572e3a9b0",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:3aa9a20572e3a9b0",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"dead player presents opaque red feedback\""
+            },
+            "label": "\"dead player presents opaque red feedback\"",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:3c340ae23956f2e3",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:3c340ae23956f2e3",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"non-loop companion completes in production simulation\""
+            },
+            "label": "\"non-loop companion completes in production simulation\"",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:52d092191519544e",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:52d092191519544e",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"cancelled ready checkpoint releases candidate and keeps the dead owner blocked\""
+            },
+            "label": "\"cancelled ready checkpoint releases candidate and keeps the dead owner blocked\"",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:5a2eeaae142b5f82",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:5a2eeaae142b5f82",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"completed consumer exposes required session, checkpoint and persistence controls\""
+            },
+            "label": "\"completed consumer exposes required session, checkpoint and persistence controls\"",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:72dc0e7ddae70f52",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:72dc0e7ddae70f52",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "`retry cycle ${cycle}: visible death and distinct actionable checkpoint control`"
+            },
+            "label": "`retry cycle ${cycle}: visible death and distinct actionable checkpoint control`",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:b4ce2ac1823e4155",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:b4ce2ac1823e4155",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "`retry cycle ${cycle}: departing claims and audio voices release exactly once`"
+            },
+            "label": "`retry cycle ${cycle}: departing claims and audio voices release exactly once`",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:b96aeb8b974569c2",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:b96aeb8b974569c2",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "`retry cycle ${cycle}: dead movement, travel, actors and effects remain blocked`"
+            },
+            "label": "`retry cycle ${cycle}: dead movement, travel, actors and effects remain blocked`",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:bab9403f5b64024b",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:bab9403f5b64024b",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"focused movement advances simulation-owned position\""
+            },
+            "label": "\"focused movement advances simulation-owned position\"",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:c8a5b6e088dd6b2c",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:c8a5b6e088dd6b2c",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"consumer wall collision stops the player\""
+            },
+            "label": "\"consumer wall collision stops the player\"",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:dae9f46b24d2b450",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:dae9f46b24d2b450",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"authored relic is collected before checkpoint rollback\""
+            },
+            "label": "\"authored relic is collected before checkpoint rollback\"",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:eb821abf8d6c5bee",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:eb821abf8d6c5bee",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "`retry cycle ${cycle}: rolled-back relic reconstructs`"
+            },
+            "label": "`retry cycle ${cycle}: rolled-back relic reconstructs`",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:f7c942ca2e03c392",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:f7c942ca2e03c392",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "\"shared animation has independent actor playback\""
+            },
+            "label": "\"shared animation has independent actor playback\"",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": {
+                "id": "assertion:tests/browser-content-checks.ts:f7c942ca2e03c392",
+                "label": "\"shared animation has independent actor playback\"",
+                "owner": "consumer",
+                "tests": [
+                    "tests/content.test.ts: animation boundaries, independent actors, exact loops and terminal completion"
+                ],
+                "reason": "Ownership corrected by source inspection: src/animation.ts in the consumer owns Playback/advance; engine has no animation clock API. Identical browser assertion plus consumer tests/content.test.ts: animation boundaries, independent actors, exact loops and terminal completion passed. See docs/evidence/consumer-retirement.json."
+            }
+        },
+        {
+            "id": "assertion:tests/browser-content-checks.ts:ff0aa9a91f5f462a",
+            "source": {
+                "id": "assertion:tests/browser-content-checks.ts:ff0aa9a91f5f462a",
+                "kind": "assertion",
+                "path": "tests/browser-content-checks.ts",
+                "label": "`retry cycle ${cycle}: duplicate requests retain only one candidate`"
+            },
+            "label": "`retry cycle ${cycle}: duplicate requests retain only one candidate`",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "Identical source assertion in consumer:verification/browser-content-checks.ts executed at root and nested; emitted dynamic cycle/success/failure labels reviewed against retained observations.",
+            "mixed": null
+        },
+        {
+            "id": "workload:consumer-checkpoint",
+            "source": {
+                "id": "workload:consumer-checkpoint",
+                "kind": "workload",
+                "path": "tests/browser-content-checks.ts",
+                "label": "Death, relic facts, duplicate/cancelled checkpoint requests, failed preparation, rollback, fresh scene/audio reconstruction and blocked dead controls."
+            },
+            "label": "Death, relic facts, duplicate/cancelled checkpoint requests, failed preparation, rollback, fresh scene/audio reconstruction and blocked dead controls.",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        },
+        {
+            "id": "workload:consumer-controls",
+            "source": {
+                "id": "workload:consumer-controls",
+                "kind": "workload",
+                "path": "tests/browser-content-checks.ts",
+                "label": "Authored actors, animation playback, movement/focus, wall collision, consumer error/UI behavior; consumer-owned replacements required."
+            },
+            "label": "Authored actors, animation playback, movement/focus, wall collision, consumer error/UI behavior; consumer-owned replacements required.",
+            "destination": "consumer:verification/browser-content-checks.ts",
+            "proof": "File/command retirement includes every assertion and workload at this source path, enumerated separately in this record. Replacement uses fresh package preparation, generic explicit compatibility, retained shared browser/cleanup and separate engine/consumer measurement owners; no source-only assertion-count substitution.",
+            "mixed": null
+        }
+    ]
+}
