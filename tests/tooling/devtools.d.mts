@@ -2,7 +2,8 @@
 export interface DevTools {
     send(method: string, params?: object, timeoutMs?: number): Promise<unknown>;
     evaluate<T>(expression: string, gesture?: boolean): Promise<T>;
-    on(method: string, handler: (value: unknown) => void): void;
+    on(method: string, handler: (value: unknown) => void): () => void;
+    once(method: string, timeoutMs?: number): Promise<unknown>;
     close(): Promise<void>;
 }
 export class TransportError extends Error {}
@@ -18,5 +19,6 @@ export function connectDevTools(
         openTimeoutMs?: number;
         closeTimeoutMs?: number;
         userGesture?: boolean;
+        onEvent?: (message: unknown) => void;
     },
 ): Promise<DevTools>;

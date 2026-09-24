@@ -1,3 +1,4 @@
+import { DevToolsSocket } from "../../tooling/core/browser/socket.ts";
 export class TransportError extends Error {}
 export class ProtocolError extends Error {
     constructor(method, detail) {
@@ -15,7 +16,7 @@ export const isNavigationError = (error) =>
 export function connectDevTools(
     url,
     {
-        socketFactory = (address) => new WebSocket(address),
+        socketFactory = (address) => new DevToolsSocket(address),
         openTimeoutMs = 10_000,
         requestTimeoutMs = 30_000,
         closeTimeoutMs = 5_000,
@@ -125,6 +126,30 @@ export function connectDevTools(
                 const listeners = subscriptions.get(method) ?? new Set();
                 listeners.add(handler);
                 subscriptions.set(method, listeners);
+                return () => listeners.delete(handler);
+            },
+            once(method, timeoutMs = requestTimeoutMs) {
+                return new Promise((resolveEvent, rejectEvent) => {
+                    const id = ++nextId;
+                    const off = client.on(method, (value) => {
+                        clock.clearTimeout(timer);
+                        pending.delete(id);
+                        off();
+                        resolveEvent(value);
+                    });
+                    const timer = clock.setTimeout(() => {
+                        off();
+                        pending.delete(id);
+                        rejectEvent(new Error(`DevTools event ${method} timed out`));
+                    }, timeoutMs);
+                    pending.set(id, {
+                        timer,
+                        reject: (error) => {
+                            off();
+                            rejectEvent(error);
+                        },
+                    });
+                });
             },
             close() {
                 finish(new TransportError("DevTools connection explicitly closed"));
@@ -137,8 +162,12 @@ export function connectDevTools(
                 clock.clearTimeout(openingTimer);
                 resolve(client);
             },
-            error() {
-                finish(new TransportError("DevTools socket failed"));
+            error(event) {
+                finish(
+                    new TransportError(
+                        `DevTools socket failed${event.data ? `: ${event.data}` : ""}`,
+                    ),
+                );
             },
             close() {
                 finish(new TransportError("DevTools socket disconnected"));

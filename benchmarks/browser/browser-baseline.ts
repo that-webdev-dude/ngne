@@ -1,5 +1,7 @@
-import { execSync, spawn, spawnSync, type ChildProcess } from "node:child_process";
-import { createHash, randomBytes } from "node:crypto";
+// BrowserSession supplies "--remote-debugging-port" and "--user-data-dir"; these launch options remain supported.
+import { BrowserSession, browserExecutable } from "../../tooling/core/browser/session.js";
+import { execSync, type ChildProcess } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
     mkdirSync,
     mkdtempSync,
@@ -8,7 +10,6 @@ import {
     statSync,
     writeFileSync,
 } from "node:fs";
-import { createConnection } from "node:net";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 
@@ -38,11 +39,11 @@ import { join, relative } from "node:path";
  * - NGNE_SNAPSHOTS=1: heap snapshots after the forced GC at sample start and end.
  * - NGNE_TRACE=1: browser trace over the sample window (GPU process, frames and V8 GC).
  * - NGNE_RETAINED_EVERY_SECONDS=S: forced-GC retained-heap checkpoints during the sample.
- * - NGNE_ARTIFACT_DIR: directory for profiles, snapshots and traces (default: the profile directory).
+ * - NGNE_ARTIFACT_DIR: directory for profiles, snapshots and traces (default: a retained temporary artifact directory).
+ * - NGNE_BROWSER_HEADLESS=1: explicit headless capability smoke; never a visible performance baseline.
  * Every artifact must parse as JSON with a non-zero node or event count, or the run aborts.
  */
-const BROWSER =
-        process.env.NGNE_BROWSER ?? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+const BROWSER = browserExecutable(),
     URL_UNDER_TEST = process.env.NGNE_URL ?? "http://127.0.0.1:4173/",
     WARMUP_SECONDS = Number(process.env.NGNE_WARMUP_SECONDS ?? 10),
     DURATION_SECONDS = Number(process.env.NGNE_DURATION_SECONDS ?? 60),
@@ -238,9 +239,17 @@ interface Artifact {
     sha256: string;
     count: number;
 }
-const profile = mkdtempSync(join(tmpdir(), "ngne-baseline-"));
-const artifactDir = process.env.NGNE_ARTIFACT_DIR ?? profile;
+const artifactDir =
+    process.env.NGNE_ARTIFACT_DIR ?? mkdtempSync(join(tmpdir(), "ngne-baseline-artifacts-"));
 mkdirSync(artifactDir, { recursive: true });
+const session = new BrowserSession();
+const browserFlags = [
+    "--no-first-run",
+    "--no-default-browser-check",
+    "--enable-precise-memory-info",
+    "--window-size=1280,900",
+    ...(process.env.NGNE_BROWSER_HEADLESS === "1" ? ["--headless=new"] : []),
+];
 let preview: ChildProcess | undefined;
 let browser: ChildProcess | undefined;
 let page: Page | undefined;
@@ -248,20 +257,14 @@ let output: Record<string, unknown> | undefined;
 try {
     if (SERVE_DIR) preview = await startPreview(SERVE_DIR);
     const servedBuild = EXPECTED_BUILD ? await checkServedBuild(EXPECTED_BUILD) : undefined;
-    browser = spawn(
-        BROWSER,
-        [
-            `--remote-debugging-port=${DEBUG_PORT}`,
-            `--user-data-dir=${profile}`,
-            "--no-first-run",
-            "--no-default-browser-check",
-            "--enable-precise-memory-info",
-            "--window-size=1280,900",
-            "about:blank",
-        ],
-        { stdio: "ignore" },
-    );
-    page = await connect(await pageTarget());
+    page = await session.start({
+        executable: BROWSER,
+        port: DEBUG_PORT,
+        flags: browserFlags,
+        transport: { requestTimeoutMs: CDP_TIMEOUT_MS },
+        log: join(artifactDir, "browser.log"),
+    });
+    browser = session.browser!;
     await page.send("Page.enable");
     await page.send("Runtime.enable");
     await page.send("HeapProfiler.enable");
@@ -407,31 +410,54 @@ try {
         trace: traceEvidence,
         run: {
             cdpPort: DEBUG_PORT,
-            profileDir: profile,
+            browserFlags,
+            profileDir: session.profile,
             artifactDir,
             browserPid: browser.pid,
             previewPid: preview?.pid,
             servedBuild,
         },
     };
+} catch (error) {
+    const failures: unknown[] = [error];
+    try {
+        await session.screenshot(join(artifactDir, "failure.png"));
+    } catch (diagnostic) {
+        failures.push(diagnostic);
+    }
+    try {
+        await session.stop();
+    } catch (cleanup) {
+        failures.push(cleanup);
+    }
+    writeFileSync(
+        join(artifactDir, "failure.json"),
+        JSON.stringify({ failures: failures.map(String), cleanup: session.records }, null, 2),
+    );
+    throw new AggregateError(failures, "Browser benchmark failed");
 } finally {
-    page?.close();
-    for (const child of [browser, preview])
-        if (child?.pid)
-            spawnSync("taskkill", ["/pid", String(child.pid), "/T", "/F"], { stdio: "ignore" });
+    if (output) {
+        try {
+            await session.stop();
+        } catch (error) {
+            writeFileSync(
+                join(artifactDir, "failure.json"),
+                JSON.stringify(
+                    { failures: [String(error)], cleanup: session.records, observations: output },
+                    null,
+                    2,
+                ),
+            );
+            throw error;
+        }
+    }
 }
 if (output) {
-    await sleep(1500);
-    const surviving = [browser?.pid, preview?.pid].filter(
-        (pid): pid is number => pid !== undefined && isAlive(pid),
-    );
-    (output.run as Record<string, unknown>).survivingOwnedProcesses = surviving;
-    if (surviving.length) {
-        console.error(`Owned processes survived the run: ${surviving.join(", ")}`);
-        process.exitCode = 1;
-    }
+    (output.run as Record<string, unknown>).survivingOwnedProcesses = [];
+    (output.run as Record<string, unknown>).cleanup = session.records;
     console.log(JSON.stringify(output, null, 2));
 }
+
 interface SamplingProfile {
     head: SamplingNode;
 }
@@ -631,7 +657,7 @@ function assertBackend(backend: Backend, expected: string): void {
 }
 async function startPreview(root: string): Promise<ChildProcess> {
     const origin = new URL(URL_UNDER_TEST);
-    const child = spawn(
+    const { child, owner } = session.ownProcess(
         process.execPath,
         [
             join(root, "node_modules/vite/bin/vite.js"),
@@ -644,12 +670,14 @@ async function startPreview(root: string): Promise<ChildProcess> {
             "--outDir",
             SERVE_OUT_DIR,
         ],
-        { cwd: root, stdio: ["ignore", "pipe", "pipe"] },
+        "preview",
+        { cwd: root },
     );
     let log = "";
     child.stdout?.on("data", (chunk) => (log += chunk));
     child.stderr?.on("data", (chunk) => (log += chunk));
     for (let attempt = 0; attempt < 100; attempt++) {
+        owner.check();
         if (child.exitCode !== null) throw new Error(`Preview exited ${child.exitCode}: ${log}`);
         // Vite colours its banner; strip ANSI escapes before matching the bound address.
         const plain = log.replace(/\x1b\[[0-9;]*m/g, "");
@@ -697,16 +725,17 @@ async function takeSnapshot(page: Page, label: string): Promise<Artifact> {
     if (!snapshot.snapshot.node_count) throw new Error(`Heap snapshot has no nodes: ${path}`);
     return { path, bytes: text.length, sha256: sha256(text), count: snapshot.snapshot.node_count };
 }
+function browserSessionConnection() {
+    return session.browserConnection();
+}
 async function startTrace() {
-    const version = (await (await fetch(`http://127.0.0.1:${DEBUG_PORT}/json/version`)).json()) as {
-        webSocketDebuggerUrl: string;
-    };
-    const session = await connect(version.webSocketDebuggerUrl);
+    const session = await browserSessionConnection();
     const { categories } = (await session.send("Tracing.getCategories")) as {
         categories: string[];
     };
     const included = TRACE_CATEGORIES.filter((category) => categories.includes(category));
     const complete = session.once("Tracing.tracingComplete");
+    complete.catch(() => {});
     await session.send("Tracing.start", {
         transferMode: "ReturnAsStream",
         traceConfig: { recordMode: "recordAsMuchAsPossible", includedCategories: included },
@@ -732,7 +761,7 @@ async function stopTrace(trace: Awaited<ReturnType<typeof startTrace>>) {
         if (chunk.eof) break;
     }
     await trace.session.send("IO.close", { handle: stream });
-    trace.session.close();
+    await trace.session.close();
     const text = chunks.join("");
     const path = join(artifactDir, "trace.json");
     writeFileSync(path, text);
@@ -747,204 +776,6 @@ async function stopTrace(trace: Awaited<ReturnType<typeof startTrace>>) {
         categories: trace.included,
         fireAnimationFrames: events.filter((event) => event.name === "FireAnimationFrame").length,
         label: "GPU-process CPU time; not GPU execution time",
-    };
-}
-async function pageTarget(): Promise<string> {
-    let targets: { type: string; webSocketDebuggerUrl: string }[] = [];
-    for (let attempt = 0; attempt < 50 && !targets.length; attempt++) {
-        await sleep(200);
-        try {
-            const response = await fetch(`http://127.0.0.1:${DEBUG_PORT}/json/list`);
-            targets = ((await response.json()) as typeof targets).filter((t) => t.type === "page");
-        } catch {
-            // The browser is still starting; keep polling.
-        }
-    }
-    if (!targets.length) throw new Error("No debuggable page target found");
-    return targets[0].webSocketDebuggerUrl;
-}
-async function connect(url: string): Promise<Page> {
-    const pending = new Map<
-        number,
-        { resolve(value: unknown): void; reject(error: Error): void }
-    >();
-    const listeners = new Map<string, Set<(params: unknown) => void>>();
-    let id = 0;
-    const socket = await openDevToolsSocket(
-        url,
-        (text) => {
-            const message = JSON.parse(text);
-            if (message.id === undefined) {
-                for (const handler of listeners.get(message.method) ?? []) handler(message.params);
-                return;
-            }
-            const waiter = pending.get(message.id);
-            if (!waiter) return;
-            pending.delete(message.id);
-            if (message.error) waiter.reject(new Error(message.error.message));
-            else waiter.resolve(message.result);
-        },
-        (reason) => {
-            for (const waiter of pending.values())
-                waiter.reject(new Error(`DevTools socket closed: ${reason}`));
-            pending.clear();
-        },
-    );
-    const page: Page = {
-        // A stalled reply fails the run instead of hanging it.
-        send: (method, params = {}) =>
-            new Promise((resolve, reject) => {
-                const callId = ++id;
-                const timer = setTimeout(() => {
-                    pending.delete(callId);
-                    reject(
-                        new Error(`DevTools call ${method} timed out after ${CDP_TIMEOUT_MS} ms`),
-                    );
-                }, CDP_TIMEOUT_MS);
-                pending.set(callId, {
-                    resolve: (value) => {
-                        clearTimeout(timer);
-                        resolve(value);
-                    },
-                    reject: (error) => {
-                        clearTimeout(timer);
-                        reject(error);
-                    },
-                });
-                socket.send(JSON.stringify({ id: callId, method, params }));
-            }),
-        evaluate: async <T>(expression: string) => {
-            const result = (await page.send("Runtime.evaluate", {
-                expression,
-                returnByValue: true,
-                awaitPromise: true,
-            })) as {
-                result: { value: T };
-                exceptionDetails?: { text: string; exception?: { description?: string } };
-            };
-            if (result.exceptionDetails)
-                throw new Error(
-                    result.exceptionDetails.exception?.description ?? result.exceptionDetails.text,
-                );
-            return result.result.value;
-        },
-        on: (event, handler) => {
-            const handlers = listeners.get(event) ?? new Set();
-            handlers.add(handler);
-            listeners.set(event, handlers);
-            return () => handlers.delete(handler);
-        },
-        once: (event) =>
-            new Promise((resolve) => {
-                const off = page.on(event, (params) => {
-                    off();
-                    resolve(params);
-                });
-            }),
-        close: () => socket.close(),
-    };
-    return page;
-}
-/**
- * Minimal RFC 6455 client over node:net: masked text frames out, unmasked (possibly fragmented)
- * frames in, no extensions. Node 24's built-in WebSocket dropped the connection on a 4.26 MB
- * HeapProfiler.stopSampling reply that this client receives intact (NGNE-12 phase 1).
- * Replies must be valid UTF-8; anything else closes the socket and fails pending calls.
- */
-async function openDevToolsSocket(
-    url: string,
-    onText: (text: string) => void,
-    onClose: (reason: string) => void,
-): Promise<{ send(text: string): void; close(): void }> {
-    const { hostname, port, pathname } = new URL(url);
-    const socket = createConnection({ host: hostname, port: Number(port) });
-    const decoder = new TextDecoder("utf-8", { fatal: true });
-    let buffer = Buffer.alloc(0);
-    let fragments: Buffer[] = [];
-    let closed = false;
-    const close = (reason: string) => {
-        if (closed) return;
-        closed = true;
-        socket.destroy();
-        onClose(reason);
-    };
-    await new Promise<void>((resolve, reject) => {
-        let upgraded = false;
-        socket.on("error", (error) => (upgraded ? close(error.message) : reject(error)));
-        socket.on("close", () => close("connection closed"));
-        socket.once("connect", () =>
-            socket.write(
-                `GET ${pathname} HTTP/1.1\r\nHost: ${hostname}:${port}\r\nUpgrade: websocket\r\n` +
-                    `Connection: Upgrade\r\nSec-WebSocket-Key: ${randomBytes(16).toString("base64")}\r\n` +
-                    "Sec-WebSocket-Version: 13\r\n\r\n",
-            ),
-        );
-        socket.on("data", (data: Buffer) => {
-            buffer = Buffer.concat([buffer, data]);
-            if (!upgraded) {
-                const headerEnd = buffer.indexOf("\r\n\r\n");
-                if (headerEnd < 0) return;
-                const head = buffer.subarray(0, headerEnd).toString();
-                if (!head.startsWith("HTTP/1.1 101"))
-                    return reject(new Error(`DevTools upgrade failed: ${head}`));
-                upgraded = true;
-                buffer = buffer.subarray(headerEnd + 4);
-                resolve();
-            }
-            for (;;) {
-                if (buffer.length < 2) return;
-                const isFinal = (buffer[0] & 0x80) !== 0;
-                const opcode = buffer[0] & 0x0f;
-                let length = buffer[1] & 0x7f;
-                let offset = 2;
-                if (length === 126) {
-                    if (buffer.length < 4) return;
-                    length = buffer.readUInt16BE(2);
-                    offset = 4;
-                } else if (length === 127) {
-                    if (buffer.length < 10) return;
-                    length = Number(buffer.readBigUInt64BE(2));
-                    offset = 10;
-                }
-                if (buffer.length < offset + length) return;
-                const payload = Buffer.from(buffer.subarray(offset, offset + length));
-                buffer = buffer.subarray(offset + length);
-                if (opcode === 0x8) return close("close frame");
-                if (opcode === 0x9 || opcode === 0xa) continue;
-                fragments.push(payload);
-                if (!isFinal) continue;
-                const message = Buffer.concat(fragments);
-                fragments = [];
-                let text: string;
-                try {
-                    text = decoder.decode(message);
-                } catch {
-                    return close(`invalid UTF-8 in a ${message.length}-byte message`);
-                }
-                onText(text);
-            }
-        });
-    });
-    return {
-        send(text) {
-            if (closed) throw new Error("DevTools socket is closed");
-            const payload = Buffer.from(text);
-            const mask = randomBytes(4);
-            let header: Buffer;
-            if (payload.length < 126) header = Buffer.from([0x81, 0x80 | payload.length]);
-            else if (payload.length < 65536) {
-                header = Buffer.from([0x81, 0xfe, 0, 0]);
-                header.writeUInt16BE(payload.length, 2);
-            } else {
-                header = Buffer.alloc(10);
-                header[0] = 0x81;
-                header[1] = 0xff;
-                header.writeBigUInt64BE(BigInt(payload.length), 2);
-            }
-            for (let i = 0; i < payload.length; i++) payload[i] ^= mask[i % 4];
-            socket.write(Buffer.concat([header, mask, payload]));
-        },
-        close: () => close("closed by driver"),
     };
 }
 async function waitFor(
@@ -989,10 +820,6 @@ function listFiles(directory: string): string[] {
 }
 function sha256(data: string | Buffer): string {
     return createHash("sha256").update(data).digest("hex");
-}
-function isAlive(pid: number): boolean {
-    const result = spawnSync("tasklist", ["/FI", `PID eq ${pid}`, "/NH"], { encoding: "utf8" });
-    return new RegExp(`\\b${pid}\\b`).test(result.stdout);
 }
 function droppedTicks(status: string): number {
     return Number(/(\d+) TICKS DROPPED/.exec(status)?.[1] ?? (/^\d+$/.test(status) ? status : 0));

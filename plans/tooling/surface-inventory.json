@@ -3160,6 +3160,18 @@
             "label": "- uses: actions/setup-node@v4"
         },
         {
+            "id": "ci:.github/workflows/ci.yml:73a9c954cdcd4226:1",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "- name: Verify large browser replies and profiler streams"
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:73e7fa0a4224740f:1",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "out/runs/*-browser-transport-*/evidence/"
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:761e4921a97565f7:1",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
@@ -3550,6 +3562,12 @@
             "label": ".test-output/installed-content/consumer/dist-nested/"
         },
         {
+            "id": "ci:.github/workflows/ci.yml:ef14c75971df094e:1",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "run: npm run check:browser-transport"
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:f017303a589086c3:1",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
@@ -3638,6 +3656,12 @@
             "kind": "command",
             "path": "package.json",
             "label": "tsx tooling/commands/prepare.ts build"
+        },
+        {
+            "id": "command:check:browser-transport",
+            "kind": "command",
+            "path": "package.json",
+            "label": "tsx tooling/commands/check-browser-transport.ts"
         },
         {
             "id": "command:check:migration",
@@ -4456,6 +4480,12 @@
             "label": "tests/webgpu-renderer.test.ts"
         },
         {
+            "id": "file:tooling/commands/check-browser-transport.ts",
+            "kind": "file",
+            "path": "tooling/commands/check-browser-transport.ts",
+            "label": "tooling/commands/check-browser-transport.ts"
+        },
+        {
             "id": "file:tooling/commands/check-migration.ts",
             "kind": "file",
             "path": "tooling/commands/check-migration.ts",
@@ -4472,6 +4502,18 @@
             "kind": "file",
             "path": "tooling/commands/verify.ts",
             "label": "tooling/commands/verify.ts"
+        },
+        {
+            "id": "file:tooling/core/browser/session.ts",
+            "kind": "file",
+            "path": "tooling/core/browser/session.ts",
+            "label": "tooling/core/browser/session.ts"
+        },
+        {
+            "id": "file:tooling/core/browser/socket.ts",
+            "kind": "file",
+            "path": "tooling/core/browser/socket.ts",
+            "label": "tooling/core/browser/socket.ts"
         },
         {
             "id": "file:tooling/core/fixture.ts",
@@ -4586,6 +4628,12 @@
             "kind": "file",
             "path": "tooling/suites/verification/browser/installed.ts",
             "label": "tooling/suites/verification/browser/installed.ts"
+        },
+        {
+            "id": "file:tooling/tests/browser-session.test.ts",
+            "kind": "file",
+            "path": "tooling/tests/browser-session.test.ts",
+            "label": "tooling/tests/browser-session.test.ts"
         },
         {
             "id": "file:tooling/tests/consumer-contract.test.ts",
@@ -4840,6 +4888,12 @@
             "label": "--enable-precise-memory-info"
         },
         {
+            "id": "option:benchmarks/browser/browser-baseline.ts:--headless",
+            "kind": "option",
+            "path": "benchmarks/browser/browser-baseline.ts",
+            "label": "--headless"
+        },
+        {
             "id": "option:benchmarks/browser/browser-baseline.ts:--host",
             "kind": "option",
             "path": "benchmarks/browser/browser-baseline.ts",
@@ -4910,6 +4964,12 @@
             "kind": "option",
             "path": "benchmarks/browser/browser-baseline.ts",
             "label": "NGNE_BROWSER"
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_BROWSER_HEADLESS",
+            "kind": "option",
+            "path": "benchmarks/browser/browser-baseline.ts",
+            "label": "NGNE_BROWSER_HEADLESS"
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_CDP_PORT",
@@ -5068,6 +5128,12 @@
             "label": "--explore"
         },
         {
+            "id": "option:benchmarks/content/run.mjs:--headless",
+            "kind": "option",
+            "path": "benchmarks/content/run.mjs",
+            "label": "--headless"
+        },
+        {
             "id": "option:benchmarks/content/run.mjs:--no-first-run",
             "kind": "option",
             "path": "benchmarks/content/run.mjs",
@@ -5096,6 +5162,12 @@
             "kind": "option",
             "path": "benchmarks/content/run.mjs",
             "label": "NGNE_BROWSER"
+        },
+        {
+            "id": "option:benchmarks/content/run.mjs:NGNE_BROWSER_HEADLESS",
+            "kind": "option",
+            "path": "benchmarks/content/run.mjs",
+            "label": "NGNE_BROWSER_HEADLESS"
         },
         {
             "id": "option:benchmarks/cpu/churn-schema.ts:--out",
@@ -5680,6 +5752,24 @@
             "label": "-NoProfile"
         },
         {
+            "id": "option:tooling/commands/check-browser-transport.ts:--headless",
+            "kind": "option",
+            "path": "tooling/commands/check-browser-transport.ts",
+            "label": "--headless"
+        },
+        {
+            "id": "option:tooling/commands/check-browser-transport.ts:--no-first-run",
+            "kind": "option",
+            "path": "tooling/commands/check-browser-transport.ts",
+            "label": "--no-first-run"
+        },
+        {
+            "id": "option:tooling/commands/check-browser-transport.ts:--no-sandbox",
+            "kind": "option",
+            "path": "tooling/commands/check-browser-transport.ts",
+            "label": "--no-sandbox"
+        },
+        {
             "id": "option:tooling/commands/check-migration.ts:--cached",
             "kind": "option",
             "path": "tooling/commands/check-migration.ts",
@@ -5744,6 +5834,30 @@
             "kind": "option",
             "path": "tooling/commands/verify.ts",
             "label": "--manifest"
+        },
+        {
+            "id": "option:tooling/core/browser/session.ts:--remote-debugging-port",
+            "kind": "option",
+            "path": "tooling/core/browser/session.ts",
+            "label": "--remote-debugging-port"
+        },
+        {
+            "id": "option:tooling/core/browser/session.ts:--user-data-dir",
+            "kind": "option",
+            "path": "tooling/core/browser/session.ts",
+            "label": "--user-data-dir"
+        },
+        {
+            "id": "option:tooling/core/browser/session.ts:CHROME_BIN",
+            "kind": "option",
+            "path": "tooling/core/browser/session.ts",
+            "label": "CHROME_BIN"
+        },
+        {
+            "id": "option:tooling/core/browser/session.ts:NGNE_BROWSER",
+            "kind": "option",
+            "path": "tooling/core/browser/session.ts",
+            "label": "NGNE_BROWSER"
         },
         {
             "id": "option:tooling/core/fixture.ts:--base",
@@ -5984,6 +6098,12 @@
             "kind": "option",
             "path": "tooling/suites/verification/browser/installed.ts",
             "label": "NGNE_WEBGPU_ADAPTER"
+        },
+        {
+            "id": "option:tooling/tests/browser-session.test.ts:-e",
+            "kind": "option",
+            "path": "tooling/tests/browser-session.test.ts",
+            "label": "-e"
         },
         {
             "id": "option:tooling/tests/consumer-contract.test.ts:--contract-version",
@@ -11108,6 +11228,36 @@
             "label": "\"a cancelled late device cannot unconfigure a newer owner of the same canvas\""
         },
         {
+            "id": "assertion:tooling/commands/check-browser-transport.ts:76f0fe687a3f3605",
+            "kind": "assertion",
+            "path": "tooling/commands/check-browser-transport.ts",
+            "label": "assert(events > 0)"
+        },
+        {
+            "id": "assertion:tooling/commands/check-browser-transport.ts:8539f5a04f8333d7",
+            "kind": "assertion",
+            "path": "tooling/commands/check-browser-transport.ts",
+            "label": "assert.equal(value.length, bytes)"
+        },
+        {
+            "id": "assertion:tooling/commands/check-browser-transport.ts:9944aa79e1bca115",
+            "kind": "assertion",
+            "path": "tooling/commands/check-browser-transport.ts",
+            "label": "assert(sampling.profile.samples.length > 0)"
+        },
+        {
+            "id": "assertion:tooling/commands/check-browser-transport.ts:ac4a7adefbfb065c",
+            "kind": "assertion",
+            "path": "tooling/commands/check-browser-transport.ts",
+            "label": "assert(snapshot.snapshot.node_count > 0)"
+        },
+        {
+            "id": "assertion:tooling/commands/check-browser-transport.ts:cd83263d282f1ae5",
+            "kind": "assertion",
+            "path": "tooling/commands/check-browser-transport.ts",
+            "label": "assert.equal(value, \"x\".repeat(bytes))"
+        },
+        {
             "id": "assertion:tooling/commands/check-migration.ts:32cc316853d091af",
             "kind": "assertion",
             "path": "tooling/commands/check-migration.ts",
@@ -11310,6 +11460,42 @@
             "kind": "assertion",
             "path": "tooling/fixtures/installed-engine/index.ts",
             "label": "\"disposal-destroys-late-device-and-releases-assets\""
+        },
+        {
+            "id": "assertion:tooling/tests/browser-session.test.ts:0493a67b4503fc85",
+            "kind": "assertion",
+            "path": "tooling/tests/browser-session.test.ts",
+            "label": "\"partial startup records cleanup and rejects session reuse\""
+        },
+        {
+            "id": "assertion:tooling/tests/browser-session.test.ts:9aa5963747f9d909",
+            "kind": "assertion",
+            "path": "tooling/tests/browser-session.test.ts",
+            "label": "\"partial startup after owned server launch retains scenario and diagnostics and kills the tree\""
+        },
+        {
+            "id": "assertion:tooling/tests/browser-session.test.ts:a3707c0164409430",
+            "kind": "assertion",
+            "path": "tooling/tests/browser-session.test.ts",
+            "label": "\"wire transport reassembles a fragmented 5 MiB reply with UTF-8 and interleaved ping\""
+        },
+        {
+            "id": "assertion:tooling/tests/browser-session.test.ts:c5ea6fa838e1bd9a",
+            "kind": "assertion",
+            "path": "tooling/tests/browser-session.test.ts",
+            "label": "\"wire invalid UTF-8 and invalid continuation reject pending commands and close\""
+        },
+        {
+            "id": "assertion:tooling/tests/browser-session.test.ts:d8a098c72af95d98",
+            "kind": "assertion",
+            "path": "tooling/tests/browser-session.test.ts",
+            "label": "\"event deadlines, unsubscribe and terminal close are bounded\""
+        },
+        {
+            "id": "assertion:tooling/tests/browser-session.test.ts:f94bc098c9240e66",
+            "kind": "assertion",
+            "path": "tooling/tests/browser-session.test.ts",
+            "label": "\"session attempts all cleanup resources and preserves independent failures\""
         },
         {
             "id": "assertion:tooling/tests/consumer-contract.test.ts:2a627d328e864b18",
@@ -11810,6 +11996,12 @@
             "kind": "workload",
             "path": "tooling/fixtures/installed-engine/index.ts",
             "label": "Engine-owned installed public-package lifecycle, root/nested external assets, recovery, resource ownership and audio output"
+        },
+        {
+            "id": "workload:browser-protocol-capabilities",
+            "kind": "workload",
+            "path": "tooling/commands/check-browser-transport.ts",
+            "label": "Real Chromium byte-exact large replies, allocation sampling, streamed heap snapshots and browser tracing; capability checks only."
         }
     ]
 }

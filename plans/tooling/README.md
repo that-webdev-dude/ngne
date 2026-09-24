@@ -165,5 +165,19 @@ T8/T10 matching, coverage and budget gates remain in force; no retirement is app
 T3 introduces `npm run verify:installed` and an engine-owned installed fixture.
 See [coverage correspondence](installed-engine-coverage.md) and the
 [dated local evidence](../../docs/evidence/installed-engine.json). Existing consumer
-migration checks remain active. T5 browser-session consolidation is next; T4 still
+migration checks remain active. T5 browser-session consolidation is delivered below; T4 still
 requires consumer-owner agreement and real explicitly selected conformance.
+
+## Browser infrastructure status
+
+Browser-session consolidation is implemented across browser verification, installed
+verification and the browser/content benchmark runners. Shared process-tree cleanup
+and transport remain at their compatibility entry points; the benchmark's duplicate
+CDP/socket implementation is removed after local wire/profiler parity checks.
+See [browser infrastructure evidence](../../docs/evidence/browser-sessions.json) for
+the measured revision, environments, raw selected records and limits. Linux execution
+is configured in CI but was not available locally. This does not waive final hosted
+coverage/cost acceptance or consumer migration gates.
+
+Next is T4, whose consumer-owner agreement and real selected conformance remain
+required. No consumer-specific scenario or archived fixture is retired here.

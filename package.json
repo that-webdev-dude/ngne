@@ -28,7 +28,8 @@
         "build:package": "tsx tooling/commands/prepare.ts build",
         "prepare:package": "tsx tooling/commands/prepare.ts prepare",
         "check:prepared": "tsx tooling/commands/prepare.ts verify",
-        "verify:installed": "tsx tooling/commands/verify.ts"
+        "verify:installed": "tsx tooling/commands/verify.ts",
+        "check:browser-transport": "tsx tooling/commands/check-browser-transport.ts"
     },
     "exports": {
         ".": {

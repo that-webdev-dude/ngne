@@ -1,8 +1,9 @@
-import { spawn } from "node:child_process";
-import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+// NGNE_BROWSER and CHROME_BIN executable selection is delegated to BrowserSession.
+// BrowserSession supplies "--remote-debugging-port" and "--user-data-dir"; these launch options remain supported.
+import { appendFileSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { ownProcess } from "../../../../tests/tooling/cleanup.mjs";
-import { connectDevTools, type DevTools } from "../../../../tests/tooling/devtools.mjs";
+import { BrowserSession } from "../../../core/browser/session.js";
+import { type DevTools } from "../../../../tests/tooling/devtools.mjs";
 import { Run } from "../../../core/run.js";
 import { copyPreparedBuild, prepare, verifyPrepared } from "../../../core/preparation.js";
 import { serve } from "../../../core/server.js";
@@ -34,7 +35,7 @@ export function readObservation(value: unknown): {
     return v as ReturnType<typeof readObservation>;
 }
 
-/** Suite orchestration only. Uses existing wire transport and process-tree owner pending session consolidation. */
+/** Suite orchestration only. Workload policy stays outside the shared browser session. */
 export async function installed(
     repository: string,
     suppliedManifest?: string,
@@ -42,6 +43,8 @@ export async function installed(
 ): Promise<Run> {
     const run = new Run(repository, "installed", output);
     let cdp: DevTools | undefined;
+    const session = new BrowserSession();
+    run.cleanup.push(["browser session", () => session.stop()]);
     await run.execute(
         async () => {
             let manifestPath = suppliedManifest;
@@ -90,11 +93,7 @@ export async function installed(
                     readFileSync(join(repository, "tests/tooling/cleanup.mjs")),
                 ),
             };
-            const profile = join(run.root, "work/profile");
-            mkdirSync(profile, { recursive: true });
             const flags = [
-                "--remote-debugging-port=0",
-                `--user-data-dir=${profile}`,
                 "--no-first-run",
                 "--disable-default-apps",
                 "--disable-dev-shm-usage",
@@ -118,58 +117,15 @@ export async function installed(
                     );
             }
             if (process.platform === "linux") flags.push("--no-sandbox");
-            const executable =
-                process.env.NGNE_BROWSER ??
-                process.env.CHROME_BIN ??
-                (process.platform === "win32"
-                    ? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
-                    : "google-chrome");
-            run.manifest.policy.browserFlags = flags.filter(
-                (x) => !x.startsWith("--user-data-dir="),
-            );
-            const browser = spawn(executable, [...flags, "about:blank"], {
-                windowsHide: true,
-                detached: process.platform !== "win32",
-                stdio: ["ignore", "pipe", "pipe"],
-            });
-            const owner = ownProcess(browser, "installed browser");
-            run.cleanup.unshift(["browser terminate/verify", () => owner.stop()]);
-            for (const stream of [browser.stdout, browser.stderr])
-                stream.on("data", (bytes) =>
-                    appendFileSync(join(run.evidence, "browser.log"), bytes),
-                );
+            run.manifest.policy.browserFlags = flags;
             await run.stage("browser-start", async () => {
-                const deadline = Date.now() + 20000;
-                while (!cdp) {
-                    owner.check();
-                    if (Date.now() > deadline) throw Error("Browser startup deadline");
-                    const portFile = join(profile, "DevToolsActivePort");
-                    if (existsSync(portFile)) {
-                        const port = Number(readFileSync(portFile, "utf8").split(/\r?\n/)[0]);
-                        const response = await fetch(`http://127.0.0.1:${port}/json/list`, {
-                            signal: AbortSignal.timeout(1000),
-                        });
-                        const targets: unknown = await response.json();
-                        if (Array.isArray(targets)) {
-                            const page = targets.find(
-                                (v: unknown): v is { type: string; webSocketDebuggerUrl: string } =>
-                                    !!v &&
-                                    typeof v === "object" &&
-                                    "type" in v &&
-                                    v.type === "page" &&
-                                    "webSocketDebuggerUrl" in v &&
-                                    typeof v.webSocketDebuggerUrl === "string",
-                            );
-                            if (page)
-                                cdp = await connectDevTools(page.webSocketDebuggerUrl, {
-                                    requestTimeoutMs: 120000,
-                                });
-                        }
-                    }
-                    if (!cdp) await new Promise((resolve) => setTimeout(resolve, 100));
-                }
+                cdp = await session.start({
+                    flags,
+                    profileParent: join(run.root, "work"),
+                    log: join(run.evidence, "browser.log"),
+                    transport: { requestTimeoutMs: 120000 },
+                });
                 const client = cdp;
-                run.cleanup.unshift(["DevTools close", () => client.close()]);
                 await client.send("Runtime.enable");
                 await client.send("Page.enable");
                 client.on("Runtime.exceptionThrown", (value) =>
@@ -203,9 +159,7 @@ export async function installed(
                 });
         },
         async () => {
-            if (!cdp) return;
-            const reply = (await cdp.send("Page.captureScreenshot")) as { data: string };
-            writeFileSync(join(run.evidence, "failure.png"), Buffer.from(reply.data, "base64"));
+            await session.screenshot(join(run.evidence, "failure.png"));
         },
     );
     return run;

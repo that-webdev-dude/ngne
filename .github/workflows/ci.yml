@@ -36,6 +36,8 @@ jobs:
         run: npm run test:installed
       - name: Install software WebGPU presentation dependencies
         run: sudo apt-get update && sudo apt-get install -y libvulkan1 mesa-vulkan-drivers xvfb xauth
+      - name: Verify large browser replies and profiler streams
+        run: npm run check:browser-transport
       - name: Verify installed engine at root and nested bases
         env:
           NGNE_BROWSER_HEADLESS: 0
@@ -90,6 +92,7 @@ jobs:
           path: |
             out/runs/ci-package/evidence/
             out/runs/*-installed-*/evidence/
+            out/runs/*-browser-transport-*/evidence/
             .test-output/browser*
             .test-output/installed-content/*.json
             .test-output/installed-content/*.log

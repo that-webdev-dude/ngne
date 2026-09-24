@@ -1,16 +1,10 @@
-import { connectDevTools, isNavigationError } from "./tooling/devtools.mjs";
+// NGNE_BROWSER and CHROME_BIN executable selection is delegated to BrowserSession.
+// BrowserSession supplies "--remote-debugging-port" and "--user-data-dir"; these launch options remain supported.
+import { BrowserSession } from "../tooling/core/browser/session.js";
+import { isNavigationError } from "./tooling/devtools.mjs";
 import { runWithCleanup, ownProcess } from "./tooling/cleanup.mjs";
-import { spawn, type ChildProcess } from "node:child_process";
-import {
-    appendFileSync,
-    existsSync,
-    mkdirSync,
-    mkdtempSync,
-    readFileSync,
-    writeFileSync,
-} from "node:fs";
-import { rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
+import { type ChildProcess } from "node:child_process";
+import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { checkInstalledContent } from "./browser-content-checks.js";
 
@@ -65,6 +59,7 @@ interface Cdp {
     close(): Promise<void>;
 }
 
+const session = new BrowserSession();
 const root = process.cwd();
 const origin = process.env.NGNE_BROWSER_URL ?? "http://127.0.0.1:4173";
 const debugPort = Number(process.env.NGNE_CDP_PORT ?? 9334);
@@ -73,7 +68,6 @@ const artifactDirectory = join(
     root,
     process.env.NGNE_BROWSER_ARTIFACT_DIR ?? ".test-output/browser",
 );
-let profileDirectory: string | undefined;
 const consoleMessages: string[] = [];
 const failures: string[] = [];
 const passed: string[] = [];
@@ -81,10 +75,8 @@ const skippedAsUnsupported: string[] = [];
 let environment: AdapterEnvironment | undefined;
 let renderer: BrowserResult["renderer"] = "unknown";
 let preview: ChildProcess | undefined;
-let browser: ChildProcess | undefined;
 let cdp: Cdp | undefined;
 const cleanup: { resource: string; status: string; error?: string }[] = [];
-let browserOwner: ReturnType<typeof ownProcess> | undefined;
 let previewOwner: ReturnType<typeof ownProcess> | undefined;
 let browserVersion: unknown;
 let browserFlags: string[] = [];
@@ -95,13 +87,9 @@ mkdirSync(artifactDirectory, { recursive: true });
 failures.push(
     ...(await runWithCleanup(
         async () => {
-            profileDirectory = mkdtempSync(join(tmpdir(), "ngne-browser-ci-"));
             preview = startPreview();
-            previewOwner = ownProcess(preview, "preview");
             await waitForPreview(15_000);
-            browser = startBrowser();
-            browserOwner = ownProcess(browser, "browser");
-            cdp = await connectToPage();
+            cdp = await startBrowser();
             await cdp.send("Runtime.enable");
             await cdp.send("Page.enable");
             await cdp.send("Log.enable");
@@ -182,22 +170,7 @@ failures.push(
         },
         captureScreenshot,
         [
-            ["DevTools socket close", () => cdp?.close()],
-            ["browser process tree terminate/verify", () => browserOwner?.stop()],
-            ["preview process tree terminate/verify", () => previewOwner?.stop()],
-            [
-                "temporary profile remove",
-                async () => {
-                    if (!profileDirectory) return { action: "no profile created" };
-                    await rm(profileDirectory, {
-                        recursive: true,
-                        force: true,
-                        maxRetries: 10,
-                        retryDelay: 200,
-                    });
-                    return { path: profileDirectory };
-                },
-            ],
+            ["browser session", () => session.stop()],
             [
                 "controlled cleanup failure",
                 () => {
@@ -215,7 +188,7 @@ if (failures.length) process.exitCode = 1;
 
 function startPreview(): ChildProcess {
     const url = new URL(origin);
-    const child = spawn(
+    const { child, owner } = session.ownProcess(
         process.execPath,
         [
             join(root, "node_modules/vite/bin/vite.js"),
@@ -228,22 +201,17 @@ function startPreview(): ChildProcess {
             "--outDir",
             "dist-browser",
         ],
-        {
-            cwd: root,
-            detached: process.platform !== "win32",
-            stdio: ["ignore", "pipe", "pipe"],
-        },
+        "preview",
+        { cwd: root },
     );
+    previewOwner = owner;
     pipeLog(child, "preview.log");
     return child;
 }
 
-function startBrowser(): ChildProcess {
-    const executable = browserExecutable();
+async function startBrowser(): Promise<Cdp> {
     const requestedAdapter = process.env.NGNE_WEBGPU_ADAPTER;
     const flags = [
-        `--remote-debugging-port=${debugPort}`,
-        `--user-data-dir=${profileDirectory}`,
         "--no-first-run",
         "--disable-default-apps",
         "--disable-dev-shm-usage",
@@ -267,43 +235,12 @@ function startBrowser(): ChildProcess {
             );
     }
     if (process.platform === "linux") flags.push("--no-sandbox");
-    flags.push("about:blank");
-    browserFlags = flags.filter((flag) => !flag.startsWith("--user-data-dir="));
-    const child = spawn(executable, flags, {
-        detached: process.platform !== "win32",
-        stdio: ["ignore", "pipe", "pipe"],
+    browserFlags = flags;
+    return session.start({
+        flags,
+        port: debugPort,
+        log: join(artifactDirectory, "browser-process.log"),
     });
-    pipeLog(child, "browser-process.log");
-    return child;
-}
-
-function browserExecutable(): string {
-    if (process.env.NGNE_BROWSER) return process.env.NGNE_BROWSER;
-    if (process.env.CHROME_BIN) return process.env.CHROME_BIN;
-    const windows = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
-    return process.platform === "win32" && existsSync(windows) ? windows : "google-chrome";
-}
-
-async function connectToPage(): Promise<Cdp> {
-    const deadline = Date.now() + 20_000;
-    while (Date.now() < deadline) {
-        browserOwner?.check();
-        try {
-            const response = await fetch(`http://127.0.0.1:${debugPort}/json/list`, {
-                signal: AbortSignal.timeout(1_000),
-            });
-            const targets = (await response.json()) as {
-                type: string;
-                webSocketDebuggerUrl: string;
-            }[];
-            const page = targets.find((target) => target.type === "page");
-            if (page) return connectDevTools(page.webSocketDebuggerUrl);
-        } catch {
-            // Chrome is still starting.
-        }
-        await sleep(100);
-    }
-    throw new Error("Chrome DevTools target did not start within 20 seconds");
 }
 
 function captureBrowserLogs(client: Cdp): void {

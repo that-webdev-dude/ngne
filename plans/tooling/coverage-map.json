@@ -992,6 +992,20 @@
             "reason": "Keep required verification and deploy gate; replace embedded consumer stages/default artifacts after T4 coverage passes and integrate new tooling checks incrementally."
         },
         {
+            "id": "ci:.github/workflows/ci.yml:73a9c954cdcd4226:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci.yml",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:73e7fa0a4224740f:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci.yml",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:761e4921a97565f7:1",
             "owner": "infrastructure",
             "destination": ".github/workflows/ci.yml",
@@ -1447,6 +1461,13 @@
             "reason": "T4 must replace this active/default consumer CI dependency or upload path after engine and external consumer replacement checks pass; steady-state CI requires no consumer."
         },
         {
+            "id": "ci:.github/workflows/ci.yml:ef14c75971df094e:1",
+            "owner": "infrastructure",
+            "destination": ".github/workflows/ci.yml",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:f017303a589086c3:1",
             "owner": "infrastructure",
             "destination": ".github/workflows/ci.yml",
@@ -1550,6 +1571,13 @@
             "destination": "package.json",
             "action": "retain",
             "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "command:check:browser-transport",
+            "owner": "infrastructure",
+            "destination": "tooling/core/browser/session.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
         },
         {
             "id": "command:check:migration",
@@ -2504,6 +2532,13 @@
             "reason": "Existing engine unit/contract/browser fixture coverage and support remain; do not delete engine tests during tooling migration."
         },
         {
+            "id": "file:tooling/commands/check-browser-transport.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/check-browser-transport.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
             "id": "file:tooling/commands/check-migration.ts",
             "owner": "infrastructure",
             "destination": "tooling/commands/check-migration.ts",
@@ -2523,6 +2558,20 @@
             "destination": "tooling/commands/verify.ts",
             "action": "retain",
             "reason": "Installed verification orchestration, isolated resolution, deterministic regression or CI integration; retains existing migration commands and deployment relationship."
+        },
+        {
+            "id": "file:tooling/core/browser/session.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/core/browser/session.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
+            "id": "file:tooling/core/browser/socket.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/core/browser/socket.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
         },
         {
             "id": "file:tooling/core/fixture.ts",
@@ -2656,6 +2705,13 @@
             "destination": "tooling/suites/verification/browser/installed.ts",
             "action": "retain",
             "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "file:tooling/tests/browser-session.test.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/browser-session.test.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
         },
         {
             "id": "file:tooling/tests/consumer-contract.test.ts",
@@ -2952,6 +3008,13 @@
             "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
         },
         {
+            "id": "option:benchmarks/browser/browser-baseline.ts:--headless",
+            "owner": "infrastructure",
+            "destination": "tooling/core/browser/session.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
             "id": "option:benchmarks/browser/browser-baseline.ts:--host",
             "owner": "infrastructure",
             "destination": "tooling/core/browser/session.ts",
@@ -3034,6 +3097,13 @@
             "destination": "tooling/core/browser/session.ts",
             "action": "migrate",
             "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+        },
+        {
+            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_BROWSER_HEADLESS",
+            "owner": "infrastructure",
+            "destination": "tooling/core/browser/session.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_CDP_PORT",
@@ -3218,6 +3288,13 @@
             "reason": "Extract lifecycle/identities; move production transitions externally; remove sibling discovery/fixed tarball and finish valid sampling even if budgets fail."
         },
         {
+            "id": "option:benchmarks/content/run.mjs:--headless",
+            "owner": "infrastructure",
+            "destination": "tooling/core/browser/session.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
             "id": "option:benchmarks/content/run.mjs:--no-first-run",
             "owner": "benchmark",
             "destination": "tooling/suites/benchmarks/content/run.ts",
@@ -3251,6 +3328,13 @@
             "destination": "tooling/suites/benchmarks/content/run.ts",
             "action": "migrate",
             "reason": "Extract lifecycle/identities; move production transitions externally; remove sibling discovery/fixed tarball and finish valid sampling even if budgets fail."
+        },
+        {
+            "id": "option:benchmarks/content/run.mjs:NGNE_BROWSER_HEADLESS",
+            "owner": "infrastructure",
+            "destination": "tooling/core/browser/session.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
         },
         {
             "id": "option:benchmarks/cpu/churn-schema.ts:--out",
@@ -3932,6 +4016,27 @@
             "reason": "Extract proven lifecycle into shared session infrastructure; preserve owned cleanup, no replay and large profiler wire capability before retirement."
         },
         {
+            "id": "option:tooling/commands/check-browser-transport.ts:--headless",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/check-browser-transport.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
+            "id": "option:tooling/commands/check-browser-transport.ts:--no-first-run",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/check-browser-transport.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
+            "id": "option:tooling/commands/check-browser-transport.ts:--no-sandbox",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/check-browser-transport.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
             "id": "option:tooling/commands/check-migration.ts:--cached",
             "owner": "infrastructure",
             "destination": "tooling/commands/check-migration.ts",
@@ -4007,6 +4112,34 @@
             "destination": "tooling/commands/verify.ts",
             "action": "retain",
             "reason": "Installed verification orchestration, isolated resolution, deterministic regression or CI integration; retains existing migration commands and deployment relationship."
+        },
+        {
+            "id": "option:tooling/core/browser/session.ts:--remote-debugging-port",
+            "owner": "infrastructure",
+            "destination": "tooling/core/browser/session.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
+            "id": "option:tooling/core/browser/session.ts:--user-data-dir",
+            "owner": "infrastructure",
+            "destination": "tooling/core/browser/session.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
+            "id": "option:tooling/core/browser/session.ts:CHROME_BIN",
+            "owner": "infrastructure",
+            "destination": "tooling/core/browser/session.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
+            "id": "option:tooling/core/browser/session.ts:NGNE_BROWSER",
+            "owner": "infrastructure",
+            "destination": "tooling/core/browser/session.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
         },
         {
             "id": "option:tooling/core/fixture.ts:--base",
@@ -4287,6 +4420,13 @@
             "destination": "tooling/suites/verification/browser/installed.ts",
             "action": "retain",
             "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/tests/browser-session.test.ts:-e",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/browser-session.test.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
         },
         {
             "id": "option:tooling/tests/consumer-contract.test.ts:--contract-version",
@@ -7343,6 +7483,41 @@
             "reason": "Existing engine unit/contract/browser fixture coverage and support remain; do not delete engine tests during tooling migration."
         },
         {
+            "id": "assertion:tooling/commands/check-browser-transport.ts:76f0fe687a3f3605",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/check-browser-transport.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
+            "id": "assertion:tooling/commands/check-browser-transport.ts:8539f5a04f8333d7",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/check-browser-transport.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
+            "id": "assertion:tooling/commands/check-browser-transport.ts:9944aa79e1bca115",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/check-browser-transport.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
+            "id": "assertion:tooling/commands/check-browser-transport.ts:ac4a7adefbfb065c",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/check-browser-transport.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
+            "id": "assertion:tooling/commands/check-browser-transport.ts:cd83263d282f1ae5",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/check-browser-transport.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
             "id": "assertion:tooling/commands/check-migration.ts:32cc316853d091af",
             "owner": "infrastructure",
             "destination": "tooling/commands/check-migration.ts",
@@ -7579,6 +7754,48 @@
             "destination": "tooling/fixtures/installed-engine/index.ts",
             "action": "retain",
             "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "assertion:tooling/tests/browser-session.test.ts:0493a67b4503fc85",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/browser-session.test.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
+            "id": "assertion:tooling/tests/browser-session.test.ts:9aa5963747f9d909",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/browser-session.test.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
+            "id": "assertion:tooling/tests/browser-session.test.ts:a3707c0164409430",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/browser-session.test.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
+            "id": "assertion:tooling/tests/browser-session.test.ts:c5ea6fa838e1bd9a",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/browser-session.test.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
+            "id": "assertion:tooling/tests/browser-session.test.ts:d8a098c72af95d98",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/browser-session.test.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+        },
+        {
+            "id": "assertion:tooling/tests/browser-session.test.ts:f94bc098c9240e66",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/browser-session.test.ts",
+            "action": "retain",
+            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
         },
         {
             "id": "assertion:tooling/tests/consumer-contract.test.ts:2a627d328e864b18",
@@ -8162,6 +8379,13 @@
             "destination": "tooling/fixtures/installed-engine/index.ts",
             "action": "retain",
             "reason": "Standalone installed verification, independent of consumer artifacts. See installed-engine-coverage.md for assertion correspondence and evidence limits."
+        },
+        {
+            "id": "workload:browser-protocol-capabilities",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/check-browser-transport.ts",
+            "action": "retain",
+            "reason": "Explicit real-wire capability workload with independent outcomes and verified owned-process cleanup. No performance baseline."
         }
     ]
 }

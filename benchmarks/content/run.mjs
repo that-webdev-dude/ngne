@@ -1,24 +1,20 @@
-import { rm } from "node:fs/promises";
-import { connectDevTools, isNavigationError } from "../../tests/tooling/devtools.mjs";
-import {
-    cleanupSteps,
-    failureText,
-    ownProcess,
-    closeServer,
-} from "../../tests/tooling/cleanup.mjs";
+// NGNE_BROWSER executable selection is delegated to BrowserSession discovery.
+// BrowserSession supplies "--remote-debugging-port" and "--user-data-dir"; these launch options remain supported.
+import { BrowserSession, browserExecutable } from "../../tooling/core/browser/session.ts";
+import { isNavigationError } from "../../tests/tooling/devtools.mjs";
+import { cleanupSteps, failureText, closeServer } from "../../tests/tooling/cleanup.mjs";
 import assert from "node:assert/strict";
-import { spawn, execFileSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import {
     mkdirSync,
     cpSync,
     readFileSync,
     writeFileSync,
     appendFileSync,
-    mkdtempSync,
     existsSync,
 } from "node:fs";
 import { resolve, join, extname } from "node:path";
-import { tmpdir, release, platform, arch } from "node:os";
+import { release, platform, arch } from "node:os";
 import { createServer } from "node:http";
 import { hash, identities, generateChurn } from "./fixtures.mjs";
 import { assertMounted, assertDisposed } from "../../tests/content-accounting.mjs";
@@ -71,29 +67,6 @@ let origin;
 const cleanup = [],
     failures = [];
 const runs = [];
-async function connect(port, owner) {
-    let page;
-    for (let attempt = 0; attempt < 100; attempt++) {
-        owner.check();
-        try {
-            page = (
-                await (
-                    await fetch(`http://127.0.0.1:${port}/json/list`, {
-                        signal: AbortSignal.timeout(1_000),
-                    })
-                ).json()
-            ).find((p) => p.type === "page");
-        } catch {}
-        if (page) break;
-        await delay(100);
-    }
-    assert(page, "browser target available");
-    return connectDevTools(page.webSocketDebuggerUrl, {
-        userGesture: true,
-        onEvent: (message) =>
-            appendFileSync(join(root, "browser-events.jsonl"), JSON.stringify(message) + "\n"),
-    });
-}
 function metrics(samples, checkpoints) {
     const values = samples.map((s) => s.ms).sort((a, b) => a - b);
     const first = checkpoints[0],
@@ -125,7 +98,15 @@ try {
         build: identities(join(consumer, "dist")),
         source: identities(join(consumer, "src")),
         harness: identities(resolve("benchmarks/content")),
-        tooling: identities(resolve("tests/tooling")),
+        tooling: {
+            ...identities(resolve("tests/tooling")),
+            ...Object.fromEntries(
+                Object.entries(identities(resolve("tooling/core/browser"))).map(([path, hash]) => [
+                    `browser/${path}`,
+                    hash,
+                ]),
+            ),
+        },
         os: { platform: platform(), release: release(), arch: arch() },
         node: process.version,
     };
@@ -148,34 +129,33 @@ try {
     });
     origin = `http://127.0.0.1:${server.address().port}/`;
     for (let repetition = 0; repetition < (exploratory ? 1 : policy.repetitions); repetition++) {
-        const port = 9450 + repetition,
-            profile = mkdtempSync(join(tmpdir(), "ngne-content-"));
+        const port = 9450 + repetition;
         const flags = [
-            `--remote-debugging-port=${port}`,
-            `--user-data-dir=${profile}`,
             "--no-first-run",
             "--disable-default-apps",
             "--disable-backgrounding-occluded-windows",
             "--window-size=1280,900",
-            "about:blank",
+            ...(process.env.NGNE_BROWSER_HEADLESS === "1" ? ["--headless=new"] : []),
         ];
-        const executable =
-            process.env.NGNE_BROWSER ??
-            "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
-        let owner, cdp;
+        const executable = browserExecutable();
+        const session = new BrowserSession();
+        let cdp;
         try {
-            const child = spawn(executable, flags, {
-                detached: process.platform !== "win32",
-                stdio: ["ignore", "pipe", "pipe"],
+            cdp = await session.start({
+                executable,
+                flags,
+                port,
+                log: join(root, `browser-${repetition}.log`),
+                transport: {
+                    userGesture: true,
+                    onEvent: (message) =>
+                        appendFileSync(
+                            join(root, "browser-events.jsonl"),
+                            JSON.stringify(message) + "\n",
+                        ),
+                },
             });
-            owner = ownProcess(child, `browser repetition ${repetition}`);
-            child.stdout.on("data", (bytes) =>
-                appendFileSync(join(root, `browser-${repetition}.log`), bytes),
-            );
-            child.stderr.on("data", (bytes) =>
-                appendFileSync(join(root, `browser-${repetition}.log`), bytes),
-            );
-            cdp = await connect(port, owner);
+            assert(cdp, "browser target available");
             await cdp.send("Page.enable");
             await cdp.send("Runtime.enable");
             await cdp.send("Emulation.setDeviceMetricsOverride", {
@@ -366,24 +346,13 @@ try {
             }
         } catch (error) {
             failures.push(failureText(error));
+            try {
+                await session.screenshot(join(root, `failure-${repetition}.png`));
+            } catch (diagnostic) {
+                failures.push(`diagnostics: ${failureText(diagnostic)}`);
+            }
         } finally {
-            await cleanupSteps(
-                [
-                    [`DevTools repetition ${repetition} close`, () => cdp?.close()],
-                    [`browser repetition ${repetition} terminate/verify`, () => owner?.stop()],
-                    [
-                        `temporary profile remove ${profile}`,
-                        () =>
-                            rm(profile, {
-                                recursive: true,
-                                force: true,
-                                maxRetries: 10,
-                                retryDelay: 200,
-                            }),
-                    ],
-                ],
-                cleanup,
-            );
+            cleanup.push(...(await session.close()));
         }
         if (failures.length || cleanup.some((step) => step.status === "failed")) break;
     }

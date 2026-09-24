@@ -157,3 +157,41 @@ submission counts, browser version/flags and process-tree cleanup. These are
 automated browser observations, not manual visual/audible approval. Asset byte
 accounting is not process/driver memory. Existing consumer migration checks remain
 active; this command makes no consumer-compatibility claim.
+
+## Browser sessions and protocol checks
+
+`core/browser/session.ts` owns browser discovery, a fresh profile, the debugging
+port, page/browser connections and processes it launches (including preview
+servers). Register `session.stop()` before starting work so partial startup is
+covered. It attempts every cleanup step, preserves process-tree records, removes
+its profile, and rejects cleanup failures. `close()` returns those same records
+without throwing so existing runners can combine them with their own outcomes.
+External servers and run-owned static servers remain explicitly caller-owned.
+
+Suites keep flags, navigation, assertions, warmup, sampling and budgets. Existing
+browser verification, installed verification and both browser benchmark runners
+use this owner. No engine exports or runtime dependencies are added. The legacy
+`tests/tooling` transport/cleanup entry points remain shared compatibility seams;
+there is no second benchmark CDP implementation.
+
+The shared transport uses the extracted RFC 6455 socket in `core/browser/socket.ts`.
+It checks the upgrade, receives large and fragmented UTF-8 messages, masks client
+frames, and handles ping frames. Commands and one-shot event waits have deadlines;
+a command timeout neither cancels nor replays it. Subscriptions return an unsubscribe
+function. Connection shutdown rejects pending commands/events and has a deadline.
+Diagnostics are attempted before cleanup; runners retain their original failure
+when screenshots or cleanup also fail.
+
+`npm run check:browser-transport` is an explicit real-Chrome capability check, also
+required by CI. It checks byte-exact 4,260,000 and 5,242,880 byte replies, actual heap
+sampling, streamed snapshots and browser tracing. `npm test` covers fragmented
+wire replies and failure cases. Evidence is under a fresh `out/runs/*-browser-transport-*`
+directory. These checks establish protocol capability, not performance, physical-GPU
+rendering or manual audible/visual approval. Full snapshots/traces from this check
+are omitted; their validated byte/node/event counts and raw sampling are retained.
+
+The legacy browser and content benchmarks remain headed by default. `NGNE_BROWSER_HEADLESS=1`
+is an explicit capability-smoke mode and is recorded in its flags; its results
+must not be substituted for visible physical-GPU performance baselines. Benchmark
+artifacts are retained separately from the disposable browser profile. Failed
+benchmark scenarios and cleanup retain `failure.json` with all available outcomes.
