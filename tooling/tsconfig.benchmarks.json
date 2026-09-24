@@ -1,0 +1,14 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "types": ["node", "@webgpu/types"],
+        "lib": ["ES2024", "DOM", "DOM.Iterable"],
+        "allowJs": true,
+        "checkJs": true
+    },
+    "include": [
+        "suites/benchmarks/cpu/*.ts",
+        "suites/benchmarks/rendering/*.ts",
+        "suites/benchmarks/cpu/*.mjs"
+    ]
+}

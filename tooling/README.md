@@ -201,7 +201,17 @@ inputs. It uses the shared installer, run lifecycle and browser session. See the
 [workload procedure](suites/benchmarks/content/README.md) for sampling, ownership
 checks, prerequisites, exact-manifest reuse and evidence. Measurements remain
 explicit; verification does not select them. This new workload has no established
-performance budgets or controlled baseline; headless runs are capability evidence.
+universal performance budget; headless runs are capability evidence. Named physical
+profiles, explicit baseline collection, and controlled measured-budget acceptance
+are described in the workload procedure. Above-budget runs retain complete sampling
+and independent budget outcomes. Strict/candidate comparator work remains separate.
+
+`npm run bench:all` uses Node orchestration for internal CPU/churn, private renderer
+and repository showcase probes. Source and build inventories identify those targets;
+they are distinct from installed-package measurements. Legacy flag aliases and
+diagnostics remain supported. Namespaced evidence is under `out/runs/`; the
+`evidence/legacy/` projection remains readable by the unchanged advisory comparator.
+See [benchmark usage](../benchmarks/README.md) for retention and flag details.
 
 ## Browser sessions and protocol checks
 

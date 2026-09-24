@@ -9,16 +9,42 @@ import { serve } from "../../../core/server.js";
 import { hash, identities, verifyIdentities } from "../../../evidence/identity.js";
 import { generate } from "./fixtures.js";
 import { readMeasurement } from "./measurement.js";
+import { environmentMismatches, loadProfile, readBudget } from "./policy.js";
+import { object } from "../../../evidence/schema.js";
+import { isDeepStrictEqual } from "node:util";
 
 export async function content(
     repository: string,
-    options: { manifest?: string; output?: string; smoke?: boolean } = {},
+    options: {
+        manifest?: string;
+        output?: string;
+        smoke?: boolean;
+        mode?: "exploratory" | "baseline" | "controlled";
+        profile?: string;
+        budget?: string;
+    } = {},
 ): Promise<Run> {
     const run = new Run(repository, "content-engine", options.output);
     const session = new BrowserSession();
     run.cleanup.push(["browser session", () => session.stop()]);
     await run.execute(
         async () => {
+            const mode = options.mode ?? "exploratory";
+            if (
+                mode !== "exploratory" &&
+                (options.smoke || !options.profile || process.env.NGNE_BROWSER_HEADLESS === "1")
+            )
+                throw Error(
+                    "Baseline/controlled measurement requires a named profile and full headed execution",
+                );
+            const profile = options.profile ? loadProfile(repository, options.profile) : undefined;
+            const budget = options.budget
+                ? readBudget(JSON.parse(readFileSync(options.budget, "utf8")))
+                : undefined;
+            if ((mode === "controlled") !== !!budget || (mode === "exploratory" && profile))
+                throw Error("Invalid measurement mode/profile/budget selection");
+            if (budget && !isDeepStrictEqual(budget.profile, profile))
+                throw Error("Budget profile mismatch");
             let manifestPath = options.manifest;
             await run.stage("preparation", async () => {
                 if (!manifestPath) {
@@ -51,8 +77,12 @@ export async function content(
             if (process.env.NGNE_BROWSER_HEADLESS === "1") flags.push("--headless=new");
             if (process.platform === "linux") flags.push("--no-sandbox");
             run.manifest.policy = {
-                mode: "exploratory",
+                mode,
+                profile: profile ?? null,
+                budget: budget ?? null,
                 workload: "engine-resource-churn-v1",
+                seed: 1,
+                assetGenerator: "deterministic-index-pattern-png-v1",
                 method: "prepare-to-mounted-and-rendered-ordinary-frames-v1",
                 count,
                 repetitions,
@@ -60,7 +90,9 @@ export async function content(
                 scenes: 12,
                 generatedImages: 13,
                 retention: { maxEntries: 3, maxBytes: 1048576 },
-                budgets: "not established for this new workload",
+                budgets: budget
+                    ? { p95Ms: budget.p95Ms, sourceSHA256: hash(readFileSync(options.budget!)) }
+                    : "not evaluated",
                 preparationManifest: selected,
                 preparationManifestSHA256: hash(readFileSync(selected)),
                 preparationRunId: manifest.runId,
@@ -111,7 +143,29 @@ export async function content(
                 run.manifest.preparation = "prepared";
             });
             const prepared = run.manifest.prepared!;
+            run.manifest.policy.budgetSignature = hash(
+                JSON.stringify({
+                    workload: prepared.workload.files,
+                    harness: run.manifest.harness,
+                    toolchain: prepared.toolchain,
+                    count,
+                    repetitions,
+                    warmup: 12,
+                    seed: 1,
+                    assetGenerator: run.manifest.policy.assetGenerator,
+                    method: run.manifest.policy.method,
+                    retention: run.manifest.policy.retention,
+                    flags,
+                }),
+            );
+            if (budget && budget.signature !== run.manifest.policy.budgetSignature)
+                throw Error(
+                    "Budget workload/harness/method/toolchain drift; establish a new measured baseline",
+                );
             const verify = () => {
+                for (const [path, sha256] of Object.entries(run.manifest.harness))
+                    if (hash(readFileSync(join(repository, path))) !== sha256)
+                        throw Error(`Changed benchmark harness: ${path}`);
                 verifyPrepared(selected);
                 if (hash(readFileSync(join(run.root, pkg.path))) !== pkg.sha256)
                     throw Error("Changed benchmark package");
@@ -148,7 +202,8 @@ export async function content(
             client.on("Runtime.exceptionThrown", (value) =>
                 appendFileSync(join(run.evidence, "exceptions.log"), JSON.stringify(value) + "\n"),
             );
-            run.manifest.policy.browserVersion = await client.send("Browser.getVersion");
+            const browser = object(await client.send("Browser.getVersion"));
+            run.manifest.policy.browserVersion = browser;
             for (let repetition = 0; repetition < repetitions; repetition++)
                 await run.stage(`repetition-${repetition}`, async () => {
                     verify();
@@ -170,7 +225,54 @@ export async function content(
                     const raw = await client.evaluate(`window.contentEngine.run(${count})`, true);
                     run.record(`repetition-${repetition}`, "measurements", { raw, base });
                     const metrics = readMeasurement(raw, count);
-                    run.record(`repetition-${repetition}`, "measurements", { raw, base, metrics });
+                    const environment = object(object(raw).environment);
+                    const observed = {
+                        ...run.manifest.environment,
+                        cpu: cpus()[0]?.model,
+                        logicalCores: cpus().length,
+                        totalMemory: totalmem(),
+                        browserProduct: browser.product,
+                        browserRevision: browser.revision,
+                        browserUserAgent: browser.userAgent,
+                        flags,
+                        headless: flags.includes("--headless=new"),
+                        viewport: environment.viewport,
+                        dpr: environment.dpr,
+                        visibility: environment.visibility,
+                        gpu: Array.isArray(environment.gpu) ? environment.gpu[0] : null,
+                    };
+                    const mismatches = profile ? environmentMismatches(profile, observed) : [];
+                    if (profile && Array.isArray(environment.gpu))
+                        for (const gpu of environment.gpu)
+                            if (!isDeepStrictEqual(gpu, profile.expected.gpu))
+                                mismatches.push(
+                                    "environment.gpu: adapter changed within repetition",
+                                );
+                    run.record(`repetition-${repetition}`, "measurements", {
+                        raw,
+                        base,
+                        metrics,
+                        observed,
+                        environmentMismatches: mismatches,
+                        metric: {
+                            name: "transition latency",
+                            unit: "ms",
+                            operation: "prepare through ordinary mounted/rendered frame",
+                            warmup: 12,
+                            population: count,
+                            aggregation: "nearest-rank p50/p95/max",
+                            instrumentation:
+                                "fixture observer and 10 ms polling; performance.memory estimates",
+                        },
+                        budget: budget
+                            ? { p95Ms: budget.p95Ms, passed: metrics.p95 <= budget.p95Ms }
+                            : null,
+                    });
+                    if (mismatches.length) throw Error(mismatches.join("\n"));
+                    if (budget)
+                        run.result.stages.find(
+                            (stage) => stage.id === `repetition-${repetition}`,
+                        )!.budgets = metrics.p95 <= budget.p95Ms ? "passed" : "failed";
                     verify();
                     verifyIdentities(build, prepared.builds[base].files);
                 });

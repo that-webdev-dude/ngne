@@ -11,10 +11,11 @@ export function report(manifest: Manifest, result: Result): string {
         "",
         `Execution: ${result.execution}; correctness: ${result.correctness}; budgets: ${result.budgets}; cleanup: ${result.cleanup}; evidence: ${result.evidence}.`,
         "",
-        "This preparation record establishes package/build identity, not browser behavior or performance comparability. Compatibility was not selected.",
+        "Evidence applies only to the selected suite and recorded environment. It does not establish controlled run comparability or manual visual/audio confirmation. Compatibility was not selected.",
         "",
         ...result.stages.map(
-            (stage) => `- ${stage.id}: ${stage.execution}, correctness ${stage.correctness}`,
+            (stage) =>
+                `- ${stage.id}: ${stage.execution}, correctness ${stage.correctness}, budgets ${stage.budgets}`,
         ),
         "",
         "[Manifest](manifest.json) · [Result](result.json)",

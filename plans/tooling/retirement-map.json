@@ -2282,10 +2282,13 @@
         },
         {
             "id": "file:benchmarks/compact-run.ps1",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/compact-run.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-compact-orchestration.json",
+                "sha256": "dc1585a83859e30e74f6d98bfde1fcca90403c673ced4c5e07e45b1b4dd30589"
+            },
+            "remainingUsers": []
         },
         {
             "id": "file:benchmarks/compare-runs.mjs",
@@ -2391,10 +2394,13 @@
         },
         {
             "id": "file:benchmarks/run-all.ps1",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "file:benchmarks/run-results.mjs",
@@ -2575,213 +2581,303 @@
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--enable-precise-memory-info",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--host",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--no-default-browser-check",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--no-first-run",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--outDir",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--port",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--remote-debugging-port",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--strictPort",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--user-data-dir",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--window-size",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_ALLOCATION_SAMPLING",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_ARTIFACT_DIR",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_BROWSER",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_CDP_PORT",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_CYCLES",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_DURATION_SECONDS",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_EXPECTED_BACKEND",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_EXPECTED_BUILD",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_RETAINED_EVERY_SECONDS",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_SERVE_DIR",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_SERVE_OUT_DIR",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_SNAPSHOTS",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_TRACE",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_URL",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_WARMUP_SECONDS",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-rendering.json",
+                "sha256": "fda1c7dcb89846e7ee2a65b5995aa632d12dee5fc2a30a261b1dab610a4ae2a1"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/compact-run.ps1:-Directory",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/compact-run.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-compact-orchestration.json",
+                "sha256": "dc1585a83859e30e74f6d98bfde1fcca90403c673ced4c5e07e45b1b4dd30589"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/compact-run.ps1:-Node",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/compact-run.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-compact-orchestration.json",
+                "sha256": "dc1585a83859e30e74f6d98bfde1fcca90403c673ced4c5e07e45b1b4dd30589"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/compact-run.ps1:-Path",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/compact-run.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-compact-orchestration.json",
+                "sha256": "dc1585a83859e30e74f6d98bfde1fcca90403c673ced4c5e07e45b1b4dd30589"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/compact-run.ps1:-ResultsScript",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/compact-run.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-compact-orchestration.json",
+                "sha256": "dc1585a83859e30e74f6d98bfde1fcca90403c673ced4c5e07e45b1b4dd30589"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/compact-run.ps1:-RunDirectory",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/compact-run.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-compact-orchestration.json",
+                "sha256": "dc1585a83859e30e74f6d98bfde1fcca90403c673ced4c5e07e45b1b4dd30589"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/compare-runs.mjs:--attention-percent",
@@ -2913,199 +3009,283 @@
         },
         {
             "id": "option:benchmarks/cpu/churn-schema.ts:--out",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/cpu/churn-schema.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-cpu.json",
+                "sha256": "47b1a2807518ff80a13ba70178f5984976f4349026aef2b7015d2db3d0f2e2fb"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/cpu/churn-schema.ts:--profile",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/cpu/churn-schema.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-options-cpu.json",
+                "sha256": "47b1a2807518ff80a13ba70178f5984976f4349026aef2b7015d2db3d0f2e2fb"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:--expose-gc",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:--import",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:--trace-gc",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:-BaseCdpPort",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:-BaseUrl",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:-Compact",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:-Diagnostics",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:-DurationSeconds",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:-OutputRoot",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:-SkipBuild",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:-WarmupSeconds",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:-Workload",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_ALLOCATION_SAMPLING",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_ARTIFACT_DIR",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_CDP_PORT",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_CYCLES",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_DURATION_SECONDS",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_EXPECTED_BACKEND",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_EXPECTED_BUILD",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_RETAINED_EVERY_SECONDS",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_SERVE_DIR",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_SERVE_OUT_DIR",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_SNAPSHOTS",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_TRACE",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_URL",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_WARMUP_SECONDS",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:tests/benchmark-output.test.ts:--out",
@@ -3116,10 +3296,13 @@
         },
         {
             "id": "option:tests/benchmark-output.test.ts:-Command",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/benchmark-output.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-test-compact.json",
+                "sha256": "0d1548a0cacc6333a92c34cc1ca2ac46df6b38a02e673e01fe3de71f9a158dbd"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:tests/benchmark-output.test.ts:-Compact",
@@ -3130,31 +3313,43 @@
         },
         {
             "id": "option:tests/benchmark-output.test.ts:-ExecutionPolicy",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/benchmark-output.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-test-compact.json",
+                "sha256": "0d1548a0cacc6333a92c34cc1ca2ac46df6b38a02e673e01fe3de71f9a158dbd"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:tests/benchmark-output.test.ts:-File",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/benchmark-output.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-test-all.json",
+                "sha256": "c00a3a2c37bb7f49f9dc78462ef2465ad1471b2da98b9382fdae653c10310637"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:tests/benchmark-output.test.ts:-NonInteractive",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/benchmark-output.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-test-compact.json",
+                "sha256": "0d1548a0cacc6333a92c34cc1ca2ac46df6b38a02e673e01fe3de71f9a158dbd"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:tests/benchmark-output.test.ts:-NoProfile",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/benchmark-output.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/benchmark-test-compact.json",
+                "sha256": "0d1548a0cacc6333a92c34cc1ca2ac46df6b38a02e673e01fe3de71f9a158dbd"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:tests/benchmark-output.test.ts:-OutputRoot",
@@ -3712,10 +3907,13 @@
         },
         {
             "id": "workload:compaction-integrity",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/compact-run.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-compact-orchestration.json",
+                "sha256": "dc1585a83859e30e74f6d98bfde1fcca90403c673ced4c5e07e45b1b4dd30589"
+            },
+            "remainingUsers": []
         },
         {
             "id": "workload:consumer-checkpoint",
@@ -3867,10 +4065,13 @@
         },
         {
             "id": "workload:orchestration-retention",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-all.ps1"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/node-all-orchestration.json",
+                "sha256": "1199ba15483459554bd5699f8176b2c1445a35dc0dc7970f29a9a43a8f21446a"
+            },
+            "remainingUsers": []
         },
         {
             "id": "workload:renderer-alternating",

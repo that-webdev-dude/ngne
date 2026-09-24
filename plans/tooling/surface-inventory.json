@@ -3541,13 +3541,13 @@
             "id": "command:bench",
             "kind": "command",
             "path": "package.json",
-            "label": "tsx benchmarks/cpu/benchmark.ts"
+            "label": "tsx tooling/suites/benchmarks/cpu/benchmark.ts"
         },
         {
             "id": "command:bench:all",
             "kind": "command",
             "path": "package.json",
-            "label": "powershell -NoProfile -ExecutionPolicy Bypass -File benchmarks/run-all.ps1"
+            "label": "tsx tooling/commands/benchmark-all.ts"
         },
         {
             "id": "command:bench:compare",
@@ -3661,7 +3661,7 @@
             "id": "command:typecheck:tooling",
             "kind": "command",
             "path": "package.json",
-            "label": "tsc -p tooling/tsconfig.node.json"
+            "label": "tsc -p tooling/tsconfig.node.json && tsc -p tooling/tsconfig.benchmarks.json"
         },
         {
             "id": "command:verify:compatibility",
@@ -3730,12 +3730,6 @@
             "label": "benchmarks/browser/tsconfig.json"
         },
         {
-            "id": "file:benchmarks/compact-run.ps1",
-            "kind": "file",
-            "path": "benchmarks/compact-run.ps1",
-            "label": "benchmarks/compact-run.ps1"
-        },
-        {
             "id": "file:benchmarks/compare-runs.mjs",
             "kind": "file",
             "path": "benchmarks/compare-runs.mjs",
@@ -3788,12 +3782,6 @@
             "kind": "file",
             "path": "benchmarks/README.md",
             "label": "benchmarks/README.md"
-        },
-        {
-            "id": "file:benchmarks/run-all.ps1",
-            "kind": "file",
-            "path": "benchmarks/run-all.ps1",
-            "label": "benchmarks/run-all.ps1"
         },
         {
             "id": "file:benchmarks/run-results.mjs",
@@ -4078,6 +4066,18 @@
             "label": "tests/webgpu-renderer.test.ts"
         },
         {
+            "id": "file:tooling/commands/benchmark-all.ts",
+            "kind": "file",
+            "path": "tooling/commands/benchmark-all.ts",
+            "label": "tooling/commands/benchmark-all.ts"
+        },
+        {
+            "id": "file:tooling/commands/benchmark-budget.ts",
+            "kind": "file",
+            "path": "tooling/commands/benchmark-budget.ts",
+            "label": "tooling/commands/benchmark-budget.ts"
+        },
+        {
             "id": "file:tooling/commands/benchmark.ts",
             "kind": "file",
             "path": "tooling/commands/benchmark.ts",
@@ -4252,10 +4252,28 @@
             "label": "tooling/fixtures/installed-engine/tone.wav"
         },
         {
+            "id": "file:tooling/profiles/environments/windows-intel-gen12-chrome153.json",
+            "kind": "file",
+            "path": "tooling/profiles/environments/windows-intel-gen12-chrome153.json",
+            "label": "tooling/profiles/environments/windows-intel-gen12-chrome153.json"
+        },
+        {
             "id": "file:tooling/README.md",
             "kind": "file",
             "path": "tooling/README.md",
             "label": "tooling/README.md"
+        },
+        {
+            "id": "file:tooling/suites/benchmarks/all.ts",
+            "kind": "file",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "tooling/suites/benchmarks/all.ts"
+        },
+        {
+            "id": "file:tooling/suites/benchmarks/compact.ts",
+            "kind": "file",
+            "path": "tooling/suites/benchmarks/compact.ts",
+            "label": "tooling/suites/benchmarks/compact.ts"
         },
         {
             "id": "file:tooling/suites/benchmarks/content/accounting.ts",
@@ -4276,6 +4294,12 @@
             "label": "tooling/suites/benchmarks/content/measurement.ts"
         },
         {
+            "id": "file:tooling/suites/benchmarks/content/policy.ts",
+            "kind": "file",
+            "path": "tooling/suites/benchmarks/content/policy.ts",
+            "label": "tooling/suites/benchmarks/content/policy.ts"
+        },
+        {
             "id": "file:tooling/suites/benchmarks/content/README.md",
             "kind": "file",
             "path": "tooling/suites/benchmarks/content/README.md",
@@ -4288,6 +4312,42 @@
             "label": "tooling/suites/benchmarks/content/run.ts"
         },
         {
+            "id": "file:tooling/suites/benchmarks/cpu/benchmark.ts",
+            "kind": "file",
+            "path": "tooling/suites/benchmarks/cpu/benchmark.ts",
+            "label": "tooling/suites/benchmarks/cpu/benchmark.ts"
+        },
+        {
+            "id": "file:tooling/suites/benchmarks/cpu/churn-gc-parse.mjs",
+            "kind": "file",
+            "path": "tooling/suites/benchmarks/cpu/churn-gc-parse.mjs",
+            "label": "tooling/suites/benchmarks/cpu/churn-gc-parse.mjs"
+        },
+        {
+            "id": "file:tooling/suites/benchmarks/cpu/churn-schema.ts",
+            "kind": "file",
+            "path": "tooling/suites/benchmarks/cpu/churn-schema.ts",
+            "label": "tooling/suites/benchmarks/cpu/churn-schema.ts"
+        },
+        {
+            "id": "file:tooling/suites/benchmarks/options.ts",
+            "kind": "file",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "tooling/suites/benchmarks/options.ts"
+        },
+        {
+            "id": "file:tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "kind": "file",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "tooling/suites/benchmarks/rendering/browser-baseline.ts"
+        },
+        {
+            "id": "file:tooling/suites/benchmarks/rendering/renderer-fixture.ts",
+            "kind": "file",
+            "path": "tooling/suites/benchmarks/rendering/renderer-fixture.ts",
+            "label": "tooling/suites/benchmarks/rendering/renderer-fixture.ts"
+        },
+        {
             "id": "file:tooling/suites/compatibility.ts",
             "kind": "file",
             "path": "tooling/suites/compatibility.ts",
@@ -4298,6 +4358,24 @@
             "kind": "file",
             "path": "tooling/suites/verification/browser/installed.ts",
             "label": "tooling/suites/verification/browser/installed.ts"
+        },
+        {
+            "id": "file:tooling/tests/benchmark-compact.test.ts",
+            "kind": "file",
+            "path": "tooling/tests/benchmark-compact.test.ts",
+            "label": "tooling/tests/benchmark-compact.test.ts"
+        },
+        {
+            "id": "file:tooling/tests/benchmark-policy.test.ts",
+            "kind": "file",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "tooling/tests/benchmark-policy.test.ts"
+        },
+        {
+            "id": "file:tooling/tests/benchmark-runner.test.ts",
+            "kind": "file",
+            "path": "tooling/tests/benchmark-runner.test.ts",
+            "label": "tooling/tests/benchmark-runner.test.ts"
         },
         {
             "id": "file:tooling/tests/browser-session.test.ts",
@@ -4322,6 +4400,12 @@
             "kind": "file",
             "path": "tooling/tests/content-engine.test.ts",
             "label": "tooling/tests/content-engine.test.ts"
+        },
+        {
+            "id": "file:tooling/tests/fixtures/benchmark-runner.ts",
+            "kind": "file",
+            "path": "tooling/tests/fixtures/benchmark-runner.ts",
+            "label": "tooling/tests/fixtures/benchmark-runner.ts"
         },
         {
             "id": "file:tooling/tests/fixtures/consumer-contract-v1/cases.json",
@@ -4540,6 +4624,12 @@
             "label": "tooling/tests/preparation.test.ts"
         },
         {
+            "id": "file:tooling/tsconfig.benchmarks.json",
+            "kind": "file",
+            "path": "tooling/tsconfig.benchmarks.json",
+            "label": "tooling/tsconfig.benchmarks.json"
+        },
+        {
             "id": "file:tooling/tsconfig.node.json",
             "kind": "file",
             "path": "tooling/tsconfig.node.json",
@@ -4562,198 +4652,6 @@
             "kind": "file",
             "path": "vite.config.ts",
             "label": "vite.config.ts"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:--enable-precise-memory-info",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "--enable-precise-memory-info"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:--headless",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "--headless"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:--host",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "--host"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:--no-default-browser-check",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "--no-default-browser-check"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:--no-first-run",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "--no-first-run"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:--outDir",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "--outDir"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:--port",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "--port"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:--remote-debugging-port",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "--remote-debugging-port"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:--strictPort",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "--strictPort"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:--user-data-dir",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "--user-data-dir"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:--window-size",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "--window-size"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_ALLOCATION_SAMPLING",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "NGNE_ALLOCATION_SAMPLING"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_ARTIFACT_DIR",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "NGNE_ARTIFACT_DIR"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_BROWSER",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "NGNE_BROWSER"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_BROWSER_HEADLESS",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "NGNE_BROWSER_HEADLESS"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_CDP_PORT",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "NGNE_CDP_PORT"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_CYCLES",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "NGNE_CYCLES"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_DURATION_SECONDS",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "NGNE_DURATION_SECONDS"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_EXPECTED_BACKEND",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "NGNE_EXPECTED_BACKEND"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_EXPECTED_BUILD",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "NGNE_EXPECTED_BUILD"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_RETAINED_EVERY_SECONDS",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "NGNE_RETAINED_EVERY_SECONDS"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_SERVE_DIR",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "NGNE_SERVE_DIR"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_SERVE_OUT_DIR",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "NGNE_SERVE_OUT_DIR"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_SNAPSHOTS",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "NGNE_SNAPSHOTS"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_TRACE",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "NGNE_TRACE"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_URL",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "NGNE_URL"
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_WARMUP_SECONDS",
-            "kind": "option",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "NGNE_WARMUP_SECONDS"
-        },
-        {
-            "id": "option:benchmarks/compact-run.ps1:-Directory",
-            "kind": "option",
-            "path": "benchmarks/compact-run.ps1",
-            "label": "-Directory"
-        },
-        {
-            "id": "option:benchmarks/compact-run.ps1:-Node",
-            "kind": "option",
-            "path": "benchmarks/compact-run.ps1",
-            "label": "-Node"
-        },
-        {
-            "id": "option:benchmarks/compact-run.ps1:-Path",
-            "kind": "option",
-            "path": "benchmarks/compact-run.ps1",
-            "label": "-Path"
-        },
-        {
-            "id": "option:benchmarks/compact-run.ps1:-ResultsScript",
-            "kind": "option",
-            "path": "benchmarks/compact-run.ps1",
-            "label": "-ResultsScript"
-        },
-        {
-            "id": "option:benchmarks/compact-run.ps1:-RunDirectory",
-            "kind": "option",
-            "path": "benchmarks/compact-run.ps1",
-            "label": "-RunDirectory"
         },
         {
             "id": "option:benchmarks/compare-runs.mjs:--attention-percent",
@@ -4780,214 +4678,16 @@
             "label": "-h"
         },
         {
-            "id": "option:benchmarks/cpu/churn-schema.ts:--out",
-            "kind": "option",
-            "path": "benchmarks/cpu/churn-schema.ts",
-            "label": "--out"
-        },
-        {
-            "id": "option:benchmarks/cpu/churn-schema.ts:--profile",
-            "kind": "option",
-            "path": "benchmarks/cpu/churn-schema.ts",
-            "label": "--profile"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:--expose-gc",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "--expose-gc"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:--import",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "--import"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:--trace-gc",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "--trace-gc"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:-BaseCdpPort",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "-BaseCdpPort"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:-BaseUrl",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "-BaseUrl"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:-Compact",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "-Compact"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:-Diagnostics",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "-Diagnostics"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:-DurationSeconds",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "-DurationSeconds"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:-OutputRoot",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "-OutputRoot"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:-SkipBuild",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "-SkipBuild"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:-WarmupSeconds",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "-WarmupSeconds"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:-Workload",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "-Workload"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:NGNE_ALLOCATION_SAMPLING",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "NGNE_ALLOCATION_SAMPLING"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:NGNE_ARTIFACT_DIR",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "NGNE_ARTIFACT_DIR"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:NGNE_CDP_PORT",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "NGNE_CDP_PORT"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:NGNE_CYCLES",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "NGNE_CYCLES"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:NGNE_DURATION_SECONDS",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "NGNE_DURATION_SECONDS"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:NGNE_EXPECTED_BACKEND",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "NGNE_EXPECTED_BACKEND"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:NGNE_EXPECTED_BUILD",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "NGNE_EXPECTED_BUILD"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:NGNE_RETAINED_EVERY_SECONDS",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "NGNE_RETAINED_EVERY_SECONDS"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:NGNE_SERVE_DIR",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "NGNE_SERVE_DIR"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:NGNE_SERVE_OUT_DIR",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "NGNE_SERVE_OUT_DIR"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:NGNE_SNAPSHOTS",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "NGNE_SNAPSHOTS"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:NGNE_TRACE",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "NGNE_TRACE"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:NGNE_URL",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "NGNE_URL"
-        },
-        {
-            "id": "option:benchmarks/run-all.ps1:NGNE_WARMUP_SECONDS",
-            "kind": "option",
-            "path": "benchmarks/run-all.ps1",
-            "label": "NGNE_WARMUP_SECONDS"
-        },
-        {
             "id": "option:tests/benchmark-output.test.ts:--out",
             "kind": "option",
             "path": "tests/benchmark-output.test.ts",
             "label": "--out"
         },
         {
-            "id": "option:tests/benchmark-output.test.ts:-Command",
-            "kind": "option",
-            "path": "tests/benchmark-output.test.ts",
-            "label": "-Command"
-        },
-        {
             "id": "option:tests/benchmark-output.test.ts:-Compact",
             "kind": "option",
             "path": "tests/benchmark-output.test.ts",
             "label": "-Compact"
-        },
-        {
-            "id": "option:tests/benchmark-output.test.ts:-ExecutionPolicy",
-            "kind": "option",
-            "path": "tests/benchmark-output.test.ts",
-            "label": "-ExecutionPolicy"
-        },
-        {
-            "id": "option:tests/benchmark-output.test.ts:-File",
-            "kind": "option",
-            "path": "tests/benchmark-output.test.ts",
-            "label": "-File"
-        },
-        {
-            "id": "option:tests/benchmark-output.test.ts:-NonInteractive",
-            "kind": "option",
-            "path": "tests/benchmark-output.test.ts",
-            "label": "-NonInteractive"
-        },
-        {
-            "id": "option:tests/benchmark-output.test.ts:-NoProfile",
-            "kind": "option",
-            "path": "tests/benchmark-output.test.ts",
-            "label": "-NoProfile"
         },
         {
             "id": "option:tests/benchmark-output.test.ts:-OutputRoot",
@@ -5248,6 +4948,24 @@
             "label": "-NoProfile"
         },
         {
+            "id": "option:tooling/commands/benchmark.ts:--baseline",
+            "kind": "option",
+            "path": "tooling/commands/benchmark.ts",
+            "label": "--baseline"
+        },
+        {
+            "id": "option:tooling/commands/benchmark.ts:--budget",
+            "kind": "option",
+            "path": "tooling/commands/benchmark.ts",
+            "label": "--budget"
+        },
+        {
+            "id": "option:tooling/commands/benchmark.ts:--controlled",
+            "kind": "option",
+            "path": "tooling/commands/benchmark.ts",
+            "label": "--controlled"
+        },
+        {
             "id": "option:tooling/commands/benchmark.ts:--explore",
             "kind": "option",
             "path": "tooling/commands/benchmark.ts",
@@ -5264,6 +4982,12 @@
             "kind": "option",
             "path": "tooling/commands/benchmark.ts",
             "label": "--output"
+        },
+        {
+            "id": "option:tooling/commands/benchmark.ts:--profile",
+            "kind": "option",
+            "path": "tooling/commands/benchmark.ts",
+            "label": "--profile"
         },
         {
             "id": "option:tooling/commands/benchmark.ts:--smoke",
@@ -5518,6 +5242,126 @@
             "label": "--porcelain"
         },
         {
+            "id": "option:tooling/suites/benchmarks/all.ts:--expose-gc",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "--expose-gc"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:--import",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "--import"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:--out",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "--out"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:--porcelain",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "--porcelain"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:--profile",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "--profile"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:--trace-gc",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "--trace-gc"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_ALLOCATION_SAMPLING",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "NGNE_ALLOCATION_SAMPLING"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_ARTIFACT_DIR",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "NGNE_ARTIFACT_DIR"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_CDP_PORT",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "NGNE_CDP_PORT"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_CYCLES",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "NGNE_CYCLES"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_DURATION_SECONDS",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "NGNE_DURATION_SECONDS"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_EXPECTED_BACKEND",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "NGNE_EXPECTED_BACKEND"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_EXPECTED_BUILD",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "NGNE_EXPECTED_BUILD"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_RETAINED_EVERY_SECONDS",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "NGNE_RETAINED_EVERY_SECONDS"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_SERVE_DIR",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "NGNE_SERVE_DIR"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_SERVE_OUT_DIR",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "NGNE_SERVE_OUT_DIR"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_SNAPSHOTS",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "NGNE_SNAPSHOTS"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_TRACE",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "NGNE_TRACE"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_URL",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "NGNE_URL"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_WARMUP_SECONDS",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/all.ts",
+            "label": "NGNE_WARMUP_SECONDS"
+        },
+        {
             "id": "option:tooling/suites/benchmarks/content/run.ts:--disable-background-timer-throttling",
             "kind": "option",
             "path": "tooling/suites/benchmarks/content/run.ts",
@@ -5582,6 +5426,288 @@
             "kind": "option",
             "path": "tooling/suites/benchmarks/content/run.ts",
             "label": "NGNE_BROWSER_HEADLESS"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/cpu/churn-schema.ts:--out",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/cpu/churn-schema.ts",
+            "label": "--out"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/cpu/churn-schema.ts:--profile",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/cpu/churn-schema.ts",
+            "label": "--profile"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:--base-cdp-port",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "--base-cdp-port"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:--base-url",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "--base-url"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:--compact",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "--compact"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:--diagnostics",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "--diagnostics"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:--duration-seconds",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "--duration-seconds"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:--output-root",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "--output-root"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:--skip-build",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "--skip-build"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:--warmup-seconds",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "--warmup-seconds"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:--workload",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "--workload"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:-BaseCdpPort",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "-BaseCdpPort"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:-BaseUrl",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "-BaseUrl"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:-Compact",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "-Compact"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:-Diagnostics",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "-Diagnostics"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:-DurationSeconds",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "-DurationSeconds"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:-OutputRoot",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "-OutputRoot"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:-SkipBuild",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "-SkipBuild"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:-WarmupSeconds",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "-WarmupSeconds"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:-Workload",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/options.ts",
+            "label": "-Workload"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--enable-precise-memory-info",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "--enable-precise-memory-info"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--headless",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "--headless"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--host",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "--host"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--no-default-browser-check",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "--no-default-browser-check"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--no-first-run",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "--no-first-run"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--outDir",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "--outDir"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--port",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "--port"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--remote-debugging-port",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "--remote-debugging-port"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--strictPort",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "--strictPort"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--user-data-dir",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "--user-data-dir"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--window-size",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "--window-size"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_ALLOCATION_SAMPLING",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "NGNE_ALLOCATION_SAMPLING"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_ARTIFACT_DIR",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "NGNE_ARTIFACT_DIR"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_BROWSER",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "NGNE_BROWSER"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_BROWSER_HEADLESS",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "NGNE_BROWSER_HEADLESS"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_CDP_PORT",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "NGNE_CDP_PORT"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_CYCLES",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "NGNE_CYCLES"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_DURATION_SECONDS",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "NGNE_DURATION_SECONDS"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_EXPECTED_BACKEND",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "NGNE_EXPECTED_BACKEND"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_EXPECTED_BUILD",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "NGNE_EXPECTED_BUILD"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_RETAINED_EVERY_SECONDS",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "NGNE_RETAINED_EVERY_SECONDS"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_SERVE_DIR",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "NGNE_SERVE_DIR"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_SERVE_OUT_DIR",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "NGNE_SERVE_OUT_DIR"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_SNAPSHOTS",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "NGNE_SNAPSHOTS"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_TRACE",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "NGNE_TRACE"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_URL",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "NGNE_URL"
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_WARMUP_SECONDS",
+            "kind": "option",
+            "path": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "label": "NGNE_WARMUP_SECONDS"
         },
         {
             "id": "option:tooling/suites/compatibility.ts:--contract-version",
@@ -5762,6 +5888,108 @@
             "kind": "option",
             "path": "tooling/suites/verification/browser/installed.ts",
             "label": "NGNE_WEBGPU_ADAPTER"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:--base-url",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "--base-url"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:--compact",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "--compact"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:--diagnostics",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "--diagnostics"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:--duration-seconds",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "--duration-seconds"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:--skip-build",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "--skip-build"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:--test",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "--test"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:--warmup-seconds",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "--warmup-seconds"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:--workload",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "--workload"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:-Compact",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "-Compact"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:-Diagnostics",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "-Diagnostics"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:-DurationSeconds",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "-DurationSeconds"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:-SkipBuild",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "-SkipBuild"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:-WarmupSeconds",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "-WarmupSeconds"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:-Workload",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "-Workload"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-runner.test.ts:--compact",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-runner.test.ts",
+            "label": "--compact"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-runner.test.ts:--out",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-runner.test.ts",
+            "label": "--out"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-runner.test.ts:--workload",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-runner.test.ts",
+            "label": "--workload"
         },
         {
             "id": "option:tooling/tests/browser-session.test.ts:-e",
@@ -10350,6 +10578,66 @@
             "kind": "assertion",
             "path": "tooling/suites/benchmarks/content/run.ts",
             "label": "verify()"
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-compact.test.ts:8967f748ff3c7861",
+            "kind": "assertion",
+            "path": "tooling/tests/benchmark-compact.test.ts",
+            "label": "\"Node compaction rejects corrupt, failed, mismatched and linked paths without deleting evidence\""
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-compact.test.ts:899d552e52ca55d9",
+            "kind": "assertion",
+            "path": "tooling/tests/benchmark-compact.test.ts",
+            "label": "\"Node compaction preserves validated summaries and raw sample arrays\""
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-compact.test.ts:b95802f3e335bcdf",
+            "kind": "assertion",
+            "path": "tooling/tests/benchmark-compact.test.ts",
+            "label": "\"Node compaction records deletion failure and retains diagnostic bytes\""
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-policy.test.ts:35d1add738c44394",
+            "kind": "assertion",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "\"benchmark flags preserve legacy selections and reject ambiguous inputs\""
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-policy.test.ts:36e8523b0d92e47b",
+            "kind": "assertion",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "\"named profiles validate every required observed field, physical adapter and headed visibility\""
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-policy.test.ts:457427d143988502",
+            "kind": "assertion",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "\"measured budgets require independent complete baselines and exact derived limits\""
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-policy.test.ts:5897c03373f43968",
+            "kind": "assertion",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "\"baseline loading verifies retained bytes and recomputes complete raw measurement metrics\""
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-policy.test.ts:ee3ec6f210577d6a",
+            "kind": "assertion",
+            "path": "tooling/tests/benchmark-policy.test.ts",
+            "label": "\"over-budget sampling completes all repetitions and cleanup with independent outcomes\""
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-runner.test.ts:84b6851529973934",
+            "kind": "assertion",
+            "path": "tooling/tests/benchmark-runner.test.ts",
+            "label": "\"Node consolidation failure cannot leave a successful legacy manifest or summary\""
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-runner.test.ts:b9e79e04e8a1141d",
+            "kind": "assertion",
+            "path": "tooling/tests/benchmark-runner.test.ts",
+            "label": "\"Node benchmark command failure retains diagnostics and refuses requested compaction\""
         },
         {
             "id": "assertion:tooling/tests/browser-session.test.ts:0493a67b4503fc85",

@@ -1,0 +1,37 @@
+{
+    "schemaVersion": 1,
+    "name": "windows-intel-gen12-chrome153",
+    "expected": {
+        "node": "v24.15.0",
+        "platform": "win32",
+        "release": "10.0.26200",
+        "arch": "x64",
+        "cpu": "12th Gen Intel(R) Core(TM) i7-12650H",
+        "logicalCores": 16,
+        "totalMemory": 16867581952,
+        "browserProduct": "Chrome/153.0.8010.53",
+        "browserRevision": "@792bf6722e73a45aa9e47c163b9901bdc17f3230",
+        "browserUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+        "flags": [
+            "--no-first-run",
+            "--disable-default-apps",
+            "--disable-dev-shm-usage",
+            "--disable-background-timer-throttling",
+            "--disable-renderer-backgrounding",
+            "--disable-backgrounding-occluded-windows",
+            "--window-size=1280,900",
+            "--enable-precise-memory-info"
+        ],
+        "headless": false,
+        "viewport": [1280, 900],
+        "dpr": 1,
+        "visibility": "visible",
+        "gpu": {
+            "vendor": "intel",
+            "architecture": "gen-12lp",
+            "device": "",
+            "description": "",
+            "isFallbackAdapter": false
+        }
+    }
+}

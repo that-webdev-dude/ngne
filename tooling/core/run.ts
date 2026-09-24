@@ -145,7 +145,8 @@ export class Run {
             const values = r.stages.filter((s) => s.required).map((s) => s[field]);
             return values.includes("failed")
                 ? "failed"
-                : values.length && values.every((v) => v === "passed")
+                : values.includes("passed") &&
+                    (field === "budgets" || values.every((v) => v === "passed"))
                   ? "passed"
                   : "not evaluated";
         };

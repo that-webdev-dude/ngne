@@ -1,0 +1,17 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "migration-replacement-proof",
+    "schemaVersion": 1,
+    "runId": "benchmark-test-compact-2026-09-24",
+    "status": "passed",
+    "coverageIds": [
+        "option:tests/benchmark-output.test.ts:-Command",
+        "option:tests/benchmark-output.test.ts:-ExecutionPolicy",
+        "option:tests/benchmark-output.test.ts:-NonInteractive",
+        "option:tests/benchmark-output.test.ts:-NoProfile"
+    ],
+    "destination": "tooling/suites/benchmarks/compact.ts",
+    "reviewedBy": "Codex: Node replacement of PowerShell-only test invocation",
+    "evidence": "docs/evidence/benchmark-migration.json",
+    "scope": "The original seven benchmark-output regression scenarios pass via Node. Only test launcher switches are retired, not reader semantics, original PowerShell script files, or Linux acceptance."
+}

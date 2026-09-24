@@ -189,8 +189,12 @@ Ordinary verification/default CI are engine-only, while compatibility requires
 explicit checkout and revision selection. Historical status paragraphs above
 describe the earlier adoption and migration stages.
 
-Next is T6: Migrate engine benchmarks and replace PowerShell orchestration.
-Only its engine resource workload portion was advanced to unblock retirement.
-Strict/candidate comparator implementation belongs to T7. Final hosted coverage,
-matched cost measurements, environment profiles and remaining retirement gates
-are not waived. Operational usage belongs in the [tooling guide](../../tooling/README.md).
+T6 is implemented and locally verified on Windows, but remains incomplete pending
+Linux execution. Node orchestration replaces the two PowerShell scripts after
+scoped replacement proofs; compatibility entry points and unrelated retirement
+gates remain. The installed resource workload now has named observed-environment
+profiles, exploratory/baseline/controlled modes and a measured local budget.
+See [benchmark migration evidence](../../docs/evidence/benchmark-migration.md).
+T7 remains blocked on T6; strict/candidate comparator implementation, final hosted
+coverage and matched CI-cost acceptance are not included or waived. Operational
+usage belongs in the [tooling guide](../../tooling/README.md).

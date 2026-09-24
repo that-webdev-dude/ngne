@@ -1,0 +1,15 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "migration-replacement-proof",
+    "schemaVersion": 1,
+    "runId": "benchmark-options-cpu-2026-09-24",
+    "status": "passed",
+    "coverageIds": [
+        "option:benchmarks/cpu/churn-schema.ts:--out",
+        "option:benchmarks/cpu/churn-schema.ts:--profile"
+    ],
+    "destination": "tooling/suites/benchmarks/cpu/churn-schema.ts",
+    "reviewedBy": "Codex: option-definition relocation and forwarding review",
+    "evidence": "docs/evidence/benchmark-migration.json",
+    "scope": "Only option definitions moved to the suite implementation. Legacy entry-point forwarding remains a separately blocked file/alias obligation; no PowerShell, comparator, transport or export retirement is approved."
+}

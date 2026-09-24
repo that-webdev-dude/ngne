@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { spawnSync } from "node:child_process";
+import { compactRun } from "../tooling/suites/benchmarks/compact.js";
+import { allBenchmarks } from "../tooling/suites/benchmarks/all.js";
+import { benchmarkOptions } from "../tooling/suites/benchmarks/options.js";
+import { benchmarkFixture } from "../tooling/tests/fixtures/benchmark-runner.js";
 import {
     mkdirSync,
     mkdtempSync,
@@ -8,7 +11,6 @@ import {
     readdirSync,
     writeFileSync,
     symlinkSync,
-    copyFileSync,
     existsSync,
 } from "node:fs";
 import { join, resolve } from "node:path";
@@ -65,24 +67,24 @@ function fixture(legacy = false) {
     if (!legacy) collectAnalysis(directory);
     return directory;
 }
-const quote = (value: string) => "'" + value.replaceAll("'", "''") + "'";
-function compact(directory: string, setup = "") {
-    return spawnSync(
-        "powershell",
-        [
-            "-NoProfile",
-            "-NonInteractive",
-            "-ExecutionPolicy",
-            "Bypass",
-            "-Command",
-            `$ErrorActionPreference='Stop'; . ${quote(resolve("benchmarks/compact-run.ps1"))}; ${setup} Compress-BenchmarkRun -RunDirectory ${quote(directory)} -ResultsScript ${quote(resolve("benchmarks/run-results.mjs"))} -Node ${quote(process.execPath)}`,
-        ],
-        { encoding: "utf8" },
-    );
+function compact(directory: string, injectFailure = false) {
+    try {
+        compactRun(
+            directory,
+            resolve("benchmarks/run-results.mjs"),
+            injectFailure
+                ? () => {
+                      throw Error("Injected deletion failure");
+                  }
+                : undefined,
+        );
+        return { status: 0, stderr: "" };
+    } catch (error) {
+        return { status: 1, stderr: String(error) };
+    }
 }
-const windows = { skip: process.platform !== "win32" };
 
-test("full, compact and legacy churn results produce identical metrics", windows, () => {
+test("full, compact and legacy churn results produce identical metrics", () => {
     const baseline = fixture(),
         candidate = fixture(),
         legacy = fixture(true);
@@ -110,7 +112,7 @@ test("full, compact and legacy churn results produce identical metrics", windows
     assert.equal(old.problems.length, 0);
 });
 
-test("missing or corrupted consolidated analysis prevents cleanup and comparison", windows, () => {
+test("missing or corrupted consolidated analysis prevents cleanup and comparison", () => {
     for (const content of ["{}", "broken"]) {
         const directory = fixture();
         writeFileSync(join(directory, "analysis.json"), content);
@@ -126,7 +128,7 @@ test("missing or corrupted consolidated analysis prevents cleanup and comparison
     assert.throws(() => loadRun(missing, "candidate"), /Missing consolidated/);
 });
 
-test("failed and incomplete runs retain diagnostics", windows, () => {
+test("failed and incomplete runs retain diagnostics", () => {
     const failed = fixture(),
         manifest = readJson(join(failed, "manifest.json"));
     manifest.status = "failed";
@@ -144,14 +146,18 @@ test("failed and incomplete runs retain diagnostics", windows, () => {
     assert.equal(readFileSync(join(incomplete, "churn/run.log"), "utf8"), "diagnostic");
 });
 
-test("compaction refuses mismatched directories, junctions and linked ancestors", windows, () => {
+test("compaction refuses mismatched directories, junctions and linked ancestors", () => {
     const directory = fixture(),
         outside = fixture();
-    symlinkSync(outside, join(directory, "escape"), "junction");
+    symlinkSync(
+        outside,
+        join(directory, "escape"),
+        process.platform === "win32" ? "junction" : "dir",
+    );
     assert.notEqual(compact(directory).status, 0);
     assert.equal(readFileSync(join(outside, "churn/run.log"), "utf8"), "diagnostic");
     const link = join(mkdtempSync(join(output, "link-")), "run");
-    symlinkSync(outside, link, "junction");
+    symlinkSync(outside, link, process.platform === "win32" ? "junction" : "dir");
     assert.notEqual(compact(link).status, 0);
     const mismatch = fixture(),
         manifest = readJson(join(mismatch, "manifest.json"));
@@ -161,12 +167,9 @@ test("compaction refuses mismatched directories, junctions and linked ancestors"
     assert.equal(readFileSync(join(mismatch, "churn/run.log"), "utf8"), "diagnostic");
 });
 
-test("cleanup failures are recorded instead of reporting compact success", windows, () => {
+test("cleanup failures are recorded instead of reporting compact success", () => {
     const directory = fixture();
-    const result = compact(
-        directory,
-        "function Remove-Item { throw 'Injected deletion failure' }; ",
-    );
+    const result = compact(directory, true);
     assert.notEqual(result.status, 0);
     assert.equal(readJson(join(directory, "manifest.json")).retention.mode, "failed");
     assert.equal(readFileSync(join(directory, "churn/run.log"), "utf8"), "diagnostic");
@@ -189,46 +192,29 @@ test("churn validation rejects incomplete samples and rejected GC traces", () =>
     assert.throws(() => validateAnalysis(valid), /Result mismatch/);
 });
 
-test("runner failure preserves logs even when compact output was requested", windows, () => {
-    const root = mkdtempSync(join(output, "failed-runner-"));
-    mkdirSync(join(root, "benchmarks/cpu"), { recursive: true });
-    for (const name of ["run-all.ps1", "compact-run.ps1", "run-results.mjs"])
-        copyFileSync(resolve("benchmarks", name), join(root, "benchmarks", name));
-    symlinkSync(resolve("node_modules"), join(root, "node_modules"), "junction");
+test("runner failure preserves logs even when compact output was requested", async () => {
+    const root = benchmarkFixture();
     writeFileSync(
-        join(root, "benchmarks/cpu/churn-schema.ts"),
-        `
-        import { writeFileSync } from 'node:fs';
-        writeFileSync(process.argv[process.argv.indexOf('--out') + 1], '{}');
-        console.error('Injected workload failure');
-    `,
+        join(root, "tooling/suites/benchmarks/cpu/churn-schema.ts"),
+        `import { writeFileSync } from 'node:fs'; writeFileSync(process.argv[process.argv.indexOf('--out') + 1], '{}'); console.error('Injected workload failure');`,
     );
-    const target = join(root, "runs");
-    const run = spawnSync(
-        "powershell",
-        [
-            "-NoProfile",
-            "-ExecutionPolicy",
-            "Bypass",
-            "-File",
-            join(root, "benchmarks/run-all.ps1"),
-            "-Workload",
-            "churn",
-            "-Compact",
-            "-OutputRoot",
-            target,
-        ],
-        { encoding: "utf8" },
+    const run = await allBenchmarks(
+        root,
+        benchmarkOptions(
+            ["-Workload", "churn", "-Compact", "-OutputRoot", join(root, "runs")],
+            root,
+        ),
     );
-    assert.equal(run.status, 1, run.stdout + run.stderr);
-    const directory = join(target, readdirSync(target)[0]);
+    assert.equal(run.result.accepted, false);
+    assert.equal(run.result.cleanup, "passed");
+    const directory = join(run.evidence, "legacy");
     const manifest = readJson(join(directory, "manifest.json"));
     assert.equal(manifest.status, "failed");
     assert.equal(manifest.stages[0].status, "failed");
     assert.equal(manifest.retention.mode, "full");
     assert.ok(existsSync(join(directory, "analysis.json")));
     assert.match(
-        readFileSync(join(directory, "churn/run.log"), "utf8"),
+        readFileSync(join(run.evidence, "stages/churn/logs/stderr.log"), "utf8"),
         /Injected workload failure/,
     );
 });

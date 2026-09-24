@@ -2009,9 +2009,9 @@
         {
             "id": "file:benchmarks/compact-run.ps1",
             "owner": "infrastructure",
-            "destination": "tooling/evidence/export.ts",
+            "destination": "tooling/suites/benchmarks/compact.ts",
             "action": "migrate",
-            "reason": "Replace PowerShell retention with Node only after integrity, safe pruning, failure retention and export parity."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "file:benchmarks/compare-runs.mjs",
@@ -2121,9 +2121,9 @@
         {
             "id": "file:benchmarks/run-all.ps1",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "file:benchmarks/run-results.mjs",
@@ -2525,6 +2525,20 @@
             "reason": "Existing engine unit/contract/browser fixture coverage and support remain; do not delete engine tests during tooling migration."
         },
         {
+            "id": "file:tooling/commands/benchmark-all.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/benchmark-all.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "file:tooling/commands/benchmark-budget.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/benchmark-budget.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
             "id": "file:tooling/commands/benchmark.ts",
             "owner": "infrastructure",
             "destination": "tooling/commands/benchmark.ts",
@@ -2728,11 +2742,32 @@
             "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
         },
         {
+            "id": "file:tooling/profiles/environments/windows-intel-gen12-chrome153.json",
+            "owner": "benchmark",
+            "destination": "tooling/profiles/environments/windows-intel-gen12-chrome153.json",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
             "id": "file:tooling/README.md",
             "owner": "infrastructure",
             "destination": "tooling/README.md",
             "action": "retain",
             "reason": "Current migration checker, harness or operating documentation; extend alongside each implementation."
+        },
+        {
+            "id": "file:tooling/suites/benchmarks/all.ts",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "file:tooling/suites/benchmarks/compact.ts",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/compact.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
         },
         {
             "id": "file:tooling/suites/benchmarks/content/accounting.ts",
@@ -2756,6 +2791,13 @@
             "reason": "Engine-only generated resource workload, public installed package, measured ownership/cancellation/disposal and explicit exploratory policy; no consumer selection."
         },
         {
+            "id": "file:tooling/suites/benchmarks/content/policy.ts",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/content/policy.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
             "id": "file:tooling/suites/benchmarks/content/README.md",
             "owner": "benchmark",
             "destination": "tooling/suites/benchmarks/content/README.md",
@@ -2770,6 +2812,48 @@
             "reason": "Engine-only generated resource workload, public installed package, measured ownership/cancellation/disposal and explicit exploratory policy; no consumer selection."
         },
         {
+            "id": "file:tooling/suites/benchmarks/cpu/benchmark.ts",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/cpu/benchmark.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "file:tooling/suites/benchmarks/cpu/churn-gc-parse.mjs",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/cpu/churn-gc-parse.mjs",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "file:tooling/suites/benchmarks/cpu/churn-schema.ts",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/cpu/churn-schema.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "file:tooling/suites/benchmarks/options.ts",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "file:tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "file:tooling/suites/benchmarks/rendering/renderer-fixture.ts",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/renderer-fixture.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
             "id": "file:tooling/suites/compatibility.ts",
             "owner": "infrastructure",
             "destination": "tooling/suites/compatibility.ts",
@@ -2782,6 +2866,27 @@
             "destination": "tooling/suites/verification/browser/installed.ts",
             "action": "retain",
             "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "file:tooling/tests/benchmark-compact.test.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-compact.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "file:tooling/tests/benchmark-policy.test.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "file:tooling/tests/benchmark-runner.test.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-runner.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
         },
         {
             "id": "file:tooling/tests/browser-session.test.ts",
@@ -2810,6 +2915,13 @@
             "destination": "tooling/tests/content-engine.test.ts",
             "action": "retain",
             "reason": "Explicit engine benchmark command or regression coverage; preserves strict input, failure, evidence and cleanup boundaries."
+        },
+        {
+            "id": "file:tooling/tests/fixtures/benchmark-runner.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/fixtures/benchmark-runner.ts",
+            "action": "retain",
+            "reason": "Synthetic Node command-failure fixture shared by legacy-reader and namespaced-runner regressions; no real engine or consumer compatibility claim."
         },
         {
             "id": "file:tooling/tests/fixtures/consumer-contract-v1/cases.json",
@@ -3064,6 +3176,13 @@
             "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
         },
         {
+            "id": "file:tooling/tsconfig.benchmarks.json",
+            "owner": "infrastructure",
+            "destination": "tooling/tsconfig.benchmarks.json",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
             "id": "file:tooling/tsconfig.node.json",
             "owner": "infrastructure",
             "destination": "tooling/tsconfig.node.json",
@@ -3094,226 +3213,212 @@
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--enable-precise-memory-info",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:--headless",
-            "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
-            "action": "retain",
-            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--host",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--no-default-browser-check",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--no-first-run",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--outDir",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--port",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--remote-debugging-port",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--strictPort",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--user-data-dir",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:--window-size",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_ALLOCATION_SAMPLING",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_ARTIFACT_DIR",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_BROWSER",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
-        },
-        {
-            "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_BROWSER_HEADLESS",
-            "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
-            "action": "retain",
-            "reason": "Shared browser lifecycle and real protocol capability verification; workload policy remains suite-owned. No consumer or performance equivalence claim."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_CDP_PORT",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_CYCLES",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_DURATION_SECONDS",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_EXPECTED_BACKEND",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_EXPECTED_BUILD",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_RETAINED_EVERY_SECONDS",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_SERVE_DIR",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_SERVE_OUT_DIR",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_SNAPSHOTS",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_TRACE",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_URL",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/browser/browser-baseline.ts:NGNE_WARMUP_SECONDS",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/compact-run.ps1:-Directory",
             "owner": "infrastructure",
-            "destination": "tooling/evidence/export.ts",
+            "destination": "tooling/suites/benchmarks/compact.ts",
             "action": "migrate",
-            "reason": "Replace PowerShell retention with Node only after integrity, safe pruning, failure retention and export parity."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/compact-run.ps1:-Node",
             "owner": "infrastructure",
-            "destination": "tooling/evidence/export.ts",
+            "destination": "tooling/suites/benchmarks/compact.ts",
             "action": "migrate",
-            "reason": "Replace PowerShell retention with Node only after integrity, safe pruning, failure retention and export parity."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/compact-run.ps1:-Path",
             "owner": "infrastructure",
-            "destination": "tooling/evidence/export.ts",
+            "destination": "tooling/suites/benchmarks/compact.ts",
             "action": "migrate",
-            "reason": "Replace PowerShell retention with Node only after integrity, safe pruning, failure retention and export parity."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/compact-run.ps1:-ResultsScript",
             "owner": "infrastructure",
-            "destination": "tooling/evidence/export.ts",
+            "destination": "tooling/suites/benchmarks/compact.ts",
             "action": "migrate",
-            "reason": "Replace PowerShell retention with Node only after integrity, safe pruning, failure retention and export parity."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/compact-run.ps1:-RunDirectory",
             "owner": "infrastructure",
-            "destination": "tooling/evidence/export.ts",
+            "destination": "tooling/suites/benchmarks/compact.ts",
             "action": "migrate",
-            "reason": "Replace PowerShell retention with Node only after integrity, safe pruning, failure retention and export parity."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/compare-runs.mjs:--attention-percent",
@@ -3418,196 +3523,196 @@
             "owner": "benchmark",
             "destination": "tooling/suites/benchmarks/cpu/churn-schema.ts",
             "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/cpu/churn-schema.ts:--profile",
             "owner": "benchmark",
             "destination": "tooling/suites/benchmarks/cpu/churn-schema.ts",
             "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+            "reason": "Relocated suite-owned option definition; compatibility entry point forwards unchanged argv/environment. Exact option correspondence and local execution are recorded in docs/evidence/benchmark-migration.json. File/alias and PowerShell retirement remain separately blocked."
         },
         {
             "id": "option:benchmarks/run-all.ps1:--expose-gc",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:--import",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:--trace-gc",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:-BaseCdpPort",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:-BaseUrl",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:-Compact",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:-Diagnostics",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:-DurationSeconds",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:-OutputRoot",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:-SkipBuild",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:-WarmupSeconds",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:-Workload",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_ALLOCATION_SAMPLING",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_ARTIFACT_DIR",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_CDP_PORT",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_CYCLES",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_DURATION_SECONDS",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_EXPECTED_BACKEND",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_EXPECTED_BUILD",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_RETAINED_EVERY_SECONDS",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_SERVE_DIR",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_SERVE_OUT_DIR",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_SNAPSHOTS",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_TRACE",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_URL",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:benchmarks/run-all.ps1:NGNE_WARMUP_SECONDS",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "option:tests/benchmark-output.test.ts:--out",
@@ -3619,9 +3724,9 @@
         {
             "id": "option:tests/benchmark-output.test.ts:-Command",
             "owner": "infrastructure",
-            "destination": "tooling/tests/benchmark-output.test.ts",
+            "destination": "tooling/suites/benchmarks/compact.ts",
             "action": "migrate",
-            "reason": "Tooling regression belongs to flat tooling harness; preserve its failure/integrity behavior while adapting old imports."
+            "reason": "PowerShell-only test launcher plumbing replaced by direct Node benchmark/compaction calls. Original legacy retention/comparison scenario names and checks remain; all pass without PowerShell invocation. Legacy reader test-file relocation and old script deletion retain separate gates."
         },
         {
             "id": "option:tests/benchmark-output.test.ts:-Compact",
@@ -3633,30 +3738,30 @@
         {
             "id": "option:tests/benchmark-output.test.ts:-ExecutionPolicy",
             "owner": "infrastructure",
-            "destination": "tooling/tests/benchmark-output.test.ts",
+            "destination": "tooling/suites/benchmarks/compact.ts",
             "action": "migrate",
-            "reason": "Tooling regression belongs to flat tooling harness; preserve its failure/integrity behavior while adapting old imports."
+            "reason": "PowerShell-only test launcher plumbing replaced by direct Node benchmark/compaction calls. Original legacy retention/comparison scenario names and checks remain; all pass without PowerShell invocation. Legacy reader test-file relocation and old script deletion retain separate gates."
         },
         {
             "id": "option:tests/benchmark-output.test.ts:-File",
             "owner": "infrastructure",
-            "destination": "tooling/tests/benchmark-output.test.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Tooling regression belongs to flat tooling harness; preserve its failure/integrity behavior while adapting old imports."
+            "reason": "PowerShell-only test launcher plumbing replaced by direct Node benchmark/compaction calls. Original legacy retention/comparison scenario names and checks remain; all pass without PowerShell invocation. Legacy reader test-file relocation and old script deletion retain separate gates."
         },
         {
             "id": "option:tests/benchmark-output.test.ts:-NonInteractive",
             "owner": "infrastructure",
-            "destination": "tooling/tests/benchmark-output.test.ts",
+            "destination": "tooling/suites/benchmarks/compact.ts",
             "action": "migrate",
-            "reason": "Tooling regression belongs to flat tooling harness; preserve its failure/integrity behavior while adapting old imports."
+            "reason": "PowerShell-only test launcher plumbing replaced by direct Node benchmark/compaction calls. Original legacy retention/comparison scenario names and checks remain; all pass without PowerShell invocation. Legacy reader test-file relocation and old script deletion retain separate gates."
         },
         {
             "id": "option:tests/benchmark-output.test.ts:-NoProfile",
             "owner": "infrastructure",
-            "destination": "tooling/tests/benchmark-output.test.ts",
+            "destination": "tooling/suites/benchmarks/compact.ts",
             "action": "migrate",
-            "reason": "Tooling regression belongs to flat tooling harness; preserve its failure/integrity behavior while adapting old imports."
+            "reason": "PowerShell-only test launcher plumbing replaced by direct Node benchmark/compaction calls. Original legacy retention/comparison scenario names and checks remain; all pass without PowerShell invocation. Legacy reader test-file relocation and old script deletion retain separate gates."
         },
         {
             "id": "option:tests/benchmark-output.test.ts:-OutputRoot",
@@ -4093,6 +4198,27 @@
             "reason": "Extract proven lifecycle into shared session infrastructure; preserve owned cleanup, no replay and large profiler wire capability before retirement."
         },
         {
+            "id": "option:tooling/commands/benchmark.ts:--baseline",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/benchmark.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "option:tooling/commands/benchmark.ts:--budget",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/benchmark.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "option:tooling/commands/benchmark.ts:--controlled",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/benchmark.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
             "id": "option:tooling/commands/benchmark.ts:--explore",
             "owner": "infrastructure",
             "destination": "tooling/commands/benchmark.ts",
@@ -4112,6 +4238,13 @@
             "destination": "tooling/commands/benchmark.ts",
             "action": "retain",
             "reason": "Explicit engine benchmark command or regression coverage; preserves strict input, failure, evidence and cleanup boundaries."
+        },
+        {
+            "id": "option:tooling/commands/benchmark.ts:--profile",
+            "owner": "infrastructure",
+            "destination": "tooling/commands/benchmark.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
         },
         {
             "id": "option:tooling/commands/benchmark.ts:--smoke",
@@ -4408,6 +4541,146 @@
             "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
         },
         {
+            "id": "option:tooling/suites/benchmarks/all.ts:--expose-gc",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:--import",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:--out",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:--porcelain",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:--profile",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:--trace-gc",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_ALLOCATION_SAMPLING",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_ARTIFACT_DIR",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_CDP_PORT",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_CYCLES",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_DURATION_SECONDS",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_EXPECTED_BACKEND",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_EXPECTED_BUILD",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_RETAINED_EVERY_SECONDS",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_SERVE_DIR",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_SERVE_OUT_DIR",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_SNAPSHOTS",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_TRACE",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_URL",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/all.ts:NGNE_WARMUP_SECONDS",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/all.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
             "id": "option:tooling/suites/benchmarks/content/run.ts:--disable-background-timer-throttling",
             "owner": "benchmark",
             "destination": "tooling/suites/benchmarks/content/run.ts",
@@ -4483,6 +4756,335 @@
             "destination": "tooling/suites/benchmarks/content/run.ts",
             "action": "retain",
             "reason": "Engine-only generated resource workload, public installed package, measured ownership/cancellation/disposal and explicit exploratory policy; no consumer selection."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/cpu/churn-schema.ts:--out",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/cpu/churn-schema.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/cpu/churn-schema.ts:--profile",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/cpu/churn-schema.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:--base-cdp-port",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:--base-url",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:--compact",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:--diagnostics",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:--duration-seconds",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:--output-root",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:--skip-build",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:--warmup-seconds",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:--workload",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:-BaseCdpPort",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:-BaseUrl",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:-Compact",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:-Diagnostics",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:-DurationSeconds",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:-OutputRoot",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:-SkipBuild",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:-WarmupSeconds",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/options.ts:-Workload",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/options.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--enable-precise-memory-info",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--headless",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--host",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--no-default-browser-check",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--no-first-run",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--outDir",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--port",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--remote-debugging-port",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--strictPort",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--user-data-dir",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:--window-size",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_ALLOCATION_SAMPLING",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_ARTIFACT_DIR",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_BROWSER",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_BROWSER_HEADLESS",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_CDP_PORT",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_CYCLES",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_DURATION_SECONDS",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_EXPECTED_BACKEND",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_EXPECTED_BUILD",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_RETAINED_EVERY_SECONDS",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_SERVE_DIR",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_SERVE_OUT_DIR",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_SNAPSHOTS",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_TRACE",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_URL",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
+        },
+        {
+            "id": "option:tooling/suites/benchmarks/rendering/browser-baseline.ts:NGNE_WARMUP_SECONDS",
+            "owner": "benchmark",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
+            "action": "retain",
+            "reason": "Reviewed engine-owned workload, Node orchestration/retention or explicit measured environment policy. No consumer dependency or comparator semantics change."
         },
         {
             "id": "option:tooling/suites/compatibility.ts:--contract-version",
@@ -4693,6 +5295,125 @@
             "destination": "tooling/suites/verification/browser/installed.ts",
             "action": "retain",
             "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:--base-url",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:--compact",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:--diagnostics",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:--duration-seconds",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:--skip-build",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:--test",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:--warmup-seconds",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:--workload",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:-Compact",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:-Diagnostics",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:-DurationSeconds",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:-SkipBuild",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:-WarmupSeconds",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-policy.test.ts:-Workload",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-runner.test.ts:--compact",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-runner.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-runner.test.ts:--out",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-runner.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-runner.test.ts:--workload",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-runner.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
         },
         {
             "id": "option:tooling/tests/browser-session.test.ts:-e",
@@ -8169,6 +8890,76 @@
             "reason": "Engine-only generated resource workload, public installed package, measured ownership/cancellation/disposal and explicit exploratory policy; no consumer selection."
         },
         {
+            "id": "assertion:tooling/tests/benchmark-compact.test.ts:8967f748ff3c7861",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-compact.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-compact.test.ts:899d552e52ca55d9",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-compact.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-compact.test.ts:b95802f3e335bcdf",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-compact.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-policy.test.ts:35d1add738c44394",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-policy.test.ts:36e8523b0d92e47b",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-policy.test.ts:457427d143988502",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-policy.test.ts:5897c03373f43968",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-policy.test.ts:ee3ec6f210577d6a",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-policy.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-runner.test.ts:84b6851529973934",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-runner.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-runner.test.ts:b9e79e04e8a1141d",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-runner.test.ts",
+            "action": "retain",
+            "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
             "id": "assertion:tooling/tests/browser-session.test.ts:0493a67b4503fc85",
             "owner": "infrastructure",
             "destination": "tooling/tests/browser-session.test.ts",
@@ -8684,9 +9475,9 @@
         {
             "id": "workload:compaction-integrity",
             "owner": "infrastructure",
-            "destination": "tooling/evidence/export.ts",
+            "destination": "tooling/suites/benchmarks/compact.ts",
             "action": "migrate",
-            "reason": "Replace PowerShell retention with Node only after integrity, safe pruning, failure retention and export parity."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "workload:consumer-checkpoint",
@@ -8803,9 +9594,9 @@
         {
             "id": "workload:orchestration-retention",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/suites/benchmarks/all.ts",
             "action": "migrate",
-            "reason": "Replace orchestration with Node preserving flags, sampling, errors, outputs, diagnostics and cleanup."
+            "reason": "Windows PowerShell behavior replaced by Node with preserved flags, validated legacy retention, diagnostic/failure propagation and verified owned-process cleanup. Exact obligations and passing evidence are recorded in docs/evidence/benchmark-migration.json. Linux acceptance remains an overall migration blocker."
         },
         {
             "id": "workload:renderer-alternating",

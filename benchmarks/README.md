@@ -1,6 +1,8 @@
 # Benchmarks
 
-Run from the repository root in PowerShell. Keep benchmark Chrome windows visible.
+Run from the repository root with Node 24. Keep benchmark Chrome windows visible.
+The entry point uses Node; use `npm.cmd` in Windows PowerShell. Windows execution
+is verified; Linux execution remains outstanding in the [dated evidence](../docs/evidence/benchmark-migration.md).
 
 For installed engine resource churn, use
 [`npm.cmd run bench:content -- --explore`](../tooling/suites/benchmarks/content/README.md).
@@ -30,14 +32,17 @@ The default suite builds both artifacts and runs CPU, churn, two renderer fixtur
 Starfall Chaos Lab and Platformer sequentially. Diagnostics run separately from clean churn
 measurements and can perturb browser timings.
 
-Each invocation creates a unique directory under `.test-output/benchmarks/`:
+Each invocation creates a unique directory under `out/runs/`. Namespaced evidence,
+raw measurement records and cleanup outcomes live in `evidence/`. The
+`evidence/legacy/` projection preserves advisory-reader compatibility:
 
 - `summary.md`: readable status report.
 - `analysis.json`: self-contained workload measurements and validation results.
 - `manifest.json`: revision, environment, stage status and retention metadata.
 
-Full output also retains logs and profiles. Compact output removes those artifacts only after
-validating the summaries. Failed runs retain diagnostics. Cleanup refuses links/junctions and
+Full output also retains logs and profiles. Compact output removes legacy raw artifacts only after
+validating the summaries; namespaced raw measurements and command logs remain.
+Failed runs retain diagnostics. Cleanup refuses links/junctions and
 never prunes historical runs or external temporary directories. Raw profiles cannot be
 re-examined after compaction; future comparisons still work.
 
@@ -72,3 +77,16 @@ CPU measurements do not measure GPU execution. Allocation bytes per batch are de
 a faster workload can allocate more bytes per second while allocating less per batch.
 Browser heap movement alone is not evidence of a leak. Replicated A/B orchestration remains
 manual; this runner executes one sample run per selected workload and mode.
+CPU, private renderer and repository showcase probes are explicitly internal-source
+microbenchmarks, with source/build inventories; they do not establish installed-package
+acceptance. Their implementation lives in `tooling/suites/benchmarks/`; old source
+paths remain compatibility entry points pending retirement gates. The installed
+resource workload above tests the exact fresh tarball. The aggregate suite is
+exploratory; named physical-environment baseline collection and measured-budget
+acceptance currently apply to that installed resource workload.
+
+The original PowerShell files are retired after Windows replacement checks;
+`bench:all` uses Node. Both original flag spellings and kebab-case forms (for example `--workload`,
+`--warmup-seconds`, `--output-root`, `--diagnostics`, `--compact`) are supported.
+Pass `evidence/legacy/` explicitly to the advisory comparator. No automatic latest-run
+selection occurs.

@@ -15,5 +15,10 @@
         "evidence/**/*.ts",
         "tests/*.test.ts",
         "suites/**/*.ts"
+    ],
+    "exclude": [
+        "suites/benchmarks/cpu/benchmark.ts",
+        "suites/benchmarks/cpu/churn-schema.ts",
+        "suites/benchmarks/rendering/**/*.ts"
     ]
 }
