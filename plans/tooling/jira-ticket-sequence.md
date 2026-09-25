@@ -72,6 +72,20 @@ framework, new reporting system or benchmark campaign.
 
 ## T8. Finish verification commands and CI artifacts
 
+Complete on 2026-09-25 for implementation `ef856e6f27f498e8288a671ae402334b3963a23a`.
+Local verification passed. [Ordinary Ubuntu CI run 36171850842](https://github.com/that-webdev-dude/ngne/actions/runs/36171850842)
+passed all required checks: 275 tests, installed root/nested checks (60 each),
+transport/profiler checks, all three failure injections and 189 browser assertions.
+Downloaded artifact `10880726507` contains 122 files; all 39 indexed payload hashes
+and sizes matched. Package tarball, fixture builds, browser inputs, logs, failure
+records and cleanup results were inspected. Real resources cleaned up successfully;
+the controlled cleanup failure correctly rejected otherwise passing validation.
+No dependency, cache, work or browser-profile directories were uploaded. Deployment
+was skipped. Logs and the downloaded artifact are retained in ignored
+`out/ci/t8-36171850842/`. This is Ubuntu/SwiftShader evidence, not physical-GPU,
+manual, benchmark or consumer-compatibility acceptance. Documented payload omissions
+and local-only preparation requirements remain unchanged.
+
 Dependencies: T7.
 
 Changes:
@@ -153,8 +167,8 @@ candidate-comparison acceptance or portable-export acceptance.
 
 ## Sequence
 
-Completed: T1a, T1b, T2, T3, T5, T4, T6, T7.
-Remaining: T8 → T9 → T10.
+Completed: T1a, T1b, T2, T3, T5, T4, T6, T7, T8.
+Remaining: T9 → T10.
 
 Each ticket includes its affected tests, command/docs updates and existing migration
 map maintenance. Do not automatically start the next ticket.

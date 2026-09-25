@@ -14,10 +14,11 @@ for implementation `a127e594de11b190f7d218364d0f4db08a1f9c69`.
 The original machine record and backup handoff remain unchanged historical records.
 T7 is complete on 2026-09-25: existing comparators/readers relocated with unchanged
 semantics; 19 affected tests, 16 migration-checker tests, typechecks, formatting
-and migration validation passed locally on Windows. T8 is next and has not started.
+and migration validation passed locally on Windows. T8 is complete on 2026-09-25:
+local verification and ordinary Ubuntu CI passed; uploaded payloads, failure records,
+cleanup and exclusions were inspected. See the [T8 acceptance record](jira-ticket-sequence.md#t8-finish-verification-commands-and-ci-artifacts).
 
-The remaining work is comparator relocation, practical verification/CI delivery,
-safe removal of superseded code and final verification. Candidate comparison,
+The remaining work is safe removal of superseded code and final verification. Candidate comparison,
 portable export and the five-run CI cost campaign are excluded; see the plan for
 exact limits. Ordinary Linux verification and existing correctness/cleanup checks
 remain required. There is no separate simplified runtime or weaker acceptance mode.
