@@ -5,7 +5,7 @@ import {
     ProtocolError,
     TransportError,
     isNavigationError,
-} from "./tooling/devtools.mjs";
+} from "../../tests/tooling/devtools.mjs";
 
 class Clock {
     next = 0;
@@ -26,7 +26,7 @@ class Clock {
 }
 class Socket {
     listeners = new Map<string, Set<(event: object) => void>>();
-    sent: { id: number; method: string; params: object }[] = [];
+    sent: { id: number; method: string; params: Record<string, unknown> }[] = [];
     closes = 0;
     readyState = 0;
     addEventListener(name: string, fn: (event: object) => void) {

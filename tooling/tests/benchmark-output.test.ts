@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { compactRun } from "../tooling/suites/benchmarks/compact.js";
-import { allBenchmarks } from "../tooling/suites/benchmarks/all.js";
-import { benchmarkOptions } from "../tooling/suites/benchmarks/options.js";
-import { benchmarkFixture } from "../tooling/tests/fixtures/benchmark-runner.js";
+import { compactRun } from "../suites/benchmarks/compact.js";
+import { allBenchmarks } from "../suites/benchmarks/all.js";
+import { benchmarkOptions } from "../suites/benchmarks/options.js";
+import { benchmarkFixture } from "./fixtures/benchmark-runner.js";
 import {
     mkdirSync,
     mkdtempSync,
@@ -20,8 +20,8 @@ import {
     readJson,
     validateAnalysis,
     validateChurn,
-} from "../tooling/evidence/run-results.mjs";
-import { compareRuns } from "../tooling/evidence/compare-runs.mjs";
+} from "../evidence/run-results.mjs";
+import { compareRuns } from "../evidence/compare-runs.mjs";
 
 const output = resolve(".test-output/benchmark-output-tests");
 mkdirSync(output, { recursive: true });

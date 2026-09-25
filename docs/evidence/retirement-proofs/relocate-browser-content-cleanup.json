@@ -1,0 +1,24 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "migration-replacement-proof",
+    "schemaVersion": 1,
+    "runId": "test-relocation-browser-content-cleanup-2026-09-25",
+    "recordedDate": "2026-09-25",
+    "revision": "1dc93c33341737c3a67ec27e129d09b716abc58c plus uncommitted test relocation",
+    "status": "passed",
+    "coverageIds": [
+        "file:tests/browser-content-cleanup.test.ts",
+        "assertion:tests/browser-content-cleanup.test.ts:641ba3a56cbcdf35"
+    ],
+    "destination": "tooling/tests/browser-content-cleanup.test.ts",
+    "reviewedBy": "Codex: unchanged assertion bodies and labels, updated imports, no remaining live callers",
+    "evidence": "out/tooling-test-relocation/20260925/affected-tests.log",
+    "source": "tests/browser-content-cleanup.test.ts",
+    "sourceSHA256": "4a949c14689280e069400670d554a0803fe41a55354ee798402991e26366b1e7",
+    "checks": [
+        "43 affected regression tests passed on Windows with owned process cleanup",
+        "Tooling typechecks passed; declaration and test annotation fixes only",
+        "Every original discovered scenario has the same label in the relocated file"
+    ],
+    "limits": "Local regression evidence only; no fresh browser, benchmark, consumer integration or hosted CI execution."
+}

@@ -3814,12 +3814,6 @@
             "label": "tests/audio.test.ts"
         },
         {
-            "id": "file:tests/benchmark-output.test.ts",
-            "kind": "file",
-            "path": "tests/benchmark-output.test.ts",
-            "label": "tests/benchmark-output.test.ts"
-        },
-        {
             "id": "file:tests/browser-audio-checks.ts",
             "kind": "file",
             "path": "tests/browser-audio-checks.ts",
@@ -3830,12 +3824,6 @@
             "kind": "file",
             "path": "tests/browser-ci.ts",
             "label": "tests/browser-ci.ts"
-        },
-        {
-            "id": "file:tests/browser-content-cleanup.test.ts",
-            "kind": "file",
-            "path": "tests/browser-content-cleanup.test.ts",
-            "label": "tests/browser-content-cleanup.test.ts"
         },
         {
             "id": "file:tests/browser-game-checks.ts",
@@ -3904,22 +3892,10 @@
             "label": "tests/content-churn.test.ts"
         },
         {
-            "id": "file:tests/content-measurement.test.ts",
-            "kind": "file",
-            "path": "tests/content-measurement.test.ts",
-            "label": "tests/content-measurement.test.ts"
-        },
-        {
             "id": "file:tests/content-ownership.test.ts",
             "kind": "file",
             "path": "tests/content-ownership.test.ts",
             "label": "tests/content-ownership.test.ts"
-        },
-        {
-            "id": "file:tests/devtools.test.ts",
-            "kind": "file",
-            "path": "tests/devtools.test.ts",
-            "label": "tests/devtools.test.ts"
         },
         {
             "id": "file:tests/ecs-soa.test.ts",
@@ -3992,12 +3968,6 @@
             "kind": "file",
             "path": "tests/platformer.test.ts",
             "label": "tests/platformer.test.ts"
-        },
-        {
-            "id": "file:tests/runner-cleanup.test.ts",
-            "kind": "file",
-            "path": "tests/runner-cleanup.test.ts",
-            "label": "tests/runner-cleanup.test.ts"
         },
         {
             "id": "file:tests/simulation.contract.test.ts",
@@ -4384,6 +4354,12 @@
             "label": "tooling/tests/benchmark-compact.test.ts"
         },
         {
+            "id": "file:tooling/tests/benchmark-output.test.ts",
+            "kind": "file",
+            "path": "tooling/tests/benchmark-output.test.ts",
+            "label": "tooling/tests/benchmark-output.test.ts"
+        },
+        {
             "id": "file:tooling/tests/benchmark-policy.test.ts",
             "kind": "file",
             "path": "tooling/tests/benchmark-policy.test.ts",
@@ -4394,6 +4370,12 @@
             "kind": "file",
             "path": "tooling/tests/benchmark-runner.test.ts",
             "label": "tooling/tests/benchmark-runner.test.ts"
+        },
+        {
+            "id": "file:tooling/tests/browser-content-cleanup.test.ts",
+            "kind": "file",
+            "path": "tooling/tests/browser-content-cleanup.test.ts",
+            "label": "tooling/tests/browser-content-cleanup.test.ts"
         },
         {
             "id": "file:tooling/tests/browser-session.test.ts",
@@ -4418,6 +4400,18 @@
             "kind": "file",
             "path": "tooling/tests/content-engine.test.ts",
             "label": "tooling/tests/content-engine.test.ts"
+        },
+        {
+            "id": "file:tooling/tests/content-measurement.test.ts",
+            "kind": "file",
+            "path": "tooling/tests/content-measurement.test.ts",
+            "label": "tooling/tests/content-measurement.test.ts"
+        },
+        {
+            "id": "file:tooling/tests/devtools.test.ts",
+            "kind": "file",
+            "path": "tooling/tests/devtools.test.ts",
+            "label": "tooling/tests/devtools.test.ts"
         },
         {
             "id": "file:tooling/tests/fixtures/benchmark-runner.ts",
@@ -4642,6 +4636,12 @@
             "label": "tooling/tests/preparation.test.ts"
         },
         {
+            "id": "file:tooling/tests/runner-cleanup.test.ts",
+            "kind": "file",
+            "path": "tooling/tests/runner-cleanup.test.ts",
+            "label": "tooling/tests/runner-cleanup.test.ts"
+        },
+        {
             "id": "file:tooling/tests/verify-engine.test.ts",
             "kind": "file",
             "path": "tooling/tests/verify-engine.test.ts",
@@ -4676,30 +4676,6 @@
             "kind": "file",
             "path": "vite.config.ts",
             "label": "vite.config.ts"
-        },
-        {
-            "id": "option:tests/benchmark-output.test.ts:--out",
-            "kind": "option",
-            "path": "tests/benchmark-output.test.ts",
-            "label": "--out"
-        },
-        {
-            "id": "option:tests/benchmark-output.test.ts:-Compact",
-            "kind": "option",
-            "path": "tests/benchmark-output.test.ts",
-            "label": "-Compact"
-        },
-        {
-            "id": "option:tests/benchmark-output.test.ts:-OutputRoot",
-            "kind": "option",
-            "path": "tests/benchmark-output.test.ts",
-            "label": "-OutputRoot"
-        },
-        {
-            "id": "option:tests/benchmark-output.test.ts:-Workload",
-            "kind": "option",
-            "path": "tests/benchmark-output.test.ts",
-            "label": "-Workload"
         },
         {
             "id": "option:tests/browser-ci.ts:--disable-background-timer-throttling",
@@ -4922,12 +4898,6 @@
             "kind": "option",
             "path": "tests/browser-ci.ts",
             "label": "NGNE_WEBGPU_ADAPTER"
-        },
-        {
-            "id": "option:tests/runner-cleanup.test.ts:-e",
-            "kind": "option",
-            "path": "tests/runner-cleanup.test.ts",
-            "label": "-e"
         },
         {
             "id": "option:tests/tooling/cleanup.mjs:-Command",
@@ -5932,6 +5902,30 @@
             "label": "NGNE_WEBGPU_ADAPTER"
         },
         {
+            "id": "option:tooling/tests/benchmark-output.test.ts:--out",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-output.test.ts",
+            "label": "--out"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-output.test.ts:-Compact",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-output.test.ts",
+            "label": "-Compact"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-output.test.ts:-OutputRoot",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-output.test.ts",
+            "label": "-OutputRoot"
+        },
+        {
+            "id": "option:tooling/tests/benchmark-output.test.ts:-Workload",
+            "kind": "option",
+            "path": "tooling/tests/benchmark-output.test.ts",
+            "label": "-Workload"
+        },
+        {
             "id": "option:tooling/tests/benchmark-policy.test.ts:--base-url",
             "kind": "option",
             "path": "tooling/tests/benchmark-policy.test.ts",
@@ -6200,6 +6194,12 @@
             "kind": "option",
             "path": "tooling/tests/migration.test.ts",
             "label": "NGNE_NEW_OPTION"
+        },
+        {
+            "id": "option:tooling/tests/runner-cleanup.test.ts:-e",
+            "kind": "option",
+            "path": "tooling/tests/runner-cleanup.test.ts",
+            "label": "-e"
         },
         {
             "id": "option:tooling/tests/verify-engine.test.ts:NGNE_BROWSER_ARTIFACT_DIR",
@@ -8774,48 +8774,6 @@
             "label": "\"scope cleanup is best effort, terminal and reports every failure\""
         },
         {
-            "id": "assertion:tests/benchmark-output.test.ts:4f5bf6273bb13a6c",
-            "kind": "assertion",
-            "path": "tests/benchmark-output.test.ts",
-            "label": "\"failed and incomplete runs retain diagnostics\""
-        },
-        {
-            "id": "assertion:tests/benchmark-output.test.ts:501faf1b41a7ec0b",
-            "kind": "assertion",
-            "path": "tests/benchmark-output.test.ts",
-            "label": "\"missing or corrupted consolidated analysis prevents cleanup and comparison\""
-        },
-        {
-            "id": "assertion:tests/benchmark-output.test.ts:7a9466df12f588ed",
-            "kind": "assertion",
-            "path": "tests/benchmark-output.test.ts",
-            "label": "\"runner failure preserves logs even when compact output was requested\""
-        },
-        {
-            "id": "assertion:tests/benchmark-output.test.ts:bba4aff5dbe2a208",
-            "kind": "assertion",
-            "path": "tests/benchmark-output.test.ts",
-            "label": "\"full, compact and legacy churn results produce identical metrics\""
-        },
-        {
-            "id": "assertion:tests/benchmark-output.test.ts:dc7f11e23bdd938e",
-            "kind": "assertion",
-            "path": "tests/benchmark-output.test.ts",
-            "label": "\"compaction refuses mismatched directories, junctions and linked ancestors\""
-        },
-        {
-            "id": "assertion:tests/benchmark-output.test.ts:e0b86faff6d07d99",
-            "kind": "assertion",
-            "path": "tests/benchmark-output.test.ts",
-            "label": "\"churn validation rejects incomplete samples and rejected GC traces\""
-        },
-        {
-            "id": "assertion:tests/benchmark-output.test.ts:e198157f294c631f",
-            "kind": "assertion",
-            "path": "tests/benchmark-output.test.ts",
-            "label": "\"cleanup failures are recorded instead of reporting compact success\""
-        },
-        {
             "id": "assertion:tests/browser-audio-checks.ts:368a95f27e69b2b9",
             "kind": "assertion",
             "path": "tests/browser-audio-checks.ts",
@@ -8892,12 +8850,6 @@
             "kind": "assertion",
             "path": "tests/browser-ci.ts",
             "label": "\"Starfall built path starts a flight\""
-        },
-        {
-            "id": "assertion:tests/browser-content-cleanup.test.ts:641ba3a56cbcdf35",
-            "kind": "assertion",
-            "path": "tests/browser-content-cleanup.test.ts",
-            "label": "\"installed checks preserve workload and restore failures while attempting remaining cleanup\""
         },
         {
             "id": "assertion:tests/browser-game-checks.ts:2eead18a769bbe95",
@@ -9410,12 +9362,6 @@
             "label": "\"repeated bounded churn preserves exact survivor claims across cancellation and late completions\""
         },
         {
-            "id": "assertion:tests/content-measurement.test.ts:925595020de2d285",
-            "kind": "assertion",
-            "path": "tests/content-measurement.test.ts",
-            "label": "\"content comparison refuses a failed run and incompatible browser environment\""
-        },
-        {
             "id": "assertion:tests/content-ownership.test.ts:0e9c769465dd539f",
             "kind": "assertion",
             "path": "tests/content-ownership.test.ts",
@@ -9432,60 +9378,6 @@
             "kind": "assertion",
             "path": "tests/content-ownership.test.ts",
             "label": "\"final upload cancellation releases acquired claims, rejects stale completion and permits explicit retry\""
-        },
-        {
-            "id": "assertion:tests/devtools.test.ts:0a279c84640ac356",
-            "kind": "assertion",
-            "path": "tests/devtools.test.ts",
-            "label": "`opening ${event} releases all listeners and timers`"
-        },
-        {
-            "id": "assertion:tests/devtools.test.ts:1af1997fc189dd3e",
-            "kind": "assertion",
-            "path": "tests/devtools.test.ts",
-            "label": "\"evaluation preserves each runner's gesture default and explicit overrides\""
-        },
-        {
-            "id": "assertion:tests/devtools.test.ts:5b6d89a56f64e569",
-            "kind": "assertion",
-            "path": "tests/devtools.test.ts",
-            "label": "\"malformed messages fail the transport and settle pending requests\""
-        },
-        {
-            "id": "assertion:tests/devtools.test.ts:61676dee9f22d3c1",
-            "kind": "assertion",
-            "path": "tests/devtools.test.ts",
-            "label": "`${event} settles pending requests once and repeated close is harmless`"
-        },
-        {
-            "id": "assertion:tests/devtools.test.ts:9aa7a7139688d9ac",
-            "kind": "assertion",
-            "path": "tests/devtools.test.ts",
-            "label": "\"synchronous send failure settles every pending request\""
-        },
-        {
-            "id": "assertion:tests/devtools.test.ts:c79df5925c66fbe2",
-            "kind": "assertion",
-            "path": "tests/devtools.test.ts",
-            "label": "\"only navigation-context protocol errors are recoverable\""
-        },
-        {
-            "id": "assertion:tests/devtools.test.ts:d689beea5425a96a",
-            "kind": "assertion",
-            "path": "tests/devtools.test.ts",
-            "label": "\"DevTools correlates out-of-order replies, protocol failures and complete events\""
-        },
-        {
-            "id": "assertion:tests/devtools.test.ts:e43e05206ed7fe53",
-            "kind": "assertion",
-            "path": "tests/devtools.test.ts",
-            "label": "\"socket shutdown has a deadline and clears its final listener\""
-        },
-        {
-            "id": "assertion:tests/devtools.test.ts:fb676633667d5125",
-            "kind": "assertion",
-            "path": "tests/devtools.test.ts",
-            "label": "\"timeout does not replay or close; diagnostics work and late replies are ignored\""
         },
         {
             "id": "assertion:tests/ecs-soa.test.ts:183c6ad088ef3b18",
@@ -10148,42 +10040,6 @@
             "label": "\"platformer deterministic reference walkthrough completes both authored levels without deaths\""
         },
         {
-            "id": "assertion:tests/runner-cleanup.test.ts:3a4d71636e5cfb7e",
-            "kind": "assertion",
-            "path": "tests/runner-cleanup.test.ts",
-            "label": "\"shutdown escalates, verifies survivors, and records failed actions\""
-        },
-        {
-            "id": "assertion:tests/runner-cleanup.test.ts:3b8a424a9e880752",
-            "kind": "assertion",
-            "path": "tests/runner-cleanup.test.ts",
-            "label": "\"failed spawn has no process to terminate\""
-        },
-        {
-            "id": "assertion:tests/runner-cleanup.test.ts:5aa2f73b96024ac3",
-            "kind": "assertion",
-            "path": "tests/runner-cleanup.test.ts",
-            "label": "\"successful validation is rejected when cleanup fails\""
-        },
-        {
-            "id": "assertion:tests/runner-cleanup.test.ts:de5544c0aac4536f",
-            "kind": "assertion",
-            "path": "tests/runner-cleanup.test.ts",
-            "label": "\"partial startup still runs every applicable cleanup step\""
-        },
-        {
-            "id": "assertion:tests/runner-cleanup.test.ts:e8779d7a1cc6924c",
-            "kind": "assertion",
-            "path": "tests/runner-cleanup.test.ts",
-            "label": "\"workload, screenshot and cleanup failures remain visible and later cleanup runs\""
-        },
-        {
-            "id": "assertion:tests/runner-cleanup.test.ts:fca6fc33f4946999",
-            "kind": "assertion",
-            "path": "tests/runner-cleanup.test.ts",
-            "label": "\"owned process tree exits while an unrelated process remains alive\""
-        },
-        {
             "id": "assertion:tests/simulation.contract.test.ts:47d711d87ea522fa",
             "kind": "assertion",
             "path": "tests/simulation.contract.test.ts",
@@ -10676,6 +10532,48 @@
             "label": "\"Node compaction records deletion failure and retains diagnostic bytes\""
         },
         {
+            "id": "assertion:tooling/tests/benchmark-output.test.ts:4f5bf6273bb13a6c",
+            "kind": "assertion",
+            "path": "tooling/tests/benchmark-output.test.ts",
+            "label": "\"failed and incomplete runs retain diagnostics\""
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-output.test.ts:501faf1b41a7ec0b",
+            "kind": "assertion",
+            "path": "tooling/tests/benchmark-output.test.ts",
+            "label": "\"missing or corrupted consolidated analysis prevents cleanup and comparison\""
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-output.test.ts:7a9466df12f588ed",
+            "kind": "assertion",
+            "path": "tooling/tests/benchmark-output.test.ts",
+            "label": "\"runner failure preserves logs even when compact output was requested\""
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-output.test.ts:bba4aff5dbe2a208",
+            "kind": "assertion",
+            "path": "tooling/tests/benchmark-output.test.ts",
+            "label": "\"full, compact and legacy churn results produce identical metrics\""
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-output.test.ts:dc7f11e23bdd938e",
+            "kind": "assertion",
+            "path": "tooling/tests/benchmark-output.test.ts",
+            "label": "\"compaction refuses mismatched directories, junctions and linked ancestors\""
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-output.test.ts:e0b86faff6d07d99",
+            "kind": "assertion",
+            "path": "tooling/tests/benchmark-output.test.ts",
+            "label": "\"churn validation rejects incomplete samples and rejected GC traces\""
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-output.test.ts:e198157f294c631f",
+            "kind": "assertion",
+            "path": "tooling/tests/benchmark-output.test.ts",
+            "label": "\"cleanup failures are recorded instead of reporting compact success\""
+        },
+        {
             "id": "assertion:tooling/tests/benchmark-policy.test.ts:35d1add738c44394",
             "kind": "assertion",
             "path": "tooling/tests/benchmark-policy.test.ts",
@@ -10716,6 +10614,12 @@
             "kind": "assertion",
             "path": "tooling/tests/benchmark-runner.test.ts",
             "label": "\"Node benchmark command failure retains diagnostics and refuses requested compaction\""
+        },
+        {
+            "id": "assertion:tooling/tests/browser-content-cleanup.test.ts:641ba3a56cbcdf35",
+            "kind": "assertion",
+            "path": "tooling/tests/browser-content-cleanup.test.ts",
+            "label": "\"installed checks preserve workload and restore failures while attempting remaining cleanup\""
         },
         {
             "id": "assertion:tooling/tests/browser-session.test.ts:0493a67b4503fc85",
@@ -10854,6 +10758,66 @@
             "kind": "assertion",
             "path": "tooling/tests/content-engine.test.ts",
             "label": "\"engine resource oracle rejects lost claims leaks hidden runs and diagnostics\""
+        },
+        {
+            "id": "assertion:tooling/tests/content-measurement.test.ts:925595020de2d285",
+            "kind": "assertion",
+            "path": "tooling/tests/content-measurement.test.ts",
+            "label": "\"content comparison refuses a failed run and incompatible browser environment\""
+        },
+        {
+            "id": "assertion:tooling/tests/devtools.test.ts:0a279c84640ac356",
+            "kind": "assertion",
+            "path": "tooling/tests/devtools.test.ts",
+            "label": "`opening ${event} releases all listeners and timers`"
+        },
+        {
+            "id": "assertion:tooling/tests/devtools.test.ts:1af1997fc189dd3e",
+            "kind": "assertion",
+            "path": "tooling/tests/devtools.test.ts",
+            "label": "\"evaluation preserves each runner's gesture default and explicit overrides\""
+        },
+        {
+            "id": "assertion:tooling/tests/devtools.test.ts:5b6d89a56f64e569",
+            "kind": "assertion",
+            "path": "tooling/tests/devtools.test.ts",
+            "label": "\"malformed messages fail the transport and settle pending requests\""
+        },
+        {
+            "id": "assertion:tooling/tests/devtools.test.ts:61676dee9f22d3c1",
+            "kind": "assertion",
+            "path": "tooling/tests/devtools.test.ts",
+            "label": "`${event} settles pending requests once and repeated close is harmless`"
+        },
+        {
+            "id": "assertion:tooling/tests/devtools.test.ts:9aa7a7139688d9ac",
+            "kind": "assertion",
+            "path": "tooling/tests/devtools.test.ts",
+            "label": "\"synchronous send failure settles every pending request\""
+        },
+        {
+            "id": "assertion:tooling/tests/devtools.test.ts:c79df5925c66fbe2",
+            "kind": "assertion",
+            "path": "tooling/tests/devtools.test.ts",
+            "label": "\"only navigation-context protocol errors are recoverable\""
+        },
+        {
+            "id": "assertion:tooling/tests/devtools.test.ts:d689beea5425a96a",
+            "kind": "assertion",
+            "path": "tooling/tests/devtools.test.ts",
+            "label": "\"DevTools correlates out-of-order replies, protocol failures and complete events\""
+        },
+        {
+            "id": "assertion:tooling/tests/devtools.test.ts:e43e05206ed7fe53",
+            "kind": "assertion",
+            "path": "tooling/tests/devtools.test.ts",
+            "label": "\"socket shutdown has a deadline and clears its final listener\""
+        },
+        {
+            "id": "assertion:tooling/tests/devtools.test.ts:fb676633667d5125",
+            "kind": "assertion",
+            "path": "tooling/tests/devtools.test.ts",
+            "label": "\"timeout does not replay or close; diagnostics work and late replies are ignored\""
         },
         {
             "id": "assertion:tooling/tests/installed.test.ts:09bce73240a7e054",
@@ -11106,6 +11070,42 @@
             "kind": "assertion",
             "path": "tooling/tests/preparation.test.ts",
             "label": "\"unique runs retain earlier evidence and reject reused explicit destinations\""
+        },
+        {
+            "id": "assertion:tooling/tests/runner-cleanup.test.ts:3a4d71636e5cfb7e",
+            "kind": "assertion",
+            "path": "tooling/tests/runner-cleanup.test.ts",
+            "label": "\"shutdown escalates, verifies survivors, and records failed actions\""
+        },
+        {
+            "id": "assertion:tooling/tests/runner-cleanup.test.ts:3b8a424a9e880752",
+            "kind": "assertion",
+            "path": "tooling/tests/runner-cleanup.test.ts",
+            "label": "\"failed spawn has no process to terminate\""
+        },
+        {
+            "id": "assertion:tooling/tests/runner-cleanup.test.ts:5aa2f73b96024ac3",
+            "kind": "assertion",
+            "path": "tooling/tests/runner-cleanup.test.ts",
+            "label": "\"successful validation is rejected when cleanup fails\""
+        },
+        {
+            "id": "assertion:tooling/tests/runner-cleanup.test.ts:de5544c0aac4536f",
+            "kind": "assertion",
+            "path": "tooling/tests/runner-cleanup.test.ts",
+            "label": "\"partial startup still runs every applicable cleanup step\""
+        },
+        {
+            "id": "assertion:tooling/tests/runner-cleanup.test.ts:e8779d7a1cc6924c",
+            "kind": "assertion",
+            "path": "tooling/tests/runner-cleanup.test.ts",
+            "label": "\"workload, screenshot and cleanup failures remain visible and later cleanup runs\""
+        },
+        {
+            "id": "assertion:tooling/tests/runner-cleanup.test.ts:fca6fc33f4946999",
+            "kind": "assertion",
+            "path": "tooling/tests/runner-cleanup.test.ts",
+            "label": "\"owned process tree exits while an unrelated process remains alive\""
         },
         {
             "id": "assertion:tooling/tests/verify-engine.test.ts:d87084eea66ac555",

@@ -1,12 +1,17 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { spawn } from "node:child_process";
+import { spawn, type SpawnOptions } from "node:child_process";
 import { once } from "node:events";
-import { runWithCleanup, ownProcess, shutdownProcessTree } from "./tooling/cleanup.mjs";
+import {
+    runWithCleanup,
+    ownProcess,
+    shutdownProcessTree,
+    type CleanupRecord,
+} from "../../tests/tooling/cleanup.mjs";
 
 test("workload, screenshot and cleanup failures remain visible and later cleanup runs", async () => {
     const visited: string[] = [],
-        records: object[] = [];
+        records: CleanupRecord[] = [];
     const failures = await runWithCleanup(
         async () => {
             throw new Error("original validation failure");
@@ -127,9 +132,9 @@ test(
     async () => {
         const options = {
             detached: process.platform !== "win32",
-            stdio: ["ignore", "pipe", "pipe"] as const,
+            stdio: ["ignore", "pipe", "pipe"],
             windowsHide: true,
-        };
+        } satisfies SpawnOptions;
         const unrelated = spawn(process.execPath, ["-e", "setInterval(()=>{},1000)"], options);
         const unrelatedOwner = ownProcess(unrelated, "unrelated fixture");
         const child = spawn(

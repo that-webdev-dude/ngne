@@ -1,6 +1,6 @@
 # Tooling completion plan
 
-Scope approved 2026-09-25. This is the owner of remaining migration scope.
+Scope approved 2026-09-25. This is the owner of the completed migration scope.
 [Local tickets](jira-ticket-sequence.md) define each task's changes and checks;
 [layout and safeguards](layout-and-evidence-contracts.md) define what those changes
 must preserve. Current commands belong in [tooling/README.md](../../tooling/README.md).
@@ -16,11 +16,13 @@ and evidence validation are the shared foundation. Ordinary and diagnostic runs
 use the same owners and failure rules. Do not introduce simple/advanced runners,
 duplicate validation paths, or a new framework.
 
-## Remaining work
+## Status
 
-| Ticket | Deliverable                                                                                |
-| ------ | ------------------------------------------------------------------------------------------ |
-| T10    | Verify the final layout locally and in ordinary Linux CI, and record the remaining limits. |
+All planned tickets are complete. Final verification passed for
+`1dc93c33341737c3a67ec27e129d09b716abc58c`; see the
+[T10 acceptance record](jira-ticket-sequence.md#t10-verify-final-tooling).
+No acceptance blockers remain within the approved scope. Existing retirement
+gates and the exclusions below remain unchanged.
 
 Execute one ticket at a time. T6 is complete under the approved Linux benchmark
 exclusion, using historical Windows evidence. T7 is complete on 2026-09-25: existing comparators/readers relocated with unchanged

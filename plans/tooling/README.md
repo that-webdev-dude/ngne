@@ -22,7 +22,11 @@ T9 is complete locally on 2026-09-25; see the [retirement acceptance record](jir
 Five benchmark forwarders are removed; necessary browser pages, helpers, tests and
 compatibility seams remain protected by their existing retirement gates.
 
-The remaining work is T10 final verification. Candidate comparison,
+T10 final verification is complete on 2026-09-25 for
+`1dc93c33341737c3a67ec27e129d09b716abc58c`: local acceptance, ordinary Linux CI,
+downloaded artifact inspection and pinned consumer integration passed. See the
+[final acceptance record](jira-ticket-sequence.md#t10-verify-final-tooling).
+All planned tooling work is complete with no acceptance blockers. Candidate comparison,
 portable export and the five-run CI cost campaign are excluded; see the plan for
 exact limits. Ordinary Linux verification and existing correctness/cleanup checks
 remain required. There is no separate simplified runtime or weaker acceptance mode.

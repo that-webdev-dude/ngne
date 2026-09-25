@@ -156,52 +156,73 @@
         },
         {
             "id": "assertion:tests/benchmark-output.test.ts:4f5bf6273bb13a6c",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/benchmark-output.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-benchmark-output.json",
+                "sha256": "de77012573c8d82422b9bd97213e4625b8e17586d3dafab883782e06c2b74af5"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/benchmark-output.test.ts:501faf1b41a7ec0b",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/benchmark-output.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-benchmark-output.json",
+                "sha256": "de77012573c8d82422b9bd97213e4625b8e17586d3dafab883782e06c2b74af5"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/benchmark-output.test.ts:7a9466df12f588ed",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/benchmark-output.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-benchmark-output.json",
+                "sha256": "de77012573c8d82422b9bd97213e4625b8e17586d3dafab883782e06c2b74af5"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/benchmark-output.test.ts:bba4aff5dbe2a208",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/benchmark-output.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-benchmark-output.json",
+                "sha256": "de77012573c8d82422b9bd97213e4625b8e17586d3dafab883782e06c2b74af5"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/benchmark-output.test.ts:dc7f11e23bdd938e",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/benchmark-output.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-benchmark-output.json",
+                "sha256": "de77012573c8d82422b9bd97213e4625b8e17586d3dafab883782e06c2b74af5"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/benchmark-output.test.ts:e0b86faff6d07d99",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/benchmark-output.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-benchmark-output.json",
+                "sha256": "de77012573c8d82422b9bd97213e4625b8e17586d3dafab883782e06c2b74af5"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/benchmark-output.test.ts:e198157f294c631f",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/benchmark-output.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-benchmark-output.json",
+                "sha256": "de77012573c8d82422b9bd97213e4625b8e17586d3dafab883782e06c2b74af5"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/browser-ci.ts:0acfaa6995ac7b91",
@@ -821,10 +842,13 @@
         },
         {
             "id": "assertion:tests/browser-content-cleanup.test.ts:641ba3a56cbcdf35",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/browser-content-cleanup.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-browser-content-cleanup.json",
+                "sha256": "b20fdef83c5ef9ad506ff18f6ee17b39110838d0e8f58f3c0646b5c148b68155"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/browser-progression-checks.ts:09f154e887b0f0b1",
@@ -1488,73 +1512,103 @@
         },
         {
             "id": "assertion:tests/content-measurement.test.ts:925595020de2d285",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/content-measurement.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-content-measurement.json",
+                "sha256": "6c389987f8d46dc96a79e7b0338fcf381c90dab88f2af86da9b9c787bef521ba"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/devtools.test.ts:0a279c84640ac356",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/devtools.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-devtools.json",
+                "sha256": "7362b9eea68c126168c671c7a2279ba8469b3d009485f17d05e683216ead2f56"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/devtools.test.ts:1af1997fc189dd3e",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/devtools.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-devtools.json",
+                "sha256": "7362b9eea68c126168c671c7a2279ba8469b3d009485f17d05e683216ead2f56"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/devtools.test.ts:5b6d89a56f64e569",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/devtools.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-devtools.json",
+                "sha256": "7362b9eea68c126168c671c7a2279ba8469b3d009485f17d05e683216ead2f56"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/devtools.test.ts:61676dee9f22d3c1",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/devtools.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-devtools.json",
+                "sha256": "7362b9eea68c126168c671c7a2279ba8469b3d009485f17d05e683216ead2f56"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/devtools.test.ts:9aa7a7139688d9ac",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/devtools.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-devtools.json",
+                "sha256": "7362b9eea68c126168c671c7a2279ba8469b3d009485f17d05e683216ead2f56"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/devtools.test.ts:c79df5925c66fbe2",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/devtools.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-devtools.json",
+                "sha256": "7362b9eea68c126168c671c7a2279ba8469b3d009485f17d05e683216ead2f56"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/devtools.test.ts:d689beea5425a96a",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/devtools.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-devtools.json",
+                "sha256": "7362b9eea68c126168c671c7a2279ba8469b3d009485f17d05e683216ead2f56"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/devtools.test.ts:e43e05206ed7fe53",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/devtools.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-devtools.json",
+                "sha256": "7362b9eea68c126168c671c7a2279ba8469b3d009485f17d05e683216ead2f56"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/devtools.test.ts:fb676633667d5125",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/devtools.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-devtools.json",
+                "sha256": "7362b9eea68c126168c671c7a2279ba8469b3d009485f17d05e683216ead2f56"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/installed-browser.mjs:1362d7afbc9b74b7",
@@ -1678,45 +1732,63 @@
         },
         {
             "id": "assertion:tests/runner-cleanup.test.ts:3a4d71636e5cfb7e",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/runner-cleanup.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-runner-cleanup.json",
+                "sha256": "c3043ac7e117839fa95d2047fccd4777296803e7077fd794789ec306ec7c1da7"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/runner-cleanup.test.ts:3b8a424a9e880752",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/runner-cleanup.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-runner-cleanup.json",
+                "sha256": "c3043ac7e117839fa95d2047fccd4777296803e7077fd794789ec306ec7c1da7"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/runner-cleanup.test.ts:5aa2f73b96024ac3",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/runner-cleanup.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-runner-cleanup.json",
+                "sha256": "c3043ac7e117839fa95d2047fccd4777296803e7077fd794789ec306ec7c1da7"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/runner-cleanup.test.ts:de5544c0aac4536f",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/runner-cleanup.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-runner-cleanup.json",
+                "sha256": "c3043ac7e117839fa95d2047fccd4777296803e7077fd794789ec306ec7c1da7"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/runner-cleanup.test.ts:e8779d7a1cc6924c",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/runner-cleanup.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-runner-cleanup.json",
+                "sha256": "c3043ac7e117839fa95d2047fccd4777296803e7077fd794789ec306ec7c1da7"
+            },
+            "remainingUsers": []
         },
         {
             "id": "assertion:tests/runner-cleanup.test.ts:fca6fc33f4946999",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/runner-cleanup.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-runner-cleanup.json",
+                "sha256": "c3043ac7e117839fa95d2047fccd4777296803e7077fd794789ec306ec7c1da7"
+            },
+            "remainingUsers": []
         },
         {
             "id": "ci:.github/workflows/ci.yml:26de2f5b78dca8e7:1",
@@ -2435,10 +2507,13 @@
         },
         {
             "id": "file:tests/benchmark-output.test.ts",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/benchmark-output.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-benchmark-output.json",
+                "sha256": "de77012573c8d82422b9bd97213e4625b8e17586d3dafab883782e06c2b74af5"
+            },
+            "remainingUsers": []
         },
         {
             "id": "file:tests/browser-ci.ts",
@@ -2459,10 +2534,13 @@
         },
         {
             "id": "file:tests/browser-content-cleanup.test.ts",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/browser-content-cleanup.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-browser-content-cleanup.json",
+                "sha256": "b20fdef83c5ef9ad506ff18f6ee17b39110838d0e8f58f3c0646b5c148b68155"
+            },
+            "remainingUsers": []
         },
         {
             "id": "file:tests/browser-progression-checks.ts",
@@ -2506,17 +2584,23 @@
         },
         {
             "id": "file:tests/content-measurement.test.ts",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/content-measurement.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-content-measurement.json",
+                "sha256": "6c389987f8d46dc96a79e7b0338fcf381c90dab88f2af86da9b9c787bef521ba"
+            },
+            "remainingUsers": []
         },
         {
             "id": "file:tests/devtools.test.ts",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/devtools.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-devtools.json",
+                "sha256": "7362b9eea68c126168c671c7a2279ba8469b3d009485f17d05e683216ead2f56"
+            },
+            "remainingUsers": []
         },
         {
             "id": "file:tests/fixtures/README.md",
@@ -2570,10 +2654,13 @@
         },
         {
             "id": "file:tests/runner-cleanup.test.ts",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/runner-cleanup.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-runner-cleanup.json",
+                "sha256": "c3043ac7e117839fa95d2047fccd4777296803e7077fd794789ec306ec7c1da7"
+            },
+            "remainingUsers": []
         },
         {
             "id": "file:tests/tooling/cleanup.d.mts",
@@ -3325,10 +3412,13 @@
         },
         {
             "id": "option:tests/benchmark-output.test.ts:--out",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/benchmark-output.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-benchmark-output.json",
+                "sha256": "de77012573c8d82422b9bd97213e4625b8e17586d3dafab883782e06c2b74af5"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:tests/benchmark-output.test.ts:-Command",
@@ -3342,10 +3432,13 @@
         },
         {
             "id": "option:tests/benchmark-output.test.ts:-Compact",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/benchmark-output.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-benchmark-output.json",
+                "sha256": "de77012573c8d82422b9bd97213e4625b8e17586d3dafab883782e06c2b74af5"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:tests/benchmark-output.test.ts:-ExecutionPolicy",
@@ -3389,17 +3482,23 @@
         },
         {
             "id": "option:tests/benchmark-output.test.ts:-OutputRoot",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/benchmark-output.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-benchmark-output.json",
+                "sha256": "de77012573c8d82422b9bd97213e4625b8e17586d3dafab883782e06c2b74af5"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:tests/benchmark-output.test.ts:-Workload",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/benchmark-output.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-benchmark-output.json",
+                "sha256": "de77012573c8d82422b9bd97213e4625b8e17586d3dafab883782e06c2b74af5"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:tests/browser-ci.ts:--disable-background-timer-throttling",
@@ -3852,10 +3951,13 @@
         },
         {
             "id": "option:tests/runner-cleanup.test.ts:-e",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["tests/runner-cleanup.test.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/relocate-runner-cleanup.json",
+                "sha256": "c3043ac7e117839fa95d2047fccd4777296803e7077fd794789ec306ec7c1da7"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:tests/tooling/cleanup.mjs:-Command",

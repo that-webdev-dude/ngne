@@ -2952,6 +2952,13 @@
             "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
         },
         {
+            "id": "file:tooling/tests/benchmark-output.test.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-output.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
             "id": "file:tooling/tests/benchmark-policy.test.ts",
             "owner": "infrastructure",
             "destination": "tooling/tests/benchmark-policy.test.ts",
@@ -2964,6 +2971,13 @@
             "destination": "tooling/tests/benchmark-runner.test.ts",
             "action": "retain",
             "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "file:tooling/tests/browser-content-cleanup.test.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/browser-content-cleanup.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
         },
         {
             "id": "file:tooling/tests/browser-session.test.ts",
@@ -2992,6 +3006,20 @@
             "destination": "tooling/tests/content-engine.test.ts",
             "action": "retain",
             "reason": "Explicit engine benchmark command or regression coverage; preserves strict input, failure, evidence and cleanup boundaries."
+        },
+        {
+            "id": "file:tooling/tests/content-measurement.test.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/content-measurement.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "file:tooling/tests/devtools.test.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/devtools.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
         },
         {
             "id": "file:tooling/tests/fixtures/benchmark-runner.ts",
@@ -3251,6 +3279,13 @@
             "destination": "tooling/tests/preparation.test.ts",
             "action": "retain",
             "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "file:tooling/tests/runner-cleanup.test.ts",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/runner-cleanup.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
         },
         {
             "id": "file:tooling/tests/verify-engine.test.ts",
@@ -5430,6 +5465,34 @@
             "reason": "Engine-only installed fixture: public package, lifecycle, external assets, GPU recovery and audio output. Passing local evidence is recorded in installed-engine-coverage.md; no consumer retirement is approved."
         },
         {
+            "id": "option:tooling/tests/benchmark-output.test.ts:--out",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-output.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-output.test.ts:-Compact",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-output.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-output.test.ts:-OutputRoot",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-output.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "option:tooling/tests/benchmark-output.test.ts:-Workload",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-output.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
             "id": "option:tooling/tests/benchmark-policy.test.ts:--base-url",
             "owner": "infrastructure",
             "destination": "tooling/tests/benchmark-policy.test.ts",
@@ -5743,6 +5806,13 @@
             "destination": "tooling/tests/migration.test.ts",
             "action": "retain",
             "reason": "Current migration checker, harness or operating documentation; extend alongside each implementation."
+        },
+        {
+            "id": "option:tooling/tests/runner-cleanup.test.ts:-e",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/runner-cleanup.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
         },
         {
             "id": "option:tooling/tests/verify-engine.test.ts:NGNE_BROWSER_ARTIFACT_DIR",
@@ -9086,6 +9156,55 @@
             "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
         },
         {
+            "id": "assertion:tooling/tests/benchmark-output.test.ts:4f5bf6273bb13a6c",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-output.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-output.test.ts:501faf1b41a7ec0b",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-output.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-output.test.ts:7a9466df12f588ed",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-output.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-output.test.ts:bba4aff5dbe2a208",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-output.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-output.test.ts:dc7f11e23bdd938e",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-output.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-output.test.ts:e0b86faff6d07d99",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-output.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/benchmark-output.test.ts:e198157f294c631f",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/benchmark-output.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
             "id": "assertion:tooling/tests/benchmark-policy.test.ts:35d1add738c44394",
             "owner": "infrastructure",
             "destination": "tooling/tests/benchmark-policy.test.ts",
@@ -9133,6 +9252,13 @@
             "destination": "tooling/tests/benchmark-runner.test.ts",
             "action": "retain",
             "reason": "Reviewed benchmark command, regression coverage or separate checked runner/browser configuration; benchmark execution remains explicit."
+        },
+        {
+            "id": "assertion:tooling/tests/browser-content-cleanup.test.ts:641ba3a56cbcdf35",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/browser-content-cleanup.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
         },
         {
             "id": "assertion:tooling/tests/browser-session.test.ts:0493a67b4503fc85",
@@ -9294,6 +9420,76 @@
             "destination": "tooling/tests/content-engine.test.ts",
             "action": "retain",
             "reason": "Explicit engine benchmark command or regression coverage; preserves strict input, failure, evidence and cleanup boundaries."
+        },
+        {
+            "id": "assertion:tooling/tests/content-measurement.test.ts:925595020de2d285",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/content-measurement.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/devtools.test.ts:0a279c84640ac356",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/devtools.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/devtools.test.ts:1af1997fc189dd3e",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/devtools.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/devtools.test.ts:5b6d89a56f64e569",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/devtools.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/devtools.test.ts:61676dee9f22d3c1",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/devtools.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/devtools.test.ts:9aa7a7139688d9ac",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/devtools.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/devtools.test.ts:c79df5925c66fbe2",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/devtools.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/devtools.test.ts:d689beea5425a96a",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/devtools.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/devtools.test.ts:e43e05206ed7fe53",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/devtools.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/devtools.test.ts:fb676633667d5125",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/devtools.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
         },
         {
             "id": "assertion:tooling/tests/installed.test.ts:09bce73240a7e054",
@@ -9588,6 +9784,48 @@
             "destination": "tooling/tests/preparation.test.ts",
             "action": "retain",
             "reason": "Package preparation, independent run evidence, integrity checks and regression coverage; preserves legacy execution and does not authorize retirement."
+        },
+        {
+            "id": "assertion:tooling/tests/runner-cleanup.test.ts:3a4d71636e5cfb7e",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/runner-cleanup.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/runner-cleanup.test.ts:3b8a424a9e880752",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/runner-cleanup.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/runner-cleanup.test.ts:5aa2f73b96024ac3",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/runner-cleanup.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/runner-cleanup.test.ts:de5544c0aac4536f",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/runner-cleanup.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/runner-cleanup.test.ts:e8779d7a1cc6924c",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/runner-cleanup.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
+        },
+        {
+            "id": "assertion:tooling/tests/runner-cleanup.test.ts:fca6fc33f4946999",
+            "owner": "infrastructure",
+            "destination": "tooling/tests/runner-cleanup.test.ts",
+            "action": "retain",
+            "reason": "Relocated tooling regression; original assertions and failure checks preserved."
         },
         {
             "id": "assertion:tooling/tests/verify-engine.test.ts:d87084eea66ac555",

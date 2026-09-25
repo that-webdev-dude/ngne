@@ -141,8 +141,8 @@ physical-GPU, manual, Linux benchmark or consumer-conformance claim. The restric
 test attempt could not complete Windows process cleanup; its identified process
 tree was stopped and the normal-access rerun passed. Test relocation was abandoned
 after exposing existing helper declaration gaps; original tests remain unchanged.
-No hosted job or external action ran. Final-revision Linux CI and repeated final
-verification belong to T10, which has not started.
+No hosted job or external action ran during T9. Final-revision Linux CI and repeated
+final verification were subsequently completed in T10 below.
 
 Changes:
 
@@ -167,6 +167,34 @@ No wholesale evidence conversion, new retirement framework or broad filesystem c
 ## T10. Verify final tooling
 
 Dependencies: T9.
+
+Complete on 2026-09-25 for `1dc93c33341737c3a67ec27e129d09b716abc58c`.
+Two local engine verification runs, two passing Windows aggregate benchmark runs
+(including diagnostics/compaction), two full installed-resource runs, regression
+checks and the reference/docs audit passed. The initial visibility rejection and
+all prior outputs remain preserved; no benchmark campaign was repeated.
+
+[Ordinary Linux CI run 36185110376](https://github.com/that-webdev-dude/ngne/actions/runs/36185110376)
+passed all required checks, including 275 tests, installed root/nested checks
+(60 assertions each), transport/profiler checks, three failure injections and
+189 browser assertions. Downloaded artifact `10885298342` contains 122 files;
+its ZIP digest and all 39 indexed payload hashes/sizes matched. Logs, failure
+records and cleanup were inspected. Deployment was skipped.
+
+Explicit Town/Dungeon integration passed with the clean consumer pinned to
+`c04cf1d013a57773a59a601ff0994f5e6bee1864` and an exact verified preparation of
+the final engine revision: 66 deterministic tests and 111 browser assertions at
+each base. Parent and consumer acceptance and cleanup passed with zero failures;
+the consumer remained unchanged. All 462 indexed local/CI/integration payloads
+and 65 historical evidence files passed preservation checks. The 92 blocked
+retirement rows still protect retained code; none was waived.
+
+The [final handoff](../../out/t10/20260925-final-verification/HANDOFF.md) and its
+adjacent logs, downloads, audits and separate integration evidence are retained
+locally under ignored `out/t10/20260925-final-verification/`. Fresh CI and consumer
+browser results are automated SwiftShader evidence; prior Windows exploratory
+benchmark limits remain unchanged. No physical-device, manual visual/audio,
+Linux benchmark or performance-baseline claim. No acceptance blockers remain.
 
 Changes and acceptance:
 
@@ -193,8 +221,8 @@ candidate-comparison acceptance or portable-export acceptance.
 
 ## Sequence
 
-Completed: T1a, T1b, T2, T3, T5, T4, T6, T7, T8, T9.
-Remaining: T10.
+Completed: T1a, T1b, T2, T3, T5, T4, T6, T7, T8, T9, T10.
+Remaining: none within the approved scope.
 
 Each ticket includes its affected tests, command/docs updates and existing migration
 map maintenance. Do not automatically start the next ticket.

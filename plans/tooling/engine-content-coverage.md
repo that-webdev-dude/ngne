@@ -24,7 +24,7 @@ The earlier machine evidence enumerated 21 unresolved mixed correspondences.
 The retirement record now resolves each to named executed installed/unit/browser
 or consumer-owned coverage. Animation clocks are consumer implementation, with
 the unchanged independent-playback assertion and test retained there.
-`tests/browser-content-cleanup.test.ts` remains active against shared cleanup:
+`tooling/tests/browser-content-cleanup.test.ts` remains active against shared cleanup:
 failure restoring the first asset cannot prevent the second restore or injected
 script cleanup, and all original failures remain observable.
 

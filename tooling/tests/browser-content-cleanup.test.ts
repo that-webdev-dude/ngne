@@ -3,7 +3,7 @@ import { test } from "node:test";
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { runWithCleanup } from "./tooling/cleanup.mjs";
+import { runWithCleanup } from "../../tests/tooling/cleanup.mjs";
 
 test("installed checks preserve workload and restore failures while attempting remaining cleanup", async () => {
     const directory = mkdtempSync(join(tmpdir(), "ngne-content-cleanup-"));
