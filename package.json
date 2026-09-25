@@ -17,7 +17,7 @@
         "test:browser": "tsx tests/browser-ci.ts",
         "bench": "tsx tooling/suites/benchmarks/cpu/benchmark.ts",
         "bench:all": "tsx tooling/commands/benchmark-all.ts",
-        "bench:compare": "node benchmarks/compare-runs.mjs",
+        "bench:compare": "node tooling/evidence/compare-runs.mjs",
         "format": "prettier --write src demo examples tests benchmarks tooling plans docs .agents .github .vscode \"./*.{ts,md,json,html}\"",
         "format:check": "prettier --check src demo examples tests benchmarks tooling plans docs .agents .github .vscode \"./*.{ts,md,json,html}\"",
         "preview": "vite preview --host 127.0.0.1",
@@ -31,7 +31,8 @@
         "check:prepared": "tsx tooling/commands/prepare.ts verify",
         "verify:installed": "tsx tooling/commands/verify.ts",
         "check:browser-transport": "tsx tooling/commands/check-browser-transport.ts",
-        "verify:compatibility": "tsx tooling/commands/compatibility.ts"
+        "verify:compatibility": "tsx tooling/commands/compatibility.ts",
+        "verify:engine": "tsx tooling/commands/verify-engine.ts"
     },
     "exports": {
         ".": {

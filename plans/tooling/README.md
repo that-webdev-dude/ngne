@@ -1,41 +1,49 @@
-# Tooling migration planning records
+# Tooling planning records
 
-This directory adopts the complete review pack for implementation. It is planning
-and ownership data, not authoritative engine documentation or proof that the
-planned runners already exist. Operational checker usage lives in
-[tooling/README.md](../../tooling/README.md).
+Updated 2026-09-25. Start with the [completion plan](migration-plan.md) for approved
+scope, then the [local tickets](jira-ticket-sequence.md) for the selected task.
+[Layout and safeguards](layout-and-evidence-contracts.md) preserve implementation
+boundaries; [tooling/README.md](../../tooling/README.md) owns current command usage.
+Planning documents do not establish fresh runtime validation.
 
-- [Migration plan](migration-plan.md)
-- [Layout and evidence contracts](layout-and-evidence-contracts.md)
-- [Epic and ticket sequence](jira-ticket-sequence.md)
-- [Surface inventory](surface-inventory.json)
-- [Coverage map](coverage-map.json) and [rendered table](coverage-map.md)
-- [Retirement map](retirement-map.json)
+## Status
+
+T1a–T5 are delivered. T6 is complete under the approved exclusion of Linux benchmark
+execution, using [historical Windows evidence](../../docs/evidence/benchmark-migration.md)
+for implementation `a127e594de11b190f7d218364d0f4db08a1f9c69`.
+The original machine record and backup handoff remain unchanged historical records.
+T7 is complete on 2026-09-25: existing comparators/readers relocated with unchanged
+semantics; 19 affected tests, 16 migration-checker tests, typechecks, formatting
+and migration validation passed locally on Windows. T8 is next and has not started.
+
+The remaining work is comparator relocation, practical verification/CI delivery,
+safe removal of superseded code and final verification. Candidate comparison,
+portable export and the five-run CI cost campaign are excluded; see the plan for
+exact limits. Ordinary Linux verification and existing correctness/cleanup checks
+remain required. There is no separate simplified runtime or weaker acceptance mode.
+
+## Retained records
+
+- [Surface inventory](surface-inventory.json), [coverage map](coverage-map.json)
+  ([rendered](coverage-map.md)) and [retirement map](retirement-map.json).
+- [Consumer command contract](consumer-command-contract.md) and
+  [legacy reader fixtures](legacy-formats.md).
+- [Installed coverage](installed-engine-coverage.md),
+  [installed evidence](../../docs/evidence/installed-engine.json),
+  [browser infrastructure](../../docs/evidence/browser-sessions.json) and
+  [consumer separation](../../docs/evidence/consumer-retirement.md).
+- [Historical CI cost record](ci-cost-baseline.json) and
+  [raw provenance](ci-baseline-evidence/README.md): five successful baseline runs,
+  one retained failure and a 161-second median. One successful-attempt ZIP was lost;
+  no payload inspection is claimed for it. The old 20% proposal is not an active
+  completion gate, and these results establish no current speedup.
 
 ## Frozen baseline
 
-The inventory freezes the full pre-migration revision
-`7d7585ede1aa25147b423f48c9c7f1339678f280` and the SHA-256 of each workflow's
-Git blob bytes. The checker reconstructs the frozen surfaces and assertion IDs
-from that revision, rather than trusting an editable count. It also records
-current surfaces introduced during adoption. T2 must not replace this baseline
-with its changed working tree.
-
-T1b recorded five deliberate successful complete hosted measurements at that frozen
-revision, with deployment disabled, plus 1 retained failed attempt. The
-[CI cost record](ci-cost-baseline.json) contains per-stage and queue-excluded wall
-durations, runner/toolchain/browser/cache provenance and artifact identities/bytes.
-The median is **161 seconds**. [Raw provenance](ci-baseline-evidence/README.md)
-records a lost successful-attempt ZIP and the retained logs/metadata; no payload
-inspection is claimed for that attempt.
-
-The baseline spans multiple hosted environment versions. Final acceptance still
-needs five matched final runs, the proposed median growth budget of at most 20%,
-and an explicit stage map for relocated consumer checks. Match recorded conditions
-or remeasure the frozen baseline under final conditions; do not discard slow
-successful runs or treat consumer removal as an engine speedup. The baseline is
-historical workload evidence, not validation of later tooling. Consumer-owner
-agreement and passing real pinned conformance are recorded in the consumer command contract.
+The checker reconstructs frozen surfaces from revision
+`7d7585ede1aa25147b423f48c9c7f1339678f280` and recorded workflow hashes.
+Preserve these identities and their Git history; scope simplification does not
+erase unfulfilled replacement obligations.
 
 ## Inventory and review method
 
@@ -107,94 +115,3 @@ final retirement audit must inspect live references and rerun affected checks.
 Frozen IDs never change. Current inventory and new reviewed rows grow during
 migration; absent frozen IDs still need proof. New workload definitions need
 stable semantic IDs and new baselines when their inputs or methods change.
-
-## Command compatibility and required checks
-
-Migrated aliases and retired consumer options are documented in the tooling guide.
-`bench:compare` stays an
-advisory scan: default attention threshold 10%, compatibility warnings, problems,
-metric direction, regressions/improvements and scan-result precedence are retained.
-It is not an acceptance gate or statistical significance claim. The content
-comparator retains strict identities and cleanup acceptance until its extraction.
-Legacy readers stay bounded to content-legacy and benchmark-legacy; curated
-historical documents receive no conversion adapters.
-
-CI requires formatting, both test directories, root and tooling typechecks,
-migration checking, existing builds, browser fault injections, browser integration
-and installed root/nested validation. Consumer-owned checks passed through the
-generic explicitly selected invocation before the embedded archive and default
-consumer stages were retired. Default commands and CI now require only engine
-inputs; the frozen baseline workflow remains a separate historical measurement.
-Benchmarks and full diagnostic exports remain explicit operations, not ordinary
-CI prerequisites. Unselected compatibility makes no claim; once selected,
-it must fail on missing prerequisites, bad evidence, scenario or cleanup failures.
-
-## Environment and export policy
-
-Existing environment prerequisites still apply: Node 24, documented Chromium,
-visible physical-GPU measurement where required, and Linux Xvfb/software-WebGPU
-dependencies for hosted presentation checks. Record Windows/Linux, browser/GPU,
-flags, viewport/DPR, visibility, toolchain, workload, harness and policy identities.
-Software GPU, physical GPU and manual visual/audible results remain distinct.
-Future named profiles must validate observations; exploratory runs are not
-accepted baseline measurements.
-
-The adopted evidence contract requires portable relative paths, runtime schema
-validation, immutable package/build identities, independent execution/correctness/
-budget/cleanup/completeness outcomes, atomic progress records and finalization
-after cleanup. Default export retains manifests, results, report, artifact
-inventory, package, raw measurements, observations, logs and required diagnostics.
-Full export may add fixture builds, traces and heaps. Declare omissions and their
-limits; never export dependencies, caches or browser profiles. Preserve failed
-evidence and old outputs. T2 begins this implementation; T8 completes export and
-aggregate delivery. No exporter or new runtime proof is claimed here.
-
-## Interoperability and baseline status
-
-T1b is complete: the [consumer command contract](consumer-command-contract.md),
-shared-schema validator/synthetic conformance fixtures, [bounded legacy formats](legacy-formats.md)
-and [five measured baseline executions](ci-cost-baseline.json) are delivered.
-Consumer-owner agreement and real pinned conformance are recorded in the contract;
-T4's exact retirement/default-CI separation and independent executions have passed.
-The [deployment-disabled measurement workflow](../../.github/workflows/ci-baseline.yml)
-is published on the existing feature branch. Its scoped automatic trigger does not
-run on a main merge. Ordinary verification retains the deployment dependency while
-removing consumer stages. T8/T10 matching, coverage and budget gates remain in force;
-only the 258 reviewed consumer-separation obligations are approved for retirement.
-
-## Installed engine verification status
-
-T3 introduces `npm run verify:installed` and an engine-owned installed fixture.
-See [coverage correspondence](installed-engine-coverage.md) and the
-[dated local evidence](../../docs/evidence/installed-engine.json). The later
-[retirement evidence](../../docs/evidence/consumer-retirement.md) records expanded
-engine assertions and final consumer-free executions. T5 browser-session consolidation
-is delivered below; consumer checks now execute only when explicitly selected.
-
-## Browser infrastructure status
-
-Browser-session consolidation is implemented across browser verification, installed
-verification and the browser/content benchmark runners. Shared process-tree cleanup
-and transport remain at their compatibility entry points; the benchmark's duplicate
-CDP/socket implementation is removed after local wire/profiler parity checks.
-See [browser infrastructure evidence](../../docs/evidence/browser-sessions.json) for
-the measured revision, environments, raw selected records and limits. Linux execution
-is configured in CI but was not available locally. This does not waive final hosted
-coverage/cost acceptance or consumer migration gates.
-
-T4 has owner agreement and passing pinned real consumer conformance. Embedded
-consumer execution is retired after exact assertion/workload review; see
-[consumer retirement evidence](../../docs/evidence/consumer-retirement.md).
-Ordinary verification/default CI are engine-only, while compatibility requires
-explicit checkout and revision selection. Historical status paragraphs above
-describe the earlier adoption and migration stages.
-
-T6 is implemented and locally verified on Windows, but remains incomplete pending
-Linux execution. Node orchestration replaces the two PowerShell scripts after
-scoped replacement proofs; compatibility entry points and unrelated retirement
-gates remain. The installed resource workload now has named observed-environment
-profiles, exploratory/baseline/controlled modes and a measured local budget.
-See [benchmark migration evidence](../../docs/evidence/benchmark-migration.md).
-T7 remains blocked on T6; strict/candidate comparator implementation, final hosted
-coverage and matched CI-cost acceptance are not included or waived. Operational
-usage belongs in the [tooling guide](../../tooling/README.md).

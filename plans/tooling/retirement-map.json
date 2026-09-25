@@ -2292,17 +2292,23 @@
         },
         {
             "id": "file:benchmarks/compare-runs.mjs",
-            "decision": "blocked",
-            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/compare-runs.mjs"]
+            "decision": "approved",
+            "gate": "T7: named existing legacy fixtures and strict/advisory parity; preserve reader semantics and remove live callers before retirement. New candidate comparison is out of scope.",
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/comparator-compare-runs.mjs.json",
+                "sha256": "55e4a64fffd40e5e1b5179b2735213842afe653b4c9e23cc776e40b8eb2f5316"
+            },
+            "remainingUsers": []
         },
         {
             "id": "file:benchmarks/content/compare.mjs",
-            "decision": "blocked",
-            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/content/compare.mjs"]
+            "decision": "approved",
+            "gate": "T7: named existing legacy fixtures and strict/advisory parity; preserve reader semantics and remove live callers before retirement. New candidate comparison is out of scope.",
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/comparator-compare-content.mjs.json",
+                "sha256": "735b83d7e32d72f794f4318944332bb23363b1bc5e6e25f1a7a3d2d9a28052f4"
+            },
+            "remainingUsers": []
         },
         {
             "id": "file:benchmarks/content/environment.json",
@@ -2404,10 +2410,13 @@
         },
         {
             "id": "file:benchmarks/run-results.mjs",
-            "decision": "blocked",
-            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-results.mjs"]
+            "decision": "approved",
+            "gate": "T7: named existing legacy fixtures and strict/advisory parity; preserve reader semantics and remove live callers before retirement. New candidate comparison is out of scope.",
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/comparator-run-results.mjs.json",
+                "sha256": "43230f4dce357bb52497219917923161cf06df9d30fbd8b9642cc9899cdda96b"
+            },
+            "remainingUsers": []
         },
         {
             "id": "file:tests/benchmark-output.test.ts",
@@ -2881,31 +2890,43 @@
         },
         {
             "id": "option:benchmarks/compare-runs.mjs:--attention-percent",
-            "decision": "blocked",
-            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/compare-runs.mjs"]
+            "decision": "approved",
+            "gate": "T7: named existing legacy fixtures and strict/advisory parity; preserve reader semantics and remove live callers before retirement. New candidate comparison is out of scope.",
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/comparator-compare-runs.mjs.json",
+                "sha256": "55e4a64fffd40e5e1b5179b2735213842afe653b4c9e23cc776e40b8eb2f5316"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/compare-runs.mjs:--help",
-            "decision": "blocked",
-            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/compare-runs.mjs"]
+            "decision": "approved",
+            "gate": "T7: named existing legacy fixtures and strict/advisory parity; preserve reader semantics and remove live callers before retirement. New candidate comparison is out of scope.",
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/comparator-compare-runs.mjs.json",
+                "sha256": "55e4a64fffd40e5e1b5179b2735213842afe653b4c9e23cc776e40b8eb2f5316"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/compare-runs.mjs:--output",
-            "decision": "blocked",
-            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/compare-runs.mjs"]
+            "decision": "approved",
+            "gate": "T7: named existing legacy fixtures and strict/advisory parity; preserve reader semantics and remove live callers before retirement. New candidate comparison is out of scope.",
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/comparator-compare-runs.mjs.json",
+                "sha256": "55e4a64fffd40e5e1b5179b2735213842afe653b4c9e23cc776e40b8eb2f5316"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/compare-runs.mjs:-h",
-            "decision": "blocked",
-            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/compare-runs.mjs"]
+            "decision": "approved",
+            "gate": "T7: named existing legacy fixtures and strict/advisory parity; preserve reader semantics and remove live callers before retirement. New candidate comparison is out of scope.",
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/comparator-compare-runs.mjs.json",
+                "sha256": "55e4a64fffd40e5e1b5179b2735213842afe653b4c9e23cc776e40b8eb2f5316"
+            },
+            "remainingUsers": []
         },
         {
             "id": "option:benchmarks/content/fixtures.mjs:-atlas",
@@ -3844,17 +3865,23 @@
         },
         {
             "id": "workload:advisory-legacy-reader",
-            "decision": "blocked",
-            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/compare-runs.mjs"]
+            "decision": "approved",
+            "gate": "T7: named existing legacy fixtures and strict/advisory parity; preserve reader semantics and remove live callers before retirement. New candidate comparison is out of scope.",
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/comparator-compare-runs.mjs.json",
+                "sha256": "55e4a64fffd40e5e1b5179b2735213842afe653b4c9e23cc776e40b8eb2f5316"
+            },
+            "remainingUsers": []
         },
         {
             "id": "workload:aggregate-legacy-reader",
-            "decision": "blocked",
-            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/run-results.mjs"]
+            "decision": "approved",
+            "gate": "T7: named existing legacy fixtures and strict/advisory parity; preserve reader semantics and remove live callers before retirement. New candidate comparison is out of scope.",
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/comparator-run-results.mjs.json",
+                "sha256": "43230f4dce357bb52497219917923161cf06df9d30fbd8b9642cc9899cdda96b"
+            },
+            "remainingUsers": []
         },
         {
             "id": "workload:browser-cycles",
@@ -4089,10 +4116,13 @@
         },
         {
             "id": "workload:strict-legacy-reader",
-            "decision": "blocked",
-            "gate": "T1b/T7: named legacy fixtures plus strict/advisory parity and new candidate gate; retain historical reader semantics.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/content/compare.mjs"]
+            "decision": "approved",
+            "gate": "T7: named existing legacy fixtures and strict/advisory parity; preserve reader semantics and remove live callers before retirement. New candidate comparison is out of scope.",
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/comparator-compare-content.mjs.json",
+                "sha256": "735b83d7e32d72f794f4318944332bb23363b1bc5e6e25f1a7a3d2d9a28052f4"
+            },
+            "remainingUsers": []
         }
     ]
 }

@@ -14,7 +14,7 @@ import { compactRun } from "../suites/benchmarks/compact.js";
 
 const base = resolve(".test-output/node-compaction");
 mkdirSync(base, { recursive: true });
-const results = resolve("benchmarks/run-results.mjs");
+const results = resolve("tooling/evidence/run-results.mjs");
 const save = (p: string, v: unknown) => writeFileSync(p, JSON.stringify(v));
 const read = (p: string) => JSON.parse(readFileSync(p, "utf8"));
 function fixture() {

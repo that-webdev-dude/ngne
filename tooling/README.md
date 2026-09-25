@@ -38,6 +38,43 @@ operations during migration. Their prerequisites and behavior remain documented
 in [repository verification guidance](../README.md), [benchmarks](../benchmarks/README.md)
 and [engine resource measurements](suites/benchmarks/content/README.md).
 
+## Local engine verification
+
+`npm run verify:engine` runs, in order: formatting, all unit/tooling tests,
+tooling typechecks, migration validation, root typecheck, the production build,
+the browser build, one package preparation, exact-manifest validation, browser
+transport/profiler capability, installed root/nested verification using that same
+manifest, and browser integration. Individual commands remain usable. Benchmarks
+and consumer compatibility are separate explicit commands.
+
+Install Chrome and the browser prerequisites described below. On Windows use
+`npm.cmd`; for software GPU verification set `NGNE_WEBGPU_ADAPTER=swiftshader`.
+On Linux install the CI Vulkan/Xvfb dependencies, set `NGNE_BROWSER_HEADLESS=0`
+and run the command under `xvfb-run -a`. Do not run competing builds in this checkout.
+
+Each invocation creates a fresh `out/runs/*-verification-*` directory. It retains
+stage command logs, aggregate outcomes and browser integration artifacts; package
+evidence is under `preparation/evidence/`. Installed and transport commands print
+their separate fresh evidence paths into the corresponding stage logs. Required
+command failures stop composition and fail aggregate acceptance; the existing
+process owner verifies cleanup before final publication. Existing command
+deadlines and acceptance rules remain in effect. This command makes no benchmark,
+consumer, physical-GPU or manual visual/audible claim.
+
+Ordinary Ubuntu CI uses these same underlying commands and additionally checks
+intentional assertion, screenshot and cleanup failures. Its always-uploaded
+`browser-integration` artifact retains preparation/installed/transport evidence,
+browser results, diagnostics and cleanup records, plus `dist/` and `dist-browser/`
+for inspecting the browser inputs. Package evidence includes the tarball, both
+installed fixture builds, identities and preparation command logs. General npm
+check output remains in the GitHub job log. Dependencies, caches, disposable
+installations and browser profiles are excluded. Transport snapshots/traces retain
+validated counts and hashes rather than full payloads, as documented below.
+The upload is inspection evidence, not a portable or resumable preparation:
+`check:prepared` still requires its original local `work/` installation and matching
+Node version. Failed evidence is retained even when later checks are skipped;
+missing required execution never establishes a passing verification.
+
 ## Package preparation
 
 ```sh
@@ -112,7 +149,7 @@ and matching Node version; an archived evidence tree alone cannot resume executi
 This is integrity checking, not cryptographic authentication of a malicious author.
 
 Failure logs and available payloads remain in the run. Working installations and
-caches are not uploaded by CI. Portable export policies remain separate work;
+caches are not uploaded by CI. Portable export is outside the approved scope;
 no new browser, compatibility or performance
 claim is implied by package preparation. Existing commands remain active.
 
@@ -204,7 +241,8 @@ explicit; verification does not select them. This new workload has no establishe
 universal performance budget; headless runs are capability evidence. Named physical
 profiles, explicit baseline collection, and controlled measured-budget acceptance
 are described in the workload procedure. Above-budget runs retain complete sampling
-and independent budget outcomes. Strict/candidate comparator work remains separate.
+and independent budget outcomes. New installed-resource cross-revision comparison
+is unsupported.
 
 `npm run bench:all` uses Node orchestration for internal CPU/churn, private renderer
 and repository showcase probes. Source and build inventories identify those targets;
@@ -212,6 +250,25 @@ they are distinct from installed-package measurements. Legacy flag aliases and
 diagnostics remain supported. Namespaced evidence is under `out/runs/`; the
 `evidence/legacy/` projection remains readable by the unchanged advisory comparator.
 See [benchmark usage](../benchmarks/README.md) for retention and flag details.
+
+## Legacy comparisons
+
+`npm run bench:compare -- <baseline-directory> <candidate-directory>` invokes
+[the advisory comparator](evidence/compare-runs.mjs). Pass `evidence/legacy/`
+explicitly for aggregate runs. Per-stage, consolidated and compact legacy inputs
+retain the same reader validation, warnings, problems and scan precedence.
+Reports remain JSON/Markdown under `.test-output/comparisons/` by default;
+`--output` selects another directory and `--attention-percent` changes the default
+10% attention threshold. A completed advisory scan exits zero even when it finds
+problems; invalid arguments or unreadable/invalid input exit one.
+
+`node tooling/evidence/compare-content.mjs <baseline-directory> <candidate-directory>`
+invokes the strict retained-content comparator. It preserves exact identity,
+passed acceptance and cleanup requirements, returning exit two for incompatibility.
+Its JSON output and supported legacy input family are unchanged.
+Neither comparator adds new-format or candidate-mode acceptance. The shared legacy
+[reader and consolidation CLI](evidence/run-results.mjs) also serves aggregate
+validation and compaction; its integrity checks remain mandatory.
 
 ## Browser sessions and protocol checks
 

@@ -20,8 +20,8 @@ import {
     readJson,
     validateAnalysis,
     validateChurn,
-} from "../benchmarks/run-results.mjs";
-import { compareRuns } from "../benchmarks/compare-runs.mjs";
+} from "../tooling/evidence/run-results.mjs";
+import { compareRuns } from "../tooling/evidence/compare-runs.mjs";
 
 const output = resolve(".test-output/benchmark-output-tests");
 mkdirSync(output, { recursive: true });
@@ -71,7 +71,7 @@ function compact(directory: string, injectFailure = false) {
     try {
         compactRun(
             directory,
-            resolve("benchmarks/run-results.mjs"),
+            resolve("tooling/evidence/run-results.mjs"),
             injectFailure
                 ? () => {
                       throw Error("Injected deletion failure");

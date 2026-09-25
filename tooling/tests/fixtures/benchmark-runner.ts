@@ -30,6 +30,9 @@ export function benchmarkFixture() {
         join(root, "node_modules"),
         process.platform === "win32" ? "junction" : "dir",
     );
-    copyFileSync(resolve("benchmarks/run-results.mjs"), join(root, "benchmarks/run-results.mjs"));
+    copyFileSync(
+        resolve("tooling/evidence/run-results.mjs"),
+        join(root, "tooling/evidence/run-results.mjs"),
+    );
     return root;
 }

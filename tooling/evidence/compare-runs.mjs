@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { loadRun } from "./run-results.mjs";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
-const repositoryRoot = resolve(scriptDirectory, "..");
+const repositoryRoot = resolve(scriptDirectory, "../..");
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url))
     try {
         main();

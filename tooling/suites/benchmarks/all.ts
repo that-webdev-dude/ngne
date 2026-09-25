@@ -47,7 +47,7 @@ export async function allBenchmarks(repository: string, options: BenchmarkOption
         finishedAt: string;
         validationError: string | null;
     }[] = [];
-    const results = join(repository, "benchmarks/run-results.mjs");
+    const results = join(repository, "tooling/evidence/run-results.mjs");
     const save = (path: string, value: unknown) =>
         writeFileSync(path, JSON.stringify(value, null, 2) + "\n");
     const source = Object.fromEntries(
@@ -87,7 +87,7 @@ export async function allBenchmarks(repository: string, options: BenchmarkOption
         "package-lock.json",
         "package.json",
         "vite.config.ts",
-        "benchmarks/run-results.mjs",
+        "tooling/evidence/run-results.mjs",
         "tooling/commands/benchmark-all.ts",
         "node_modules/typescript/package.json",
         "node_modules/tsx/package.json",

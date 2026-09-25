@@ -1,5 +1,11 @@
 # Frozen CI baseline procedure
 
+Historical procedure, retained with its original requirements and results.
+Scope update 2026-09-25: the [completion plan](migration-plan.md) excludes the
+five-run final timing campaign, 20% budget and rebaselining. References below to
+those final gates describe the original proposal, not current acceptance.
+Ordinary Linux verification remains required. No new timing run is authorized.
+
 The [baseline record](ci-cost-baseline.json) contains five successful complete hosted measurements and 1 retained failed attempt. Median queue-excluded job wall time is 161 seconds. This is a frozen-workload baseline, not a final cost-comparison pass. Hosted execution and consumer agreement are separate gates.
 
 The original reviewed draft [ci-baseline.workflow.yml](ci-baseline.workflow.yml) retains the frozen verification steps, uses an exact frozen checkout, disables deployment by removing both showcase publication and the deploy job, and allows only manual dispatch. The draft remains inactive. The installed [measurement workflow](../../.github/workflows/ci-baseline.yml) adds a bootstrap push trigger restricted to `tooling/t1a-coverage-ownership` and its own workflow path, plus manual dispatch. Merging it into `main` does not trigger baseline execution. It has read-only repository permissions and no deployment or Pages publication. The ordinary verification/deployment workflow remains unchanged. Artifact names include the attempt number for attribution, but GitHub removes prior artifacts on a full rerun: download each ZIP and retain raw metadata/logs before requesting the next attempt. Original workflow bytes and their SHA-256 remain fixed in the baseline record. The draft adds a 30-minute hang guard and environment logging; all original verification commands and failure-injection checks remain. Setup-node retains the original Node 24/npm-cache configuration. The original consumer coverage is retained because this is the old baseline.

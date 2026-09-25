@@ -3184,10 +3184,22 @@
             "label": "jq -e '.status == \"failed\" and (.failures | any(contains(\"intentional CI assertion failure\"))) and (.failures | any(contains(\"NGNE.invalidScreenshotCommand\"))) and ([.cleanup[].status] | all(. == \"passed\"))' .test-output/browser-diagnostic-failure/results.json"
         },
         {
+            "id": "ci:.github/workflows/ci.yml:86a948ddc7b21f17:1",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "dist-browser/"
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:86df7daf5573a93b:1",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
             "label": "- name: Demonstrate browser assertion failure detection"
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:887f42eeae4276a8:1",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "dist/"
         },
         {
             "id": "ci:.github/workflows/ci.yml:8a68279c707d1575:1",
@@ -3230,6 +3242,12 @@
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
             "label": "- name: Reject successful validation when cleanup fails"
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:94f3dcdfc4f79d20:1",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "!**/node_modules/**"
         },
         {
             "id": "ci:.github/workflows/ci.yml:9aaca4bacd14c136:1",
@@ -3298,6 +3316,12 @@
             "label": "pull_request:"
         },
         {
+            "id": "ci:.github/workflows/ci.yml:b2a73798f3033ac3:1",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "!**/.npm-cache/**"
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:b4bdc848109722a3:1",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
@@ -3314,6 +3338,12 @@
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
             "label": "fi"
+        },
+        {
+            "id": "ci:.github/workflows/ci.yml:b6d1d23260633754:1",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "!**/profile/**"
         },
         {
             "id": "ci:.github/workflows/ci.yml:b8304e0d0cab5117:1",
@@ -3514,6 +3544,12 @@
             "label": "branches: [main]"
         },
         {
+            "id": "ci:.github/workflows/ci.yml:f9891e77026b54ab:1",
+            "kind": "ci",
+            "path": ".github/workflows/ci.yml",
+            "label": "!**/work/**"
+        },
+        {
             "id": "ci:.github/workflows/ci.yml:fa028828e4584a82:1",
             "kind": "ci",
             "path": ".github/workflows/ci.yml",
@@ -3553,7 +3589,7 @@
             "id": "command:bench:compare",
             "kind": "command",
             "path": "package.json",
-            "label": "node benchmarks/compare-runs.mjs"
+            "label": "node tooling/evidence/compare-runs.mjs"
         },
         {
             "id": "command:bench:content",
@@ -3670,6 +3706,12 @@
             "label": "tsx tooling/commands/compatibility.ts"
         },
         {
+            "id": "command:verify:engine",
+            "kind": "command",
+            "path": "package.json",
+            "label": "tsx tooling/commands/verify-engine.ts"
+        },
+        {
             "id": "command:verify:installed",
             "kind": "command",
             "path": "package.json",
@@ -3730,18 +3772,6 @@
             "label": "benchmarks/browser/tsconfig.json"
         },
         {
-            "id": "file:benchmarks/compare-runs.mjs",
-            "kind": "file",
-            "path": "benchmarks/compare-runs.mjs",
-            "label": "benchmarks/compare-runs.mjs"
-        },
-        {
-            "id": "file:benchmarks/content/compare.mjs",
-            "kind": "file",
-            "path": "benchmarks/content/compare.mjs",
-            "label": "benchmarks/content/compare.mjs"
-        },
-        {
             "id": "file:benchmarks/cpu/benchmark.ts",
             "kind": "file",
             "path": "benchmarks/cpu/benchmark.ts",
@@ -3782,12 +3812,6 @@
             "kind": "file",
             "path": "benchmarks/README.md",
             "label": "benchmarks/README.md"
-        },
-        {
-            "id": "file:benchmarks/run-results.mjs",
-            "kind": "file",
-            "path": "benchmarks/run-results.mjs",
-            "label": "benchmarks/run-results.mjs"
         },
         {
             "id": "file:package-lock.json",
@@ -4108,6 +4132,12 @@
             "label": "tooling/commands/prepare.ts"
         },
         {
+            "id": "file:tooling/commands/verify-engine.ts",
+            "kind": "file",
+            "path": "tooling/commands/verify-engine.ts",
+            "label": "tooling/commands/verify-engine.ts"
+        },
+        {
             "id": "file:tooling/commands/verify.ts",
             "kind": "file",
             "path": "tooling/commands/verify.ts",
@@ -4162,6 +4192,18 @@
             "label": "tooling/core/server.ts"
         },
         {
+            "id": "file:tooling/evidence/compare-content.mjs",
+            "kind": "file",
+            "path": "tooling/evidence/compare-content.mjs",
+            "label": "tooling/evidence/compare-content.mjs"
+        },
+        {
+            "id": "file:tooling/evidence/compare-runs.mjs",
+            "kind": "file",
+            "path": "tooling/evidence/compare-runs.mjs",
+            "label": "tooling/evidence/compare-runs.mjs"
+        },
+        {
             "id": "file:tooling/evidence/consumer-contract-v1.ts",
             "kind": "file",
             "path": "tooling/evidence/consumer-contract-v1.ts",
@@ -4184,6 +4226,12 @@
             "kind": "file",
             "path": "tooling/evidence/report.ts",
             "label": "tooling/evidence/report.ts"
+        },
+        {
+            "id": "file:tooling/evidence/run-results.mjs",
+            "kind": "file",
+            "path": "tooling/evidence/run-results.mjs",
+            "label": "tooling/evidence/run-results.mjs"
         },
         {
             "id": "file:tooling/evidence/schema.ts",
@@ -4624,6 +4672,12 @@
             "label": "tooling/tests/preparation.test.ts"
         },
         {
+            "id": "file:tooling/tests/verify-engine.test.ts",
+            "kind": "file",
+            "path": "tooling/tests/verify-engine.test.ts",
+            "label": "tooling/tests/verify-engine.test.ts"
+        },
+        {
             "id": "file:tooling/tsconfig.benchmarks.json",
             "kind": "file",
             "path": "tooling/tsconfig.benchmarks.json",
@@ -4652,30 +4706,6 @@
             "kind": "file",
             "path": "vite.config.ts",
             "label": "vite.config.ts"
-        },
-        {
-            "id": "option:benchmarks/compare-runs.mjs:--attention-percent",
-            "kind": "option",
-            "path": "benchmarks/compare-runs.mjs",
-            "label": "--attention-percent"
-        },
-        {
-            "id": "option:benchmarks/compare-runs.mjs:--help",
-            "kind": "option",
-            "path": "benchmarks/compare-runs.mjs",
-            "label": "--help"
-        },
-        {
-            "id": "option:benchmarks/compare-runs.mjs:--output",
-            "kind": "option",
-            "path": "benchmarks/compare-runs.mjs",
-            "label": "--output"
-        },
-        {
-            "id": "option:benchmarks/compare-runs.mjs:-h",
-            "kind": "option",
-            "path": "benchmarks/compare-runs.mjs",
-            "label": "-h"
         },
         {
             "id": "option:tests/benchmark-output.test.ts:--out",
@@ -5098,6 +5128,24 @@
             "label": "--output"
         },
         {
+            "id": "option:tooling/commands/verify-engine.ts:--manifest",
+            "kind": "option",
+            "path": "tooling/commands/verify-engine.ts",
+            "label": "--manifest"
+        },
+        {
+            "id": "option:tooling/commands/verify-engine.ts:--output",
+            "kind": "option",
+            "path": "tooling/commands/verify-engine.ts",
+            "label": "--output"
+        },
+        {
+            "id": "option:tooling/commands/verify-engine.ts:NGNE_BROWSER_ARTIFACT_DIR",
+            "kind": "option",
+            "path": "tooling/commands/verify-engine.ts",
+            "label": "NGNE_BROWSER_ARTIFACT_DIR"
+        },
+        {
             "id": "option:tooling/commands/verify.ts:--manifest",
             "kind": "option",
             "path": "tooling/commands/verify.ts",
@@ -5240,6 +5288,30 @@
             "kind": "option",
             "path": "tooling/core/preparation.ts",
             "label": "--porcelain"
+        },
+        {
+            "id": "option:tooling/evidence/compare-runs.mjs:--attention-percent",
+            "kind": "option",
+            "path": "tooling/evidence/compare-runs.mjs",
+            "label": "--attention-percent"
+        },
+        {
+            "id": "option:tooling/evidence/compare-runs.mjs:--help",
+            "kind": "option",
+            "path": "tooling/evidence/compare-runs.mjs",
+            "label": "--help"
+        },
+        {
+            "id": "option:tooling/evidence/compare-runs.mjs:--output",
+            "kind": "option",
+            "path": "tooling/evidence/compare-runs.mjs",
+            "label": "--output"
+        },
+        {
+            "id": "option:tooling/evidence/compare-runs.mjs:-h",
+            "kind": "option",
+            "path": "tooling/evidence/compare-runs.mjs",
+            "label": "-h"
         },
         {
             "id": "option:tooling/suites/benchmarks/all.ts:--expose-gc",
@@ -6094,16 +6166,46 @@
             "label": "--run-id"
         },
         {
+            "id": "option:tooling/tests/legacy-formats.test.ts:--attention-percent",
+            "kind": "option",
+            "path": "tooling/tests/legacy-formats.test.ts",
+            "label": "--attention-percent"
+        },
+        {
+            "id": "option:tooling/tests/legacy-formats.test.ts:--help",
+            "kind": "option",
+            "path": "tooling/tests/legacy-formats.test.ts",
+            "label": "--help"
+        },
+        {
             "id": "option:tooling/tests/legacy-formats.test.ts:--input-type",
             "kind": "option",
             "path": "tooling/tests/legacy-formats.test.ts",
             "label": "--input-type"
         },
         {
+            "id": "option:tooling/tests/legacy-formats.test.ts:--output",
+            "kind": "option",
+            "path": "tooling/tests/legacy-formats.test.ts",
+            "label": "--output"
+        },
+        {
+            "id": "option:tooling/tests/legacy-formats.test.ts:--unknown",
+            "kind": "option",
+            "path": "tooling/tests/legacy-formats.test.ts",
+            "label": "--unknown"
+        },
+        {
             "id": "option:tooling/tests/legacy-formats.test.ts:-e",
             "kind": "option",
             "path": "tooling/tests/legacy-formats.test.ts",
             "label": "-e"
+        },
+        {
+            "id": "option:tooling/tests/legacy-formats.test.ts:-h",
+            "kind": "option",
+            "path": "tooling/tests/legacy-formats.test.ts",
+            "label": "-h"
         },
         {
             "id": "option:tooling/tests/migration.test.ts:--quiet",
@@ -6128,6 +6230,12 @@
             "kind": "option",
             "path": "tooling/tests/migration.test.ts",
             "label": "NGNE_NEW_OPTION"
+        },
+        {
+            "id": "option:tooling/tests/verify-engine.test.ts:NGNE_BROWSER_ARTIFACT_DIR",
+            "kind": "option",
+            "path": "tooling/tests/verify-engine.test.ts",
+            "label": "NGNE_BROWSER_ARTIFACT_DIR"
         }
     ],
     "frozenAssertions": [
@@ -10826,6 +10934,18 @@
             "label": "\"benchmark legacy rejects missing and tampered analysis\""
         },
         {
+            "id": "assertion:tooling/tests/legacy-formats.test.ts:2d6ad566e23b4211",
+            "kind": "assertion",
+            "path": "tooling/tests/legacy-formats.test.ts",
+            "label": "\"advisory CLI retains scan precedence and metric directions\""
+        },
+        {
+            "id": "assertion:tooling/tests/legacy-formats.test.ts:d97eacfb39eeb8c7",
+            "kind": "assertion",
+            "path": "tooling/tests/legacy-formats.test.ts",
+            "label": "\"relocated advisory CLI preserves dispatch, relative paths, reports and exit codes\""
+        },
+        {
             "id": "assertion:tooling/tests/migration.test.ts:0b039719fb0db412",
             "kind": "assertion",
             "path": "tooling/tests/migration.test.ts",
@@ -11016,6 +11136,12 @@
             "kind": "assertion",
             "path": "tooling/tests/preparation.test.ts",
             "label": "\"unique runs retain earlier evidence and reject reused explicit destinations\""
+        },
+        {
+            "id": "assertion:tooling/tests/verify-engine.test.ts:d87084eea66ac555",
+            "kind": "assertion",
+            "path": "tooling/tests/verify-engine.test.ts",
+            "label": "\"Verification composition requires every command, retains failure logs and uses one exact preparation\""
         }
     ],
     "workloads": [

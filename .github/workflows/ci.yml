@@ -87,6 +87,12 @@ jobs:
             out/runs/*-installed-*/evidence/
             out/runs/*-browser-transport-*/evidence/
             .test-output/browser*
+            dist/
+            dist-browser/
+            !**/node_modules/**
+            !**/.npm-cache/**
+            !**/work/**
+            !**/profile/**
           include-hidden-files: true
           if-no-files-found: warn
       - name: Upload showcase

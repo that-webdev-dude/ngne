@@ -6,6 +6,14 @@ source identities, run IDs, results and retention limits are in
 [the machine record](benchmark-migration.json). This is dated evidence, not a
 current performance guarantee.
 
+Scope decision, 2026-09-25: the user excluded Linux benchmark execution from the
+tooling effort and accepted the migration using this historical Windows evidence.
+The original incomplete status below and in the machine record describes the
+2026-09-24 acceptance scope; its Linux blocker is superseded by the
+[current planning decision](../../plans/tooling/README.md). No measurements were
+rerun or changed. Linux benchmark portability/performance remains unvalidated;
+ordinary Linux CI verification and final hosted coverage/cost acceptance remain required.
+
 CPU, churn, private renderer and repository showcase probes now execute through
 Node orchestration with their implementations under `tooling/suites/benchmarks/`.
 They explicitly identify internal source targets and retain source/build hashes.

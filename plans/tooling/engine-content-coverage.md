@@ -14,9 +14,11 @@ default CI stages after their replacements passed.
 
 Old production transitions and their original budgets remain consumer-owned.
 The new workload has different authored inputs and timing endpoints, so its
-measurements establish exploratory observations only. Performance budgets,
-environment profiles and strict/candidate comparison modes still need their own
-implementation and evidence; old game thresholds are not replacement budgets.
+measurements in that earlier record establish exploratory observations only.
+Later profiles and measured Windows budgets are recorded in the
+[benchmark migration evidence](../../docs/evidence/benchmark-migration.md).
+New-format strict/candidate comparison is excluded by the current
+[completion plan](migration-plan.md); old game thresholds are not replacement budgets.
 
 The earlier machine evidence enumerated 21 unresolved mixed correspondences.
 The retirement record now resolves each to named executed installed/unit/browser

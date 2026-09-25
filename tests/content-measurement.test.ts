@@ -32,7 +32,7 @@ test("content comparison refuses a failed run and incompatible browser environme
         ]);
         put("result", { status: "passed", cleanupPassed: true });
         const compare = () =>
-            spawnSync(process.execPath, ["benchmarks/content/compare.mjs", root, root], {
+            spawnSync(process.execPath, ["tooling/evidence/compare-content.mjs", root, root], {
                 encoding: "utf8",
             });
         assert.equal(compare().status, 0);
@@ -63,7 +63,7 @@ test("content comparison refuses a failed run and incompatible browser environme
                 writeFileSync(join(other, name + ".json"), JSON.stringify(value));
             const result = spawnSync(
                 process.execPath,
-                ["benchmarks/content/compare.mjs", root, other],
+                ["tooling/evidence/compare-content.mjs", root, other],
                 { encoding: "utf8" },
             );
             assert.equal(result.status, 2);
@@ -75,7 +75,7 @@ test("content comparison refuses a failed run and incompatible browser environme
             );
             const changed = spawnSync(
                 process.execPath,
-                ["benchmarks/content/compare.mjs", root, other],
+                ["tooling/evidence/compare-content.mjs", root, other],
                 { encoding: "utf8" },
             );
             assert.equal(changed.status, 2);

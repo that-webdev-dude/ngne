@@ -38,7 +38,7 @@ test("Node consolidation failure cannot leave a successful legacy manifest or su
     );
     // Synthetic parser boundary: only consolidation fails after a completed stage.
     writeFileSync(
-        join(root, "benchmarks/run-results.mjs"),
+        join(root, "tooling/evidence/run-results.mjs"),
         `if (process.argv[2] === 'collect') throw Error('Injected consolidation failure');`,
     );
     const run = await allBenchmarks(
