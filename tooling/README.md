@@ -31,8 +31,8 @@ coverage and retirement records together. Do not erase frozen IDs. Render the
 table using the exported `renderCoverage(inventory, coverage)` function, then run
 Prettier and the checker. No automatic mapping-approval command is provided.
 
-These checks establish ownership and migration gates. They do not execute the
-consumer protocol, benchmarks or evidence exporter.
+These checks establish ownership and migration gates. They do not execute
+runtime verification, consumer compatibility or benchmarks.
 Existing browser and benchmark commands still own those
 operations during migration. Their prerequisites and behavior remain documented
 in [repository verification guidance](../README.md), [benchmarks](../benchmarks/README.md)

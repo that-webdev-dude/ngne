@@ -3742,12 +3742,6 @@
             "label": ".prettierrc.json"
         },
         {
-            "id": "file:benchmarks/browser/browser-baseline.ts",
-            "kind": "file",
-            "path": "benchmarks/browser/browser-baseline.ts",
-            "label": "benchmarks/browser/browser-baseline.ts"
-        },
-        {
             "id": "file:benchmarks/browser/entry.ts",
             "kind": "file",
             "path": "benchmarks/browser/entry.ts",
@@ -3760,34 +3754,10 @@
             "label": "benchmarks/browser/index.html"
         },
         {
-            "id": "file:benchmarks/browser/renderer-fixture.ts",
-            "kind": "file",
-            "path": "benchmarks/browser/renderer-fixture.ts",
-            "label": "benchmarks/browser/renderer-fixture.ts"
-        },
-        {
             "id": "file:benchmarks/browser/tsconfig.json",
             "kind": "file",
             "path": "benchmarks/browser/tsconfig.json",
             "label": "benchmarks/browser/tsconfig.json"
-        },
-        {
-            "id": "file:benchmarks/cpu/benchmark.ts",
-            "kind": "file",
-            "path": "benchmarks/cpu/benchmark.ts",
-            "label": "benchmarks/cpu/benchmark.ts"
-        },
-        {
-            "id": "file:benchmarks/cpu/churn-gc-parse.mjs",
-            "kind": "file",
-            "path": "benchmarks/cpu/churn-gc-parse.mjs",
-            "label": "benchmarks/cpu/churn-gc-parse.mjs"
-        },
-        {
-            "id": "file:benchmarks/cpu/churn-schema.ts",
-            "kind": "file",
-            "path": "benchmarks/cpu/churn-schema.ts",
-            "label": "benchmarks/cpu/churn-schema.ts"
         },
         {
             "id": "file:benchmarks/evidence/content-raw.json.gz",

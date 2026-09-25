@@ -2247,10 +2247,13 @@
         },
         {
             "id": "file:benchmarks/browser/browser-baseline.ts",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/forwarder-browser-baseline.ts.json",
+                "sha256": "442c61b9673e9ef7b06b6ebe04edd33eae0af7a7df14b54b6bd9d8e710aa5aaa"
+            },
+            "remainingUsers": []
         },
         {
             "id": "file:benchmarks/browser/entry.ts",
@@ -2268,10 +2271,13 @@
         },
         {
             "id": "file:benchmarks/browser/renderer-fixture.ts",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/renderer-fixture.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/forwarder-renderer-fixture.ts.json",
+                "sha256": "2bb5321b07259c8e0464deaaf395614bb9777b46d7e3dcfb28116aa874edc8d6"
+            },
+            "remainingUsers": []
         },
         {
             "id": "file:benchmarks/browser/tsconfig.json",
@@ -2372,24 +2378,33 @@
         },
         {
             "id": "file:benchmarks/cpu/benchmark.ts",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/cpu/benchmark.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/forwarder-benchmark.ts.json",
+                "sha256": "e9c593a00034c48896bbc25214f585b51d3d331af90c4015d610b6ab226c07cf"
+            },
+            "remainingUsers": []
         },
         {
             "id": "file:benchmarks/cpu/churn-gc-parse.mjs",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/cpu/churn-gc-parse.mjs"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/forwarder-churn-gc-parse.mjs.json",
+                "sha256": "71695b8d267e881aff1dee5a00fbf04560986ed0e7fba3204d8c35c403e9198d"
+            },
+            "remainingUsers": []
         },
         {
             "id": "file:benchmarks/cpu/churn-schema.ts",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/cpu/churn-schema.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/forwarder-churn-schema.ts.json",
+                "sha256": "db2224d1bb86547659d61e27388137971e9403cd95a37fb931ffdffca64ebc1d"
+            },
+            "remainingUsers": []
         },
         {
             "id": "file:benchmarks/README.md",
@@ -3885,52 +3900,73 @@
         },
         {
             "id": "workload:browser-cycles",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/forwarder-browser-baseline.ts.json",
+                "sha256": "442c61b9673e9ef7b06b6ebe04edd33eae0af7a7df14b54b6bd9d8e710aa5aaa"
+            },
+            "remainingUsers": []
         },
         {
             "id": "workload:browser-platformer",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/forwarder-browser-baseline.ts.json",
+                "sha256": "442c61b9673e9ef7b06b6ebe04edd33eae0af7a7df14b54b6bd9d8e710aa5aaa"
+            },
+            "remainingUsers": []
         },
         {
             "id": "workload:browser-profiler-transport",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/forwarder-browser-baseline.ts.json",
+                "sha256": "442c61b9673e9ef7b06b6ebe04edd33eae0af7a7df14b54b6bd9d8e710aa5aaa"
+            },
+            "remainingUsers": []
         },
         {
             "id": "workload:browser-starfall",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "T5: real large-frame/fragmentation/profiler parity and Windows/Linux owned cleanup; all callers migrated.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/browser-baseline.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/forwarder-browser-baseline.ts.json",
+                "sha256": "442c61b9673e9ef7b06b6ebe04edd33eae0af7a7df14b54b6bd9d8e710aa5aaa"
+            },
+            "remainingUsers": []
         },
         {
             "id": "workload:churn-alloc",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/cpu/churn-schema.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/forwarder-churn-schema.ts.json",
+                "sha256": "db2224d1bb86547659d61e27388137971e9403cd95a37fb931ffdffca64ebc1d"
+            },
+            "remainingUsers": []
         },
         {
             "id": "workload:churn-gc",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/cpu/churn-schema.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/forwarder-churn-schema.ts.json",
+                "sha256": "db2224d1bb86547659d61e27388137971e9403cd95a37fb931ffdffca64ebc1d"
+            },
+            "remainingUsers": []
         },
         {
             "id": "workload:churn-timed",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/cpu/churn-schema.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/forwarder-churn-schema.ts.json",
+                "sha256": "db2224d1bb86547659d61e27388137971e9403cd95a37fb931ffdffca64ebc1d"
+            },
+            "remainingUsers": []
         },
         {
             "id": "workload:compaction-integrity",
@@ -4034,31 +4070,43 @@
         },
         {
             "id": "workload:cpu-chaos",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/cpu/benchmark.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/forwarder-benchmark.ts.json",
+                "sha256": "e9c593a00034c48896bbc25214f585b51d3d331af90c4015d610b6ab226c07cf"
+            },
+            "remainingUsers": []
         },
         {
             "id": "workload:cpu-collision-grid",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/cpu/benchmark.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/forwarder-benchmark.ts.json",
+                "sha256": "e9c593a00034c48896bbc25214f585b51d3d331af90c4015d610b6ab226c07cf"
+            },
+            "remainingUsers": []
         },
         {
             "id": "workload:cpu-ecs",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/cpu/benchmark.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/forwarder-benchmark.ts.json",
+                "sha256": "e9c593a00034c48896bbc25214f585b51d3d331af90c4015d610b6ab226c07cf"
+            },
+            "remainingUsers": []
         },
         {
             "id": "workload:cpu-epoch-traversal",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/cpu/benchmark.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/forwarder-benchmark.ts.json",
+                "sha256": "e9c593a00034c48896bbc25214f585b51d3d331af90c4015d610b6ab226c07cf"
+            },
+            "remainingUsers": []
         },
         {
             "id": "workload:installed-engine-lifecycle",
@@ -4102,17 +4150,23 @@
         },
         {
             "id": "workload:renderer-alternating",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/renderer-fixture.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/forwarder-renderer-fixture.ts.json",
+                "sha256": "2bb5321b07259c8e0464deaaf395614bb9777b46d7e3dcfb28116aa874edc8d6"
+            },
+            "remainingUsers": []
         },
         {
             "id": "workload:renderer-grouped",
-            "decision": "blocked",
+            "decision": "approved",
             "gate": "Passing replacement evidence for this exact obligation, reviewed ownership and zero remaining live imports/commands/config/CI references; final retirement audit.",
-            "proof": null,
-            "remainingUsers": ["benchmarks/browser/renderer-fixture.ts"]
+            "proof": {
+                "path": "docs/evidence/retirement-proofs/forwarder-renderer-fixture.ts.json",
+                "sha256": "2bb5321b07259c8e0464deaaf395614bb9777b46d7e3dcfb28116aa874edc8d6"
+            },
+            "remainingUsers": []
         },
         {
             "id": "workload:strict-legacy-reader",

@@ -17,7 +17,7 @@ import { join, relative } from "node:path";
  * Sustained browser measurement in a real headful Chromium, driven over the DevTools
  * protocol so the same warmup, duration and sampling can be repeated later.
  *
- * Usage: `npx tsx benchmarks/browser/browser-baseline.ts` against a running `npm run preview`.
+ * Usage: `npx tsx tooling/suites/benchmarks/rendering/browser-baseline.ts` against a running `npm run preview`.
  * The renderer fixture uses `/benchmarks/browser/index.html?workload=renderer-webgpu` from the
  * browser-mode build instead of the production preview.
  * Environment: NGNE_BROWSER (Chromium executable), NGNE_URL (default preview origin),

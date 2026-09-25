@@ -1,0 +1,21 @@
+{
+    "format": "ngne-tooling",
+    "documentType": "migration-replacement-proof",
+    "schemaVersion": 1,
+    "runId": "forwarder-retirement-churn-gc-parse.mjs-2026-09-25",
+    "recordedDate": "2026-09-25",
+    "revision": "147acd0",
+    "status": "passed",
+    "coverageIds": ["file:benchmarks/cpu/churn-gc-parse.mjs"],
+    "destination": "tooling/suites/benchmarks/cpu/churn-gc-parse.mjs",
+    "reviewedBy": "Codex: direct callers, unchanged implementation and replacement checks reviewed",
+    "evidence": "plans/tooling/jira-ticket-sequence.md#t9-remove-superseded-tooling",
+    "scope": "Retires only forwarding source paths and their already-relocated workloads. Existing tests, readers, browser page, shared cleanup/transport and historical evidence remain. Benchmark implementation accepted at a127e594de11b190f7d218364d0f4db08a1f9c69 is unchanged except the browser usage comment. Historical Windows execution remains historical, not new performance acceptance.",
+    "checks": [
+        "39 replacement regression checks passed before removal (out/t9/replacement-tests-before-unrestricted.log)",
+        "Direct CPU command passed (out/t9/cpu.log)",
+        "Direct churn timed/allocation/GC and compaction passed on fresh retry (out/t9/churn-retry.log); first GC alignment failure retained in out/t9/runs",
+        "Direct renderer import browser build passed (out/t9/browser-build-before-unrestricted.log)",
+        "Live repository callers updated before forwarding-file deletion"
+    ]
+}

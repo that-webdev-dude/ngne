@@ -1554,7 +1554,7 @@
         {
             "id": "command:bench:all",
             "owner": "infrastructure",
-            "destination": "tooling/commands/benchmark.ts",
+            "destination": "tooling/commands/benchmark-all.ts",
             "action": "migrate",
             "reason": "Preserve command compatibility while removing archived/sibling consumer defaults after T3/T4 replacements; generic explicit selection owns consumer acceptance."
         },
@@ -2023,9 +2023,9 @@
         {
             "id": "file:benchmarks/browser/browser-baseline.ts",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Forwarding path retired after direct replacement checks and caller audit; workload implementation, diagnostics and cleanup preserved."
         },
         {
             "id": "file:benchmarks/browser/entry.ts",
@@ -2044,9 +2044,9 @@
         {
             "id": "file:benchmarks/browser/renderer-fixture.ts",
             "owner": "benchmark",
-            "destination": "tooling/suites/benchmarks/browser/renderer-fixture.ts",
+            "destination": "tooling/suites/benchmarks/rendering/renderer-fixture.ts",
             "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+            "reason": "Forwarding path retired after direct replacement checks and caller audit; workload implementation, diagnostics and cleanup preserved."
         },
         {
             "id": "file:benchmarks/browser/tsconfig.json",
@@ -2123,21 +2123,21 @@
             "owner": "benchmark",
             "destination": "tooling/suites/benchmarks/cpu/benchmark.ts",
             "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+            "reason": "Forwarding path retired after direct replacement checks and caller audit; workload implementation, diagnostics and cleanup preserved."
         },
         {
             "id": "file:benchmarks/cpu/churn-gc-parse.mjs",
             "owner": "benchmark",
             "destination": "tooling/suites/benchmarks/cpu/churn-gc-parse.mjs",
             "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+            "reason": "Forwarding path retired after direct replacement checks and caller audit; workload implementation, diagnostics and cleanup preserved."
         },
         {
             "id": "file:benchmarks/cpu/churn-schema.ts",
             "owner": "benchmark",
             "destination": "tooling/suites/benchmarks/cpu/churn-schema.ts",
             "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+            "reason": "Forwarding path retired after direct replacement checks and caller audit; workload implementation, diagnostics and cleanup preserved."
         },
         {
             "id": "file:benchmarks/evidence/content-raw.json.gz",
@@ -9615,9 +9615,9 @@
         {
             "id": "workload:browser-cycles",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Forwarding path retired after direct replacement checks and caller audit; workload implementation, diagnostics and cleanup preserved."
         },
         {
             "id": "workload:browser-engine",
@@ -9629,44 +9629,44 @@
         {
             "id": "workload:browser-platformer",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Forwarding path retired after direct replacement checks and caller audit; workload implementation, diagnostics and cleanup preserved."
         },
         {
             "id": "workload:browser-profiler-transport",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Forwarding path retired after direct replacement checks and caller audit; workload implementation, diagnostics and cleanup preserved."
         },
         {
             "id": "workload:browser-starfall",
             "owner": "infrastructure",
-            "destination": "tooling/core/browser/session.ts",
+            "destination": "tooling/suites/benchmarks/rendering/browser-baseline.ts",
             "action": "migrate",
-            "reason": "Split workload policy into benchmark suites and adapt existing RFC6455 transport; preserve large-frame/profiler/cleanup capabilities."
+            "reason": "Forwarding path retired after direct replacement checks and caller audit; workload implementation, diagnostics and cleanup preserved."
         },
         {
             "id": "workload:churn-alloc",
             "owner": "benchmark",
             "destination": "tooling/suites/benchmarks/cpu/churn-schema.ts",
             "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+            "reason": "Forwarding path retired after direct replacement checks and caller audit; workload implementation, diagnostics and cleanup preserved."
         },
         {
             "id": "workload:churn-gc",
             "owner": "benchmark",
             "destination": "tooling/suites/benchmarks/cpu/churn-schema.ts",
             "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+            "reason": "Forwarding path retired after direct replacement checks and caller audit; workload implementation, diagnostics and cleanup preserved."
         },
         {
             "id": "workload:churn-timed",
             "owner": "benchmark",
             "destination": "tooling/suites/benchmarks/cpu/churn-schema.ts",
             "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+            "reason": "Forwarding path retired after direct replacement checks and caller audit; workload implementation, diagnostics and cleanup preserved."
         },
         {
             "id": "workload:compaction-integrity",
@@ -9743,28 +9743,28 @@
             "owner": "benchmark",
             "destination": "tooling/suites/benchmarks/cpu/benchmark.ts",
             "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+            "reason": "Forwarding path retired after direct replacement checks and caller audit; workload implementation, diagnostics and cleanup preserved."
         },
         {
             "id": "workload:cpu-collision-grid",
             "owner": "benchmark",
             "destination": "tooling/suites/benchmarks/cpu/benchmark.ts",
             "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+            "reason": "Forwarding path retired after direct replacement checks and caller audit; workload implementation, diagnostics and cleanup preserved."
         },
         {
             "id": "workload:cpu-ecs",
             "owner": "benchmark",
             "destination": "tooling/suites/benchmarks/cpu/benchmark.ts",
             "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+            "reason": "Forwarding path retired after direct replacement checks and caller audit; workload implementation, diagnostics and cleanup preserved."
         },
         {
             "id": "workload:cpu-epoch-traversal",
             "owner": "benchmark",
             "destination": "tooling/suites/benchmarks/cpu/benchmark.ts",
             "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+            "reason": "Forwarding path retired after direct replacement checks and caller audit; workload implementation, diagnostics and cleanup preserved."
         },
         {
             "id": "workload:installed-engine-lifecycle",
@@ -9797,16 +9797,16 @@
         {
             "id": "workload:renderer-alternating",
             "owner": "benchmark",
-            "destination": "tooling/suites/benchmarks/browser/renderer-fixture.ts",
+            "destination": "tooling/suites/benchmarks/rendering/renderer-fixture.ts",
             "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+            "reason": "Forwarding path retired after direct replacement checks and caller audit; workload implementation, diagnostics and cleanup preserved."
         },
         {
             "id": "workload:renderer-grouped",
             "owner": "benchmark",
-            "destination": "tooling/suites/benchmarks/browser/renderer-fixture.ts",
+            "destination": "tooling/suites/benchmarks/rendering/renderer-fixture.ts",
             "action": "migrate",
-            "reason": "Preserve workload parameters, sampling, diagnostics and identity; record internal-source versus installed-package target."
+            "reason": "Forwarding path retired after direct replacement checks and caller audit; workload implementation, diagnostics and cleanup preserved."
         },
         {
             "id": "workload:showcase-browser",

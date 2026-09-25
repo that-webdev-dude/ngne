@@ -1,4 +1,4 @@
-import { startRendererBenchmark } from "./renderer-fixture.js";
+import { startRendererBenchmark } from "../../tooling/suites/benchmarks/rendering/renderer-fixture.js";
 
 const workload = new URLSearchParams(location.search).get("workload");
 

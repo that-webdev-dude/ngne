@@ -81,8 +81,8 @@ Browser heap movement alone is not evidence of a leak. Replicated A/B orchestrat
 manual; this runner executes one sample run per selected workload and mode.
 CPU, private renderer and repository showcase probes are explicitly internal-source
 microbenchmarks, with source/build inventories; they do not establish installed-package
-acceptance. Their implementation lives in `tooling/suites/benchmarks/`; old source
-paths remain compatibility entry points pending retirement gates. The installed
+acceptance. Their implementation lives in `tooling/suites/benchmarks/`; the browser
+page remains here and imports the renderer implementation directly. The installed
 resource workload above tests the exact fresh tarball. The aggregate suite is
 exploratory; named physical-environment baseline collection and measured-budget
 acceptance currently apply to that installed resource workload.

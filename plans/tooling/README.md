@@ -18,7 +18,11 @@ and migration validation passed locally on Windows. T8 is complete on 2026-09-25
 local verification and ordinary Ubuntu CI passed; uploaded payloads, failure records,
 cleanup and exclusions were inspected. See the [T8 acceptance record](jira-ticket-sequence.md#t8-finish-verification-commands-and-ci-artifacts).
 
-The remaining work is safe removal of superseded code and final verification. Candidate comparison,
+T9 is complete locally on 2026-09-25; see the [retirement acceptance record](jira-ticket-sequence.md#t9-remove-superseded-tooling).
+Five benchmark forwarders are removed; necessary browser pages, helpers, tests and
+compatibility seams remain protected by their existing retirement gates.
+
+The remaining work is T10 final verification. Candidate comparison,
 portable export and the five-run CI cost campaign are excluded; see the plan for
 exact limits. Ordinary Linux verification and existing correctness/cleanup checks
 remain required. There is no separate simplified runtime or weaker acceptance mode.

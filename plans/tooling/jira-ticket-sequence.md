@@ -118,6 +118,32 @@ splitting, timing campaign or new comparison behavior.
 
 Dependencies: T8.
 
+Complete locally, 2026-09-25, on `147acd0` plus the uncommitted retirement changes.
+Removed five benchmark forwarding files after direct replacement checks; the
+browser page imports the renderer implementation directly. Active usage references,
+inventory and 18 existing retirement obligations are reconciled. The remaining
+92 blocked rows protect retained live code, tests, browser entry/configuration and
+compatibility seams; no gates were waived. Shared `tests/tooling` helpers, engine
+tests, supported readers, diagnostics, npm aliases and browser page remain active.
+
+Validation: all 275 tests (including migration regressions), tooling typechecks,
+production/browser builds, formatting and migration checks passed. Direct CPU
+execution and churn timed/allocation/GC/compaction passed; the first diagnostic
+attempt rejected GC alignment, then a fresh retry passed unchanged validation.
+A headless Chrome renderer smoke passed with owned browser/server/profile cleanup.
+No active caller references removed paths; default verification still uses only
+engine-owned inputs, with explicit compatibility separate. All 147 pre-existing
+historical evidence files retain identical hashes. Old outputs and backups were
+not pruned or relocated. Logs and failed attempts remain under `out/t9/`.
+
+Limits: Windows local checks and headless capability only; no new performance,
+physical-GPU, manual, Linux benchmark or consumer-conformance claim. The restricted
+test attempt could not complete Windows process cleanup; its identified process
+tree was stopped and the normal-access rerun passed. Test relocation was abandoned
+after exposing existing helper declaration gaps; original tests remain unchanged.
+No hosted job or external action ran. Final-revision Linux CI and repeated final
+verification belong to T10, which has not started.
+
 Changes:
 
 - Remove duplicate implementations, obsolete configuration and unused migration
@@ -167,8 +193,8 @@ candidate-comparison acceptance or portable-export acceptance.
 
 ## Sequence
 
-Completed: T1a, T1b, T2, T3, T5, T4, T6, T7, T8.
-Remaining: T9 → T10.
+Completed: T1a, T1b, T2, T3, T5, T4, T6, T7, T8, T9.
+Remaining: T10.
 
 Each ticket includes its affected tests, command/docs updates and existing migration
 map maintenance. Do not automatically start the next ticket.

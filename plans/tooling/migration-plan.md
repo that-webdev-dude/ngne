@@ -18,10 +18,9 @@ duplicate validation paths, or a new framework.
 
 ## Remaining work
 
-| Ticket | Deliverable                                                                                              |
-| ------ | -------------------------------------------------------------------------------------------------------- |
-| T9     | Remove superseded implementations after their replacement checks pass; repair callers and documentation. |
-| T10    | Verify the final layout locally and in ordinary Linux CI, and record the remaining limits.               |
+| Ticket | Deliverable                                                                                |
+| ------ | ------------------------------------------------------------------------------------------ |
+| T10    | Verify the final layout locally and in ordinary Linux CI, and record the remaining limits. |
 
 Execute one ticket at a time. T6 is complete under the approved Linux benchmark
 exclusion, using historical Windows evidence. T7 is complete on 2026-09-25: existing comparators/readers relocated with unchanged
@@ -29,6 +28,10 @@ semantics; 19 affected tests, 16 migration-checker tests, typechecks, formatting
 and migration validation passed locally on Windows. T8 is complete on 2026-09-25;
 local verification and ordinary Ubuntu CI artifact inspection passed. See the
 [T8 acceptance record](jira-ticket-sequence.md#t8-finish-verification-commands-and-ci-artifacts).
+T9 is complete locally on 2026-09-25: five superseded benchmark forwarders removed,
+callers and existing retirement records reconciled, affected checks passed and
+historical evidence preserved. See the [T9 acceptance record](jira-ticket-sequence.md#t9-remove-superseded-tooling)
+for retained live code, the diagnostic retry and validation limits.
 
 ## Required safeguards
 
