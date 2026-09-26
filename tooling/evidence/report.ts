@@ -19,6 +19,21 @@ export function report(manifest: Manifest, result: Result): string {
         ),
         "",
         "[Manifest](manifest.json) · [Result](result.json)",
+        ...(manifest.suite === "benchmarks"
+            ? [
+                  "",
+                  "Exploratory internal-source measurements; no controlled performance claim.",
+                  ...result.stages
+                      .filter(
+                          (stage) =>
+                              !stage.id.startsWith("build-") && stage.correctness === "passed",
+                      )
+                      .map(
+                          (stage) =>
+                              `- [${stage.id} measurements](stages/${stage.id}/measurements.json)`,
+                      ),
+              ]
+            : []),
         "",
     ].join("\n");
 }

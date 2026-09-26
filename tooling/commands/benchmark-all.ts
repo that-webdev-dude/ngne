@@ -6,7 +6,7 @@ try {
         process.cwd(),
         benchmarkOptions(process.argv.slice(2), process.cwd()),
     );
-    console.log(`Benchmark evidence: ${run.evidence}`);
+    console.log(`Benchmark run: ${run.root}`);
     if (!run.result.accepted) process.exitCode = 1;
 } catch (error) {
     console.error(error);

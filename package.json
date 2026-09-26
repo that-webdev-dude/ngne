@@ -17,7 +17,7 @@
         "test:browser": "tsx tests/browser-ci.ts",
         "bench": "tsx tooling/suites/benchmarks/cpu/benchmark.ts",
         "bench:all": "tsx tooling/commands/benchmark-all.ts",
-        "bench:compare": "node tooling/evidence/compare-runs.mjs",
+        "bench:compare": "tsx tooling/commands/compare-benchmarks.ts",
         "format": "prettier --write src demo examples tests tooling plans docs .agents .github .vscode \"./*.{ts,md,json,html}\"",
         "format:check": "prettier --check src demo examples tests tooling plans docs .agents .github .vscode \"./*.{ts,md,json,html}\"",
         "preview": "vite preview --host 127.0.0.1",

@@ -1,102 +1,53 @@
-import {
-    appendFileSync,
-    lstatSync,
-    readdirSync,
-    readFileSync,
-    rmdirSync,
-    unlinkSync,
-    writeFileSync,
-} from "node:fs";
-import { dirname, join, relative, resolve, sep } from "node:path";
-import { execFileSync } from "node:child_process";
+import { existsSync, lstatSync, readdirSync, rmdirSync, unlinkSync } from "node:fs";
+import { dirname, join, relative, resolve } from "node:path";
+import type { Run } from "../../core/run.js";
+import { benchmarkMeasurements } from "../../evidence/benchmark-results.js";
+import { contained, identities } from "../../evidence/identity.js";
 
-/** Compact only an explicitly supplied legacy projection, never a v1 evidence tree. */
-export function compactRun(
-    directory: string,
-    resultsScript: string,
-    removeFile = unlinkSync,
-): void {
-    const root = resolve(directory);
-    const plain = (path: string) => {
-        const stat = lstatSync(path);
-        if (stat.isSymbolicLink()) throw Error(`Compaction refuses links or junctions: ${path}`);
-        return stat;
-    };
-    const ancestors = (path: string) => {
-        for (;;) {
-            plain(path);
-            const parent = dirname(path);
-            if (parent === path) break;
-            path = parent;
-        }
-    };
-    ancestors(root);
-    const keep = new Set(["manifest.json", "analysis.json", "summary.md"]);
+/** Called by the run owner after process cleanup, before the final artifact inventory. */
+export function compactRun(run: Run, removeFile = unlinkSync): void {
+    const root = resolve(run.evidence);
+    for (let p = root; ; p = dirname(p)) {
+        if (lstatSync(p).isSymbolicLink()) throw Error(`Compaction refuses linked ancestor: ${p}`);
+        if (dirname(p) === p) break;
+    }
+    if (root !== join(resolve(run.root), "evidence")) throw Error("Compaction target mismatch");
+    if (
+        run.manifest.preparation !== "prepared" ||
+        run.result.failures.length ||
+        !run.result.stages.length ||
+        run.result.stages.some((s) => s.execution !== "completed" || s.correctness !== "passed") ||
+        run.result.cleanupRecords.some((s) => s.status !== "passed")
+    )
+        throw Error("Failed or incomplete run: diagnostics retained");
+    benchmarkMeasurements(root, run.manifest, run.result);
+    identities(root); // Reject links anywhere before deleting anything.
     const files: string[] = [],
         directories: string[] = [];
-    const visit = (directory: string) => {
-        for (const name of readdirSync(directory)) {
-            const path = resolve(directory, name),
-                rel = relative(root, path);
-            if (rel.startsWith(`..${sep}`) || rel === ".." || !rel)
-                throw Error("Compaction target escaped run directory");
-            if (plain(path).isDirectory()) {
-                visit(path);
-                directories.push(path);
-            } else if (directory !== root || !keep.has(name)) files.push(path);
+    const visit = (path: string) => {
+        for (const item of readdirSync(path, { withFileTypes: true })) {
+            const child = join(path, item.name);
+            if (item.isDirectory()) visit(child);
+            else files.push(relative(root, child).replaceAll("\\", "/"));
         }
+        directories.push(relative(root, path).replaceAll("\\", "/"));
     };
-    visit(root);
-    for (const name of keep) {
-        const stat = plain(join(root, name));
-        if (!stat.isFile() || !stat.size) throw Error(`Missing retained file: ${name}`);
+    for (const stage of run.result.stages) {
+        const path = `stages/${stage.id}/diagnostics`;
+        if (existsSync(join(root, path))) visit(contained(root, path));
     }
-    const manifestPath = join(root, "manifest.json");
-    const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
-    if (
-        manifest.format ||
-        manifest.status !== "passed" ||
-        manifest.fatalError ||
-        !Array.isArray(manifest.stages) ||
-        manifest.stages.some((s: { status: string }) => s.status !== "passed")
-    )
-        throw Error("Failed, incomplete or non-legacy run: diagnostics retained");
-    if (resolve(manifest.outputDirectory) !== root)
-        throw Error("Run directory does not match its manifest");
-    execFileSync(process.execPath, [resultsScript, "validate", root], {
-        stdio: "pipe",
-        windowsHide: true,
-    });
-    const removed: string[] = [];
-    manifest.retention = {
-        mode: "compacting",
-        removedArtifacts: removed,
-        rawEvidenceAvailable: true,
-    };
-    const save = () => writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
-    save();
+    const removedArtifacts: string[] = [];
+    const retention = { mode: "compacting", compactRequested: true, removedArtifacts };
+    run.manifest.policy.retention = retention;
     try {
-        for (const path of files) {
-            ancestors(path);
-            removeFile(path);
-            removed.push(relative(root, path).split(sep).join("/"));
+        for (const file of files) {
+            removeFile(contained(root, file));
+            removedArtifacts.push(file);
         }
-        for (const path of directories) {
-            ancestors(path);
-            rmdirSync(path);
-        }
-        manifest.retention.mode = "compact";
-        manifest.retention.rawEvidenceAvailable = false;
-        appendFileSync(
-            join(root, "summary.md"),
-            "\nOutput: compact; raw artifacts removed. Comparisons use analysis.json.\n",
-        );
+        for (const directory of directories) rmdirSync(contained(root, directory));
+        retention.mode = "compact";
     } catch (error) {
-        manifest.retention.mode = "failed";
-        manifest.retention.rawEvidenceAvailable = removed.length === 0;
-        manifest.retention.error = String(error);
+        retention.mode = "failed";
         throw error;
-    } finally {
-        save();
     }
 }

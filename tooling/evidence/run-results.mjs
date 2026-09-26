@@ -64,7 +64,7 @@ function stageName(name) {
     return name;
 }
 
-function validateResult(name, result) {
+export function validateResult(name, result) {
     if (name.startsWith("churn")) {
         validateChurn(result, name === "churn" ? "timed" : name.slice(6));
     } else if (name === "cpu") {
@@ -218,7 +218,14 @@ export function loadRun(directory, role) {
             else if (stage.status === "passed") throw new Error(`Missing result: ${stage.name}`);
         }
     }
-    return { role, directory, manifestPath, manifest, results };
+    return {
+        role,
+        directory,
+        manifestPath,
+        reportPath: join(directory, "summary.md"),
+        manifest,
+        results,
+    };
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

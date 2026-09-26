@@ -1,5 +1,12 @@
 import { spawn, execFileSync } from "node:child_process";
-import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+    appendFileSync,
+    existsSync,
+    mkdirSync,
+    readFileSync,
+    unlinkSync,
+    writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 import { cpus, totalmem } from "node:os";
 import { randomUUID } from "node:crypto";
@@ -9,6 +16,7 @@ import { npmPath } from "../../core/process.js";
 import { hash, identities, verifyIdentities } from "../../evidence/identity.js";
 import type { BenchmarkOptions } from "./options.js";
 import { compactRun } from "./compact.js";
+import { validateResult } from "../../evidence/run-results.mjs";
 
 const managed = [
     "NGNE_URL",
@@ -36,20 +44,8 @@ export async function allBenchmarks(repository: string, options: BenchmarkOption
             `${new Date().toISOString().replaceAll(":", "-")}-benchmarks-${randomUUID()}`,
         ),
     );
-    const legacy = join(run.evidence, "legacy");
-    mkdirSync(legacy);
-    const stages: {
-        name: string;
-        kind: string;
-        status: string;
-        exitCode: number;
-        startedAt: string;
-        finishedAt: string;
-        validationError: string | null;
-    }[] = [];
     const results = join(repository, "tooling/evidence/run-results.mjs");
-    const save = (path: string, value: unknown) =>
-        writeFileSync(path, JSON.stringify(value, null, 2) + "\n");
+    const diagnostics = (name: string) => join(run.evidence, "stages", name, "diagnostics");
     const source = Object.fromEntries(
         ["src", "demo", "examples", "tooling/suites/benchmarks/rendering/browser"].flatMap((p) =>
             Object.entries(identities(join(repository, p))).map(([name, sha]) => [
@@ -67,9 +63,7 @@ export async function allBenchmarks(repository: string, options: BenchmarkOption
         reason: "CPU and renderer probes exercise private World and WebGpuRuntime implementation; showcase probes measure repository-owned demo workloads. Installed package evidence is the separate content-engine suite.",
         units: "milliseconds, bytes, counts; metric-specific boundaries in raw results",
         budgets: "not established; 60 Hz tick counts are descriptive, not acceptance budgets",
-        retention: options.compact
-            ? "compact legacy projection; namespaced raw measurements and command logs retained; legacy profiles and traces omitted"
-            : "full",
+        retention: { mode: "full", compactRequested: options.compact },
         hardware: { cpu: cpus().map((c) => c.model), totalMemory: totalmem() },
         manualVisual: "not evaluated",
         manualAudible: "not evaluated",
@@ -177,18 +171,15 @@ export async function allBenchmarks(repository: string, options: BenchmarkOption
         values: Record<string, string> = {},
         mode?: string,
     ) => {
-        const startedAt = new Date().toISOString(),
-            directory = join(legacy, name);
-        mkdirSync(directory);
+        const directory = diagnostics(name);
+        mkdirSync(directory, { recursive: true });
         let failure: unknown;
         try {
             await run.stage(name, async () => {
                 verifySource();
                 const { stdout, stderr } = await invoke(name, args, values);
-                writeFileSync(join(directory, "run.log"), stderr);
                 if (kind === "benchmark") {
                     if (mode) {
-                        writeFileSync(join(directory, "stdout.log"), stdout);
                         if (stderr) throw Error(`${name}: churn emitted stderr`);
                         const parsed = join(directory, "gc-parsed.json");
                         if (mode === "gc")
@@ -197,7 +188,7 @@ export async function allBenchmarks(repository: string, options: BenchmarkOption
                                     repository,
                                     "tooling/suites/benchmarks/cpu/churn-gc-parse.mjs",
                                 ),
-                                join(directory, "stdout.log"),
+                                join(run.evidence, "stages", name, "logs/stdout.log"),
                                 join(directory, "result.json"),
                                 parsed,
                             ]);
@@ -212,25 +203,20 @@ export async function allBenchmarks(repository: string, options: BenchmarkOption
                     const raw: unknown = JSON.parse(
                         readFileSync(join(directory, "result.json"), "utf8"),
                     );
+                    validateResult(name, raw);
                     run.record(name, "measurements", {
                         target: "internal-source-microbenchmark",
                         raw,
                     });
+                    unlinkSync(join(directory, "result.json"));
+                    if (!mode && existsSync(join(run.evidence, "stages", name, "logs/stdout.log")))
+                        unlinkSync(join(run.evidence, "stages", name, "logs/stdout.log"));
                 }
                 verifySource();
             });
         } catch (error) {
             failure = error;
         }
-        stages.push({
-            name,
-            kind,
-            status: failure ? "failed" : "passed",
-            exitCode: failure ? 1 : 0,
-            startedAt,
-            finishedAt: new Date().toISOString(),
-            validationError: failure ? String(failure) : null,
-        });
         // Independent workloads still execute; acceptance remains failed.
         if (failure)
             run.result.failures.push({ kind: "scenario", message: `${name}: ${String(failure)}` });
@@ -270,7 +256,7 @@ export async function allBenchmarks(repository: string, options: BenchmarkOption
             }
             for (const mode of options.diagnostics ? ["timed", "alloc", "gc"] : ["timed"]) {
                 const name = mode === "timed" ? "churn" : `churn-${mode}`,
-                    directory = join(legacy, name);
+                    directory = diagnostics(name);
                 const args = [
                     ...(mode === "alloc" ? ["--expose-gc"] : mode === "gc" ? ["--trace-gc"] : []),
                     "--import",
@@ -322,7 +308,7 @@ export async function allBenchmarks(repository: string, options: BenchmarkOption
                             NGNE_SERVE_OUT_DIR: build,
                             NGNE_EXPECTED_BUILD: join(repository, build),
                             NGNE_EXPECTED_BACKEND: "webgpu",
-                            NGNE_ARTIFACT_DIR: join(legacy, name),
+                            NGNE_ARTIFACT_DIR: diagnostics(name),
                             ...(options.diagnostics
                                 ? {
                                       NGNE_ALLOCATION_SAMPLING: "1",
@@ -337,58 +323,19 @@ export async function allBenchmarks(repository: string, options: BenchmarkOption
             }
             run.manifest.preparation = "prepared";
         } finally {
-            const status =
-                run.result.failures.length || run.manifest.preparation !== "prepared"
-                    ? "failed"
-                    : "passed";
-            save(join(legacy, "manifest.json"), {
-                schemaVersion: 2,
-                status,
-                startedAt: run.manifest.startedAt,
-                finishedAt: new Date().toISOString(),
-                revision: run.manifest.provenance!.revision,
-                parameters: options,
-                environment: run.manifest.environment,
-                outputDirectory: legacy,
-                fatalError: status === "failed" ? "See namespaced run failures" : null,
-                retention: {
-                    mode: "full",
-                    compactRequested: options.compact,
-                    rawEvidenceAvailable: true,
-                },
-                stages,
-            });
-            writeFileSync(
-                join(legacy, "summary.md"),
-                `# Internal-source benchmark measurements\n\nStatus: ${status}. Exploratory; no controlled performance claim.\n\n${stages.map((s) => `- ${s.name}: ${s.status}`).join("\n")}\n`,
-            );
-            try {
-                await invoke("consolidate", [results, "collect", legacy]);
-                if (options.compact && status === "passed") compactRun(legacy, results);
-            } catch (error) {
-                try {
-                    const failed = JSON.parse(readFileSync(join(legacy, "manifest.json"), "utf8"));
-                    save(join(legacy, "manifest.json"), {
-                        ...failed,
-                        status: "failed",
-                        reportError: String(error),
-                    });
-                    const summary = readFileSync(join(legacy, "summary.md"), "utf8").replace(
-                        "Status: passed.",
-                        "Status: failed.",
-                    );
-                    writeFileSync(
-                        join(legacy, "summary.md"),
-                        `${summary}\nReporting or compaction failed: ${String(error)}\n`,
-                    );
-                } catch (publication) {
-                    throw new AggregateError(
-                        [error, publication],
-                        "Benchmark reporting and failure publication failed",
-                    );
-                }
-                throw error;
-            }
+            if (
+                options.compact &&
+                run.manifest.preparation === "prepared" &&
+                !run.result.failures.length
+            )
+                run.cleanup.push([
+                    "benchmark diagnostics compaction",
+                    () => {
+                        if (run.result.cleanupRecords.some((record) => record.status === "failed"))
+                            return;
+                        compactRun(run);
+                    },
+                ]);
         }
     });
     return run;

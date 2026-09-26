@@ -95,7 +95,7 @@ For hardware verification, set `NGNE_BROWSER_HEADLESS=0` and `NGNE_EXPECT_GPU_VE
 Consumer acceptance is explicitly selected with
 `npm run verify:compatibility -- --consumer <checkout> --revision <full-commit>`.
 It requires a conforming consumer-owned command and validates its pinned source,
-selected package and returned evidence. See [compatibility usage](tooling/README.md#consumer-evidence-and-legacy-fixtures).
+selected package and returned evidence. See [compatibility usage](tooling/README.md#consumer-evidence).
 Ordinary verification and CI require no consumer. `test:installed` is an alias
 for engine-only `verify:installed`; `bench:content -- --explore` is an alias
 for the [engine resource workload](tooling/suites/benchmarks/content/README.md).

@@ -1,12 +1,14 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { writeFileSync, readFileSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { writeFileSync, readFileSync, existsSync } from "node:fs";
+import { join } from "node:path";
 import { benchmarkFixture } from "./fixtures/benchmark-runner.js";
+import { measurement } from "./fixtures/benchmark-evidence.js";
 import { allBenchmarks } from "../suites/benchmarks/all.js";
 import { benchmarkOptions } from "../suites/benchmarks/options.js";
+import { loadBenchmarkRun } from "../evidence/benchmark-results.js";
 
-test("Node benchmark command failure retains diagnostics and refuses requested compaction", async () => {
+test("benchmark command failure retains diagnostics and refuses requested compaction", async () => {
     const root = benchmarkFixture();
     writeFileSync(
         join(root, "tooling/suites/benchmarks/cpu/churn-schema.ts"),
@@ -17,44 +19,50 @@ test("Node benchmark command failure retains diagnostics and refuses requested c
         benchmarkOptions(["--workload", "churn", "--compact"], root),
     );
     assert.equal(run.result.accepted, false);
-    assert.equal(run.result.execution, "failed");
     assert.equal(run.result.cleanup, "passed");
-    assert.equal(run.result.stages[0].correctness, "failed");
     assert.match(
         readFileSync(join(run.evidence, "stages/churn/logs/stderr.log"), "utf8"),
         /Injected workload failure/,
     );
-    const legacy = JSON.parse(readFileSync(join(run.evidence, "legacy/manifest.json"), "utf8"));
-    assert.equal(legacy.status, "failed");
-    assert.equal(legacy.retention.mode, "full");
-    assert.equal(legacy.outputDirectory, join(dirname(run.evidence), "evidence/legacy"));
+    assert.equal(existsSync(join(run.evidence, "legacy")), false);
+    assert.deepEqual(run.manifest.policy.retention, { mode: "full", compactRequested: true });
+    assert.equal(loadBenchmarkRun(run.root, "candidate").manifest.status, "failed");
 });
 
-test("Node consolidation failure cannot leave a successful legacy manifest or summary", async () => {
+test("invalid workload payload cannot publish successful acceptance", async () => {
     const root = benchmarkFixture();
     writeFileSync(
         join(root, "tooling/suites/benchmarks/cpu/churn-schema.ts"),
         `import {writeFileSync} from 'node:fs'; writeFileSync(process.argv[process.argv.indexOf('--out')+1], '{}');`,
     );
-    // Synthetic parser boundary: only consolidation fails after a completed stage.
-    writeFileSync(
-        join(root, "tooling/evidence/run-results.mjs"),
-        `if (process.argv[2] === 'collect') throw Error('Injected consolidation failure');`,
-    );
     const run = await allBenchmarks(
         root,
         benchmarkOptions(["--workload", "churn", "--compact"], root),
     );
-    assert.equal(run.result.stages[0].execution, "completed");
+    assert.equal(run.result.stages[0].execution, "failed");
     assert.equal(run.result.accepted, false);
     assert.equal(run.result.cleanup, "passed");
-    const legacy = JSON.parse(readFileSync(join(run.evidence, "legacy/manifest.json"), "utf8"));
-    assert.equal(legacy.status, "failed");
-    assert.equal(legacy.retention.mode, "full");
-    assert.match(legacy.reportError, /consolidate/);
-    assert.match(readFileSync(join(run.evidence, "legacy/summary.md"), "utf8"), /Status: failed/);
-    assert.match(
-        readFileSync(join(run.evidence, "stages/consolidate/logs/stderr.log"), "utf8"),
-        /Injected consolidation failure/,
-    );
+    assert.ok(existsSync(join(run.evidence, "stages/churn/diagnostics/result.json")));
+    assert.equal(existsSync(join(run.evidence, "stages/churn/measurements.json")), false);
+});
+
+test("successful runner stores one measurement payload and compares full and compact runs", async () => {
+    for (const compact of [false, true]) {
+        const root = benchmarkFixture();
+        writeFileSync(
+            join(root, "tooling/suites/benchmarks/cpu/churn-schema.ts"),
+            `import {writeFileSync} from 'node:fs'; writeFileSync(process.argv[process.argv.indexOf('--out')+1], ${JSON.stringify(JSON.stringify(measurement()))});`,
+        );
+        const run = await allBenchmarks(
+            root,
+            benchmarkOptions(["--workload", "churn", ...(compact ? ["--compact"] : [])], root),
+        );
+        assert.equal(run.result.accepted, true);
+        assert.equal(existsSync(join(run.evidence, "legacy")), false);
+        assert.equal(existsSync(join(run.evidence, "stages/churn/diagnostics/result.json")), false);
+        assert.deepEqual(
+            loadBenchmarkRun(run.root, "candidate").results.get("churn")?.value,
+            measurement(),
+        );
+    }
 });

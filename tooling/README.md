@@ -153,7 +153,7 @@ caches are not uploaded by CI. Portable export is outside the approved scope;
 no new browser, compatibility or performance
 claim is implied by package preparation. Existing commands remain active.
 
-## Consumer evidence and legacy fixtures
+## Consumer evidence
 
 The [consumer command contract](../plans/tooling/consumer-command-contract.md)
 defines the versioned tarball/hash/output interface. The validator reuses the shared
@@ -192,9 +192,8 @@ select only engine verification. No consumer is fetched, discovered or required.
 Consumer acceptance and game measurements belong to the explicitly supplied
 consumer. Synthetic runner tests do not establish real integration.
 
-[Bounded legacy fixtures](../plans/tooling/legacy-formats.md) preserve both existing
-reader families. Explicit format selection rejects unknown/new formats; existing
-readers retain their strict and advisory semantics. No historical evidence is converted.
+Historical reader fixtures preserve the existing strict and advisory semantics.
+Unknown formats are rejected; historical evidence is not converted.
 
 ## Installed engine verification
 
@@ -246,29 +245,30 @@ is unsupported.
 
 `npm run bench:all` uses Node orchestration for internal CPU/churn, private renderer
 and repository showcase probes. Source and build inventories identify those targets;
-they are distinct from installed-package measurements. Legacy flag aliases and
-diagnostics remain supported. Namespaced evidence is under `out/runs/`; the
-`evidence/legacy/` projection remains readable by the unchanged advisory comparator.
+they are distinct from installed-package measurements. Existing flag aliases and
+diagnostics remain supported. Each run writes one canonical evidence tree under
+`out/runs/`, with one measurement document per workload.
 See [benchmark usage](suites/benchmarks/README.md) for retention and flag details.
 
-## Legacy comparisons
+## Benchmark comparisons
 
-`npm run bench:compare -- <baseline-directory> <candidate-directory>` invokes
-[the advisory comparator](evidence/compare-runs.mjs). Pass `evidence/legacy/`
-explicitly for aggregate runs. Per-stage, consolidated and compact legacy inputs
-retain the same reader validation, warnings, problems and scan precedence.
+`npm run bench:compare -- <baseline-run-directory> <candidate-run-directory>` invokes
+[the comparison command](commands/compare-benchmarks.ts). Supply run directories directly;
+`evidence/` directories are also accepted. Current-format reading checks document versions,
+run identities, final outcomes, artifact sizes/hashes and workload data. Historical
+per-stage, consolidated and compact output directories remain readable without conversion.
+New runs never produce a compatibility copy. Full and compact runs use the same measurements.
 Reports remain JSON/Markdown under `.test-output/comparisons/` by default;
 `--output` selects another directory and `--attention-percent` changes the default
 10% attention threshold. A completed advisory scan exits zero even when it finds
-problems; invalid arguments or unreadable/invalid input exit one.
+problems; invalid arguments or unreadable/invalid input exit one. A comparison does
+not establish controlled performance acceptance.
 
 `node tooling/evidence/compare-content.mjs <baseline-directory> <candidate-directory>`
 invokes the strict retained-content comparator. It preserves exact identity,
 passed acceptance and cleanup requirements, returning exit two for incompatibility.
-Its JSON output and supported legacy input family are unchanged.
-Neither comparator adds new-format or candidate-mode acceptance. The shared legacy
-[reader and consolidation CLI](evidence/run-results.mjs) also serves aggregate
-validation and compaction; its integrity checks remain mandatory.
+Its historical input family and JSON output are unchanged; new installed-resource
+cross-revision comparison remains unsupported.
 
 ## Browser sessions and protocol checks
 
@@ -282,7 +282,7 @@ External servers and run-owned static servers remain explicitly caller-owned.
 
 Suites keep flags, navigation, assertions, warmup, sampling and budgets. Existing
 browser verification, installed verification and both browser benchmark runners
-use this owner. No engine exports or runtime dependencies are added. The legacy
+use this owner. No engine exports or runtime dependencies are added. The shared
 `tests/tooling` transport/cleanup entry points remain shared compatibility seams;
 there is no second benchmark CDP implementation.
 
@@ -302,7 +302,7 @@ directory. These checks establish protocol capability, not performance, physical
 rendering or manual audible/visual approval. Full snapshots/traces from this check
 are omitted; their validated byte/node/event counts and raw sampling are retained.
 
-The legacy browser benchmark remains headed by default. `NGNE_BROWSER_HEADLESS=1`
+The browser benchmark remains headed by default. `NGNE_BROWSER_HEADLESS=1`
 is an explicit capability-smoke mode and is recorded in its flags; its results
 must not be substituted for visible physical-GPU performance baselines. Benchmark
 artifacts are retained separately from the disposable browser profile. Failed

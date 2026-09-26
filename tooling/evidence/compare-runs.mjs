@@ -15,15 +15,15 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
         process.exitCode = 1;
     }
 
-function main() {
+export function main(readRun = loadRun) {
     const parsed = parseArguments(process.argv.slice(2));
     if (parsed.help || parsed.positionals.length !== 2) {
         printUsage();
         process.exitCode = parsed.help ? 0 : 1;
         return;
     }
-    const baseline = loadRun(parsed.positionals[0], "baseline");
-    const candidate = loadRun(parsed.positionals[1], "candidate");
+    const baseline = readRun(parsed.positionals[0], "baseline");
+    const candidate = readRun(parsed.positionals[1], "candidate");
     const outputDirectory = parsed.output
         ? resolveInputPath(parsed.output)
         : join(
@@ -137,6 +137,11 @@ export function compareRuns(baseline, candidate, attentionPercent = 10) {
         candidate.manifest.parameters?.diagnostics,
     );
 
+    if (baseline.manifest.status !== "passed")
+        problems.push({
+            scope: "baseline",
+            message: `Baseline run status is ${baseline.manifest.status}`,
+        });
     if (candidate.manifest.status !== "passed")
         problems.push({
             scope: "candidate",
@@ -259,6 +264,7 @@ function runIdentity(run) {
     return {
         directory: run.directory,
         manifest: run.manifestPath,
+        report: run.reportPath ?? join(run.directory, "summary.md"),
         revision: run.manifest.revision,
         startedAt: run.manifest.startedAt,
         status: run.manifest.status,
@@ -552,8 +558,8 @@ function renderMarkdown(comparison, outputDirectory) {
         `- Baseline: revision \`${shortRevision(comparison.baseline.revision)}\`, ${comparison.baseline.startedAt}`,
         `- Candidate: revision \`${shortRevision(comparison.candidate.revision)}\`, ${comparison.candidate.startedAt}`,
         `- Attention threshold: ${formatNumber(comparison.attentionPercent)}%`,
-        `- Baseline run: [summary](${markdownPath(outputDirectory, join(comparison.baseline.directory, "summary.md"))})`,
-        `- Candidate run: [summary](${markdownPath(outputDirectory, join(comparison.candidate.directory, "summary.md"))})`,
+        `- Baseline run: [report](${markdownPath(outputDirectory, comparison.baseline.report)})`,
+        `- Candidate run: [report](${markdownPath(outputDirectory, comparison.candidate.report)})`,
         "",
         "| Definite problems | Compatibility warnings | Notable regressions | Improvements |",
         "| ---: | ---: | ---: | ---: |",

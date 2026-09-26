@@ -1,220 +1,126 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { compactRun } from "../suites/benchmarks/compact.js";
-import { allBenchmarks } from "../suites/benchmarks/all.js";
-import { benchmarkOptions } from "../suites/benchmarks/options.js";
-import { benchmarkFixture } from "./fixtures/benchmark-runner.js";
-import {
-    mkdirSync,
-    mkdtempSync,
-    readFileSync,
-    readdirSync,
-    writeFileSync,
-    symlinkSync,
-    existsSync,
-} from "node:fs";
-import { join, resolve } from "node:path";
-import {
-    collectAnalysis,
-    loadRun,
-    readJson,
-    validateAnalysis,
-    validateChurn,
-} from "../evidence/run-results.mjs";
+import { execFileSync } from "node:child_process";
+import { existsSync, readFileSync, writeFileSync, unlinkSync } from "node:fs";
+import { join, resolve, dirname } from "node:path";
+import { evidenceFixture, measured } from "./fixtures/benchmark-evidence.js";
+import { loadBenchmarkRun } from "../evidence/benchmark-results.js";
 import { compareRuns } from "../evidence/compare-runs.mjs";
+import { readJson } from "../evidence/run-results.mjs";
+import { hash } from "../evidence/identity.js";
 
-const output = resolve(".test-output/benchmark-output-tests");
-mkdirSync(output, { recursive: true });
-const save = (path: string, value: unknown) => writeFileSync(path, JSON.stringify(value));
-function fixture(legacy = false) {
-    const directory = mkdtempSync(join(output, "run-"));
-    mkdirSync(join(directory, "churn"));
-    const result = {
-        api: "schema",
-        mode: "timed",
-        revision: "fixture",
-        node: "fixture",
-        cpu: "fixture",
-        parameters: {
-            LIVE: 10000,
-            PER_COMMIT: 1000,
-            WARMUP_COMMITS: 100,
-            SAMPLE_COMMITS: 1000,
-            RETAINED_EVERY: 100,
-        },
-        sourceHashes: {
-            "../../src/ecs.ts": "1".repeat(64),
-            "../../package-lock.json": "2".repeat(64),
-            "./churn-schema.ts": "3".repeat(64),
-        },
-        batchMs: { samples: 1000, p50: 1, p95: 1, p99: 1 },
-        rawBatchMs: Array(1000).fill(1),
-    };
-    save(join(directory, "churn/result.json"), result);
-    writeFileSync(join(directory, "churn/run.log"), "diagnostic");
-    save(join(directory, "manifest.json"), {
-        schemaVersion: legacy ? 1 : 2,
-        status: "passed",
-        revision: "fixture",
-        startedAt: "fixture",
-        outputDirectory: directory,
-        parameters: { workload: "churn", diagnostics: false },
-        environment: { machine: "fixture" },
-        fatalError: null,
-        stages: [{ name: "churn", kind: "benchmark", status: "passed" }],
-    });
-    writeFileSync(join(directory, "summary.md"), "# Benchmark\n");
-    if (!legacy) collectAnalysis(directory);
-    return directory;
-}
-function compact(directory: string, injectFailure = false) {
-    try {
-        compactRun(
-            directory,
-            resolve("tooling/evidence/run-results.mjs"),
-            injectFailure
-                ? () => {
-                      throw Error("Injected deletion failure");
-                  }
-                : undefined,
-        );
-        return { status: 0, stderr: "" };
-    } catch (error) {
-        return { status: 1, stderr: String(error) };
-    }
+function reseal(directory: string, path: string) {
+    const inventory = readJson(join(directory, "artifacts.json"));
+    const file = inventory.files.find((f: { path: string }) => f.path === path);
+    const bytes = readFileSync(join(directory, path));
+    file.bytes = bytes.length;
+    file.sha256 = hash(bytes);
+    writeFileSync(join(directory, "artifacts.json"), JSON.stringify(inventory));
 }
 
-test("full, compact and legacy churn results produce identical metrics", () => {
-    const baseline = fixture(),
-        candidate = fixture(),
-        legacy = fixture(true);
-    const metrics = () =>
-        compareRuns(loadRun(baseline, "baseline"), loadRun(candidate, "candidate")).workloads.map(
-            (w) => w.metrics,
-        );
-    const before = metrics();
-    const result = compact(candidate);
-    assert.equal(result.status, 0, result.stderr);
-    assert.deepEqual(readdirSync(candidate).sort(), [
-        "analysis.json",
-        "manifest.json",
-        "summary.md",
-    ]);
-    assert.equal(readJson(join(candidate, "manifest.json")).retention.mode, "compact");
-    assert.deepEqual(metrics(), before);
-    assert.equal(compact(baseline).status, 0);
-    assert.deepEqual(metrics(), before);
-    const old = compareRuns(loadRun(legacy, "baseline"), loadRun(candidate, "candidate"));
-    assert.deepEqual(
-        old.workloads.map((w) => w.metrics),
-        before,
+test("current run roots and evidence paths share canonical measurements; historical metrics match", async () => {
+    const run = evidenceFixture();
+    await run.execute(() => measured(run));
+    const current = loadBenchmarkRun(run.root, "candidate");
+    assert.deepEqual(current.results, loadBenchmarkRun(run.evidence, "candidate").results);
+    assert.equal(existsSync(join(run.evidence, "legacy")), false);
+    const old = loadBenchmarkRun(
+        "tooling/tests/fixtures/legacy/benchmark-consolidated",
+        "baseline",
     );
-    assert.equal(old.problems.length, 0);
+    const metrics = (a: typeof old, b: typeof old) =>
+        compareRuns(a, b).workloads.map((w) => w.metrics);
+    assert.deepEqual(metrics(old, current), metrics(old, old));
 });
 
-test("missing or corrupted consolidated analysis prevents cleanup and comparison", () => {
-    for (const content of ["{}", "broken"]) {
-        const directory = fixture();
-        writeFileSync(join(directory, "analysis.json"), content);
-        assert.notEqual(compact(directory).status, 0);
-        assert.equal(readFileSync(join(directory, "churn/run.log"), "utf8"), "diagnostic");
-        assert.throws(() => loadRun(directory, "candidate"));
+test("comparison CLI links canonical reports and rejects tampered current evidence", async () => {
+    const run = evidenceFixture();
+    await run.execute(() => measured(run));
+    const output = join(dirname(run.root), "comparison with spaces");
+    const args = [
+        "--import",
+        "tsx",
+        resolve("tooling/commands/compare-benchmarks.ts"),
+        run.root,
+        run.root,
+        "--output",
+        output,
+    ];
+    execFileSync(process.execPath, args, { windowsHide: true });
+    const report = readFileSync(join(output, "report.md"), "utf8");
+    assert.match(report, /\.\.\/run\/evidence\/report\.md/);
+    assert.doesNotMatch(report, /summary\.md/);
+    writeFileSync(join(run.evidence, "stages/churn/measurements.json"), "{}");
+    assert.throws(
+        () => execFileSync(process.execPath, args, { windowsHide: true, stdio: "pipe" }),
+        /Changed artifact/,
+    );
+});
+
+test("current reader rejects corrupt, missing, unlisted and cross-run evidence", async () => {
+    for (const kind of [
+        "corrupt",
+        "missing",
+        "unlisted",
+        "identity",
+        "version",
+        "workload",
+        "partial",
+        "acceptance",
+        "traversal",
+    ]) {
+        const run = evidenceFixture();
+        await run.execute(() => measured(run));
+        const path = "stages/churn/measurements.json";
+        if (kind === "missing") unlinkSync(join(run.evidence, path));
+        else if (kind === "unlisted" || kind === "traversal") {
+            const p = join(run.evidence, "artifacts.json"),
+                inventory = readJson(p);
+            if (kind === "unlisted")
+                inventory.files = inventory.files.filter((f: { path: string }) => f.path !== path);
+            else inventory.files[0].path = "../escape";
+            writeFileSync(p, JSON.stringify(inventory));
+        } else if (kind === "partial" || kind === "acceptance") {
+            const p = "result.json",
+                data = readJson(join(run.evidence, p));
+            if (kind === "partial") {
+                data.evidence = "partial";
+                data.accepted = false;
+            } else data.cleanup = "failed";
+            writeFileSync(join(run.evidence, p), JSON.stringify(data));
+            reseal(run.evidence, p);
+        } else {
+            const data = readJson(join(run.evidence, path));
+            if (kind === "identity") data.runId = "another-run";
+            else if (kind === "version") data.schemaVersion = 99;
+            else data.raw.rawBatchMs.pop();
+            writeFileSync(join(run.evidence, path), JSON.stringify(data));
+            if (kind !== "corrupt") reseal(run.evidence, path);
+        }
+        assert.throws(() => loadBenchmarkRun(run.root, "candidate"), kind);
     }
-    const missing = fixture(true);
-    const manifest = readJson(join(missing, "manifest.json"));
-    manifest.schemaVersion = 2;
-    save(join(missing, "manifest.json"), manifest);
-    assert.notEqual(compact(missing).status, 0);
-    assert.throws(() => loadRun(missing, "candidate"), /Missing consolidated/);
 });
 
-test("failed and incomplete runs retain diagnostics", () => {
-    const failed = fixture(),
-        manifest = readJson(join(failed, "manifest.json"));
-    manifest.status = "failed";
-    manifest.stages[0].status = "failed";
-    save(join(failed, "manifest.json"), manifest);
-    collectAnalysis(failed);
-    assert.notEqual(compact(failed).status, 0);
-    assert.equal(readFileSync(join(failed, "churn/run.log"), "utf8"), "diagnostic");
-    const incomplete = fixture(),
-        incompleteManifest = readJson(join(incomplete, "manifest.json"));
-    incompleteManifest.stages = [];
-    save(join(incomplete, "manifest.json"), incompleteManifest);
-    assert.throws(() => collectAnalysis(incomplete), /Missing expected/);
-    assert.notEqual(compact(incomplete).status, 0);
-    assert.equal(readFileSync(join(incomplete, "churn/run.log"), "utf8"), "diagnostic");
-});
-
-test("compaction refuses mismatched directories, junctions and linked ancestors", () => {
-    const directory = fixture(),
-        outside = fixture();
-    symlinkSync(
-        outside,
-        join(directory, "escape"),
-        process.platform === "win32" ? "junction" : "dir",
-    );
-    assert.notEqual(compact(directory).status, 0);
-    assert.equal(readFileSync(join(outside, "churn/run.log"), "utf8"), "diagnostic");
-    const link = join(mkdtempSync(join(output, "link-")), "run");
-    symlinkSync(outside, link, process.platform === "win32" ? "junction" : "dir");
-    assert.notEqual(compact(link).status, 0);
-    const mismatch = fixture(),
-        manifest = readJson(join(mismatch, "manifest.json"));
-    manifest.outputDirectory = outside;
-    save(join(mismatch, "manifest.json"), manifest);
-    assert.notEqual(compact(mismatch).status, 0);
-    assert.equal(readFileSync(join(mismatch, "churn/run.log"), "utf8"), "diagnostic");
-});
-
-test("cleanup failures are recorded instead of reporting compact success", () => {
-    const directory = fixture();
-    const result = compact(directory, true);
-    assert.notEqual(result.status, 0);
-    assert.equal(readJson(join(directory, "manifest.json")).retention.mode, "failed");
-    assert.equal(readFileSync(join(directory, "churn/run.log"), "utf8"), "diagnostic");
-});
-
-test("churn validation rejects incomplete samples and rejected GC traces", () => {
-    const directory = fixture(),
-        result = readJson(join(directory, "churn/result.json"));
-    result.rawBatchMs.pop();
-    assert.throws(() => validateChurn(result, "timed"), /timing samples/);
-    result.mode = "gc";
-    result.gcTrace = { accepted: false, windowCount: 1, windowPauseTotalMs: 1 };
-    assert.throws(() => validateChurn(result, "gc"), /not accepted/);
-    result.mode = "alloc";
-    assert.throws(() => validateChurn(result, "alloc"), /missing allocation/);
-    const valid = fixture();
-    const changed = readJson(join(valid, "churn/result.json"));
-    changed.batchMs.p50 = 2;
-    save(join(valid, "churn/result.json"), changed);
-    assert.throws(() => validateAnalysis(valid), /Result mismatch/);
-});
-
-test("runner failure preserves logs even when compact output was requested", async () => {
-    const root = benchmarkFixture();
-    writeFileSync(
-        join(root, "tooling/suites/benchmarks/cpu/churn-schema.ts"),
-        `import { writeFileSync } from 'node:fs'; writeFileSync(process.argv[process.argv.indexOf('--out') + 1], '{}'); console.error('Injected workload failure');`,
-    );
-    const run = await allBenchmarks(
-        root,
-        benchmarkOptions(
-            ["-Workload", "churn", "-Compact", "-OutputRoot", join(root, "runs")],
-            root,
-        ),
-    );
-    assert.equal(run.result.accepted, false);
-    assert.equal(run.result.cleanup, "passed");
-    const directory = join(run.evidence, "legacy");
-    const manifest = readJson(join(directory, "manifest.json"));
-    assert.equal(manifest.status, "failed");
-    assert.equal(manifest.stages[0].status, "failed");
-    assert.equal(manifest.retention.mode, "full");
-    assert.ok(existsSync(join(directory, "analysis.json")));
-    assert.match(
-        readFileSync(join(run.evidence, "stages/churn/logs/stderr.log"), "utf8"),
-        /Injected workload failure/,
-    );
+test("failed workloads and cleanup failures remain visible for either comparison role", async () => {
+    const good = evidenceFixture();
+    await good.execute(() => measured(good));
+    for (const kind of ["workload", "cleanup"]) {
+        const run = evidenceFixture();
+        if (kind === "cleanup")
+            run.cleanup.push([
+                "injected cleanup",
+                () => {
+                    throw Error("cleanup failed");
+                },
+            ]);
+        await run.execute(async () => {
+            await measured(run);
+            if (kind === "workload") throw Error("workload failed");
+        });
+        const failed = loadBenchmarkRun(run.root, "candidate"),
+            passed = loadBenchmarkRun(good.root, "baseline");
+        assert.equal(failed.manifest.status, "failed");
+        assert.ok(compareRuns(passed, failed).problems.length);
+        assert.ok(compareRuns(failed, passed).problems.length);
+    }
 });

@@ -146,9 +146,9 @@ Each run creates a directory under `out/runs/`:
 | ----------------------------------------- | --------------------------------------------------------------------- |
 | `evidence/report.md`                      | Run acceptance and cleanup, not timing statistics                     |
 | `evidence/stages/churn/measurements.json` | `raw.batchMs` for statistics; `raw.rawBatchMs` for individual samples |
-| `evidence/legacy/analysis.json`           | Consolidated measurements in the format used by `bench:compare`       |
+| `evidence/artifacts.json`                 | File sizes and hashes checked before comparison                       |
 
-`legacy/` contains **this run's data in the older output format**, not old results. It keeps the existing comparator working; its other files hold metadata, a brief summary and workload logs/results.
+Measurements are stored once. The comparator reads the same stage measurement files.
 
 | Metric       | Meaning                                                    |
 | ------------ | ---------------------------------------------------------- |
@@ -164,7 +164,7 @@ Times are milliseconds per batch, not game FPS or GPU time. `accepted: true` mea
 Run the same benchmark again, then pass **baseline first, candidate second**:
 
 ```powershell
-npm.cmd run bench:compare -- "out/runs/<baseline-run>/evidence/legacy" "out/runs/<candidate-run>/evidence/legacy"
+npm.cmd run bench:compare -- "out/runs/<baseline-run>" "out/runs/<candidate-run>"
 ```
 
 This reads saved results; it does not rerun benchmarks. Reports are written under `.test-output/comparisons/` as `report.md` and `comparison.json`.
@@ -177,7 +177,7 @@ Repeat runs with the same machine, power mode, runtime and workload. Look for a 
 
 A **consumer** is a separate game that uses NGNE. Run this before adopting or releasing an engine update to check whether a fixed game revision still passes its verification with the selected package. It covers the checks that game implements, not every possible gameplay behavior.
 
-Unlike `verify:installed`, which uses NGNE's own fixture, this invokes the separate game's verification command. It works only with consumers implementing the [verification interface](README.md#consumer-evidence-and-legacy-fixtures), not arbitrary game folders. The checkout must be clean and committed, with its documented prerequisites ready.
+Unlike `verify:installed`, which uses NGNE's own fixture, this invokes the separate game's verification command. It works only with consumers implementing the [verification interface](README.md#consumer-evidence), not arbitrary game folders. The checkout must be clean and committed, with its documented prerequisites ready.
 
 Example for the platformer, run from the **NGNE repository root**:
 
