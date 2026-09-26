@@ -9,6 +9,7 @@
         "docs/contracts"
     ],
     "scripts": {
+        "clean": "node -e \"for (const dir of ['out', 'dist', 'dist-browser', '.test-output']) require('node:fs').rmSync(dir, { recursive: true, force: true })\"",
         "dev": "vite --host 127.0.0.1",
         "build": "tsc --noEmit && tsc -p tests/tsconfig.browser.json && tsc -p tooling/suites/verification/browser/tsconfig.json && tsc -p tooling/suites/benchmarks/rendering/browser/tsconfig.json && tsc -p tsconfig.lib.json && tsc -p tests/tsconfig.api.json && vite build",
         "build:browser": "vite build --mode browser --outDir dist-browser",
