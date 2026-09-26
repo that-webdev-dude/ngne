@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { arch, platform, release } from "node:os";
-import { cleanupSteps, failureText, type CleanupStep } from "../../tests/tooling/cleanup.mjs";
+import { cleanupSteps, failureText, type CleanupStep } from "./cleanup.mjs";
 import { hash, identities, safePath } from "../evidence/identity.js";
 import {
     accepts,

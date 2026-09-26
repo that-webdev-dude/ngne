@@ -2,7 +2,7 @@ import { execFileSync, spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { appendFileSync, existsSync, readFileSync, realpathSync } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
-import { ownProcess, failureText } from "../../tests/tooling/cleanup.mjs";
+import { ownProcess, failureText } from "../core/cleanup.mjs";
 import { Run } from "../core/run.js";
 import { npmPath } from "../core/process.js";
 import { prepare, verifyPrepared } from "../core/preparation.js";
@@ -77,7 +77,7 @@ export async function compatibility(
             ...[
                 "tooling/suites/compatibility.ts",
                 "tooling/core/run.ts",
-                "tests/tooling/cleanup.mjs",
+                "tooling/core/cleanup.mjs",
             ].map((p) => [p, hash(readFileSync(join(repository, p)))]),
         ]);
         let manifestPath = options.manifest && resolve(options.manifest);

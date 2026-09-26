@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { readFileSync } from "node:fs";
 import { extname } from "node:path";
 import { contained } from "../evidence/identity.js";
-import { closeServer } from "../../tests/tooling/cleanup.mjs";
+import { closeServer } from "./cleanup.mjs";
 import type { Run } from "./run.js";
 
 /** Serve only a verified disposable build, with no SPA/source fallback. */

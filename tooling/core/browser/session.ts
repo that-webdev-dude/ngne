@@ -10,13 +10,8 @@ import {
 import { rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import {
-    cleanupSteps,
-    ownProcess,
-    type CleanupRecord,
-    type CleanupStep,
-} from "../../../tests/tooling/cleanup.mjs";
-import { connectDevTools, type DevTools } from "../../../tests/tooling/devtools.mjs";
+import { cleanupSteps, ownProcess, type CleanupRecord, type CleanupStep } from "../cleanup.mjs";
+import { connectDevTools, type DevTools } from "./devtools.mjs";
 
 export function browserExecutable(): string {
     return (

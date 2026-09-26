@@ -5,7 +5,7 @@ import {
     ProtocolError,
     TransportError,
     isNavigationError,
-} from "../../tests/tooling/devtools.mjs";
+} from "../core/browser/devtools.mjs";
 
 class Clock {
     next = 0;

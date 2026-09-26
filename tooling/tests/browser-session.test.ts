@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { createServer } from "node:http";
 import { createHash } from "node:crypto";
-import { connectDevTools } from "../../tests/tooling/devtools.mjs";
+import { connectDevTools } from "../core/browser/devtools.mjs";
 import { BrowserSession } from "../core/browser/session.js";
-import { closeServer, runWithCleanup } from "../../tests/tooling/cleanup.mjs";
+import { closeServer, runWithCleanup } from "../core/cleanup.mjs";
 
 function frame(text: string | Buffer, opcode = 1, final = true): Buffer {
     const bytes = Buffer.isBuffer(text) ? text : Buffer.from(text);

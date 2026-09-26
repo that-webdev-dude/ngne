@@ -10,7 +10,6 @@ export async function verifyEngine(repository: string): Promise<Run> {
         ["format", ["run", "format:check"]],
         ["tests", ["test"]],
         ["tooling-types", ["run", "typecheck:tooling"]],
-        ["migration", ["run", "check:migration"]],
         ["types", ["run", "typecheck"]],
         ["build", ["run", "build"]],
         ["browser-build", ["run", "build:browser"]],

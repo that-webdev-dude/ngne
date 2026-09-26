@@ -1,4 +1,4 @@
-import { DevToolsSocket } from "../../tooling/core/browser/socket.ts";
+import { DevToolsSocket } from "./socket.ts";
 export class TransportError extends Error {}
 export class ProtocolError extends Error {
     constructor(method, detail) {

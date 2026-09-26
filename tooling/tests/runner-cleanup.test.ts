@@ -7,7 +7,7 @@ import {
     ownProcess,
     shutdownProcessTree,
     type CleanupRecord,
-} from "../../tests/tooling/cleanup.mjs";
+} from "../core/cleanup.mjs";
 
 test("workload, screenshot and cleanup failures remain visible and later cleanup runs", async () => {
     const visited: string[] = [],

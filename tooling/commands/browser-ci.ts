@@ -1,8 +1,8 @@
 // NGNE_BROWSER and CHROME_BIN executable selection is delegated to BrowserSession.
 // BrowserSession supplies "--remote-debugging-port" and "--user-data-dir"; these launch options remain supported.
-import { BrowserSession } from "../tooling/core/browser/session.js";
-import { isNavigationError } from "./tooling/devtools.mjs";
-import { runWithCleanup, ownProcess } from "./tooling/cleanup.mjs";
+import { BrowserSession } from "../core/browser/session.js";
+import { isNavigationError } from "../core/browser/devtools.mjs";
+import { runWithCleanup, ownProcess, type CleanupRecord } from "../core/cleanup.mjs";
 import { type ChildProcess } from "node:child_process";
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -75,7 +75,7 @@ let environment: AdapterEnvironment | undefined;
 let renderer: BrowserResult["renderer"] = "unknown";
 let preview: ChildProcess | undefined;
 let cdp: Cdp | undefined;
-const cleanup: { resource: string; status: string; error?: string }[] = [];
+const cleanup: CleanupRecord[] = [];
 let previewOwner: ReturnType<typeof ownProcess> | undefined;
 let browserVersion: unknown;
 let browserFlags: string[] = [];

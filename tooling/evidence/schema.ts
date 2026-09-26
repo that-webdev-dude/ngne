@@ -1,5 +1,5 @@
 import { safePath, type Identities } from "./identity.js";
-import type { CleanupRecord } from "../../tests/tooling/cleanup.mjs";
+import type { CleanupRecord } from "../core/cleanup.mjs";
 
 export interface Header {
     format: "ngne-tooling";

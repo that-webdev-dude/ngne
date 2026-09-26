@@ -3,7 +3,7 @@
 import { appendFileSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { BrowserSession } from "../../../core/browser/session.js";
-import { type DevTools } from "../../../../tests/tooling/devtools.mjs";
+import { type DevTools } from "../../../core/browser/devtools.mjs";
 import { Run } from "../../../core/run.js";
 import { copyPreparedBuild, prepare, verifyPrepared } from "../../../core/preparation.js";
 import { serve } from "../../../core/server.js";
@@ -86,11 +86,11 @@ export async function installed(
                         identities(join(repository, "tooling/suites/verification/browser")),
                     ).map(([p, h]) => [`tooling/suites/verification/browser/${p}`, h]),
                 ),
-                "tests/tooling/devtools.mjs": hash(
-                    readFileSync(join(repository, "tests/tooling/devtools.mjs")),
+                "tooling/core/browser/devtools.mjs": hash(
+                    readFileSync(join(repository, "tooling/core/browser/devtools.mjs")),
                 ),
-                "tests/tooling/cleanup.mjs": hash(
-                    readFileSync(join(repository, "tests/tooling/cleanup.mjs")),
+                "tooling/core/cleanup.mjs": hash(
+                    readFileSync(join(repository, "tooling/core/cleanup.mjs")),
                 ),
             };
             const flags = [

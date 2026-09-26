@@ -29,7 +29,7 @@ export async function prepare(repository: string, output?: string): Promise<Run>
                     ]),
                 ),
                 ...[
-                    "tests/tooling/cleanup.mjs",
+                    "tooling/core/cleanup.mjs",
                     "tsconfig.lib.json",
                     "tsconfig.json",
                     "package.json",

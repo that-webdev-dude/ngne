@@ -1,4 +1,4 @@
-import type { DevToolsSocket } from "../../tooling/core/browser/socket.js";
+import type { DevToolsSocket } from "./socket.js";
 
 /** Typed boundary over the shared transport; implementation remains in devtools.mjs. */
 export interface DevTools {

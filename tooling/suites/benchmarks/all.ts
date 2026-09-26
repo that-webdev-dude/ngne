@@ -10,7 +10,7 @@ import {
 import { join } from "node:path";
 import { cpus, totalmem } from "node:os";
 import { randomUUID } from "node:crypto";
-import { ownProcess } from "../../../tests/tooling/cleanup.mjs";
+import { ownProcess } from "../../core/cleanup.mjs";
 import { Run } from "../../core/run.js";
 import { npmPath } from "../../core/process.js";
 import { hash, identities, verifyIdentities } from "../../evidence/identity.js";
@@ -69,12 +69,11 @@ export async function allBenchmarks(repository: string, options: BenchmarkOption
         manualAudible: "not evaluated",
     };
     run.manifest.harness = Object.fromEntries(
-        ["tooling/core", "tooling/evidence", "tooling/suites/benchmarks", "tests/tooling"].flatMap(
-            (p) =>
-                Object.entries(identities(join(repository, p))).map(([name, sha]) => [
-                    `${p}/${name}`,
-                    sha,
-                ]),
+        ["tooling/core", "tooling/evidence", "tooling/suites/benchmarks"].flatMap((p) =>
+            Object.entries(identities(join(repository, p))).map(([name, sha]) => [
+                `${p}/${name}`,
+                sha,
+            ]),
         ),
     );
     for (const path of [

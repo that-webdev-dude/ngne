@@ -120,8 +120,8 @@ export async function content(
                 ),
             );
             for (const path of [
-                "tests/tooling/cleanup.mjs",
-                "tests/tooling/devtools.mjs",
+                "tooling/core/cleanup.mjs",
+                "tooling/core/browser/devtools.mjs",
                 "tooling/commands/benchmark.ts",
                 "package-lock.json",
                 "node_modules/vite/package.json",

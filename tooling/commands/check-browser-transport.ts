@@ -16,8 +16,8 @@ run.manifest.harness = {
     ),
     ...Object.fromEntries(
         [
-            "tests/tooling/devtools.mjs",
-            "tests/tooling/cleanup.mjs",
+            "tooling/core/browser/devtools.mjs",
+            "tooling/core/cleanup.mjs",
             "tooling/commands/check-browser-transport.ts",
         ].map((path) => [path, hash(readFileSync(path))]),
     ),

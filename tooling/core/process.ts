@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import { appendFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { ownProcess } from "../../tests/tooling/cleanup.mjs";
+import { ownProcess } from "./cleanup.mjs";
 import type { Run } from "./run.js";
 
 /** Every spawned process immediately receives the existing verified tree owner. */

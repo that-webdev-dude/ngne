@@ -5,7 +5,6 @@ Run from the repository root with Node 24 and dependencies installed using `npm 
 ```sh
 npm test
 npm run typecheck:tooling
-npm run check:migration
 ```
 
 `npm test` discovers engine tests in `tests/*.test.ts` and tooling regressions in
@@ -14,34 +13,14 @@ tooling configuration is independent of the browser/source-alias configuration.
 Extend its includes when introducing additional Node modules; browser code needs
 its own checked target. No public engine export changes are needed.
 
-The migration checker reads the [planning records](../plans/tooling/README.md),
-compares them with tracked and nonignored untracked surfaces, verifies the frozen
-Git revision and workflow hashes, and checks the rendered ownership table. It
-prints discovered/mapped/excluded counts and the number of blocked retirement
-rows. A blocked retirement is expected while the old implementation remains.
-A missing mapping, malformed document, stale table, changed command, unclassified
-assertion or unproved deletion exits nonzero. It never edits or deletes files.
-
-The checker needs the frozen revision in local Git history. CI fetches full
-history for that reason. A shallow checkout must fetch that revision before
-running the checker; a missing revision is a failure, not an exemption.
-
-When adding a surface, review its owner and destination and update the inventory,
-coverage and retirement records together. Do not erase frozen IDs. Render the
-table using the exported `renderCoverage(inventory, coverage)` function, then run
-Prettier and the checker. No automatic mapping-approval command is provided.
-
-These checks establish ownership and migration gates. They do not execute
-runtime verification, consumer compatibility or benchmarks.
-Existing browser and benchmark commands still own those
-operations during migration. Their prerequisites and behavior remain documented
-in [repository verification guidance](../README.md), [benchmarks](suites/benchmarks/README.md)
+Browser and benchmark prerequisites are documented in
+[repository verification guidance](../README.md), [benchmarks](suites/benchmarks/README.md)
 and [engine resource measurements](suites/benchmarks/content/README.md).
 
 ## Local engine verification
 
 `npm run verify:engine` runs, in order: formatting, all unit/tooling tests,
-tooling typechecks, migration validation, root typecheck, the production build,
+tooling typechecks, root typecheck, the production build,
 the browser build, one package preparation, exact-manifest validation, browser
 transport/profiler capability, installed root/nested verification using that same
 manifest, and browser integration. Individual commands remain usable. Benchmarks
@@ -49,7 +28,8 @@ and consumer compatibility are separate explicit commands.
 
 Install Chrome and the browser prerequisites described below. On Windows use
 `npm.cmd`; for software GPU verification set `NGNE_WEBGPU_ADAPTER=swiftshader`.
-On Linux install the CI Vulkan/Xvfb dependencies, set `NGNE_BROWSER_HEADLESS=0`
+On Linux, Chrome needs Vulkan support for SwiftShader and Xvfb for headed execution.
+Set `NGNE_BROWSER_HEADLESS=0`
 and run the command under `xvfb-run -a`. Do not run competing builds in this checkout.
 
 Each invocation creates a fresh `out/runs/*-verification-*` directory. It retains
@@ -60,20 +40,6 @@ command failures stop composition and fail aggregate acceptance; the existing
 process owner verifies cleanup before final publication. Existing command
 deadlines and acceptance rules remain in effect. This command makes no benchmark,
 consumer, physical-GPU or manual visual/audible claim.
-
-Ordinary Ubuntu CI uses these same underlying commands and additionally checks
-intentional assertion, screenshot and cleanup failures. Its always-uploaded
-`browser-integration` artifact retains preparation/installed/transport evidence,
-browser results, diagnostics and cleanup records, plus `dist/` and `dist-browser/`
-for inspecting the browser inputs. Package evidence includes the tarball, both
-installed fixture builds, identities and preparation command logs. General npm
-check output remains in the GitHub job log. Dependencies, caches, disposable
-installations and browser profiles are excluded. Transport snapshots/traces retain
-validated counts and hashes rather than full payloads, as documented below.
-The upload is inspection evidence, not a portable or resumable preparation:
-`check:prepared` still requires its original local `work/` installation and matching
-Node version. Failed evidence is retained even when later checks are skipped;
-missing required execution never establishes a passing verification.
 
 ## Package preparation
 
@@ -107,8 +73,8 @@ configuration, runner, evidence modules and existing process-cleanup implementat
 Without `--output`, each invocation creates a timestamp/UUID directory under
 `out/runs`. An explicit destination must not exist, even if empty. Earlier outputs
 are retained. The command prints the exact manifest path; no latest-run discovery
-or fixed fallback is supported. CI prepares once, verifies that handoff, and includes
-the evidence directory in its existing always-uploaded artifact tree.
+or fixed fallback is supported. `verify:engine` prepares once and reuses that exact
+manifest for validation and installed verification.
 
 ## Evidence and handoff
 
@@ -148,20 +114,18 @@ Keep prepared inputs immutable. The handoff requires its original `work/` instal
 and matching Node version; an archived evidence tree alone cannot resume execution.
 This is integrity checking, not cryptographic authentication of a malicious author.
 
-Failure logs and available payloads remain in the run. Working installations and
-caches are not uploaded by CI. Portable export is outside the approved scope;
-no new browser, compatibility or performance
-claim is implied by package preparation. Existing commands remain active.
+Failure logs and available payloads remain in the run. An evidence-only archive
+excludes the working installation and cannot resume preparation. Package preparation
+does not establish browser, compatibility or performance acceptance.
 
 ## Consumer evidence
 
-The [consumer command contract](../plans/tooling/consumer-command-contract.md)
+The [consumer command validator](evidence/consumer-contract-v1.ts)
 defines the versioned tarball/hash/output interface. The validator reuses the shared
 schema and checks selected identities, outcomes, exit status and retained payloads.
 Use it on failed responses too, retaining the original consumer failure. The synthetic
 peer and conformance tests run through `npm test`; no real consumer is selected by
-these tests. Owner agreement is recorded in the contract; [pinned real integration](../docs/evidence/consumer-integration.md)
-has passed. Remaining replacement and retirement gates still apply.
+these tests.
 
 `npm run verify:compatibility -- --consumer <checkout> --revision <full-commit>`
 explicitly selects a consumer. Checkout mode requires a clean Git root, a full
@@ -187,8 +151,8 @@ terminates/verifies its owned process tree, and validates every response, includ
 nonzero exits or missing/partial publication. Timeout does not imply cancellation;
 termination and cleanup are required. It preserves command failures alongside
 validation errors and rechecks consumer/package inputs after execution. Cleanup,
-input drift and evidence errors fail acceptance. Ordinary commands and default CI
-select only engine verification. No consumer is fetched, discovered or required.
+input drift and evidence errors fail acceptance. `verify:engine` selects only
+engine verification. No consumer is fetched, discovered or required.
 Consumer acceptance and game measurements belong to the explicitly supplied
 consumer. Synthetic runner tests do not establish real integration.
 
@@ -200,7 +164,8 @@ Unknown formats are rejected; historical evidence is not converted.
 `npm run verify:installed` prepares the current package, then runs the engine-owned
 fixture at `/` and `/nested/`. It requires Chrome (`NGNE_BROWSER` or `CHROME_BIN`
 can select its executable) and WebGPU. `NGNE_WEBGPU_ADAPTER=swiftshader` selects
-software evidence; on Linux use the Vulkan/Xvfb prerequisites in CI. Set
+software evidence; on Linux, Chrome needs Vulkan support and headed execution needs
+Xvfb or a display server. Set
 `NGNE_BROWSER_HEADLESS=0` for a visible browser.
 
 `npm run verify:installed -- --manifest <exact evidence/manifest.json>` reuses a
@@ -283,7 +248,7 @@ External servers and run-owned static servers remain explicitly caller-owned.
 Suites keep flags, navigation, assertions, warmup, sampling and budgets. Existing
 browser verification, installed verification and both browser benchmark runners
 use this owner. No engine exports or runtime dependencies are added. The shared
-`tests/tooling` transport/cleanup entry points remain shared compatibility seams;
+`core/browser/devtools.mjs` transport and `core/cleanup.mjs` cleanup helpers are shared;
 there is no second benchmark CDP implementation.
 
 The shared transport uses the extracted RFC 6455 socket in `core/browser/socket.ts`.
@@ -294,8 +259,8 @@ function. Connection shutdown rejects pending commands/events and has a deadline
 Diagnostics are attempted before cleanup; runners retain their original failure
 when screenshots or cleanup also fail.
 
-`npm run check:browser-transport` is an explicit real-Chrome capability check, also
-required by CI. It checks byte-exact 4,260,000 and 5,242,880 byte replies, actual heap
+`npm run check:browser-transport` is a real-Chrome capability check included in
+`verify:engine`. It checks byte-exact 4,260,000 and 5,242,880 byte replies, actual heap
 sampling, streamed snapshots and browser tracing. `npm test` covers fragmented
 wire replies and failure cases. Evidence is under a fresh `out/runs/*-browser-transport-*`
 directory. These checks establish protocol capability, not performance, physical-GPU

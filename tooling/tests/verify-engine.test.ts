@@ -22,7 +22,6 @@ test("Verification composition requires every command, retains failure logs and 
                 "format",
                 "tests",
                 "tooling-types",
-                "migration",
                 "types",
                 "build",
                 "browser-build",

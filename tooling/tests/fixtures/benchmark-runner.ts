@@ -14,7 +14,6 @@ export function benchmarkFixture() {
         "tooling/evidence",
         "tooling/suites/benchmarks/cpu",
         "tooling/commands",
-        "tests/tooling",
     ])
         mkdirSync(join(root, p), { recursive: true });
     for (const p of [
