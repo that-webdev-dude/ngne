@@ -26,11 +26,12 @@
 
 - Cover non-trivial behavior changes with focused regression tests. Use fixed
   seeds and controlled clocks or promises for deterministic behavior.
-- Keep engine unit and contract tests in `tests/*.test.ts` and tooling regression
-  tests in flat `tooling/tests/*.test.ts` files. `npm test` discovers both; nested
-  tooling fixture data is not a test entry point. Typecheck Node tooling with
-  `npm run typecheck:tooling`. Use the existing browser and benchmark harnesses
-  for those concerns.
+- Reserve `tests/` for `src/` tests and engine-only fixtures; no demo, example,
+  or tooling dependencies. Put consumer tests in `demo/tests/` or
+  `examples/<name>/tests/`, tooling regressions in `tooling/tests/`, and shared
+  runners/browser orchestration in `tooling/`. Split mixed suites by owner and
+  preserve test discovery, browser checks, and typecheck coverage when moving files.
+  Typecheck Node tooling with `npm run typecheck:tooling`.
 - Validate browser-dependent changes in a browser and report the environment
   and anything not tested.
 - For hot-path changes, record relevant before/after measurements, workload,

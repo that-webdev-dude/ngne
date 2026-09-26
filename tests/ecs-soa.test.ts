@@ -16,7 +16,6 @@ import {
     type Entity,
     type SchemaComponentView,
 } from "../src/ecs.js";
-import { helloScene } from "../examples/hello/scene.js";
 import { Frame, Game, type SceneDefinition } from "../src/index.js";
 
 test("schema fields use declared columns, defaults, validation, and sparse access", () => {
@@ -676,23 +675,6 @@ test("game inspection records exact null, live and stale reference fields and ta
     });
     assert.deepStrictEqual(world.free, [stale.index]);
     assert.deepStrictEqual(JSON.parse(JSON.stringify(field(holders[2]))), field(holders[2]));
-});
-
-test("the migrated hello scene interpolates and resets both poses when wrapping", async (t) => {
-    const game = new Game({ seed: "hello-test", dt: 1, state: {}, transition: (state) => state });
-    t.after(() => game.dispose());
-    await game.start(await game.prepare(helloScene, { key: "hello-test" }));
-    const frame = new Frame();
-    game.render(frame, 0.5);
-    assert.equal(centerX(frame), 40);
-    game.tick();
-    frame.reset();
-    game.render(frame, 0.5);
-    assert.equal(centerX(frame), 60);
-    for (let tick = 1; tick < 16; tick++) game.tick();
-    frame.reset();
-    game.render(frame, 0.5);
-    assert.equal(centerX(frame), 0);
 });
 
 test("world access and query runtimes stay opaque and reject unchecked callers", () => {

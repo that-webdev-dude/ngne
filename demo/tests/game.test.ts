@@ -1,8 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { Game, Frame, emptyInput } from "../src/index.js";
-import type { Asset, Audio, ImageAsset } from "../src/index.js";
-import { arena, type Progress, type ProgressCommand } from "../demo/game.js";
+import { Game, Frame, emptyInput } from "../../src/index.js";
+import type { Asset, Audio, ImageAsset } from "../../src/index.js";
+import { arena, type Progress, type ProgressCommand } from "../game.js";
 const create = () =>
     new Game<Progress, ProgressCommand>({
         seed: "test",

@@ -1,36 +1,8 @@
 import { BrowserGame, type FrameScheduler } from "../src/index.js";
-import { checkBrowserAudio } from "./browser-audio-checks.js";
-import { checkBrowserGames } from "./browser-game-checks.js";
-import { checkBrowserLifecycle } from "./browser-lifecycle-checks.js";
-import { checkBrowserInput } from "./browser-input-checks.js";
-import { checkBrowserInterpolation } from "./browser-interpolation-checks.js";
-import { checkBrowserImages } from "./browser-image-checks.js";
-import { checkBrowserRecovery } from "./browser-recovery-checks.js";
-import { checkBrowserRetention } from "./browser-retention-checks.js";
-import { checkBrowserGpuHost } from "./browser-gpu-host-checks.js";
-import { checkWebGPUEnvironment, checkWebGPUCore } from "./browser-webgpu-checks.js";
-void checkWebGPUEnvironment().catch((error: unknown) => {
-    const output = document.getElementById("webgpu-environment");
-    if (output) output.textContent = String(error);
-});
-const results: string[] = [];
-const validation = (window.__ngneValidation = {
-    status: "idle" as "idle" | "running" | "passed" | "failed",
-    passed: results,
-    skipped: [] as string[],
-    failures: [] as string[],
-});
-const check = (condition: unknown, message: string) => {
-    if (!condition) throw new Error(message);
-    results.push("PASS " + message);
-    document.getElementById("results")!.textContent = results.join("\n");
-};
-async function main() {
-    validation.status = "running";
-    if (new URLSearchParams(location.search).has("injectFailure"))
-        check(false, "intentional CI assertion failure");
-    await checkBrowserAudio(check);
-    await checkWebGPUCore(check);
+
+export async function checkBrowserHost(
+    check: (condition: unknown, message: string) => void,
+): Promise<void> {
     const surface = document.createElement("canvas");
     let callback: FrameRequestCallback = () => {};
     let cancelled = 0;
@@ -87,39 +59,4 @@ async function main() {
     );
     await app.dispose();
     check(app.game.lifecycle === "Disposed" && cancelled >= 2, "browser teardown completes");
-    await checkBrowserLifecycle((condition, message) => check(condition, "WebGPU " + message));
-    await checkBrowserImages(check);
-    await checkBrowserGames(check);
-    await checkBrowserRecovery(check);
-    await checkBrowserRetention(check);
-    await checkBrowserGpuHost(check);
-    await checkBrowserInput((condition, message) => check(condition, "WebGPU " + message));
-    await checkBrowserInterpolation(check);
-    validation.status = "passed";
-    document.getElementById("results")!.textContent = results.join("\n") + "\n\nALL CHECKS PASSED";
-}
-document.getElementById("start-validation")!.addEventListener(
-    "click",
-    () => {
-        document.getElementById("results")!.textContent = "Running…";
-        void main().catch((error) => {
-            validation.status = "failed";
-            validation.failures.push(error instanceof Error ? error.message : String(error));
-            document.getElementById("results")!.textContent =
-                results.join("\n") + "\nFAIL " + error.stack;
-            console.error(error);
-        });
-    },
-    { once: true },
-);
-
-declare global {
-    interface Window {
-        __ngneValidation: {
-            status: "idle" | "running" | "passed" | "failed";
-            passed: string[];
-            skipped: string[];
-            failures: string[];
-        };
-    }
 }

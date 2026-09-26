@@ -10,10 +10,10 @@
     ],
     "scripts": {
         "dev": "vite --host 127.0.0.1",
-        "build": "tsc --noEmit && tsc -p tests/tsconfig.browser.json && tsc -p tooling/suites/benchmarks/rendering/browser/tsconfig.json && tsc -p tsconfig.lib.json && tsc -p tests/tsconfig.api.json && vite build",
+        "build": "tsc --noEmit && tsc -p tests/tsconfig.browser.json && tsc -p tooling/suites/verification/browser/tsconfig.json && tsc -p tooling/suites/benchmarks/rendering/browser/tsconfig.json && tsc -p tsconfig.lib.json && tsc -p tests/tsconfig.api.json && vite build",
         "build:browser": "vite build --mode browser --outDir dist-browser",
         "typecheck": "tsc --noEmit",
-        "test": "tsx --test tests/*.test.ts tooling/tests/*.test.ts",
+        "test": "tsx --test tests/*.test.ts demo/tests/*.test.ts examples/*/tests/*.test.ts tooling/tests/*.test.ts",
         "test:browser": "tsx tooling/commands/browser-ci.ts",
         "bench": "tsx tooling/suites/benchmarks/cpu/benchmark.ts",
         "bench:all": "tsx tooling/commands/benchmark-all.ts",

@@ -1,23 +1,17 @@
 import { centerX, centerY } from "./frame-values.js";
-import { QUAD_STRIDE } from "../src/quad-layout.js";
+import { QUAD_STRIDE } from "../../../src/quad-layout.js";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { test } from "node:test";
 
-import { CONTACT, moveX, moveY } from "../examples/platformer/collision.js";
-import {
-    createOverlay,
-    createProgress,
-    HEIGHT,
-    transition,
-    WIDTH,
-} from "../examples/platformer/game.js";
-import type { Progress, ProgressCommand } from "../examples/platformer/game.js";
-import { LEVEL_ONE, LEVEL_TWO, parseLevel, TILE } from "../examples/platformer/levels.js";
-import type { LevelData } from "../examples/platformer/levels.js";
-import { createTransitionRegistry, levelKey } from "../examples/platformer/transitions.js";
-import type { RegistryOptions } from "../examples/platformer/transitions.js";
-import { emptyInput, Frame, Game } from "../src/index.js";
+import { CONTACT, moveX, moveY } from "../collision.js";
+import { createOverlay, createProgress, HEIGHT, transition, WIDTH } from "../game.js";
+import type { Progress, ProgressCommand } from "../game.js";
+import { LEVEL_ONE, LEVEL_TWO, parseLevel, TILE } from "../levels.js";
+import type { LevelData } from "../levels.js";
+import { createTransitionRegistry, levelKey } from "../transitions.js";
+import type { RegistryOptions } from "../transitions.js";
+import { emptyInput, Frame, Game } from "../../../src/index.js";
 import type {
     Asset,
     GameInspection,
@@ -26,7 +20,7 @@ import type {
     PreparedScene,
     SceneDefinition,
     SceneSetup,
-} from "../src/index.js";
+} from "../../../src/index.js";
 
 const DISPLAY = Object.freeze({ width: WIDTH, height: HEIGHT, pixelRatio: 1 });
 const FLOOR = parseLevel([

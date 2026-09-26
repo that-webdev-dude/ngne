@@ -7,8 +7,11 @@ npm test
 npm run typecheck:tooling
 ```
 
-`npm test` discovers engine tests in `tests/*.test.ts` and tooling regressions in
-`tooling/tests/*.test.ts`. Keep entry files flat; fixtures can be nested. The Node
+`npm test` discovers engine tests in `tests/*.test.ts`, demo tests in
+`demo/tests/*.test.ts`, example tests in `examples/*/tests/*.test.ts`, and tooling
+regressions in `tooling/tests/*.test.ts`. Keep entry files flat; fixtures can be nested.
+The browser validation entry is `suites/verification/browser/validation.ts`; it
+composes engine and consumer checks from their owning directories. The Node
 tooling configuration is independent of the browser/source-alias configuration.
 Extend its includes when introducing additional Node modules; browser code needs
 its own checked target. No public engine export changes are needed.
