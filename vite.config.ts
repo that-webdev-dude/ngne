@@ -19,7 +19,7 @@ export default defineConfig(({ command, mode }) => ({
                 platformer: "examples/platformer/index.html",
                 ...(mode === "browser"
                     ? {
-                          benchmark: "benchmarks/browser/index.html",
+                          benchmark: "tooling/suites/benchmarks/rendering/browser/index.html",
                           validation: "validation.html",
                       }
                     : {}),

@@ -1,7 +1,7 @@
 // Schema churn workload: 10,000 live entities, 1,000 replacements per batch.
 // A timed batch includes authoring, despawn/spawn queueing, and World.commit().
 // Workload, warmup, sampling and allocation/GC modes are fixed across runs.
-// See benchmarks/README.md for fresh-process commands and comparison rules.
+// See tooling/suites/benchmarks/README.md for fresh-process commands and comparison rules.
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";

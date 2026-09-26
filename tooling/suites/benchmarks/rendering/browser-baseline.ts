@@ -18,7 +18,7 @@ import { join, relative } from "node:path";
  * protocol so the same warmup, duration and sampling can be repeated later.
  *
  * Usage: `npx tsx tooling/suites/benchmarks/rendering/browser-baseline.ts` against a running `npm run preview`.
- * The renderer fixture uses `/benchmarks/browser/index.html?workload=renderer-webgpu` from the
+ * The renderer fixture uses `/tooling/suites/benchmarks/rendering/browser/index.html?workload=renderer-webgpu` from the
  * browser-mode build instead of the production preview.
  * Environment: NGNE_BROWSER (Chromium executable), NGNE_URL (default preview origin),
  * NGNE_WARMUP_SECONDS (default 10), NGNE_DURATION_SECONDS (default 60).

@@ -35,7 +35,7 @@ These checks establish ownership and migration gates. They do not execute
 runtime verification, consumer compatibility or benchmarks.
 Existing browser and benchmark commands still own those
 operations during migration. Their prerequisites and behavior remain documented
-in [repository verification guidance](../README.md), [benchmarks](../benchmarks/README.md)
+in [repository verification guidance](../README.md), [benchmarks](suites/benchmarks/README.md)
 and [engine resource measurements](suites/benchmarks/content/README.md).
 
 ## Local engine verification
@@ -249,7 +249,7 @@ and repository showcase probes. Source and build inventories identify those targ
 they are distinct from installed-package measurements. Legacy flag aliases and
 diagnostics remain supported. Namespaced evidence is under `out/runs/`; the
 `evidence/legacy/` projection remains readable by the unchanged advisory comparator.
-See [benchmark usage](../benchmarks/README.md) for retention and flag details.
+See [benchmark usage](suites/benchmarks/README.md) for retention and flag details.
 
 ## Legacy comparisons
 

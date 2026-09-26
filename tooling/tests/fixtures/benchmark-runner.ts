@@ -9,7 +9,7 @@ export function benchmarkFixture() {
         "src",
         "demo",
         "examples",
-        "benchmarks/browser",
+        "tooling/suites/benchmarks/rendering/browser",
         "tooling/core",
         "tooling/evidence",
         "tooling/suites/benchmarks/cpu",

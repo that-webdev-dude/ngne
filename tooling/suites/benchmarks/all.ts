@@ -51,7 +51,7 @@ export async function allBenchmarks(repository: string, options: BenchmarkOption
     const save = (path: string, value: unknown) =>
         writeFileSync(path, JSON.stringify(value, null, 2) + "\n");
     const source = Object.fromEntries(
-        ["src", "demo", "examples", "benchmarks/browser"].flatMap((p) =>
+        ["src", "demo", "examples", "tooling/suites/benchmarks/rendering/browser"].flatMap((p) =>
             Object.entries(identities(join(repository, p))).map(([name, sha]) => [
                 `${p}/${name}`,
                 sha,
@@ -242,7 +242,12 @@ export async function allBenchmarks(repository: string, options: BenchmarkOption
                 if (options.skipBuild) {
                     if (
                         !existsSync(join(repository, "dist/index.html")) ||
-                        !existsSync(join(repository, "dist-browser/benchmarks/browser/index.html"))
+                        !existsSync(
+                            join(
+                                repository,
+                                "dist-browser/tooling/suites/benchmarks/rendering/browser/index.html",
+                            ),
+                        )
                     )
                         throw Error("SkipBuild requires production and browser builds");
                 } else {
@@ -284,12 +289,12 @@ export async function allBenchmarks(repository: string, options: BenchmarkOption
                 const selections = [
                     [
                         "renderer-webgpu",
-                        "/benchmarks/browser/index.html?workload=renderer-webgpu",
+                        "/tooling/suites/benchmarks/rendering/browser/index.html?workload=renderer-webgpu",
                         "dist-browser",
                     ],
                     [
                         "renderer-webgpu-alternating",
-                        "/benchmarks/browser/index.html?workload=renderer-webgpu&alternating=1",
+                        "/tooling/suites/benchmarks/rendering/browser/index.html?workload=renderer-webgpu&alternating=1",
                         "dist-browser",
                     ],
                     ["starfall-chaos", "/", "dist"],

@@ -171,7 +171,7 @@ This reads saved results; it does not rerun benchmarks. Reports are written unde
 
 **Unchanged code can produce different timings.** Background activity, CPU clocks/temperature, garbage collection and runtime optimisation can affect results. `REVIEW REGRESSIONS` flags slowdowns crossing the default 10% attention threshold; it is not proof that code caused a regression.
 
-Repeat runs with the same machine, power mode, runtime and workload. Look for a consistent slowdown; p99 and maximum are especially sensitive to occasional delays. The comparator can exit zero despite warnings or detected problems, so read its report. See [comparison guidance](../benchmarks/README.md#compare).
+Repeat runs with the same machine, power mode, runtime and workload. Look for a consistent slowdown; p99 and maximum are especially sensitive to occasional delays. The comparator can exit zero despite warnings or detected problems, so read its report. See [comparison guidance](suites/benchmarks/README.md#compare).
 
 ## Stage 5: Consumer compatibility
 

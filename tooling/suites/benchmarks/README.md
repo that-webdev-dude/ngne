@@ -2,15 +2,15 @@
 
 Run from the repository root with Node 24. Keep benchmark Chrome windows visible.
 The entry point uses Node; use `npm.cmd` in Windows PowerShell. Windows execution
-was verified in the [dated evidence](../docs/evidence/benchmark-migration.md).
+was verified in the [dated evidence](../../../docs/evidence/benchmark-migration.md).
 Linux benchmark execution is unvalidated and out of scope for the current tooling
 migration; no Linux benchmark portability or performance claim is made.
 
 For installed engine resource churn, use
-[`npm.cmd run bench:content -- --explore`](../tooling/suites/benchmarks/content/README.md).
+[`npm.cmd run bench:content -- --explore`](content/README.md).
 This aliases `bench:engine-content` and prepares its own engine package. Game
 transition measurements are consumer-owned; no sibling checkout is selected.
-The legacy [content comparator](../tooling/evidence/compare-content.mjs) remains available for retained
+The legacy [content comparator](../../evidence/compare-content.mjs) remains available for retained
 old-format runs with its strict identity and cleanup gates.
 
 ## Run
@@ -82,7 +82,7 @@ manual; this runner executes one sample run per selected workload and mode.
 CPU, private renderer and repository showcase probes are explicitly internal-source
 microbenchmarks, with source/build inventories; they do not establish installed-package
 acceptance. Their implementation lives in `tooling/suites/benchmarks/`; the browser
-page remains here and imports the renderer implementation directly. The installed
+page lives in `rendering/browser/` and imports the renderer implementation directly. The installed
 resource workload above tests the exact fresh tarball. The aggregate suite is
 exploratory; named physical-environment baseline collection and measured-budget
 acceptance currently apply to that installed resource workload.
