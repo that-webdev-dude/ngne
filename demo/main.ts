@@ -1,21 +1,19 @@
 import "./style.css";
-import { audioAsset, BrowserGame, type ImageAsset, type Stats } from "ngne";
+import { audioAsset, imageAsset, BrowserGame, type Stats } from "ngne";
 import { arena, overlay, W, H, type Progress, type ProgressCommand, type RunView } from "./game.js";
-import { makeAtlas, titleArt } from "./art.js";
+import { titleArt } from "./art.js";
 const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 el("game-title").innerHTML = titleArt("STARFALL '89");
 const canvas = el<HTMLCanvasElement>("game"),
     play = el<HTMLButtonElement>("play"),
     pause = el<HTMLButtonElement>("pause"),
     chaos = el<HTMLButtonElement>("chaos");
-// Preparation decodes the generated atlas; the WebGPU renderer uploads it before the scene mounts.
-const atlas: ImageAsset = {
-    id: "ships",
-    kind: "image",
-    load: () =>
-        createImageBitmap(makeAtlas(), { premultiplyAlpha: "none", colorSpaceConversion: "none" }),
-    dispose: (bitmap) => bitmap.close(),
-};
+// Vite emits these runtime files with deployment-relative URLs in production.
+const atlas = imageAsset("ships", new URL("./assets/starfall.png", import.meta.url).href);
+const background = imageAsset(
+    "starfall-background",
+    new URL("./assets/background.png", import.meta.url).href,
+);
 const music = audioAsset(
     "starfall-music",
     "data:audio/wav;base64,UklGRmQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUAAAACAhYuQlJeam5ybmpeUkIuFgHt1cGxpZmVkZWZpbHB1e4CFi5CUl5qbnJual5SQi4WAe3VwbGlmZWRlZmlscHV7",
@@ -67,6 +65,7 @@ function options(attract = false, stress = false) {
         stress,
         audio: app.audio,
         atlas,
+        background,
         music,
         reducedMotion,
         onView: (next: RunView) => {

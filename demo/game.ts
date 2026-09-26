@@ -21,6 +21,8 @@ import {
     type ImageAsset,
 } from "ngne";
 
+import { animationFrame, bodySprites, createEffects, drawSprite } from "./sprites.js";
+
 export const W = 640,
     H = 400;
 export const Position = component("position", { x: f64(), y: f64(), px: f64(), py: f64() });
@@ -35,7 +37,7 @@ const Body = component("body", {
     age: f64(),
     cooldown: f64(),
 });
-const Visual = component("visual", { sprite: u8(), size: f64(24), angle: f64() });
+const Visual = component("visual", { angle: f64() });
 const Particle = component("particle", {
     vx: f64(),
     vy: f64(),
@@ -86,6 +88,7 @@ export interface ShowcaseOptions {
     stress?: boolean;
     audio?: Pick<Audio, "scene">;
     atlas?: ImageAsset;
+    background?: ImageAsset;
     music?: Asset<AudioBuffer>;
     onView?: (view: RunView) => void;
     pause?: () => PreparedScene | undefined;
@@ -98,6 +101,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
         id: options.attract ? "attract" : "starfall-arena",
         assets: [
             ...(options.atlas ? [options.atlas] : []),
+            ...(options.background ? [options.background] : []),
             ...(options.music ? [options.music] : []),
         ],
         setup(s) {
@@ -133,6 +137,8 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                 bossWave: number;
                 finished: boolean;
             });
+            const effects = createEffects();
+            s.defer(() => effects.clear());
             const sound = options.audio?.scene(options.attract ? "attract" : "arena");
             if (sound) {
                 s.defer(() => sound.dispose());
@@ -168,19 +174,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                         hp: kind === 5 ? 160 + run.wave * 10 : kind === 2 ? 3 : 1,
                         cooldown: rng.int(40, 140),
                     }),
-                    Visual.of({
-                        sprite:
-                            kind === 0
-                                ? 0
-                                : kind === 5
-                                  ? 5
-                                  : kind === 6
-                                    ? 4
-                                    : kind === 3 || kind === 4
-                                      ? 3
-                                      : kind,
-                        size: kind === 5 ? 68 : kind === 0 ? 28 : kind >= 3 && kind <= 4 ? 12 : 26,
-                    }),
+                    Visual.of(),
                 );
             const player = s.resource("player", spawn(W / 2, H * 0.65, 0));
             // The player handle is immutable; all mutable gameplay data is owned above.
@@ -303,6 +297,11 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                                     s.world.despawn(chunk.entityAt(row));
                                     if (kind !== 4) run.score += 25;
                                 }
+                                effects.add(
+                                    kind === 4 ? "impact" : "explosion",
+                                    p.x[row],
+                                    p.y[row],
+                                );
                                 burst(p.x[row], p.y[row], 0x83e8e1, 8);
                             }
                         }
@@ -420,6 +419,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                 });
                 const kill = ({ e, p, b, row }: GridEntry) => {
                     const boss = b.kind[row] === 5;
+                    effects.add("explosion", p.x[row], p.y[row]);
                     b.active[row] = 0;
                     s.world.despawn(e);
                     run.score += (boss ? 2000 : 100) * run.combo;
@@ -461,6 +461,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                                         ) {
                                             b.active[row] = 0;
                                             s.world.despawn(chunk.entityAt(row));
+                                            effects.add("impact", p.x[row], p.y[row]);
                                             if (--target.b.hp[t] <= 0) kill(target);
                                             break;
                                         }
@@ -482,6 +483,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                                     volume: 0.2,
                                 });
                             } else if (!run.invulnerable && !options.attract && !run.stress) {
+                                effects.add("impact", pp.x[pr], pp.y[pr]);
                                 run.hp--;
                                 run.invulnerable = 100;
                                 run.flash = 6;
@@ -503,6 +505,7 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
             });
             s.system(
                 (ctx) => {
+                    effects.step();
                     run.shake = Math.max(0, run.shake - 0.5);
                     run.flash = Math.max(0, run.flash - 1);
                     s.camera.shakeX = options.reducedMotion
@@ -553,7 +556,13 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                 }
             });
             s.render((frame, alpha) => {
-                backdrop(frame, stars, run.seconds);
+                backdrop(
+                    frame,
+                    stars,
+                    options.reducedMotion ? 0 : run.seconds,
+                    options.background?.id,
+                );
+                effects.render(frame, options.reducedMotion);
                 particles.eachChunk((chunk) => {
                     const { position: p, particle: b } = chunk.views;
                     for (let row = 0, count = chunk.count; row < count; row++)
@@ -573,26 +582,32 @@ export function arena(options: ShowcaseOptions = {}): SceneDefinition<Progress, 
                         if (!b.active[row]) continue;
                         const kind = b.kind[row];
                         if (kind === 0 && run.invulnerable % 10 > 5) continue;
-                        frame.sprite({
-                            x: lerp(p.px[row], p.x[row], alpha),
-                            y: lerp(p.py[row], p.y[row], alpha),
-                            width: v.size[row],
-                            height: v.size[row],
-                            texture: "ships",
-                            u: v.sprite[row] / 8,
-                            v: 0.25,
-                            uw: 1 / 8,
-                            vh: 0.5,
-                            rotation: v.angle[row],
-                            layer: kind === 0 ? 4 : 3,
-                            color: kind === 4 ? 0xff6d82 : 0xffffff,
-                        });
+                        const x = lerp(p.px[row], p.x[row], alpha);
+                        const y = lerp(p.py[row], p.y[row], alpha);
+                        const angle = v.angle[row];
+                        if (kind === 0) {
+                            const thrust = animationFrame(
+                                "thrust",
+                                options.reducedMotion ? 0 : effects.timeMs,
+                            )!;
+                            // Top pivot joins the engine at local (0, 12), behind the hull.
+                            drawSprite(
+                                frame,
+                                thrust,
+                                x - Math.sin(angle) * 12,
+                                y + Math.cos(angle) * 12,
+                                angle,
+                                2,
+                                0.85,
+                            );
+                        }
+                        drawSprite(frame, bodySprites[kind], x, y, angle, kind === 0 ? 4 : 3);
                         if (kind === 5) {
                             const health = Math.max(0, b.hp[row] / (160 + run.wave * 10));
-                            frame.rect(p.x[row], p.y[row] - 28, 64, 3, 0x442b43, 1, 5);
+                            frame.rect(x, Math.max(4, y - 38), 64, 3, 0x442b43, 1, 5);
                             frame.rect(
-                                p.x[row] - 32 + 32 * health,
-                                p.y[row] - 28,
+                                x - 32 + 32 * health,
+                                Math.max(4, y - 38),
                                 64 * health,
                                 3,
                                 0xff6d82,
@@ -629,20 +644,20 @@ function backdrop(
     frame: Frame,
     stars: { x: number; y: number; size: number; speed: number }[],
     time: number,
+    background?: string,
 ) {
-    // Layered pixel planet, stars and debris; no simulation RNG is consumed by rendering.
-    for (let y = -64; y <= 64; y += 4) {
-        const half = Math.floor(Math.sqrt(64 * 64 - y * y) / 4) * 4;
-        frame.rect(
-            510,
-            85 + y,
-            half * 2,
-            4,
-            y < -24 ? 0x28465d : y < 0 ? 0x294e60 : y < 28 ? 0x233d55 : 0x1b2f47,
-            1,
-            -4,
-        );
-        if (y % 12 === 0) frame.rect(505, 85 + y, half * 1.5, 4, 0x20384f, 1, -3);
+    // The supplied background is not seamless: one fixed screen-space image, never wrapped.
+    if (background) {
+        frame.sprite({
+            x: W / 2,
+            y: H / 2,
+            width: W,
+            height: H,
+            texture: background,
+            layer: -5,
+            screen: true,
+        });
+        frame.rect(W / 2, H / 2, W, H, 0x080c1b, 0.28, -4, true);
     }
     for (const star of stars)
         frame.rect(

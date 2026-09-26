@@ -1,0 +1,123 @@
+{
+    "width": 256,
+    "height": 128,
+    "frames": {
+        "player": {
+            "x": 34,
+            "y": 72,
+            "w": 32,
+            "h": 36,
+            "pivot": [0.5, 0.5]
+        },
+        "chaser": {
+            "x": 66,
+            "y": 72,
+            "w": 30,
+            "h": 30,
+            "pivot": [0.5, 0.5]
+        },
+        "gunship": {
+            "x": 0,
+            "y": 72,
+            "w": 34,
+            "h": 34,
+            "pivot": [0.5, 0.5]
+        },
+        "boss": {
+            "x": 0,
+            "y": 0,
+            "w": 112,
+            "h": 72,
+            "pivot": [0.5, 0.5]
+        },
+        "player-bolt": {
+            "x": 250,
+            "y": 96,
+            "w": 6,
+            "h": 18,
+            "pivot": [0.5, 0.5]
+        },
+        "enemy-round": {
+            "x": 24,
+            "y": 106,
+            "w": 10,
+            "h": 10,
+            "pivot": [0.5, 0.5]
+        },
+        "repair": {
+            "x": 96,
+            "y": 72,
+            "w": 16,
+            "h": 24,
+            "pivot": [0.5, 0.5]
+        },
+        "explosion-a": {
+            "x": 176,
+            "y": 64,
+            "w": 64,
+            "h": 64,
+            "pivot": [0.5, 0.5]
+        },
+        "explosion-b": {
+            "x": 112,
+            "y": 64,
+            "w": 64,
+            "h": 64,
+            "pivot": [0.5, 0.5]
+        },
+        "explosion-c": {
+            "x": 176,
+            "y": 0,
+            "w": 64,
+            "h": 64,
+            "pivot": [0.5, 0.5]
+        },
+        "explosion-d": {
+            "x": 112,
+            "y": 0,
+            "w": 64,
+            "h": 64,
+            "pivot": [0.5, 0.5]
+        },
+        "thrust-a": {
+            "x": 240,
+            "y": 0,
+            "w": 14,
+            "h": 32,
+            "pivot": [0.5, 0.03125]
+        },
+        "thrust-b": {
+            "x": 240,
+            "y": 32,
+            "w": 14,
+            "h": 32,
+            "pivot": [0.5, 0.03125]
+        },
+        "thrust-c": {
+            "x": 240,
+            "y": 64,
+            "w": 14,
+            "h": 32,
+            "pivot": [0.5, 0.03125]
+        },
+        "impact": {
+            "x": 96,
+            "y": 96,
+            "w": 16,
+            "h": 16,
+            "pivot": [0.5, 0.5]
+        }
+    },
+    "animations": {
+        "explosion": {
+            "frames": ["explosion-a", "explosion-b", "explosion-c", "explosion-d"],
+            "frameMs": 80,
+            "loop": false
+        },
+        "thrust": {
+            "frames": ["thrust-a", "thrust-b", "thrust-c"],
+            "frameMs": 80,
+            "loop": true
+        }
+    }
+}

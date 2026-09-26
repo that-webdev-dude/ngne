@@ -1,6 +1,6 @@
-import { makeAtlas } from "../art.js";
+import art from "../assets/starfall.json";
 import { arena, H, W, type Progress, type ProgressCommand } from "../game.js";
-import { BrowserGame } from "ngne";
+import { BrowserGame, imageAsset } from "ngne";
 import type { Asset, FrameScheduler, ImageAsset, Lease } from "ngne";
 
 type Check = (condition: unknown, message: string) => void;
@@ -32,16 +32,31 @@ async function checkStarfallAtlasLifetime(check: Check): Promise<void> {
             callback = undefined;
         },
     };
-    const counts = { loads: 0, disposals: 0 };
+    const counts = { loads: 0, disposals: 0, backgroundLoads: 0, backgroundDisposals: 0 };
+    const source = imageAsset("ships", new URL("../assets/starfall.png", import.meta.url).href);
+    const sky = imageAsset(
+        "starfall-background",
+        new URL("../assets/background.png", import.meta.url).href,
+    );
+    const background: ImageAsset = {
+        ...sky,
+        async load(signal) {
+            counts.backgroundLoads++;
+            return sky.load(signal);
+        },
+        dispose(bitmap) {
+            counts.backgroundDisposals++;
+            sky.dispose?.(bitmap);
+        },
+    };
+    let decoded: ImageBitmap;
     const atlas: ImageAsset = {
         id: "ships",
         kind: "image",
-        async load() {
+        async load(signal) {
             counts.loads++;
-            return createImageBitmap(makeAtlas(), {
-                premultiplyAlpha: "none",
-                colorSpaceConversion: "none",
-            });
+            decoded = await source.load(signal);
+            return decoded;
         },
         dispose(bitmap) {
             counts.disposals++;
@@ -90,14 +105,10 @@ async function checkStarfallAtlasLifetime(check: Check): Promise<void> {
     if (!reader || !atlasReader) throw new Error("Canvas readback unavailable");
     reader.canvas.width = W;
     reader.canvas.height = H;
-    atlasReader.canvas.width = 16;
-    atlasReader.canvas.height = 32;
-    atlasReader.drawImage(makeAtlas(), 0, 0);
-    const cell = atlasReader.getImageData(0, 0, 16, 32).data;
+    const player = art.frames.player;
+    atlasReader.canvas.width = player.w;
+    atlasReader.canvas.height = player.h;
     const shipColours = new Set<string>();
-    for (let offset = 0; offset < cell.length; offset += 4)
-        if (cell[offset + 3] === 255)
-            shipColours.add(Array.from(cell.slice(offset, offset + 3)).join());
     let now = 1000;
     // Runs host frames, then reads the player ship's centre texels from the presented canvas.
     const frames = (count: number): number => {
@@ -117,7 +128,22 @@ async function checkStarfallAtlasLifetime(check: Check): Promise<void> {
         return matches;
     };
     try {
-        await app.start(await app.game.prepare(arena({ atlas }), { key: "atlas-0" }));
+        await app.start(await app.game.prepare(arena({ atlas, background }), { key: "atlas-0" }));
+        atlasReader.drawImage(
+            decoded!,
+            player.x,
+            player.y,
+            player.w,
+            player.h,
+            0,
+            0,
+            player.w,
+            player.h,
+        );
+        const cell = atlasReader.getImageData(0, 0, player.w, player.h).data;
+        for (let offset = 0; offset < cell.length; offset += 4)
+            if (cell[offset + 3] === 255)
+                shipColours.add(Array.from(cell.slice(offset, offset + 3)).join());
         if (leases.host.acquired !== 1 || leases.scene.acquired !== 1)
             throw new Error(
                 `Atlas lease wrapper could not separate scene and host leases: ${JSON.stringify(leases)}`,
@@ -128,7 +154,11 @@ async function checkStarfallAtlasLifetime(check: Check): Promise<void> {
             `Starfall atlas renders ship texels with one scene lease and one renderer source lease (${initialMatches}/9 texels)`,
         );
         for (let replacement = 1; replacement <= 3; replacement++) {
-            app.game.set(await app.game.prepare(arena({ atlas }), { key: `atlas-${replacement}` }));
+            app.game.set(
+                await app.game.prepare(arena({ atlas, background }), {
+                    key: `atlas-${replacement}`,
+                }),
+            );
             const matches = frames(30);
             const current = live();
             check(
@@ -136,6 +166,8 @@ async function checkStarfallAtlasLifetime(check: Check): Promise<void> {
                     matches >= 5 &&
                     counts.loads === 1 &&
                     counts.disposals === 0 &&
+                    counts.backgroundLoads === 1 &&
+                    counts.backgroundDisposals === 0 &&
                     current.scene === 1 &&
                     current.host === 1,
                 `Starfall atlas replacement ${replacement} keeps one load, no disposal, one scene and one source lease, and renders ship texels (${matches}/9; scene ${current.scene}, source ${current.host})`,
@@ -146,8 +178,13 @@ async function checkStarfallAtlasLifetime(check: Check): Promise<void> {
     }
     const final = live();
     check(
-        counts.loads === 1 && counts.disposals === 1 && final.scene === 0 && final.host === 0,
-        `Starfall atlas is disposed exactly once after host disposal with every atlas lease released (${leases.scene.acquired} scene, ${leases.host.acquired} source leases)`,
+        counts.loads === 1 &&
+            counts.disposals === 1 &&
+            counts.backgroundLoads === 1 &&
+            counts.backgroundDisposals === 1 &&
+            final.scene === 0 &&
+            final.host === 0,
+        `Starfall atlas and background are disposed exactly once after host disposal with every atlas lease released (${leases.scene.acquired} scene, ${leases.host.acquired} source leases)`,
     );
 }
 
