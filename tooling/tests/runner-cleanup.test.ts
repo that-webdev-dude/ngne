@@ -141,7 +141,7 @@ test(
             process.execPath,
             [
                 "-e",
-                `const {spawn}=require('node:child_process'); const child=spawn(process.execPath,['-e','setInterval(()=>{},1000)'],{stdio:'ignore'}); console.log(child.pid); setInterval(()=>{},1000);`,
+                `const {spawn}=require('node:child_process'); const child=spawn(process.execPath,['-e','setInterval(()=>{},1000)'],{stdio:'ignore'}); process.stdout.write(String(child.pid)); setInterval(()=>{},1000);`,
             ],
             options,
         );
@@ -149,7 +149,10 @@ test(
         try {
             const [data] = await once(child.stdout!, "data");
             const grandchild = Number(String(data).trim());
-            assert(grandchild > 0);
+            assert(
+                grandchild > 0,
+                `Expected a positive PID; stdout=${JSON.stringify(String(data))}, parsed=${grandchild}`,
+            );
             const result = await owner.stop();
             assert.deepEqual(result.survivors, []);
             assert.throws(() => process.kill(grandchild, 0));
