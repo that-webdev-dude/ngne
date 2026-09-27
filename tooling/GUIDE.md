@@ -183,7 +183,7 @@ Example for the platformer, run from the **NGNE repository root**:
 
 ```powershell
 $env:NGNE_WEBGPU_ADAPTER = "swiftshader"
-$consumer = "C:\Users\jfabi\Documents\Projects\tests\ngne-platformer"
+$consumer = "C:\path\to\ngne-platformer"
 $revision = git -C $consumer rev-parse HEAD
 
 npm.cmd run verify:compatibility -- `
