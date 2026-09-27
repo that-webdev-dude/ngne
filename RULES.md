@@ -46,8 +46,15 @@
   contracts for exact semantics, and the guide and examples for usage. Link to
   that owner rather than maintain competing specifications. Keep consumer-specific
   details in consumer documentation and work tracking outside authoritative docs.
-- Update the owning document in the same task as an observable behavior or
-  public API change.
+- Before adding, editing, moving, or deleting authoritative repository documentation
+  (including rules, architecture, contracts, and usage guides), obtain explicit
+  user permission for the proposed change. If not already authorized, present the
+  affected paths, reason, and proposed wording and ask before applying it. A general
+  implementation or issue-completion request does not imply documentation permission.
+- When an observable behavior or public API change needs an owning-document update,
+  propose it in the same task under this permission requirement. If permission is
+  pending or declined, leave the docs unchanged and report the outstanding mismatch;
+  do not claim the task is fully complete.
 - Separate current behavior from proposals and historical evidence. Label evidence
   with its date, revision, environment and limits; it does not define current
   contracts or validate later revisions. Preserve recorded results and existing
