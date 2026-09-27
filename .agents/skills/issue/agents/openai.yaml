@@ -1,0 +1,7 @@
+interface:
+  display_name: "Issue"
+  short_description: "Draft and create actionable GitHub issues"
+  default_prompt: "Use $issue to draft a concise GitHub issue with observable acceptance criteria."
+
+policy:
+  allow_implicit_invocation: false
