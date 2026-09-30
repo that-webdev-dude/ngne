@@ -728,7 +728,7 @@ function createChunkDescriptor<Types extends readonly AnySchemaComponent[]>(
     for (const type of types) {
         const typeIndex = archetype.types.indexOf(type),
             view = {};
-        for (const [fieldName, descriptor] of Object.entries(type.fields)) {
+        for (const [fieldName, descriptor] of fieldsOf(type)) {
             const column = chunk.columns[typeIndex][fieldName];
             const exposed =
                 descriptor.kind === "entity"
