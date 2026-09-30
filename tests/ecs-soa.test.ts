@@ -399,11 +399,36 @@ test("typed query borrows are nested, exception-safe, visible, and invalidated b
         /visitor/,
     );
     world.commit();
-    assert.throws(() => retainedChunk!.count, /expired/);
-    assert.throws(() => retainedChunk!.views, /expired/);
-    assert.throws(() => retainedViews!.position, /expired/);
+    const assertExpired = () => {
+        assert.throws(() => retainedChunk!.count, /expired/);
+        assert.throws(() => retainedChunk!.capacity, /expired/);
+        assert.throws(() => retainedChunk!.views, /expired/);
+        assert.throws(() => retainedChunk!.entityAt(0), /expired/);
+        assert.throws(() => retainedViews!.position, /expired/);
+    };
+    assertExpired();
     assert.equal(retainedView!.x[0], 3); // Raw columns cannot be revoked; retaining them is prohibited.
-    positions.eachChunk((chunk) => assert.equal(chunk.views.position.x[0], 3));
+    let freshChunk: typeof retainedChunk;
+    let freshViews: typeof retainedViews;
+    positions.eachChunk((chunk) => {
+        freshChunk = chunk;
+        freshViews = chunk.views;
+        assert.notEqual(chunk, retainedChunk);
+        assert.notEqual(chunk.views, retainedViews);
+        assert.notEqual(chunk.views.position, retainedView);
+        assert.equal(chunk.count, 1);
+        assert.equal(chunk.capacity, 512);
+        assert.equal(chunk.entityAt(0), entity);
+        assert.equal(chunk.views.position.x[0], 3);
+    });
+    assertExpired(); // Rebuilding must never resurrect the old borrow.
+    world.dispose();
+    assertExpired();
+    assert.throws(() => freshChunk!.count, /expired/);
+    assert.throws(() => freshChunk!.capacity, /expired/);
+    assert.throws(() => freshChunk!.views, /expired/);
+    assert.throws(() => freshChunk!.entityAt(0), /expired/);
+    assert.throws(() => freshViews!.position, /expired/);
 });
 
 test("same-query nested traversal visits the chunk cross product in creation, chunk and row order", () => {

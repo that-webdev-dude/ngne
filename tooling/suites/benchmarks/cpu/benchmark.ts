@@ -1,6 +1,6 @@
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
-import { cpus, totalmem } from "node:os";
+import { cpus, release, totalmem } from "node:os";
 import { performance } from "node:perf_hooks";
 
 import { World, type SchemaComponentView } from "../../../../src/ecs.js";
@@ -69,6 +69,7 @@ for (let i = 0; i < CHAOS_TICKS; i++) {
 }
 const grid = runCollisionGridBenchmark();
 const epoch = runEpochTraversalBenchmark();
+const smallQueries = runSmallQueriesBenchmark();
 console.log(
     JSON.stringify(
         {
@@ -76,6 +77,7 @@ console.log(
             environment: {
                 node: process.version,
                 platform: process.platform,
+                osRelease: release(),
                 arch: process.arch,
                 cpu: cpus()[0]?.model.trim(),
                 logicalCores: cpus().length,
@@ -102,6 +104,7 @@ console.log(
             },
             collisionGrid: grid.result,
             epochTraversal: epoch,
+            manySmallQueries: smallQueries,
             target: "internal-source-microbenchmark",
             note: "CPU only. Excludes GPU submission, browser display, and input polling. Dropped ticks are a browser host-loop measure; ticksOverBudget counts sampled ticks whose CPU time exceeded one 60 Hz step.",
         },
@@ -191,8 +194,9 @@ function runCollisionGridBenchmark() {
  * changes no membership but still advances the epoch; it is timed separately from both
  * traversals. Runs after the other sections so it cannot change their warm state.
  */
-function runEpochTraversalBenchmark() {
-    const traverse = () =>
+function runEpochTraversalBenchmark(
+    epochWorld = world,
+    traverse = () =>
         q.eachChunk((chunk) => {
             const position = chunk.views.position;
             const velocity = chunk.views.velocity;
@@ -200,20 +204,27 @@ function runEpochTraversalBenchmark() {
                 position.x[row] += velocity.x[row];
                 position.y[row] += velocity.y[row];
             }
-        });
+        }),
+    batchesPerSample = 1,
+) {
     const sample = (record?: { commit: number[]; first: number[]; second: number[] }) => {
-        const epochBefore = world.commitEpoch;
-        let start = performance.now();
-        world.commit();
-        const commit = performance.now() - start;
-        if (world.commitEpoch === epochBefore)
-            throw new Error("No-op commit did not advance the query borrow epoch");
-        start = performance.now();
-        traverse();
-        const first = performance.now() - start;
-        start = performance.now();
-        traverse();
-        const second = performance.now() - start;
+        let commit = 0,
+            first = 0,
+            second = 0;
+        for (let batch = 0; batch < batchesPerSample; batch++) {
+            const epochBefore = epochWorld.commitEpoch;
+            let start = performance.now();
+            epochWorld.commit();
+            commit += performance.now() - start;
+            if (epochWorld.commitEpoch === epochBefore)
+                throw new Error("No-op commit did not advance the query borrow epoch");
+            start = performance.now();
+            traverse();
+            first += performance.now() - start;
+            start = performance.now();
+            traverse();
+            second += performance.now() - start;
+        }
         record?.commit.push(commit);
         record?.first.push(first);
         record?.second.push(second);
@@ -222,18 +233,73 @@ function runEpochTraversalBenchmark() {
     const samples = { commit: [] as number[], first: [] as number[], second: [] as number[] };
     for (let i = 0; i < ECS_SAMPLES; i++) sample(samples);
     let chunks = 0;
-    q.eachChunk(() => chunks++);
+    // Count physical chunks independently of query sharing.
+    for (const archetype of epochWorld.archetypeList) chunks += archetype.chunks.length;
+    const perTick = (values: number[]) => values.map((time) => time / batchesPerSample);
     return {
-        entities: world.size,
+        entities: epochWorld.size,
         chunks,
+        batchesPerSample,
+        timerResolutionMs: measureTimerResolution(),
         warmupIterations: ECS_WARMUP,
         sampledIterations: ECS_SAMPLES,
+        // Raw samples are batch sums; summaries are milliseconds per simulated tick.
         rawMs: samples,
-        noOpCommitMs: summarize(samples.commit),
-        firstTraversalAfterCommitMs: summarize(samples.first),
-        secondTraversalSameEpochMs: summarize(samples.second),
-        pairedDeltaMs: summarize(samples.first.map((first, i) => first - samples.second[i])),
+        noOpCommitMs: summarize(perTick(samples.commit)),
+        firstTraversalAfterCommitMs: summarize(perTick(samples.first)),
+        secondTraversalSameEpochMs: summarize(perTick(samples.second)),
+        pairedDeltaMs: summarize(
+            perTick(samples.first.map((first, i) => first - samples.second[i])),
+        ),
+        simulatedTickMs: summarize(
+            perTick(samples.first.map((first, i) => first + samples.second[i] + samples.commit[i])),
+        ),
     };
+}
+
+function runSmallQueriesBenchmark() {
+    const smallWorld = new World();
+    const systems = Array.from({ length: 12 }, (_, system) => {
+        const State = component(`small-state-${system}`, {
+            x: f64(),
+            y: f64(),
+            dx: f64(1),
+            dy: f64(2),
+            age: f64(),
+            energy: f64(100),
+            weight: f64(1),
+            speed: f64(1),
+        });
+        for (let row = 0; row < 16; row++) smallWorld.spawn(State.of());
+        const query = smallWorld.query(State);
+        return () =>
+            query.eachChunk((chunk) => {
+                const state = chunk.views[State.name];
+                for (let row = 0; row < chunk.count; row++) {
+                    state.x[row] += state.dx[row] * state.speed[row];
+                    state.y[row] += state.dy[row] * state.speed[row];
+                    state.age[row]++;
+                    state.energy[row] -= state.weight[row] * 0.001;
+                }
+            });
+    });
+    smallWorld.commit();
+    // ponytail: repeat the same retained query, so sharing cannot count as a rebuild.
+    const traverse = () => {
+        for (const system of systems) system();
+        systems[0]();
+    };
+    try {
+        return {
+            uniqueQueries: systems.length,
+            traversalsPerPass: systems.length + 1,
+            entitiesPerQuery: 16,
+            fieldsPerComponent: 8,
+            ...runEpochTraversalBenchmark(smallWorld, traverse, 16),
+        };
+    } finally {
+        smallWorld.dispose();
+    }
 }
 
 function measureTimerResolution(): number {
