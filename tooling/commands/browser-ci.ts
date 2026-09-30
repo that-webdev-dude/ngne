@@ -323,7 +323,7 @@ async function checkStarfall(): Promise<void> {
         "Starfall readiness",
     );
     await waitFor(
-        "document.getElementById('engine-status')?.textContent === 'RUNNING'",
+        "window.__ngneRenderingDevices?.some(device => device.submissions > 1 && device.canvasConfigurations > 0)",
         10_000,
         "Starfall WebGPU attract frames",
     );
