@@ -104,8 +104,9 @@ export class Audio {
     flush() {
         const queue = this.queue.splice(0);
         const ctx = this.context;
-        if (!ctx || ctx.state !== "running" || this.muted) return;
+        if (!ctx || ctx.state !== "running") return;
         for (const { scope, sound } of queue) {
+            if (this.muted && !("buffer" in sound && sound.loop)) continue;
             if (this.voices.size >= this.maxVoices) break;
             if ("buffer" in sound) {
                 if (!(

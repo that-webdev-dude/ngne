@@ -15,6 +15,7 @@ class Node {
     frequency = new Parameter();
     playbackRate = new Parameter();
     stopped = false;
+    startCalls = 0;
     stopCalls = 0;
     disconnectCalls = 0;
     failStop = false;
@@ -27,6 +28,7 @@ class Node {
         if (this.failDisconnect) throw new Error("disconnect failed");
     }
     start() {
+        this.startCalls++;
         if (this.endOnStart) this.onended?.();
     }
     stop(time?: number) {
@@ -191,6 +193,114 @@ test("unlock and close failures stay observable without reviving disposed audio"
         assert.throws(() => audio.scene("late"), /Audio is disposed/);
     } finally {
         Context.resumeError = Context.closeError = undefined;
+        Object.assign(globalThis, { AudioContext: original });
+    }
+});
+
+test("muted loops start at flush, retain their sources and mix, and drop transients", async () => {
+    const original = globalThis.AudioContext;
+    Object.assign(globalThis, { AudioContext: Context });
+    try {
+        const audio = new Audio();
+        await audio.unlock();
+        const existing = audio.scene("room"),
+            silent = audio.scene("room"),
+            cancelled = audio.scene("room");
+        const ctx = Context.latest,
+            buffer = {} as AudioBuffer;
+        existing.play({ buffer, loop: true });
+        audio.flush();
+        audio.duck(0.5);
+        audio.muted = true;
+        silent.volume(0.4);
+        silent.play({ buffer, loop: true });
+        silent.play({ buffer });
+        silent.play({ frequency: 440, duration: 0.1 });
+        cancelled.play({ buffer, loop: true });
+        cancelled.dispose();
+        assert.equal(ctx.nodes.length, 1, "requests wait for flush");
+        audio.flush();
+        assert.equal(ctx.nodes.length, 2, "only the new live loop starts while muted");
+        assert.equal(ctx.gains[0].gain.value, 0);
+        assert.equal(ctx.gains[4].gain.value, 0.4, "silent loop retains its scope volume");
+        const sources = [...ctx.nodes];
+        for (let i = 0; i < 3; i++) {
+            audio.muted = false;
+            audio.flush();
+            assert.equal(ctx.gains[0].gain.value, 0.15);
+            audio.muted = true;
+        }
+        assert.deepEqual(ctx.nodes, sources);
+        assert.ok(sources.every((source) => source.startCalls === 1 && !source.stopped));
+        silent.dispose();
+        assert.equal(sources[1].stopped, true);
+        assert.equal(sources[0].stopped, false, "equal names remain isolated");
+        silent.play({ buffer, loop: true });
+        audio.muted = false;
+        audio.duck(1);
+        audio.flush();
+        assert.equal(ctx.nodes.length, 2, "unmute cannot revive disposed work or dropped effects");
+        assert.equal(ctx.gains[0].gain.value, 0.3);
+        await audio.dispose();
+        assert.ok(sources.every((source) => source.stopped));
+    } finally {
+        Object.assign(globalThis, { AudioContext: original });
+    }
+});
+
+test("silent loops obey voice and pending limits without replaying excess work", async () => {
+    const original = globalThis.AudioContext;
+    Object.assign(globalThis, { AudioContext: Context });
+    try {
+        for (const endOnStart of [false, true]) {
+            Context.endOnStart = endOnStart;
+            const audio = new Audio();
+            await audio.unlock();
+            audio.muted = true;
+            const scope = audio.scene("bounded");
+            for (let i = 0; i < 200; i++) scope.play({ buffer: {} as AudioBuffer, loop: true });
+            audio.flush();
+            const ctx = Context.latest;
+            assert.equal(ctx.nodes.length, endOnStart ? 128 : 32);
+            scope.dispose();
+            audio.muted = false;
+            audio.flush();
+            assert.equal(ctx.nodes.length, endOnStart ? 128 : 32);
+            await audio.dispose();
+        }
+    } finally {
+        Context.endOnStart = false;
+        Object.assign(globalThis, { AudioContext: original });
+    }
+});
+
+test("mute does not retain loops flushed before unlock or during suspension", async () => {
+    const original = globalThis.AudioContext;
+    Object.assign(globalThis, { AudioContext: Context });
+    try {
+        const audio = new Audio(),
+            scope = audio.scene("room");
+        const loop = { buffer: {} as AudioBuffer, loop: true };
+        audio.muted = true;
+        scope.play(loop);
+        audio.flush();
+        await audio.unlock();
+        audio.flush();
+        assert.equal(Context.latest.nodes.length, 0);
+        scope.play(loop);
+        await audio.suspend();
+        await audio.resume();
+        audio.flush();
+        assert.equal(Context.latest.nodes.length, 0, "suspension clears pending requests");
+        await audio.suspend();
+        scope.play(loop);
+        audio.flush();
+        await audio.resume();
+        audio.muted = false;
+        audio.flush();
+        assert.equal(Context.latest.nodes.length, 0, "suspended requests do not replay");
+        await audio.dispose();
+    } finally {
         Object.assign(globalThis, { AudioContext: original });
     }
 });

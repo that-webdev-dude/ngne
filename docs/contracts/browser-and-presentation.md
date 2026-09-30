@@ -269,13 +269,18 @@ Asset identity must map to one definition object per service. Leases release onc
 - Named scopes are internally instance-isolated, even with the same authored name.
   Effects use oscillator envelopes; clips use decoded AudioBuffers, optionally looping.
 - Scope buses support independent gain; the master supports mute and ducking.
+- With an unlocked, running device, mute keeps existing voices progressing behind
+  zero master gain and starts newly requested looping clips at the normal flush.
+  Unmute reveals those same sources without restarting them. New non-looping clips
+  and oscillator effects are dropped while muted, with no backlog.
 - Requests flush after simulation commit. Unmount removes queued/active scope
   voices before releasing scene asset leases.
 - Scope and terminal disposal become final before cleanup, attempt every owned
   voice, gain and bus action, and aggregate failures. A failed cleanup cannot make
   that scope usable again.
 - Suspension clears queued requests before awaiting the device.
-- Limits: 128 pending requests and 32 active voices; excess is dropped.
+- Limits: 128 pending requests and 32 active voices, including silent loops; excess
+  is dropped.
 - Audio presentation state is outside simulation enumeration.
 
 The engine provides no entity collision schema. Starfall owns a spatial grid resource and collision rules. The engine does not provide snapshot capture, restore, replay or editors.
