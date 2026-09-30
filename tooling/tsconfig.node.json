@@ -7,11 +7,13 @@
         "types": ["node"],
         "strict": true,
         "allowJs": true,
+        "allowImportingTsExtensions": true,
         "noEmit": true,
         "skipLibCheck": true
     },
     "include": [
         "commands/**/*.ts",
+        "consumer/**/*.ts",
         "core/**/*.ts",
         "evidence/**/*.ts",
         "tests/*.test.ts",

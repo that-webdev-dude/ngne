@@ -162,6 +162,87 @@ consumer. Synthetic runner tests do not establish real integration.
 Historical reader fixtures preserve the existing strict and advisory semantics.
 Unknown formats are rejected; historical evidence is not converted.
 
+### Adopting the consumer command
+
+Start with [the executable reference](consumer/verify-engine.ts). It uses the
+existing [v1 validator](evidence/consumer-contract-v1.ts) and
+[evidence schema](evidence/schema.ts); the synthetic contract peer is not an
+installation example. Copy these files into the consumer, preserving their paths
+beneath a consumer-owned directory such as `verification/`:
+
+```text
+consumer/verify-engine.ts
+core/cleanup.mjs
+core/cleanup.d.mts
+evidence/identity.ts
+evidence/schema.ts
+```
+
+Copy NGNE's `LICENSE` alongside them. These are vendored source files: no sibling
+checkout imports or published tooling dependency are needed. Add
+`"verify:engine": "node verification/consumer/verify-engine.ts"` to the consumer's
+npm scripts. Node 24 runs the reference's erasable TypeScript directly; include
+`verification/**/*.ts` in a Node typecheck with `allowImportingTsExtensions: true`.
+
+Edit the reference's `checks`, `dependencySection`, `candidateDirectory`,
+`configureCandidate` and `omissions` for the game. Defaults select typecheck,
+tests, build and package checks. Each selected script must exist and test the
+installed public package. Keep acceptance assertions in those consumer-owned
+checks. The reference supports a single npm package with a tracked lockfile;
+workspace layouts and required install scripts need consumer-specific adaptation.
+
+The five v1 flags remain unchanged. Run through npm so `npm_execpath` identifies
+the npm CLI. Prerequisites are Git, Node 24, npm, `tar` and an npm cache containing
+the consumer's locked dependencies for the current OS. Install dependencies once
+using the consumer's normal setup before selecting its clean, committed checkout.
+The isolated run uses that cache with `--offline --ignore-scripts`; cache misses
+fail with retained logs rather than silently fetching or running install hooks.
+Windows process cleanup also requires PowerShell/CIM and `taskkill` permissions.
+
+The reference copies tracked inputs into fresh `work/app` outside the checkout,
+retains the caller's actual tarball filename/hash, updates only the copied package
+and lock, installs with `npm ci`, and compares every installed package file with
+the supplied archive. Original source/lock identities and revision are recorded
+separately from the isolated package/lock hashes. The original vendor archive and
+historical engine record remain source inputs, even when the candidate has a
+different version or filename. Do not identify a candidate by the old vendor name.
+
+For a vendor-based game, choose a new location such as `vendor/.candidate` and
+teach its package check to use `.ngne-candidate.json` only inside the isolated
+copy: check the dependency against the record's actual filename, compare archive
+SHA-256 and installed version, and retain the ordinary baseline check otherwise.
+Do not overwrite or relabel the historical engine record with the candidate's
+identity. Candidate version and filename are independent; prerelease or renamed
+archives must not be rejected by a numeric-only vendor filename convention.
+
+Commands have a two-minute deadline each, beneath the parent's ten-minute limit.
+Every process tree is stopped and verified before evidence finalization, including
+failed checks. Original checkout/tarball and installed bytes are rechecked after
+cleanup on both success and failure. Check, cleanup, integrity and publication
+failures cannot produce acceptance. Failures before installation may leave
+partial/nonconforming evidence; the parent retains and rejects that response.
+
+Browser checks are optional consumer scripts. If selected, use a fresh browser
+profile and disposable build/storage, register process cleanup before startup,
+retain observations under `evidence/stages/`, and record actual browser/GPU
+identity and remaining omissions. Ordinary profiles and saved games must remain
+untouched. Default reference checks establish no browser, audible, device or
+performance acceptance.
+
+Prepare once with `npm run prepare:package`, then use the exact printed manifest:
+
+```sh
+npm run verify:compatibility -- --consumer <checkout> --revision <full-commit> --manifest <exact-manifest> --output <new-directory>
+```
+
+Prove adoption with one real consumer and a second fresh run whose consumer-owned
+check deliberately fails only in its isolated copy. Confirm nonzero acceptance,
+the original failing stage/log, before/after input identities and process cleanup.
+Record the committed adapter revision, candidate identity, customization and any
+recipe gaps. Keep parent `evidence/`, child `consumer/` (including its `work/` for
+rebuilding diagnostics), and the referenced preparation. Passing synthetic tests
+alone does not close a real adoption gap. Engine-only verification remains independent.
+
 ## Installed engine verification
 
 `npm run verify:installed` prepares the current package, then runs the engine-owned
