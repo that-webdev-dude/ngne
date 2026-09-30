@@ -8,6 +8,13 @@ export interface InputSnapshot {
         active: boolean;
         dx: number;
         dy: number;
+        completed: readonly Readonly<{
+            button: number;
+            startX: number;
+            startY: number;
+            x: number;
+            y: number;
+        }>[];
     }>;
     readonly wheel: number;
     readonly axes: readonly number[];
@@ -17,7 +24,14 @@ export const emptyInput = (): InputSnapshot =>
         held: Object.freeze([]),
         pressed: Object.freeze([]),
         released: Object.freeze([]),
-        pointer: Object.freeze({ x: 0, y: 0, active: false, dx: 0, dy: 0 }),
+        pointer: Object.freeze({
+            x: 0,
+            y: 0,
+            active: false,
+            dx: 0,
+            dy: 0,
+            completed: Object.freeze([]),
+        }),
         wheel: 0,
         axes: Object.freeze([0, 0, 0, 0]),
     });
@@ -32,6 +46,8 @@ export class Input {
     private dx = 0;
     private dy = 0;
     private active = false;
+    private pointerPresses = new Map<number, { pointerId: number; x: number; y: number }>();
+    private completions: InputSnapshot["pointer"]["completed"][number][] = [];
     private wheel = 0;
     private cleanups: (() => void)[] = [];
     private padHeld = new Set<string>();
@@ -90,15 +106,29 @@ export class Input {
             canvas.focus();
             pointer(p);
             canvas.setPointerCapture(p.pointerId);
+            this.pointerPresses.set(p.button, { pointerId: p.pointerId, x: this.x, y: this.y });
             this.set("Pointer" + p.button, true);
         });
         on(canvas, "pointerup", (e) => {
             const p = e as PointerEvent;
+            const start = this.pointerPresses.get(p.button);
+            if (!start || start.pointerId !== p.pointerId) return;
             pointer(p);
+            this.completions.push(
+                Object.freeze({
+                    button: p.button,
+                    startX: start.x,
+                    startY: start.y,
+                    x: this.x,
+                    y: this.y,
+                }),
+            );
+            this.pointerPresses.delete(p.button);
             this.set("Pointer" + p.button, false);
         });
         const cancelPointer = () => {
             for (const key of this.held) if (key.startsWith("Pointer")) this.set(key, false);
+            this.pointerPresses.clear();
             this.active = false;
         };
         on(canvas, "pointercancel", cancelPointer);
@@ -150,16 +180,20 @@ export class Input {
                 active: this.active,
                 dx: this.dx,
                 dy: this.dy,
+                completed: Object.freeze(this.completions),
             }),
             wheel: this.wheel,
             axes: Object.freeze(axes),
         });
         this.presses.clear();
         this.releases.clear();
+        this.completions = [];
         this.dx = this.dy = this.wheel = 0;
         return result;
     }
     clear(): void {
+        this.pointerPresses.clear();
+        this.completions = [];
         for (const key of this.held) this.releases.add(key);
         for (const key of this.padHeld) this.releases.add(key);
         this.held.clear();

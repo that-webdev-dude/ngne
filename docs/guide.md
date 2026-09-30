@@ -152,6 +152,10 @@ game. `BrowserGame` then owns keyboard and gamepad input only while that canvas 
 focused; ordinary buttons and form controls keep their normal keyboard behavior. Pointer
 input is canvas-scoped and uses current CSS-to-logical scaling.
 
+Release-to-activate consumers must use `input.pointer.completed`, checking both start
+and release coordinates against their target; `released` only means an action stopped
+being held and does not establish successful completion.
+
 Blur, pointer cancellation or capture loss, host stop and disposal clear held actions.
 The first connected gamepad supplies the one logical player; after cancellation it must
 return to neutral before being read again. Local multiplayer and explicit pad assignment

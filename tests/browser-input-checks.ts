@@ -150,11 +150,13 @@ export async function checkBrowserInput(check: Check): Promise<void> {
     button.remove();
 
     await checkFrameDelivery(check);
+    installNativePointerCheck();
 }
 
 async function checkFrameDelivery(check: Check): Promise<void> {
     const canvas = document.createElement("canvas");
     canvas.tabIndex = 0;
+    canvas.setPointerCapture = () => {};
     canvas.style.position = "absolute";
     canvas.style.left = "-10000px";
     document.body.append(canvas);
@@ -188,6 +190,8 @@ async function checkFrameDelivery(check: Check): Promise<void> {
     canvas.focus();
     callback(100);
     canvas.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyD", bubbles: true }));
+    canvas.dispatchEvent(new PointerEvent("pointerdown", { pointerId: 1, button: 0 }));
+    canvas.dispatchEvent(new PointerEvent("pointerup", { pointerId: 1, button: 0 }));
     callback(108);
     check(snapshots.length === 0, "input edges wait through a zero-tick frame");
     callback(142);
@@ -196,20 +200,37 @@ async function checkFrameDelivery(check: Check): Promise<void> {
             snapshots[0].pressed.includes("KeyD") &&
             snapshots[0].held.includes("KeyD") &&
             snapshots[1].pressed.length === 0 &&
-            snapshots[1].held.includes("KeyD"),
+            snapshots[1].held.includes("KeyD") &&
+            snapshots[0].pointer.completed.length === 1 &&
+            snapshots[1].pointer.completed.length === 0,
         "catch-up ticks consume edges once and retain held state",
     );
+    canvas.dispatchEvent(new PointerEvent("pointerdown", { pointerId: 1, button: 0 }));
+    canvas.dispatchEvent(new PointerEvent("pointerup", { pointerId: 1, button: 0 }));
     await app.stop();
     canvas.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyD", bubbles: true }));
+    canvas.dispatchEvent(new PointerEvent("pointerdown", { pointerId: 1, button: 0 }));
+    canvas.dispatchEvent(new PointerEvent("pointerup", { pointerId: 1, button: 0 }));
+    const resumeAudio = app.audio.resume.bind(app.audio);
+    app.audio.resume = async () => {
+        await resumeAudio();
+        canvas.dispatchEvent(new PointerEvent("pointerdown", { pointerId: 1, button: 0 }));
+        canvas.dispatchEvent(new PointerEvent("pointerup", { pointerId: 1, button: 0 }));
+    };
     await app.start();
     callback(200);
     callback(217);
     check(
         snapshots.length === 3 &&
             !snapshots[2].held.includes("KeyD") &&
-            snapshots[2].released.includes("KeyD"),
+            snapshots[2].released.includes("KeyD") &&
+            snapshots[2].pointer.completed.length === 0,
         "stop and resume cannot retain a held key",
     );
+    canvas.dispatchEvent(new PointerEvent("pointerdown", { pointerId: 1, button: 0 }));
+    canvas.dispatchEvent(new PointerEvent("pointerup", { pointerId: 1, button: 0 }));
+    callback(234);
+    check(snapshots[3].pointer.completed.length === 1, "fresh click completes after resume");
     await app.dispose();
     canvas.remove();
 }
@@ -227,4 +248,37 @@ function gamepad(
             pressed: pressedButtons.includes(button),
         })),
     };
+}
+
+function installNativePointerCheck(): void {
+    const canvas = document.createElement("canvas");
+    canvas.id = "native-pointer";
+    canvas.tabIndex = 0;
+    canvas.style.cssText = "position:fixed;left:0;top:0;width:200px;height:100px;z-index:9999";
+    document.body.append(canvas);
+    const input = new Input();
+    input.attach(canvas, 100, 50);
+    const events: { type: string; pointerId: number; trusted: boolean }[] = [];
+    let pointerId = 0;
+    for (const type of [
+        "pointerdown",
+        "gotpointercapture",
+        "pointerup",
+        "pointercancel",
+        "lostpointercapture",
+        "blur",
+    ]) {
+        canvas.addEventListener(type, (event) => {
+            if (event instanceof PointerEvent) pointerId = event.pointerId;
+            events.push({ type, pointerId, trusted: event.isTrusted });
+        });
+    }
+    const fixture = {
+        consume: () => ({ snapshot: input.consume(), events: events.splice(0) }),
+        release: () => canvas.releasePointerCapture(pointerId),
+        cancel: () => canvas.dispatchEvent(new PointerEvent("pointercancel", { pointerId })),
+        blur: () => canvas.blur(),
+        clear: () => input.clear(),
+    };
+    Object.assign(window, { __ngnePointer: fixture });
 }

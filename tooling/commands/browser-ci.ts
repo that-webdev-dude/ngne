@@ -1,5 +1,6 @@
 // NGNE_BROWSER and CHROME_BIN executable selection is delegated to BrowserSession.
 // BrowserSession supplies "--remote-debugging-port" and "--user-data-dir"; these launch options remain supported.
+import { checkNativePointer } from "../suites/verification/native-pointer.js";
 import { BrowserSession } from "../core/browser/session.js";
 import { isNavigationError } from "../core/browser/devtools.mjs";
 import { runWithCleanup, ownProcess, type CleanupRecord } from "../core/cleanup.mjs";
@@ -36,6 +37,7 @@ interface BrowserResult {
     console: string[];
     recordedAt: string;
     browserVersion?: unknown;
+    nativePointer: unknown[];
     browserFlags: string[];
     cleanup: { resource: string; status: string; error?: string }[];
     renderingDevices: { page: string; devices: RenderingDevice[] }[];
@@ -79,6 +81,7 @@ const cleanup: CleanupRecord[] = [];
 let previewOwner: ReturnType<typeof ownProcess> | undefined;
 let browserVersion: unknown;
 let browserFlags: string[] = [];
+let nativePointer: unknown[] = [];
 const renderingDevices: BrowserResult["renderingDevices"] = [];
 
 mkdirSync(artifactDirectory, { recursive: true });
@@ -145,6 +148,10 @@ failures.push(
             failures.push(...validation.failures);
             if (validation.status !== "passed") throw new Error(validation.failures.join("; "));
 
+            nativePointer = await checkNativePointer(cdp, nativePointer);
+            passed.push(
+                "native mouse capture, focus loss, release coordinates and completion recovery",
+            );
             environment = await readEnvironment();
             await recordRenderingDevices("validation");
             renderer = isSoftware(environment) ? "software" : "hardware";
@@ -458,6 +465,7 @@ function writeResult(status: BrowserResult["status"]): void {
         console: consoleMessages,
         recordedAt: new Date().toISOString(),
         browserVersion,
+        nativePointer,
         browserFlags,
         renderingDevices,
         cleanup,

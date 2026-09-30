@@ -225,6 +225,7 @@ export class BrowserGame<S, C> {
             this.last = 0;
             await this.game.start(initial, {
                 start: () => {
+                    if (!cold) this.input.clear();
                     this.raf = this.scheduler.request(callback);
                 },
                 stop: () => this.scheduler.cancel(this.raf),

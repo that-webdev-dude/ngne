@@ -77,7 +77,14 @@ The attached canvas is the focused input surface. Keyboard presses are accepted 
 when their event targets that focused canvas; key releases remain window-observed so a
 focus change cannot latch a key. Buttons, inputs, text areas and selects keep normal
 keyboard behavior. Pointer coordinates are recomputed from the canvas's current client
-rectangle for every event and mapped to fixed logical display pixels. Pointer cancellation
+rectangle for every event and mapped to fixed logical display pixels.
+`pointer.completed` contains ordered, frozen records `{ button, startX, startY, x, y }`
+for matching normal pointer-up events, with logical press and release coordinates.
+Repeated clicks remain separate records; later movement does not change their coordinates.
+Cancellation or capture loss ends outstanding presses without completion; capture loss
+after a normal up preserves its completion. Duplicate or unmatched endings cannot
+complete a press. Blur, clear, stop and disposal discard pending completions. Completion
+records follow the same once-per-consuming-tick delivery as other edges. Pointer cancellation
 or capture loss releases every held `PointerN` action and clears pointer activity.
 
 The lowest-index connected gamepad contributes to the same logical player only while
