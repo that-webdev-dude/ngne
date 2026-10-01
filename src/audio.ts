@@ -67,21 +67,43 @@ export class Audio {
         if (this.disposed) throw new Error("Audio is disposed");
         id = `${id}:${this.nextScope++}`;
         let disposed = false;
+        let fade: { from: number; target: number; start: number; end: number } | undefined;
+        const volume = (target: number, seconds: number) => {
+            if (disposed || this.disposed) return;
+            if (!Number.isFinite(target)) throw new Error("Invalid volume");
+            if (!Number.isFinite(seconds) || seconds < 0) throw new Error("Invalid fade duration");
+            target = Math.max(0, Math.min(1, target));
+            const now = this.context?.currentTime ?? 0;
+            const end = now + seconds;
+            if (!Number.isFinite(end)) throw new Error("Invalid fade duration");
+            const from = fade
+                ? fade.from +
+                  (fade.target - fade.from) *
+                      Math.min(1, (now - fade.start) / (fade.end - fade.start))
+                : (this.volumes.get(id) ?? 1);
+            const bus = this.context && seconds > 0 ? this.bus(id) : this.buses.get(id);
+            fade = undefined;
+            if (bus) {
+                // Replace the entire owned timeline; retain only the current linear envelope.
+                bus.gain.cancelScheduledValues(0);
+                bus.gain.setValueAtTime(end > now ? from : target, now);
+                if (end > now) {
+                    bus.gain.linearRampToValueAtTime(target, end);
+                    fade = { from, target, start: now, end };
+                }
+            }
+            this.volumes.set(id, target);
+        };
         return {
             play: (sound: Sound | Clip) => {
                 if (!disposed && !this.disposed && this.queue.length < 128)
                     this.queue.push({ scope: id, sound });
             },
-            volume: (volume: number) => {
-                if (disposed || this.disposed) return;
-                if (!Number.isFinite(volume)) throw new Error("Invalid volume");
-                const level = Math.max(0, Math.min(1, volume));
-                this.volumes.set(id, level);
-                const bus = this.buses.get(id);
-                if (bus) bus.gain.value = level;
-            },
+            volume: (target: number) => volume(target, 0),
+            fadeTo: (target: number, seconds: number) => volume(target, seconds),
             dispose: () => {
                 disposed = true;
+                fade = undefined;
                 this.release(id);
             },
         };
@@ -171,6 +193,11 @@ export class Audio {
                 this.voices.delete(o);
             }
         try {
+            this.buses.get(scope)?.gain.cancelScheduledValues(0);
+        } catch (error) {
+            errors.push(error);
+        }
+        try {
             this.buses.get(scope)?.disconnect();
         } catch (error) {
             errors.push(error);
@@ -195,6 +222,11 @@ export class Audio {
         this.voices.clear();
         this.volumes.clear();
         for (const b of this.buses.values()) {
+            try {
+                b.gain.cancelScheduledValues(0);
+            } catch (e) {
+                errors.push(e);
+            }
             try {
                 b.disconnect();
             } catch (e) {

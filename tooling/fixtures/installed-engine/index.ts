@@ -96,6 +96,7 @@ async function run() {
     };
     const image = imageAsset("tile", new URL("./tile.png", import.meta.url).href);
     const audio = audioAsset("tone", new URL("./tone.wav", import.meta.url).href);
+    let music: ReturnType<typeof host.audio.scene> | undefined;
     let replacement: PreparedScene | undefined;
     const scene = (id: string, texture = image): SceneDefinition => ({
         id,
@@ -106,6 +107,7 @@ async function run() {
             if (!(clip instanceof AudioBuffer)) throw Error("Expected decoded AudioBuffer");
             check("decoded-audio-buffer", true);
             const scope = host.audio.scene("shared-authored-name");
+            music = scope;
             s.defer(() => {
                 scope.dispose();
                 unmounted++;
@@ -264,6 +266,24 @@ async function run() {
         state.samples.firstRms = platform.rms();
         check("decoded-clip-produces-output", platform.voices.length === 1);
         check("unlocked-voice-loops", platform.voices[0].source.loop);
+        const fadeTicks = ticks,
+            fadeSource = platform.voices[0].source;
+        const fadeStart = platform.contexts[0].currentTime;
+        music!.fadeTo(0, 0.15);
+        await until(() => platform.contexts[0].currentTime > fadeStart + 0.3, "packaged fade out");
+        state.samples.fadedRms = platform.rms();
+        check(
+            "packaged-scope-fades-to-silence-without-ticks",
+            platform.rms() < 0.000001 && ticks === fadeTicks,
+        );
+        music!.fadeTo(1, 0.15);
+        await until(() => platform.rms() > 0.001, "packaged fade in");
+        check(
+            "packaged-fades-preserve-source",
+            platform.voices.length === 1 &&
+                platform.voices[0].source === fadeSource &&
+                ticks === fadeTicks,
+        );
         await host.audio.unlock();
         step();
         check("repeated-unlock-preserves-one-voice", platform.voices.length === 1);

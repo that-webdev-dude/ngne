@@ -3,6 +3,33 @@ import { Assets, Audio, audioAsset } from "../src/index.js";
 const LOOP_URL =
     "data:audio/wav;base64,UklGRmQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUAAAACAhYuQlJeam5ybmpeUkIuFgHt1cGxpZmVkZWZpbHB1e4CFi5CUl5qbnJual5SQi4WAe3VwbGlmZWRlZmlscHV7";
 
+/** Human listening is separate from automated envelope evidence. Invoke from a gesture. */
+export async function listenToScopeFades(): Promise<void> {
+    const audio = new Audio(),
+        scope = audio.scene("listening");
+    try {
+        await audio.unlock();
+        const buffer = new AudioBuffer({ length: 44100, numberOfChannels: 1, sampleRate: 44100 });
+        const samples = buffer.getChannelData(0);
+        for (let i = 0; i < samples.length; i++)
+            samples[i] = Math.sin((2 * Math.PI * 220 * i) / 44100);
+        scope.volume(0);
+        scope.play({ buffer, loop: true, volume: 0.3 });
+        audio.flush();
+        scope.fadeTo(1, 2);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        scope.fadeTo(0, 1);
+        await new Promise((resolve) => setTimeout(resolve, 1250));
+        scope.fadeTo(1, 1);
+        await new Promise((resolve) => setTimeout(resolve, 1250));
+        scope.fadeTo(0, 1);
+        await new Promise((resolve) => setTimeout(resolve, 1250));
+    } finally {
+        scope.dispose();
+        await audio.dispose();
+    }
+}
+
 export async function checkBrowserAudio(
     check: (value: unknown, message: string) => void,
 ): Promise<void> {
@@ -71,6 +98,55 @@ export async function checkBrowserAudio(
         first.release();
         second.release();
         check(true, "audio suspends and resumes with scene scopes released");
+
+        // A constant signal makes every output sample an independent gain measurement.
+        const buffer = observation
+            .context()
+            .createBuffer(1, 2048, observation.context().sampleRate);
+        buffer.getChannelData(0).fill(0.25);
+        const fading = audio.scene("envelope");
+        fading.play({ buffer, loop: true, volume: 1 });
+        audio.flush();
+        const source = observation.voices.at(-1)!.source;
+        await observation.measure(check, false, "constant envelope probe is playing");
+        await observation.envelope(check, () => fading.fadeTo(0, 1), 1, 0);
+        await observation.envelope(check, () => fading.fadeTo(1, 1), 0, 1);
+        const rejectSteps = (value: unknown, message: string) => {
+            if (!value) throw Error(message);
+        };
+        await checkRejects(
+            observation.envelope(rejectSteps, () => fading.volume(0), 1, 0),
+            "envelope regression must reject an immediate change",
+        );
+        let timer: ReturnType<typeof setInterval> | undefined;
+        try {
+            await checkRejects(
+                observation.envelope(
+                    rejectSteps,
+                    () => {
+                        const start = observation.context().currentTime;
+                        timer = setInterval(
+                            () => fading.volume(observation.context().currentTime - start),
+                            1000 / 60,
+                        );
+                    },
+                    0,
+                    1,
+                ),
+                "envelope regression must reject 60 Hz volume steps",
+            );
+        } finally {
+            clearInterval(timer);
+        }
+        check(true, "envelope regression rejects immediate changes and 60 Hz volume steps");
+        check(
+            observation.voices.at(-1)!.source === source && observation.voices.at(-1)!.starts === 1,
+            "audio-clock fades preserve the playing source without another flush",
+        );
+        fading.fadeTo(0, 10);
+        fading.dispose();
+        fading.fadeTo(1, 0);
+        await observation.measure(check, true, "disposed fade cannot revive audio");
     } finally {
         assets.dispose();
         try {
@@ -137,6 +213,57 @@ function observeAudio() {
     };
     return {
         voices,
+        context() {
+            if (!output) throw Error("Audio master output was not observed");
+            return output.context;
+        },
+        async envelope(
+            check: (value: unknown, message: string) => void,
+            start: () => void,
+            from: number,
+            target: number,
+        ) {
+            if (!output) throw Error("Audio master output was not observed");
+            const context = output.context;
+            const begin = context.currentTime;
+            start();
+            const data = new Float32Array(output.fftSize);
+            const samples: { time: number; gain: number; error: number; slopeError: number }[] = [];
+            const slope = (0.075 * (target - from)) / context.sampleRate;
+            const deadline = performance.now() + 5000;
+            while (context.currentTime < begin + 1.15 && performance.now() < deadline) {
+                await new Promise((resolve) => setTimeout(resolve, 25));
+                const time = context.currentTime - begin;
+                if (time < 0.15 || time > 0.85) continue;
+                output.getFloatTimeDomainData(data);
+                const gain = data.reduce((sum, value) => sum + value, 0) / data.length / 0.075;
+                const expected =
+                    from + (target - from) * (time - data.length / (2 * context.sampleRate));
+                let slopeError = 0;
+                for (let i = 1; i < data.length; i++)
+                    slopeError = Math.max(slopeError, Math.abs(data[i] - data[i - 1] - slope));
+                samples.push({ time, gain, error: Math.abs(gain - expected), slopeError });
+            }
+            // Interior samples and per-sample slope reject endpoint jumps and tick-sized steps.
+            const tolerance = 0.02;
+            const slopeTolerance = Math.abs(slope) * 0.1 + 1e-8;
+            check(
+                samples.length >= 8 &&
+                    samples[0].time < 0.3 &&
+                    samples.at(-1)!.time > 0.7 &&
+                    samples.every(
+                        (sample) =>
+                            sample.error <= tolerance && sample.slopeError <= slopeTolerance,
+                    ),
+                `native linear fade ${from}->${target}: gain tolerance=${tolerance}, slope tolerance=${slopeTolerance}, samples=${JSON.stringify(samples)}`,
+            );
+            output.getFloatTimeDomainData(data);
+            check(
+                context.currentTime >= begin + 1.15 &&
+                    data.every((value) => Math.abs(value / 0.075 - target) <= 0.00001),
+                `native fade reaches and holds ${target} without simulation or render updates`,
+            );
+        },
         async measure(
             check: (value: unknown, message: string) => void,
             silent: boolean,

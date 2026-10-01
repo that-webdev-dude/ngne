@@ -2,7 +2,7 @@ import { checkBrowserGames } from "../../../../demo/tests/browser-checks.js";
 import { checkPlatformerUnsupported } from "../../../../examples/platformer/tests/browser-checks.js";
 import { checkHelloCapability } from "../../../../examples/hello/tests/browser-checks.js";
 import { checkBrowserHost } from "../../../../tests/browser-validation.js";
-import { checkBrowserAudio } from "../../../../tests/browser-audio-checks.js";
+import { checkBrowserAudio, listenToScopeFades } from "../../../../tests/browser-audio-checks.js";
 
 import { checkBrowserLifecycle } from "../../../../tests/browser-lifecycle-checks.js";
 import { checkBrowserInput } from "../../../../tests/browser-input-checks.js";
@@ -20,6 +20,21 @@ void checkWebGPUEnvironment().catch((error: unknown) => {
     if (output) output.textContent = String(error);
 });
 const results: string[] = [];
+const listen = document.querySelector<HTMLButtonElement>("#listen-fades")!;
+listen.addEventListener("click", async () => {
+    listen.disabled = true;
+    const result = document.getElementById("listening-result")!;
+    result.textContent = "Playing: partial fade-in, retarget to silence, full fade-in, fade-out.";
+    try {
+        await listenToScopeFades();
+        result.textContent =
+            "Playback finished. Record what you heard, browser and output device; this is not an automated pass.";
+    } catch (error) {
+        result.textContent = String(error);
+    } finally {
+        listen.disabled = false;
+    }
+});
 const validation = (window.__ngneValidation = {
     status: "idle" as "idle" | "running" | "passed" | "failed",
     passed: results,

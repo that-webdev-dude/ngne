@@ -276,6 +276,16 @@ Asset identity must map to one definition object per service. Leases release onc
 - Named scopes are internally instance-isolated, even with the same authored name.
   Effects use oscillator envelopes; clips use decoded AudioBuffers, optionally looping.
 - Scope buses support independent gain; the master supports mute and ducking.
+- `scope.fadeTo(target, seconds)` applies a linear gain envelope on the audio clock,
+  without further ticks or renders. Finite targets clamp to `[0, 1]`; durations must
+  be finite and nonnegative. Zero duration and `volume(target)` immediately set gain
+  and cancel an active fade; retargeting starts at the current envelope gain.
+- Before device creation, fades only remember their target: no deferred fade or
+  implicit unlock. With a device, fades start when called, even before first playback.
+  Suspension freezes progress; resume continues it. Mute does not pause fades.
+- Fades preserve source identity, playback scheduling and scope isolation. Disposal
+  cancels automation and releases scope state; later volume/fade calls are no-ops.
+  Targets, durations, crossfade weights and ducking policy remain consumer-owned.
 - With an unlocked, running device, mute keeps existing voices progressing behind
   zero master gain and starts newly requested looping clips at the normal flush.
   Unmute reveals those same sources without restarting them. New non-looping clips

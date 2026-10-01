@@ -264,8 +264,9 @@ For audio:
 - From systems, enqueue `scope.play({ frequency: 440, duration: .15 })` or
   `scope.play({ buffer, loop: true, volume: .2 })`. Requests flush after commit;
   never enqueue from render callbacks.
-- Adjust independent scope volume, or use `audio.duck(.25)` for the overall mix
-  and `audio.duck(1)` to restore it.
+- Use `scope.volume(.5)` for an immediate level or `scope.fadeTo(0, 1)` for a
+  one-second fade. Use `audio.duck(.25)` for the overall mix and `audio.duck(1)`
+  to restore it.
 
 The [audio contract](contracts/browser-and-presentation.md#audio-scopes-and-playback)
 owns voice/request limits and cleanup failures. Starfall and the platformer lease
