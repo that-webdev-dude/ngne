@@ -115,8 +115,10 @@ endpoint or after once completion, so it receives its full duration on resume.
 
 Inspection magnification offers 1× (baseline), 2×, 4× and 8×. The Baseline button
 restores 1× and centers the canvas. Controls stay above a viewport bounded by the
-window; artwork is never fitted. Drag inside the viewport to pan, use the wheel
-(Shift for horizontal pan), or focus it and use arrow keys (Shift for larger steps).
+window; artwork is never fitted. Left-click and drag to pan, or focus the viewport
+and use arrow keys (Shift for larger steps). Wheel up/down steps zoom through 1×,
+2×, 4× and 8×, capped at the supported limits. Ctrl/Command-wheel remains
+browser-controlled.
 Panning can bring any canvas edge to the viewport center. Magnification retains the
 canvas point at that center, including when resizing the window. Rendering details
 expand below the viewport. Magnification scales the rendered canvas

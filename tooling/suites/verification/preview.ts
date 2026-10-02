@@ -235,6 +235,12 @@ export async function verifyPreview(
                         client,
                         "document.querySelector('#details').textContent.startsWith('Frame kite')",
                     );
+                    assert.deepEqual(
+                        await client.evaluate(
+                            "['selection-name', 'playback-state', 'selection-summary', 'sprite-size'].map(id => document.getElementById(id).textContent)",
+                        ),
+                        ["kite", "Still", "Standalone frame", "20 × 44 CSS px at 1×"],
+                    );
                     await session.screenshot(join(run.evidence, "different-size.png"));
                     await client.evaluate(
                         "document.querySelector('#frames').value = 'badge'; document.querySelector('#frames').dispatchEvent(new Event('change'))",
@@ -256,6 +262,18 @@ export async function verifyPreview(
                     "{ const s = document.querySelector('#animations'); s.selectedIndex = 1; s.dispatchEvent(new Event('change')); }",
                 );
                 await until(page, "!document.querySelector('#next').disabled");
+                if (!suppliedFixture)
+                    assert.deepEqual(
+                        await page.evaluate(
+                            "['selection-name', 'playback-state', 'selection-summary', 'sprite-size'].map(id => document.getElementById(id).textContent)",
+                        ),
+                        [
+                            "signal-loop",
+                            "Paused",
+                            "Entry 1/3 · 80 ms · Loop",
+                            "36 × 28 CSS px at 1×",
+                        ],
+                    );
                 const count = await page.evaluate<number>(
                     "parseInt(document.querySelector('#entry').textContent.split('entry 1/')[1], 10)",
                 );
@@ -496,32 +514,69 @@ export async function verifyPreview(
                     assert.ok(current.controlsVisible);
                     observations.push({ zoom, ...current });
                 }
-                await page.send("Input.dispatchMouseEvent", {
-                    type: "mouseWheel",
-                    x,
-                    y,
-                    deltaX: 16,
-                    deltaY: 24,
-                });
-                await settle();
-                const wheeled = await measure();
-                assert.ok(wheeled.center[0] > dragged.center[0]);
-                assert.ok(wheeled.center[1] > dragged.center[1]);
-                await key("ArrowRight");
-                assert.ok((await measure()).center[0] > wheeled.center[0]);
-                // Very large wheel movement clamps each edge at center, leaving artwork reachable.
-                for (const sign of [-1, 1]) {
+                const wheelZooms = [];
+                for (const [deltaY, expected] of [
+                    [120, 4],
+                    [120, 2],
+                    [120, 1],
+                    [120, 1],
+                    [-120, 2],
+                    [-120, 4],
+                    [-120, 8],
+                    [-120, 8],
+                    [0, 8],
+                ]) {
                     await page.send("Input.dispatchMouseEvent", {
                         type: "mouseWheel",
                         x,
                         y,
-                        deltaX: sign * 100000,
-                        deltaY: sign * 100000,
+                        deltaX: 16,
+                        deltaY,
+                    });
+                    await settle();
+                    const actual = await page.evaluate<number>(
+                        "Number(document.querySelector('#magnification').value)",
+                    );
+                    assert.equal(actual, expected);
+                    const current = await measure();
+                    current.center.forEach((v, i) =>
+                        assert.ok(
+                            Math.abs(v - dragged.center[i]) <= 1,
+                            "wheel keeps inspection center",
+                        ),
+                    );
+                    assert.deepEqual(current.backing, baseline.backing);
+                    wheelZooms.push(actual);
+                }
+                await key("ArrowRight");
+                assert.ok((await measure()).center[0] > dragged.center[0]);
+                // Captured left-button dragging can reach every edge even beyond the viewport.
+                for (const sign of [-1, 1]) {
+                    await page.send("Input.dispatchMouseEvent", {
+                        type: "mousePressed",
+                        x,
+                        y,
+                        button: "left",
+                        clickCount: 1,
+                    });
+                    await page.send("Input.dispatchMouseEvent", {
+                        type: "mouseMoved",
+                        x: x + sign * 100000,
+                        y: y + sign * 100000,
+                        button: "left",
+                        buttons: 1,
+                    });
+                    await page.send("Input.dispatchMouseEvent", {
+                        type: "mouseReleased",
+                        x: x + sign * 100000,
+                        y: y + sign * 100000,
+                        button: "left",
+                        clickCount: 1,
                     });
                     await settle();
                     const edge = await measure();
                     edge.center.forEach((v, i) =>
-                        assert.ok(Math.abs(v - (sign < 0 ? 0 : baseline.canvas[i + 2])) <= 1),
+                        assert.ok(Math.abs(v - (sign > 0 ? 0 : baseline.canvas[i + 2])) <= 1),
                     );
                 }
                 await page.evaluate("document.querySelector('#baseline').click()");
@@ -562,7 +617,8 @@ export async function verifyPreview(
                     observations,
                     layouts,
                     pointerCaptureReleaseOutside: true,
-                    wheelAndKeyboardPan: true,
+                    wheelZooms,
+                    dragAndKeyboardPan: true,
                     edgesReachable: true,
                     baselineRestored: true,
                 });
@@ -582,6 +638,10 @@ export async function verifyPreview(
                 await until(
                     page,
                     "document.querySelector('#entry').textContent.includes('playing') && !document.querySelector('#entry').textContent.includes('entry 1/')",
+                );
+                assert.equal(
+                    await page.evaluate("document.querySelector('#playback-state').textContent"),
+                    "Playing",
                 );
                 const moving = await page.evaluate("document.querySelector('#entry').textContent");
                 await session.screenshot(join(run.evidence, "playing.png"));

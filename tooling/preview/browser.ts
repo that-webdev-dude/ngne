@@ -17,6 +17,10 @@ const play = element("play", HTMLButtonElement),
 const error = element("error", HTMLParagraphElement),
     entry = element("entry", HTMLParagraphElement);
 const details = element("details", HTMLPreElement);
+const selectionName = element("selection-name", HTMLHeadingElement),
+    playbackState = element("playback-state", HTMLSpanElement),
+    selectionSummary = element("selection-summary", HTMLParagraphElement),
+    spriteSize = element("sprite-size", HTMLParagraphElement);
 const previous = element("previous", HTMLButtonElement),
     next = element("next", HTMLButtonElement),
     magnification = element("magnification", HTMLSelectElement),
@@ -135,13 +139,15 @@ async function start() {
         (event) => {
             if (event.ctrlKey || event.metaKey) return;
             event.preventDefault();
-            const unit =
-                event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? stage.clientHeight : 1;
-            inspection.pan(
-                -(event.shiftKey ? event.deltaY + event.deltaX : event.deltaX) * unit,
-                -(event.shiftKey ? 0 : event.deltaY) * unit,
+            if (!event.deltaY || controls.disabled) return;
+            const levels = [...magnification.options]
+                .filter((option) => !option.disabled)
+                .map((option) => Number(option.value));
+            const index = Math.max(
+                0,
+                Math.min(levels.length - 1, levels.indexOf(zoom) - Math.sign(event.deltaY)),
             );
-            position();
+            setZoom(levels[index]);
         },
         { ...listen, passive: false },
     );
@@ -242,7 +248,7 @@ async function start() {
                         y + cell / 2,
                         cell,
                         cell,
-                        (x / cell + y / cell) % 2 ? 0x606060 : 0x909090,
+                        (x / cell + y / cell) % 2 ? 0x272d37 : 0x303845,
                     );
             frame.sprite({
                 x: size.width / 2,
@@ -268,6 +274,16 @@ async function start() {
             play.disabled = !playback || document.hidden;
             play.textContent = playback?.playing ? "Pause" : "Play";
             previous.disabled = next.disabled = !playback || playback.playing || document.hidden;
+            selectionName.textContent = playback?.animation.id ?? selected;
+            playbackState.textContent = playback
+                ? playback.playing
+                    ? "Playing"
+                    : "Paused"
+                : "Still";
+            selectionSummary.textContent = playback
+                ? `Entry ${playback.index + 1}/${playback.animation.entries.length} · ${playback.animation.entries[playback.index].ms} ms · ${playback.animation.playback === "loop" ? "Loop" : "Once"}`
+                : "Standalone frame";
+            spriteSize.textContent = `${sprite.destinationWidth * preview.display.density * preview.display.scale} × ${sprite.destinationHeight * preview.display.density * preview.display.scale} CSS px at 1×`;
             entry.textContent = playback
                 ? `${playback.animation.id}: entry ${playback.index + 1}/${playback.animation.entries.length} · ${playback.animation.entries[playback.index].ms} ms · elapsed ${playback.elapsed.toFixed(1)}/${playback.total} ms · ${playback.animation.playback} · ${playback.playing ? "playing" : "paused"}`
                 : `${selected}: standalone frame`;
