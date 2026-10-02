@@ -21,6 +21,7 @@ import type { Outcome, Result, Stage } from "../evidence/schema.js";
 // Consumer-owned choices: edit these and configureCandidate when adopting this file.
 const checks = ["typecheck", "test", "build", "check:package"];
 const dependencySection = "dependencies";
+const packageName = "@that-webdev-dude/ngne";
 const candidateDirectory = ".ngne-candidate";
 const omissions = [
     "No browser, rendering, native input, audible audio, performance or physical-device checks.",
@@ -44,8 +45,8 @@ interface Candidate {
 function configureCandidate(app: string, candidate: Candidate): void {
     const path = join(app, "package.json");
     const pkg = JSON.parse(readFileSync(path, "utf8"));
-    assert(pkg[dependencySection]?.ngne, `Expected ${dependencySection}.ngne`);
-    pkg[dependencySection].ngne = candidate.dependency;
+    assert(pkg[dependencySection]?.[packageName], `Expected ${dependencySection}.${packageName}`);
+    pkg[dependencySection][packageName] = candidate.dependency;
     writeFileSync(path, JSON.stringify(pkg, null, 2) + "\n");
     // ponytail: a separate candidate record lets vendor checks preserve historical engine evidence.
     writeFileSync(join(app, ".ngne-candidate.json"), JSON.stringify(candidate, null, 2) + "\n");
@@ -273,7 +274,7 @@ export async function verify(input: Input, checkout = process.cwd()): Promise<Re
             const packageRoot = join(expected, "package");
             const expectedFiles = identities(packageRoot);
             const pkg = JSON.parse(readFileSync(contained(packageRoot, "package.json"), "utf8"));
-            assert.equal(pkg.name, "ngne", "Candidate must be ngne");
+            assert.equal(pkg.name, packageName, `Candidate must be ${packageName}`);
             assert.equal(typeof pkg.version, "string", "Candidate version required");
             assert(
                 !existsSync(join(app, candidateDirectory)) &&
@@ -306,7 +307,7 @@ export async function verify(input: Input, checkout = process.cwd()): Promise<Re
                 "--no-audit",
                 "--no-fund",
             ]);
-            manifest.installed = identities(join(app, "node_modules/ngne"));
+            manifest.installed = identities(contained(app, `node_modules/${packageName}`));
             assert.deepEqual(
                 manifest.installed,
                 expectedFiles,
@@ -346,7 +347,7 @@ export async function verify(input: Input, checkout = process.cwd()): Promise<Re
             assert.equal(hash(readFileSync(tarball)), digest, "Supplied tarball changed");
             if (Object.keys(manifest.installed).length)
                 assert.deepEqual(
-                    identities(join(app, "node_modules/ngne")),
+                    identities(contained(app, `node_modules/${packageName}`)),
                     manifest.installed,
                     "Installed package changed during checks",
                 );

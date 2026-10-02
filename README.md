@@ -26,7 +26,7 @@ setup, assets and game logic, including movement, collision and progression.
 For registry installation, pin the exact experimental version in your application:
 
 ```sh
-npm install --save-exact ngne@0.2.0-alpha.0
+npm install --save-exact @that-webdev-dude/ngne@0.2.0-alpha.1
 ```
 
 The experimental release channel is `next`. Pin the version and commit your lockfile;
@@ -43,7 +43,7 @@ module. Serve it over HTTPS or localhost in a WebGPU-capable browser; the exampl
 uses top-level `await` and draws a square at the center of a 320 × 180 canvas.
 
 ```ts
-import { BrowserGame } from "ngne";
+import { BrowserGame } from "@that-webdev-dude/ngne";
 
 const canvas = document.querySelector("canvas");
 if (!canvas) throw new Error("Canvas missing");

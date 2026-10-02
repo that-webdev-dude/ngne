@@ -101,7 +101,13 @@ export async function pack(
     ])
         if (!files[required]) throw Error(`Missing required package content: ${required}`);
     const pkg = object(JSON.parse(readFileSync(join(repository, "package.json"), "utf8")));
-    if (pkg.name !== "ngne") throw Error("Unexpected package name");
+    if (pkg.name !== "@that-webdev-dude/ngne") throw Error("Unexpected package name");
+    if (
+        entry.name !== pkg.name ||
+        entry.version !== pkg.version ||
+        filename !== `${pkg.name.replace(/^@/, "").replace("/", "-")}-${pkg.version}.tgz`
+    )
+        throw Error("Unexpected npm pack identity");
     if (object(pkg.bin)["ngne-preview"] !== "dist/preview/cli.js")
         throw Error("Missing preview executable mapping");
     for (const key of ["dependencies", "optionalDependencies", "peerDependencies"])

@@ -60,28 +60,28 @@ The command builds the engine, creates an npm `.tgz`, installs it in isolation, 
 
 The command prints a preparation path under `out/runs/`:
 
-| Path inside that run                | Purpose                                                       |
-| ----------------------------------- | ------------------------------------------------------------- |
-| `evidence/package/ngne-0.1.0.tgz`   | The package another game installs                             |
-| `evidence/builds/root/`, `nested/`  | Fixture builds for two URL locations                          |
-| `evidence/report.md`, `result.json` | Readable and machine-readable outcomes                        |
-| `evidence/manifest.json`            | Identifies this exact preparation, its inputs and environment |
-| `evidence/artifacts.json`           | Output-file inventory                                         |
-| `evidence/stages/`                  | Per-step logs and outputs                                     |
-| `work/installation/`                | Isolated test app, installed engine and dependencies          |
-| `work/dependencies/`, `work/cache/` | Dependency manifests/lockfile and npm cache/logs              |
+| Path inside that run                                       | Purpose                                                       |
+| ---------------------------------------------------------- | ------------------------------------------------------------- |
+| `evidence/package/that-webdev-dude-ngne-0.2.0-alpha.1.tgz` | The package another game installs                             |
+| `evidence/builds/root/`, `nested/`                         | Fixture builds for two URL locations                          |
+| `evidence/report.md`, `result.json`                        | Readable and machine-readable outcomes                        |
+| `evidence/manifest.json`                                   | Identifies this exact preparation, its inputs and environment |
+| `evidence/artifacts.json`                                  | Output-file inventory                                         |
+| `evidence/stages/`                                         | Per-step logs and outputs                                     |
+| `work/installation/`                                       | Isolated test app, installed engine and dependencies          |
+| `work/dependencies/`, `work/cache/`                        | Dependency manifests/lockfile and npm cache/logs              |
 
 To use the package, run this **from the separate game's directory**:
 
 ```powershell
-npm.cmd install "C:\path\to\ngne-0.1.0.tgz"
+npm.cmd install "C:\path\to\that-webdev-dude-ngne-0.2.0-alpha.1.tgz"
 ```
 
-The game imports public exports from `ngne`. It only needs the `.tgz`, not the rest of the preparation. Install a newly generated `.tgz` to try a later engine build.
+The game imports public exports from `@that-webdev-dude/ngne`. It only needs the `.tgz`, not the rest of the preparation. Install a newly generated `.tgz` to try a later engine build.
 
 ### Reuse a preparation
 
-Save the printed `evidence/manifest.json` path. **A manifest is not a package version**: two different engine builds can both be called `ngne@0.1.0`. The manifest and recorded hashes identify the exact preparation.
+Save the printed `evidence/manifest.json` path. **A manifest is not a package version**: two different engine builds can both be called `@that-webdev-dude/ngne@0.2.0-alpha.1`. The manifest and recorded hashes identify the exact preparation.
 
 ```powershell
 npm.cmd run check:prepared -- --manifest "<manifest>"

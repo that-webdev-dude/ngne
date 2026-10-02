@@ -6,7 +6,11 @@ export default defineConfig(({ command, mode }) => ({
     resolve: {
         alias:
             command === "serve"
-                ? { ngne: fileURLToPath(new URL("./src/index.ts", import.meta.url)) }
+                ? {
+                      "@that-webdev-dude/ngne": fileURLToPath(
+                          new URL("./src/index.ts", import.meta.url),
+                      ),
+                  }
                 : {},
     },
     build: {

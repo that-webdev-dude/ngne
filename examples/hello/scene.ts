@@ -1,4 +1,11 @@
-import { component, f64, lerp, type ImageAsset, type SceneDefinition, type Sprite } from "ngne";
+import {
+    component,
+    f64,
+    lerp,
+    type ImageAsset,
+    type SceneDefinition,
+    type Sprite,
+} from "@that-webdev-dude/ngne";
 
 const Position = component("position", { x: f64(40), previousX: f64(40) });
 

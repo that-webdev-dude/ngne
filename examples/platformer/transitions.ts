@@ -1,4 +1,4 @@
-import type { Asset, Audio, Game, SceneDefinition } from "ngne";
+import type { Asset, Audio, Game, SceneDefinition } from "@that-webdev-dude/ngne";
 
 import { createLevel } from "./game.js";
 import type { OverlayOptions, Progress, ProgressCommand, Run } from "./game.js";

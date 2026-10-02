@@ -7,7 +7,7 @@ Examples assume a TypeScript browser app with a canvas. The [first scene](https:
 For registry installation, pin the exact experimental version in your application:
 
 ```sh
-npm install --save-exact ngne@0.2.0-alpha.0
+npm install --save-exact @that-webdev-dude/ngne@0.2.0-alpha.1
 ```
 
 The experimental release channel is `next`. Commit your consumer lockfile and upgrade deliberately
@@ -158,7 +158,7 @@ not establish readability against game backgrounds, lighting, HUD or moving came
 ## Your first scene
 
 ```ts
-import { BrowserGame, component, f64, lerp, type SceneDefinition } from "ngne";
+import { BrowserGame, component, f64, lerp, type SceneDefinition } from "@that-webdev-dude/ngne";
 
 const Position = component("position", { x: f64(40), previousX: f64(40) });
 const scene: SceneDefinition = {
@@ -249,7 +249,7 @@ See the [renderer contract](contracts/browser-and-presentation.md#renderer) for 
 ## Image sprites
 
 ```ts
-import { imageAsset, type SceneDefinition } from "ngne";
+import { imageAsset, type SceneDefinition } from "@that-webdev-dude/ngne";
 
 const spark = imageAsset("spark", new URL("./spark.png", import.meta.url).href);
 const room: SceneDefinition = {
@@ -471,7 +471,7 @@ The [boundary table](contracts/browser-and-presentation.md#interpolation-and-dis
 Keep authored tiles in a scene-owned `Uint8Array` copy. Inside `setup(scene)`, with authored `level` data and a scene-owned `player` position component, initialize the camera before the first render and register follow after movement:
 
 ```ts
-import { clamp } from "ngne";
+import { clamp } from "@that-webdev-dude/ngne";
 
 // Inside setup; tile size 16, viewport width 480 logical pixels.
 const tiles = scene.resource("tiles", level.tiles.slice());

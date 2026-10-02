@@ -117,7 +117,9 @@ export function verifyPrepared(manifestPath: string): Manifest {
     for (const tree of [p.installed, p.workload, p.dependencies, p.builds.root, p.builds.nested])
         verifyIdentities(contained(root, tree.path), tree.files);
     verifyIdentities(contained(root, p.installed.path), p.package.files);
-    const installation = dirname(dirname(contained(root, p.installed.path)));
+    const installedPath = /^(.+)\/node_modules\/(?:@[^/]+\/)?[^/]+$/.exec(p.installed.path);
+    if (!installedPath) throw Error("Invalid installed package path");
+    const installation = contained(root, installedPath[1]);
     for (const file of ["package.json", "package-lock.json"])
         if (hash(readFileSync(contained(installation, file))) !== p.dependencies.files[file])
             throw Error(`Changed installation ${file}`);

@@ -12,12 +12,12 @@ test("installed declarations reject aliases, inherited configuration and source 
     const root = mkdtempSync(join(tmpdir(), "ngne-resolution-"));
     t.after(() => rmSync(root, { recursive: true, force: true }));
     const app = join(root, "app"),
-        engine = join(root, "node_modules/ngne");
+        engine = join(root, "node_modules/@that-webdev-dude/ngne");
     mkdirSync(app);
     mkdirSync(join(engine, "dist/engine"), { recursive: true });
     writeFileSync(
         join(engine, "package.json"),
-        JSON.stringify({ name: "ngne", types: "dist/engine/index.d.ts" }),
+        JSON.stringify({ name: "@that-webdev-dude/ngne", types: "dist/engine/index.d.ts" }),
     );
     writeFileSync(join(engine, "dist/engine/index.d.ts"), "export {};");
     const config = (value: object) =>
@@ -26,7 +26,7 @@ test("installed declarations reject aliases, inherited configuration and source 
     assert.doesNotThrow(() => verifyDeclarationResolution(app));
     for (const value of [
         { extends: "../../tsconfig.json" },
-        { compilerOptions: { paths: { ngne: ["../../src/index.ts"] } } },
+        { compilerOptions: { paths: { "@that-webdev-dude/ngne": ["../../src/index.ts"] } } },
         { compilerOptions: { baseUrl: "../../" } },
     ]) {
         config(value);

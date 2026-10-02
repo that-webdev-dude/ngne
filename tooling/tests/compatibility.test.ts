@@ -86,7 +86,9 @@ async function preparation(root: string) {
                     writeFileSync(join(run.root, path, name), bytes);
                 return { path, files: identities(join(run.root, path)) };
             };
-            const installed = tree("work/app/node_modules/ngne", { "index.js": "synthetic" });
+            const installed = tree("work/app/node_modules/@that-webdev-dude/ngne", {
+                "index.js": "synthetic",
+            });
             const pkg = tree("evidence/package", { "synthetic.tgz": "synthetic package" });
             const dependencies = tree("work/dependencies", {
                 "package.json": "{}",

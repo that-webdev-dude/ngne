@@ -138,7 +138,7 @@ artifact hashes, and explicit approval. Initial publication uses the maintainerâ
 login and 2FA to publish the verified tarball directly. Trusted publishing is configured
 after the package exists.
 
-The first release is `0.2.0-alpha.0` under `next`. Registry archive identity and
+The first release is `@that-webdev-dude/ngne@0.2.0-alpha.1` under `next`. Registry archive identity and
 exact-version installation are checked before separately authorized consumer adoption.
 Successful evaluation leads to a newly prepared and verified `0.2.0` release under `latest`.
 

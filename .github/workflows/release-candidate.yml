@@ -43,7 +43,7 @@ jobs:
           const tag = process.env.RELEASE_TAG;
           if (sha !== process.env.GITHUB_SHA || git('status', '--porcelain'))
             throw Error('Candidate must use the clean dispatch revision');
-          if (pkg.name !== 'ngne' || pkg.private === true ||
+          if (pkg.name !== '@that-webdev-dude/ngne' || pkg.private === true ||
               lock.version !== pkg.version || lock.packages[''].version !== pkg.version ||
               lock.name !== pkg.name || lock.packages[''].name !== pkg.name ||
               tag !== `v${pkg.version}`)
@@ -107,7 +107,8 @@ jobs:
             throw Error('Preparation must be accepted and match the clean source');
           const pkg = manifest.prepared.package;
           const tarball = path.resolve(path.dirname(manifestPath), '..', pkg.path);
-          if (pkg.filename !== `ngne-${source.version}.tgz` || hash(tarball) !== pkg.sha256)
+          const expectedFilename = `${source.name.replace(/^@/, '').replace('/', '-')}-${source.version}.tgz`;
+          if (pkg.filename !== expectedFilename || hash(tarball) !== pkg.sha256)
             throw Error('Prepared tarball identity mismatch');
           const destination = 'out/release-candidate';
           fs.mkdirSync(destination);

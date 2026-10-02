@@ -1,4 +1,4 @@
-import { BrowserGame, component, f32, type PreparedScene } from "ngne";
+import { BrowserGame, component, f32, type PreparedScene } from "@that-webdev-dude/ngne";
 declare const host: BrowserGame<unknown, never>;
 declare const prepared: PreparedScene;
 // @ts-expect-error Prepared handles expose no mutable engine world.

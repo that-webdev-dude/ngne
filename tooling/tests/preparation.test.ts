@@ -31,7 +31,7 @@ function temporary(t: { after: (fn: () => void) => void }): string {
 }
 const read = (path: string) => JSON.parse(readFileSync(path, "utf8"));
 
-async function prepared(root: string): Promise<Run> {
+async function prepared(root: string, packageName = "@that-webdev-dude/ngne"): Promise<Run> {
     const run = new Run(root, "test");
     await run.execute(() =>
         run.stage("fixture", async () => {
@@ -41,12 +41,16 @@ async function prepared(root: string): Promise<Run> {
                 return { path, files: identities(join(run.root, path)) };
             };
             const installed = tree(
-                "work/installation/node_modules/ngne",
+                `work/installation/node_modules/${packageName}`,
                 "index.js",
                 "export const answer = 42;\n",
             );
             const pkg = tree("evidence/package", "engine.tgz", "controlled package bytes");
-            const workload = tree("work/installation/app", "index.ts", "import 'ngne';");
+            const workload = tree(
+                "work/installation/app",
+                "index.ts",
+                "import '@that-webdev-dude/ngne';",
+            );
             const dependencies = tree(
                 "work/dependencies",
                 "package-lock.json",
@@ -81,6 +85,16 @@ async function prepared(root: string): Promise<Run> {
         }),
     );
     return run;
+}
+
+for (const packageName of ["ngne", "@that-webdev-dude/ngne"]) {
+    test(`prepared ${packageName} checks installation metadata outside node_modules`, async (t) => {
+        const run = await prepared(temporary(t), packageName);
+        const manifest = join(run.evidence, "manifest.json");
+        assert.doesNotThrow(() => verifyPrepared(manifest));
+        writeFileSync(join(run.root, "work/installation/package.json"), '{"changed":true}');
+        assert.throws(() => verifyPrepared(manifest), /Changed installation package.json/);
+    });
 }
 
 test("unique runs retain earlier evidence and reject reused explicit destinations", async (t) => {
@@ -297,7 +311,7 @@ test("disposable copy verifies identities first and never edits prepared builds"
 test("added installation files and removed evidence payloads invalidate handoff", async (t) => {
     const run = await prepared(temporary(t)),
         manifest = join(run.evidence, "manifest.json");
-    const extra = join(run.root, "work/installation/node_modules/ngne/extra.js");
+    const extra = join(run.root, "work/installation/node_modules/@that-webdev-dude/ngne/extra.js");
     writeFileSync(extra, "stale");
     assert.throws(() => verifyPrepared(manifest), /Changed identities/);
     rmSync(extra);

@@ -1,4 +1,4 @@
-import { BrowserGame, imageAsset } from "ngne";
+import { BrowserGame, imageAsset } from "@that-webdev-dude/ngne";
 
 import { createHelloScene } from "./scene.js";
 

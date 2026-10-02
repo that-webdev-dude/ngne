@@ -1,4 +1,4 @@
-import { Camera, Frame, WebGPURenderer, imageAsset } from "ngne";
+import { Camera, Frame, WebGPURenderer, imageAsset } from "@that-webdev-dude/ngne";
 import { stageSize, validate, validateBounds } from "./model.js";
 import { Playback } from "./playback.js";
 import { Inspection } from "./inspection.js";

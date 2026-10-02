@@ -98,7 +98,7 @@ export async function verifyPreview(
                             private: true,
                             type: "module",
                             scripts: { "preview:assets": "ngne-preview ./preview.config.mjs" },
-                            dependencies: { ngne: `file:./${pkg.filename}` },
+                            dependencies: { "@that-webdev-dude/ngne": `file:./${pkg.filename}` },
                         },
                         null,
                         2,
@@ -124,11 +124,17 @@ export async function verifyPreview(
                         ],
                         installation,
                     );
-                verifyIdentities(join(installation, "node_modules/ngne"), pkg.files);
+                verifyIdentities(
+                    join(installation, "node_modules/@that-webdev-dude/ngne"),
+                    pkg.files,
+                );
                 consumerIdentity = previewConsumerIdentity(installation);
                 run.record("install", "observations", {
                     version: JSON.parse(
-                        readFileSync(join(installation, "node_modules/ngne/package.json"), "utf8"),
+                        readFileSync(
+                            join(installation, "node_modules/@that-webdev-dude/ngne/package.json"),
+                            "utf8",
+                        ),
                     ).version,
                     tarballSHA256: pkg.sha256,
                     fixture: fixtureIdentity,
@@ -806,7 +812,7 @@ export async function verifyPreview(
                         `--allow-fs-read=${installation}`,
                         "--import",
                         preload,
-                        "node_modules/ngne/dist/preview/cli.js",
+                        "node_modules/@that-webdev-dude/ngne/dist/preview/cli.js",
                         "preview.config.mjs",
                     ],
                     installation,
@@ -823,7 +829,10 @@ export async function verifyPreview(
             });
             await run.stage("integrity", async () => {
                 verifyPrepared(manifestPath);
-                verifyIdentities(join(installation, "node_modules/ngne"), pkg.files);
+                verifyIdentities(
+                    join(installation, "node_modules/@that-webdev-dude/ngne"),
+                    pkg.files,
+                );
                 verifyIdentities(fixture, fixtureIdentity);
                 verifyPreviewConsumer(installation, consumerIdentity);
                 run.record("integrity", "observations", {

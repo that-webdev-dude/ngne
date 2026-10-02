@@ -1,5 +1,5 @@
 import "./style.css";
-import { audioAsset, imageAsset, BrowserGame, type Stats } from "ngne";
+import { audioAsset, imageAsset, BrowserGame, type Stats } from "@that-webdev-dude/ngne";
 import { arena, overlay, W, H, type Progress, type ProgressCommand, type RunView } from "./game.js";
 import { titleArt } from "./art.js";
 const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;

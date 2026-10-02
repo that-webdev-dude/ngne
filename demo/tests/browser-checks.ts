@@ -1,7 +1,7 @@
 import art from "../assets/starfall.json";
 import { arena, H, W, type Progress, type ProgressCommand } from "../game.js";
-import { BrowserGame, imageAsset } from "ngne";
-import type { Asset, FrameScheduler, ImageAsset, Lease } from "ngne";
+import { BrowserGame, imageAsset } from "@that-webdev-dude/ngne";
+import type { Asset, FrameScheduler, ImageAsset, Lease } from "@that-webdev-dude/ngne";
 
 type Check = (condition: unknown, message: string) => void;
 

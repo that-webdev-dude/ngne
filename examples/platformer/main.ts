@@ -1,4 +1,4 @@
-﻿import { audioAsset, BrowserGame } from "ngne";
+﻿import { audioAsset, BrowserGame } from "@that-webdev-dude/ngne";
 
 import { createOverlay, createProgress, HEIGHT, transition, WIDTH } from "./game.js";
 import type { Progress, ProgressCommand, Run } from "./game.js";

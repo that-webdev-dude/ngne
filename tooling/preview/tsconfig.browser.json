@@ -8,7 +8,7 @@
         "strict": true,
         "rootDir": ".",
         "outDir": "../../dist/preview",
-        "paths": { "ngne": ["../../dist/engine/index.d.ts"] }
+        "paths": { "@that-webdev-dude/ngne": ["../../dist/engine/index.d.ts"] }
     },
     "files": ["browser.ts", "model.ts", "playback.ts"]
 }

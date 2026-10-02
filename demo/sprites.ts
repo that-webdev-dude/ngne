@@ -1,4 +1,4 @@
-import type { Frame } from "ngne";
+import type { Frame } from "@that-webdev-dude/ngne";
 import art from "./assets/starfall.json";
 
 export type SpriteName = keyof typeof art.frames;
