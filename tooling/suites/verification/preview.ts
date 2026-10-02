@@ -7,6 +7,7 @@ import { verifyPrepared } from "../../core/preparation.js";
 import { BrowserSession } from "../../core/browser/session.js";
 import { hash, identities, verifyIdentities } from "../../evidence/identity.js";
 import type { DevTools } from "../../core/browser/devtools.mjs";
+import { previewConsumerIdentity, verifyPreviewConsumer } from "./preview-consumer.js";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 async function until(client: DevTools, expression: string): Promise<void> {
@@ -55,6 +56,7 @@ export async function verifyPreview(
             const installation = join(run.root, "work/consumer");
             const fixture = suppliedFixture ?? join(repository, "tooling/fixtures/preview");
             const fixtureIdentity = identities(fixture);
+            let consumerIdentity: ReturnType<typeof previewConsumerIdentity>;
             await run.stage("install", async () => {
                 mkdirSync(installation, { recursive: true });
                 cpSync(fixture, installation, { recursive: true });
@@ -97,18 +99,20 @@ export async function verifyPreview(
                         installation,
                     );
                 verifyIdentities(join(installation, "node_modules/ngne"), pkg.files);
+                consumerIdentity = previewConsumerIdentity(installation);
                 run.record("install", "observations", {
                     version: JSON.parse(
                         readFileSync(join(installation, "node_modules/ngne/package.json"), "utf8"),
                     ).version,
                     tarballSHA256: pkg.sha256,
                     fixture: fixtureIdentity,
-                    consumer: identities(installation),
+                    consumer: consumerIdentity,
                     npmScript: "npm.cmd run preview:assets",
                 });
                 run.manifest.preparation = "prepared";
             });
             const launch = async (config: string, label: string) => {
+                verifyPreviewConsumer(installation, consumerIdentity);
                 // The installed npm shim runs Node with reads restricted to this independent consumer.
                 // No source checkout, Vite, tsx, adapter transpiler or global renderer is accessible.
                 const executable =
@@ -723,6 +727,7 @@ export async function verifyPreview(
                 await run.stage("visible-diagnostics", async () => {
                     // Invalid consumer inputs leave the installed tool and renderer untouched.
                     writeFileSync(join(installation, "broken.png"), "not an image");
+                    consumerIdentity.files["broken.png"] = hash("not an image");
                     for (const [name, mutation, expected] of [
                         [
                             "image",
@@ -732,10 +737,9 @@ export async function verifyPreview(
                         ["bounds", "config.frames[0].x = 999;", "frame flag"],
                     ]) {
                         const config = `diagnostic-${name}.mjs`;
-                        writeFileSync(
-                            join(installation, config),
-                            `import config from './preview.config.mjs'; ${mutation} export default config;`,
-                        );
+                        const contents = `import config from './preview.config.mjs'; ${mutation} export default config;`;
+                        writeFileSync(join(installation, config), contents);
+                        consumerIdentity.files[config] = hash(contents);
                         const diagnosticUrl = await launch(config, `diagnostic-${name}-host`);
                         await page.send("Page.navigate", { url: diagnosticUrl });
                         await until(
@@ -812,10 +816,12 @@ export async function verifyPreview(
                 verifyPrepared(manifestPath);
                 verifyIdentities(join(installation, "node_modules/ngne"), pkg.files);
                 verifyIdentities(fixture, fixtureIdentity);
+                verifyPreviewConsumer(installation, consumerIdentity);
                 run.record("integrity", "observations", {
                     preparedPackageUnchanged: true,
                     installedPackageUnchanged: true,
                     fixtureUnchanged: true,
+                    consumerAndLauncherUnchanged: true,
                 });
             });
         },
