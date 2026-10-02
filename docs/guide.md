@@ -1,27 +1,41 @@
 # Engine guide
 
-Examples assume a TypeScript browser app with a canvas. Use the runnable [first scene](../examples/hello/index.html) in this checkout, or adapt the imports to your project. NGNE is not published to npm.
+Examples assume a TypeScript browser app with a canvas. The [first scene](https://github.com/that-webdev-dude/ngne/tree/main/examples/hello) provides a complete example. Application setup and game code remain consumer-owned.
+
+## Install from npm
+
+NGNE is not yet published to npm. Once the experimental prerelease is available,
+install its exact version in your application:
+
+```sh
+npm install --save-exact ngne@0.2.0-alpha.0
+```
+
+The planned channel is `next`. Commit your consumer lockfile and upgrade deliberately
+as the experimental API evolves. Use Node 24 or newer (`npm.cmd` in Windows PowerShell).
+For unpublished candidates, use the local-package workflow below.
 
 ## Install a local package
 
-Use Node 24 or newer. From the engine checkout, build before packing:
+From the engine checkout, install locked dependencies and prepare the package:
 
 ```powershell
 npm ci
-npm run build:package
-New-Item -ItemType Directory -Force .test-output/package-smoke
-npm pack --pack-destination .test-output/package-smoke
+npm run prepare:package
 ```
 
-Copy `ngne-0.1.0.tgz` into the separate application's `vendor` directory,
-then run `npm install ./vendor/ngne-0.1.0.tgz` there. Commit the tarball and
-consumer lockfile together; subsequent clean installs use `npm ci`.
-Record `git rev-parse HEAD`, any engine changes, and `Get-FileHash` of the tarball.
+The command prints the exact preparation manifest path. Copy the tarball identified
+by that manifest into the separate application's `vendor` directory and install it
+there with `npm install ./vendor/<actual-tarball-filename>`, replacing the placeholder
+with the emitted filename including `.tgz`. Commit the tarball and consumer lockfile together;
+subsequent clean installs use `npm ci`. Retain the preparation manifest, source revision
+(`git rev-parse HEAD`), any engine changes and the tarball hash (`Get-FileHash`).
+See [package preparation](https://github.com/that-webdev-dude/ngne/blob/main/tooling/README.md#package-preparation)
+for the authoritative commands, output selection and manifest semantics.
 Do not use a workspace link, source alias, or imports from engine `src`.
 
-The sibling [Town/Dungeon consumer](../../ngne-town-dungeon/README.md) demonstrates
-a separately installed package; its README owns consumer commands and fixtures.
-For a Vite application, use TypeScript with `moduleResolution: "Bundler"`, DOM
+Your application owns its commands and fixtures. For either installation method,
+a Vite application should use TypeScript with `moduleResolution: "Bundler"`, DOM
 libraries, `types: []` and `skipLibCheck: false`; consumer declarations need no
 `@webgpu/types`. Set `build.target: "es2022"` for top-level await. Use
 `new URL("../assets/file.png", import.meta.url)` so Vite rewrites asset URLs for
@@ -37,7 +51,7 @@ visible rendering and audible playback separately from successful decoding.
 
 The installed package includes `ngne-preview`, a local development tool using that
 same installation's WebGPU renderer. Node 24+ and a WebGPU-capable desktop browser
-are required. After installing the local tarball above, add this consumer npm script:
+are required. After installing NGNE in your application, add this consumer npm script:
 
 ```json
 { "scripts": { "preview:assets": "ngne-preview ./preview.config.mjs" } }
@@ -223,9 +237,10 @@ try {
 Rectangles and sprites use **center coordinates**. Distances are logical canvas pixels; `dt` is seconds. Composition is fixed when an entity spawns. Schema queries invoke one callback per nonempty 512-row chunk; hoist the inferred typed columns and read `chunk.count` once before the row loop to avoid repeating the borrow check for every row.
 
 Use a secure origin (localhost or HTTPS) and a WebGPU-capable browser with hardware
-acceleration. The supported target is desktop Chromium. Unsupported startup and failed device recovery remain visible
-in the alert above. `BrowserGame` renders only through WebGPU; there is no fallback
-backend.
+acceleration. See the [README's Status and platform support section](../README.md#status-and-platform-support)
+for the documented validation envelope and unverified platforms. Unsupported startup
+and failed device recovery remain visible in the alert above. `BrowserGame` renders
+only through WebGPU; there is no fallback backend.
 
 CSS can resize the canvas on screen. BrowserGame preserves its fixed logical backing
 resolution and converts input through the current bounding rectangle. Stop/resume
@@ -252,7 +267,7 @@ With the WebGPU host, `app.game.prepare(room, { key: "room" })` waits for decodi
 and validated GPU upload, even before the first start. Preparation does not mount or
 tick the room. Reuse the same ImageAsset definition for shared consumers; setup assets
 remain CPU values. The host releases GPU registrations with their scene/candidate.
-The [hello example](../examples/hello/main.ts) combines an image sprite and a solid quad.
+The [hello example](https://github.com/that-webdev-dude/ngne/blob/main/examples/hello/main.ts) combines an image sprite and a solid quad.
 
 ## Browser input
 
@@ -333,10 +348,8 @@ resolution and preparation, and release a completed candidate if that owner has
 departed. Format, URL and graph policies remain consumer-owned; see the
 [referenced-content contract](contracts/browser-and-presentation.md#referenced-consumer-content).
 
-The [Town/Dungeon consumer](../../ngne-town-dungeon/README.md#content-ownership-and-retention)
-demonstrates validated external rooms, shared images, independent actor playback
-and scene-owned music. Its README owns the asset list, retention configuration,
-resource-count table and pause/retry workflow.
+Consumer documentation owns its asset list, retention configuration, resource-count
+table and pause/retry workflow.
 
 `imageAsset(id, url)` and `audioAsset(id, url)` return definitions for shared decoded data. List definitions in a scene's `assets`; setup receives a map of leased values keyed by stable IDs. `game.assets.acquire(definition)` gives a manually managed lease for platform setup. Release it when finished. The browser host uploads every listed image asset during preparation, and sprites refer to it by the same stable authored ID. Generated images use a custom `ImageAsset` loader:
 
@@ -411,7 +424,7 @@ Systems receive `WorldAccess`, not commit or enumeration authority. For headless
 create a `Game`, prepare/start a scene, then call `game.tick()`; the runtime owns world
 commits. Direct `World` construction is internal. Component queries expose `size` and
 `eachChunk`; `query()` with no components performs entity-only traversal.
-[Starfall](../demo/game.ts) and the [platformer](../examples/platformer/game.ts) use schema components.
+[Starfall](https://github.com/that-webdev-dude/ngne/blob/main/demo/game.ts) and the [platformer](https://github.com/that-webdev-dude/ngne/blob/main/examples/platformer/game.ts) use schema components.
 
 For diagnostics, read `game.scenes` and `game.enumerate()` after `game.tick()` returns;
 both return detached read-only data, never live worlds or resources. Use explicitly
@@ -470,7 +483,7 @@ scene.system(() => {
 });
 ```
 
-The [camera coordinate contract](contracts/browser-and-presentation.md#camera-coordinates) defines the origin and mount cut. The [platformer](../examples/platformer/README.md) adds vertical clamping, a horizontal dead-zone, visible-tile rendering and game-owned collision.
+The [camera coordinate contract](contracts/browser-and-presentation.md#camera-coordinates) defines the origin and mount cut. The [platformer](https://github.com/that-webdev-dude/ngne/blob/main/examples/platformer/README.md) adds vertical clamping, a horizontal dead-zone, visible-tile rendering and game-owned collision.
 
 ## Audio example
 
@@ -493,4 +506,4 @@ const room: SceneDefinition = {
 };
 ```
 
-The browser host flushes requests after simulation commit. Disposing the scene removes its queued and active voices before its asset leases release. Cleanup failures are aggregated and leave the scope terminal. For complete consumers, read [Starfall](../demo/game.ts), its [browser entry](../demo/main.ts), and the [platformer](../examples/platformer/README.md).
+The browser host flushes requests after simulation commit. Disposing the scene removes its queued and active voices before its asset leases release. Cleanup failures are aggregated and leave the scope terminal. For complete consumers, read [Starfall](https://github.com/that-webdev-dude/ngne/blob/main/demo/game.ts), its [browser entry](https://github.com/that-webdev-dude/ngne/blob/main/demo/main.ts), and the [platformer](https://github.com/that-webdev-dude/ngne/blob/main/examples/platformer/README.md).

@@ -121,6 +121,32 @@ Failure logs and available payloads remain in the run. An evidence-only archive
 excludes the working installation and cannot resume preparation. Package preparation
 does not establish browser, compatibility or performance acceptance.
 
+## Release candidates and publication
+
+The manually dispatched [release-candidate workflow](../.github/workflows/release-candidate.yml)
+prepares one package from a selected committed revision and verifies the engine and
+previewer against the same manifest. The intended release tag matches the package
+version. The workflow creates neither tags nor publications.
+
+A successful workflow retains the unchanged tarball, manifest, source identity,
+checksums and verification evidence for review. Failure diagnostics do not establish
+acceptance. Downloaded evidence does not recreate the full prepared workspace.
+
+Publication requires reviewed package contents and installed examples, confirmed
+account permissions and version availability, matching source/tag identity, unchanged
+artifact hashes, and explicit approval. Initial publication uses the maintainer’s npm
+login and 2FA to publish the verified tarball directly. Trusted publishing is configured
+after the package exists.
+
+The first release is `0.2.0-alpha.0` under `next`. Registry archive identity and
+exact-version installation are checked before separately authorized consumer adoption.
+Successful evaluation leads to a newly prepared and verified `0.2.0` release under `latest`.
+
+Failed verification blocks publication. An uncertain publication outcome requires
+checking the exact registry version before retrying. Corrections use a new version;
+deprecation and tag changes require authorization. Existing releases and evidence
+are preserved.
+
 ## Consumer evidence
 
 The [consumer command validator](evidence/consumer-contract-v1.ts)

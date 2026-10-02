@@ -1,0 +1,154 @@
+name: Prepare release candidate
+
+# Initial publication is manual after artifact review and explicit approval.
+# This workflow creates neither a Git tag nor an npm release.
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Intended v<package version> tag (not created by this workflow)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_TAG: ${{ inputs.release_tag }}
+      PREPARATION_MANIFEST: out/runs/release-package/evidence/manifest.json
+      NGNE_BROWSER_HEADLESS: "0"
+      NGNE_WEBGPU_ADAPTER: swiftshader
+      NGNE_BROWSER_ARTIFACT_DIR: .test-output/release-browser
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Bind source, package and intended tag
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const { execFileSync, spawnSync } = require('node:child_process');
+          const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim();
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const lock = JSON.parse(fs.readFileSync('package-lock.json', 'utf8'));
+          const sha = git('rev-parse', 'HEAD');
+          const tag = process.env.RELEASE_TAG;
+          if (sha !== process.env.GITHUB_SHA || git('status', '--porcelain'))
+            throw Error('Candidate must use the clean dispatch revision');
+          if (pkg.name !== 'ngne' || pkg.private === true ||
+              lock.version !== pkg.version || lock.packages[''].version !== pkg.version ||
+              lock.name !== pkg.name || lock.packages[''].name !== pkg.name ||
+              tag !== `v${pkg.version}`)
+            throw Error('Package, lockfile and intended release tag must agree');
+          if (pkg.publishConfig?.registry !== 'https://registry.npmjs.org/' ||
+              pkg.publishConfig?.access !== 'public' ||
+              pkg.publishConfig?.tag !== (pkg.version.includes('-') ? 'next' : 'latest'))
+            throw Error('Unexpected registry, access or distribution tag');
+          const exists = spawnSync('git', ['show-ref', '--verify', '--quiet', `refs/tags/${tag}`]);
+          if (![0, 1].includes(exists.status)) throw Error('Cannot inspect intended tag');
+          if (exists.status === 0 && git('rev-parse', `refs/tags/${tag}^{commit}`) !== sha)
+            throw Error('Existing release tag points to another commit');
+          fs.mkdirSync('out', { recursive: true });
+          fs.writeFileSync('out/release-source.json', JSON.stringify({
+            name: pkg.name, version: pkg.version, publishConfig: pkg.publishConfig,
+            sourceSHA: sha, intendedTag: tag,
+            tagStatus: exists.status === 0 ? 'matches-source' : 'not-created',
+            workflowRun: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
+            runAttempt: process.env.GITHUB_RUN_ATTEMPT,
+          }, null, 2) + '\n');
+          NODE
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm test
+      - run: npm run typecheck:tooling
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm run build:browser
+      - name: Prepare package once
+        run: npm run prepare:package -- --output out/runs/release-package
+      - name: Validate exact preparation
+        run: npm run check:prepared -- --manifest "$PREPARATION_MANIFEST"
+      - name: Install software WebGPU presentation dependencies
+        run: sudo apt-get update && sudo apt-get install -y libvulkan1 mesa-vulkan-drivers xvfb xauth
+      - name: Verify browser transport
+        run: xvfb-run -a npm run check:browser-transport
+      - name: Verify installed engine at root and nested bases
+        run: xvfb-run -a npm run verify:installed -- --manifest "$PREPARATION_MANIFEST"
+      - name: Verify packaged previewer
+        run: xvfb-run -a npm run verify:preview -- --manifest "$PREPARATION_MANIFEST"
+      - name: Verify browser integration
+        run: xvfb-run -a npm run test:browser
+      - name: Recheck preparation integrity after verification
+        run: npm run check:prepared -- --manifest "$PREPARATION_MANIFEST"
+      - name: Assemble immutable candidate for review
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const { createHash } = require('node:crypto');
+          const { execFileSync } = require('node:child_process');
+          const hash = file => createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+          const source = JSON.parse(fs.readFileSync('out/release-source.json', 'utf8'));
+          const manifestPath = path.resolve(process.env.PREPARATION_MANIFEST);
+          const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+          const result = JSON.parse(fs.readFileSync(path.join(path.dirname(manifestPath), 'result.json'), 'utf8'));
+          if (result.accepted !== true || manifest.provenance.revision !== source.sourceSHA ||
+              manifest.provenance.changes.trim() ||
+              execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim() !== source.sourceSHA ||
+              execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim())
+            throw Error('Preparation must be accepted and match the clean source');
+          const pkg = manifest.prepared.package;
+          const tarball = path.resolve(path.dirname(manifestPath), '..', pkg.path);
+          if (pkg.filename !== `ngne-${source.version}.tgz` || hash(tarball) !== pkg.sha256)
+            throw Error('Prepared tarball identity mismatch');
+          const destination = 'out/release-candidate';
+          fs.mkdirSync(destination);
+          fs.copyFileSync(tarball, path.join(destination, pkg.filename));
+          fs.copyFileSync(manifestPath, path.join(destination, 'manifest.json'));
+          const identity = {
+            ...source, verification: 'workflow-checks-passed', publicationApproved: false,
+            preparationRunId: manifest.runId, tarball: pkg.filename, tarballSHA256: pkg.sha256,
+            manifestSHA256: hash(manifestPath),
+            evidenceArtifact: `release-diagnostics-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}`,
+            limits: 'Automated Linux/SwiftShader evidence. Review and final publication approval required. Evidence archive is not a resumable prepared workspace.',
+          };
+          fs.writeFileSync(path.join(destination, 'candidate.json'), JSON.stringify(identity, null, 2) + '\n');
+          const sums = [pkg.filename, 'manifest.json', 'candidate.json']
+            .map(file => `${hash(path.join(destination, file))}  ${file}`).join('\n') + '\n';
+          fs.writeFileSync(path.join(destination, 'SHA256SUMS'), sums);
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+            `Candidate ${source.name}@${source.version}, source ${source.sourceSHA}, intended tag ${source.intendedTag} (${source.tagStatus}).\n\n` +
+            `Tarball SHA-256: ${pkg.sha256}\n\n` +
+            'Review only: require a successful whole job, inspect evidence/contents and recheck hashes and tag before explicit publication approval. Publish the downloaded .tgz without rebuilding or repacking. No publication occurred.\n');
+          NODE
+      - name: Retain diagnostic evidence (not publication approval)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            out/release-source.json
+            out/runs/**/evidence/**
+            .test-output/release-browser/**
+            !**/node_modules/**
+            !**/.npm-cache/**
+            !**/work/**
+            !**/profile/**
+            !**/*.tgz
+          include-hidden-files: true
+          if-no-files-found: warn
+      - name: Upload candidate only after all checks pass
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-candidate-${{ github.run_id }}-${{ github.run_attempt }}
+          path: out/release-candidate/
+          if-no-files-found: error
