@@ -10,6 +10,32 @@ import type { DevTools } from "../../core/browser/devtools.mjs";
 import { previewConsumerIdentity, verifyPreviewConsumer } from "./preview-consumer.js";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export function previewBrowserFlags(
+    headless = process.env.NGNE_BROWSER_HEADLESS,
+    platform = process.platform,
+): string[] {
+    const flags = [
+        "--no-first-run",
+        "--disable-default-apps",
+        "--window-size=1100,850",
+        "--force-device-scale-factor=1",
+        "--use-webgpu-adapter=swiftshader",
+        "--enable-unsafe-webgpu",
+        "--enable-unsafe-swiftshader",
+    ];
+    if (headless !== "0") flags.push("--headless=new");
+    if (platform === "linux")
+        flags.push(
+            "--no-sandbox",
+            "--enable-features=Vulkan",
+            "--use-angle=vulkan",
+            "--use-vulkan=swiftshader",
+            "--disable-vulkan-surface",
+        );
+    return flags;
+}
+
 async function until(client: DevTools, expression: string): Promise<void> {
     const end = Date.now() + 20000;
     while (!(await client.evaluate<boolean>(expression))) {
@@ -173,24 +199,7 @@ export async function verifyPreview(
                     modules: served,
                 });
             });
-            const flags = [
-                "--headless=new",
-                "--no-first-run",
-                "--disable-default-apps",
-                "--window-size=1100,850",
-                "--force-device-scale-factor=1",
-                "--use-webgpu-adapter=swiftshader",
-                "--enable-unsafe-webgpu",
-                "--enable-unsafe-swiftshader",
-            ];
-            if (process.platform === "linux")
-                flags.push(
-                    "--no-sandbox",
-                    "--enable-features=Vulkan",
-                    "--use-angle=vulkan",
-                    "--use-vulkan=swiftshader",
-                    "--disable-vulkan-surface",
-                );
+            const flags = previewBrowserFlags();
             await run.stage("browser", async () => {
                 client = await session.start({
                     flags,

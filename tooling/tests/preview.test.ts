@@ -8,6 +8,36 @@ import { validate, validateBounds, stageSize } from "../preview/model.js";
 import { Playback } from "../preview/playback.js";
 import { Inspection } from "../preview/inspection.js";
 import { loadAdapter, startPreview } from "../preview/host.js";
+import { previewBrowserFlags } from "../suites/verification/preview.js";
+
+test("preview respects the headed override without changing rendering flags", (t) => {
+    for (const platform of ["linux", "win32"] as const) {
+        const headed = previewBrowserFlags("0", platform);
+        assert.ok(!headed.some((flag) => flag.startsWith("--headless")));
+        assert.ok(headed.includes("--use-webgpu-adapter=swiftshader"));
+        assert.ok(headed.includes("--window-size=1100,850"));
+        assert.equal(headed.includes("--use-vulkan=swiftshader"), platform === "linux");
+        for (const value of ["1", "", "false"]) {
+            const headless = previewBrowserFlags(value, platform);
+            assert.ok(headless.includes("--headless=new"));
+            assert.deepEqual(
+                headless.filter((flag) => flag !== "--headless=new"),
+                headed,
+            );
+        }
+    }
+    const original = process.env.NGNE_BROWSER_HEADLESS;
+    t.after(() => {
+        if (original === undefined) delete process.env.NGNE_BROWSER_HEADLESS;
+        else process.env.NGNE_BROWSER_HEADLESS = original;
+    });
+    delete process.env.NGNE_BROWSER_HEADLESS;
+    assert.ok(previewBrowserFlags().includes("--headless=new"));
+    process.env.NGNE_BROWSER_HEADLESS = "0";
+    assert.ok(!previewBrowserFlags().includes("--headless=new"));
+    process.env.NGNE_BROWSER_HEADLESS = "1";
+    assert.ok(previewBrowserFlags().includes("--headless=new"));
+});
 
 function input() {
     return {
