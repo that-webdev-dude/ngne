@@ -4,14 +4,13 @@ Examples assume a TypeScript browser app with a canvas. The [first scene](https:
 
 ## Install from npm
 
-NGNE is not yet published to npm. Once the experimental prerelease is available,
-install its exact version in your application:
+For registry installation, pin the exact experimental version in your application:
 
 ```sh
 npm install --save-exact ngne@0.2.0-alpha.0
 ```
 
-The planned channel is `next`. Commit your consumer lockfile and upgrade deliberately
+The experimental release channel is `next`. Commit your consumer lockfile and upgrade deliberately
 as the experimental API evolves. Use Node 24 or newer (`npm.cmd` in Windows PowerShell).
 For unpublished candidates, use the local-package workflow below.
 

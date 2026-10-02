@@ -2,9 +2,9 @@
 
 A TypeScript engine for retro 2D games, with WebGPU rendering and zero runtime dependencies.
 
-> **Publication pending.** NGNE is not yet published to npm.
-> Installation below describes the planned `0.2.0-alpha.0` prerelease; it is not
-> available yet, and no release candidate has been certified.
+> **Experimental release.** NGNE is an early-stage engine for retro 2D games.
+> APIs may change between releases. Pin an exact version and review changes before
+> upgrading.
 
 [Play Starfall '89](https://that-webdev-dude.github.io/ngne/) · [Engine guide](https://github.com/that-webdev-dude/ngne/blob/main/docs/guide.md) · [First scene](https://github.com/that-webdev-dude/ngne/tree/main/examples/hello)
 
@@ -23,14 +23,13 @@ setup, assets and game logic, including movement, collision and progression.
 
 ## Install
 
-**After the prerelease is published**, install its exact version in your TypeScript
-browser application:
+For registry installation, pin the exact experimental version in your application:
 
 ```sh
 npm install --save-exact ngne@0.2.0-alpha.0
 ```
 
-The planned prerelease channel is `next`. Pin the version and commit your lockfile;
+The experimental release channel is `next`. Pin the version and commit your lockfile;
 upgrade deliberately as the experimental API evolves. Use Node.js 24 or newer for
 package tooling (`npm.cmd` in Windows PowerShell).
 
