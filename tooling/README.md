@@ -53,8 +53,8 @@ npm run prepare:package -- --output out/runs/my-check
 npm run check:prepared -- --manifest out/runs/my-check/evidence/manifest.json
 ```
 
-`build:package` cleans only `dist/engine` before compiling the library. It rejects
-linked emission directories and preserves the showcase and other outputs. Do not
+`build:package` cleans only `dist/engine` and `dist/preview` before compiling the
+library and preview tool. It rejects linked emission directories and preserves other outputs. Do not
 run competing builds against the same checkout concurrently.
 
 `prepare:package` builds the current package and uses the actual filename returned
@@ -244,6 +244,27 @@ rebuilding diagnostics), and the referenced preparation. Passing synthetic tests
 alone does not close a real adoption gap. Engine-only verification remains independent.
 
 ## Installed engine verification
+
+### Sprite inspection
+
+The installed `ngne-preview` command and adapter format are documented in the
+[engine guide](../docs/guide.md#sprite-and-animation-inspection). Its source lives
+in `preview/`; fixtures and regression tests live in `fixtures/preview/` and
+`tests/preview.test.ts`. No consumer checkout is required by ordinary tests.
+
+After package preparation, run
+`npm run verify:preview -- --manifest <exact evidence/manifest.json>`.
+This uses the shared run, integrity and process/browser owners with a fresh isolated
+installation and headless Chrome/SwiftShader. It checks installed engine bytes,
+stepping, bounded viewport/panning and zoom-center retention, CSS magnification
+(including lost-detail pixel comparisons), playback,
+diagnostics and cleanup. `--fixture <isolated-input-directory>` selects an external
+snapshot containing `preview.config.mjs` and its local images/metadata; the runner
+copies it into a fresh installation. External fixtures must provide an animation
+with multiple entries for playback verification. Art and motion approval requires
+separate human observations; software browser checks do not establish device appearance.
+
+### Engine lifecycle
 
 `npm run verify:installed` prepares the current package, then runs the engine-owned
 fixture at `/` and `/nested/`. It requires Chrome (`NGNE_BROWSER` or `CHROME_BIN`

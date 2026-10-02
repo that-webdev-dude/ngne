@@ -1,0 +1,66 @@
+export default {
+    images: [{ id: "prism", src: new URL("./prism.png", import.meta.url) }],
+    frames: [
+        {
+            id: "flag",
+            image: "prism",
+            x: 3,
+            y: 5,
+            width: 9,
+            height: 7,
+            destinationWidth: 18,
+            destinationHeight: 14,
+        },
+        {
+            id: "kite",
+            image: "prism",
+            x: 19,
+            y: 2,
+            width: 5,
+            height: 11,
+            destinationWidth: 10,
+            destinationHeight: 22,
+        },
+        {
+            id: "badge",
+            image: "prism",
+            x: 28,
+            y: 17,
+            width: 7,
+            height: 3,
+            destinationWidth: 14,
+            destinationHeight: 6,
+        },
+        {
+            id: "detail-loss",
+            image: "prism",
+            x: 0,
+            y: 24,
+            width: 8,
+            height: 4,
+            destinationWidth: 4,
+            destinationHeight: 2,
+        },
+    ],
+    animations: [
+        {
+            id: "signal-loop",
+            playback: "loop",
+            entries: [
+                { frame: "flag", ms: 80 },
+                { frame: "kite", ms: 120 },
+                { frame: "flag", ms: 200 },
+            ],
+        },
+        {
+            id: "signal-once",
+            playback: "once",
+            entries: [
+                { frame: "flag", ms: 80 },
+                { frame: "kite", ms: 120 },
+                { frame: "flag", ms: 200 },
+            ],
+        },
+    ],
+    display: { density: 1, scale: 2, pixelSnap: true },
+};

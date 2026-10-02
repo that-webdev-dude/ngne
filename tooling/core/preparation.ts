@@ -22,7 +22,12 @@ export async function prepare(repository: string, output?: string): Promise<Run>
                 changes: git(["status", "--porcelain"]),
             };
             run.manifest.harness = Object.fromEntries([
-                ...["tooling/core", "tooling/evidence", "tooling/commands"].flatMap((directory) =>
+                ...[
+                    "tooling/core",
+                    "tooling/evidence",
+                    "tooling/commands",
+                    "tooling/preview",
+                ].flatMap((directory) =>
                     Object.entries(identities(join(root, directory))).map(([path, digest]) => [
                         `${directory}/${path}`,
                         digest,

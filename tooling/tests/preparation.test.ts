@@ -101,11 +101,16 @@ test("emission cleaning removes stale engine files while preserving showcase and
     const root = temporary(t);
     mkdirSync(join(root, "dist/engine"), { recursive: true });
     writeFileSync(join(root, "dist/engine/stale.js"), "stale");
+    mkdirSync(join(root, "dist/preview"));
+    writeFileSync(join(root, "dist/preview/stale.js"), "stale");
     writeFileSync(join(root, "dist/index.html"), "showcase");
     mkdirSync(join(root, "out"));
     writeFileSync(join(root, "out/keep"), "user");
     cleanEmission(root);
     assert.equal(existsSync(join(root, "dist/engine")), false);
+    assert.equal(existsSync(join(root, "dist/preview/stale.js")), true);
+    cleanEmission(root, "preview");
+    assert.equal(existsSync(join(root, "dist/preview")), false);
     assert.equal(readFileSync(join(root, "dist/index.html"), "utf8"), "showcase");
     assert.equal(readFileSync(join(root, "out/keep"), "utf8"), "user");
 });

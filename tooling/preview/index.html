@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>NGNE sprite inspection</title>
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                font: 14px system-ui;
+                margin: 0;
+                padding: 16px;
+                height: 100dvh;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                background: #eee;
+                color: #111;
+                overflow: hidden;
+            }
+            header {
+                flex: 0 1 auto;
+                min-height: 0;
+                overflow: auto;
+            }
+            h1 {
+                font-size: 20px;
+                margin: 0 0 8px;
+            }
+            p {
+                margin: 6px 0;
+                overflow-wrap: anywhere;
+            }
+            fieldset {
+                min-width: 0;
+                margin: 0;
+            }
+            .toolbar {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 8px 16px;
+            }
+            label {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 6px;
+                min-width: 0;
+                max-width: 100%;
+            }
+            select {
+                min-width: 0;
+                max-width: 100%;
+            }
+            button,
+            select {
+                font: inherit;
+                padding: 5px;
+            }
+            .buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            canvas {
+                position: absolute;
+                display: block;
+                image-rendering: pixelated;
+                max-width: none;
+            }
+            #stage {
+                position: relative;
+                flex: 1 0 96px;
+                min-height: 96px;
+                overflow: clip;
+                contain: size layout paint;
+                background: #30343b;
+                border: 1px solid #777;
+                cursor: grab;
+                touch-action: none;
+                user-select: none;
+            }
+            #stage:focus-visible {
+                outline: 3px solid #1665c1;
+                outline-offset: -3px;
+            }
+            #stage.dragging {
+                cursor: grabbing;
+            }
+            #error {
+                color: #9c1420;
+                white-space: pre-wrap;
+            }
+            #error:empty {
+                display: none;
+            }
+            details {
+                flex: 0 1 auto;
+                min-height: 24px;
+                max-height: 30vh;
+                overflow: auto;
+            }
+            summary {
+                cursor: pointer;
+            }
+            pre {
+                white-space: pre-wrap;
+                overflow-wrap: anywhere;
+            }
+        </style>
+        <script type="importmap">
+            { "imports": { "ngne": "/engine/index.js" } }
+        </script>
+        <script type="module" src="/browser.js"></script>
+    </head>
+    <body>
+        <header>
+            <h1>Sprite inspection</h1>
+            <p id="status" role="status">Loading adapter and images…</p>
+            <p id="error" role="alert"></p>
+            <fieldset id="controls" disabled>
+                <legend>Selection and playback</legend>
+                <div class="toolbar">
+                    <label
+                        >Frame
+                        <select id="frames"></select
+                    ></label>
+                    <label
+                        >Animation
+                        <select id="animations"></select
+                    ></label>
+                    <div class="buttons">
+                        <button id="play" type="button" disabled>Play</button>
+                        <button id="previous" type="button" disabled>Previous</button>
+                        <button id="next" type="button" disabled>Next</button>
+                    </div>
+                    <label
+                        >Inspection magnification
+                        <select id="magnification">
+                            <option value="1">1× (baseline)</option>
+                            <option value="2">2×</option>
+                            <option value="4">4×</option>
+                            <option value="8">8×</option>
+                        </select>
+                    </label>
+                    <button id="baseline" type="button">Baseline (1×)</button>
+                </div>
+            </fieldset>
+            <p id="entry"></p>
+            <p id="pan-help">
+                Drag to pan · wheel to pan (Shift: sideways) · focus viewport and use arrow keys
+                (Shift: faster). Zoom keeps the inspected center; Baseline restores 1× and center.
+            </p>
+        </header>
+        <div
+            id="stage"
+            tabindex="0"
+            role="region"
+            aria-label="Sprite inspection viewport"
+            aria-describedby="pan-help"
+        >
+            <canvas id="canvas" aria-label="Sprite preview"></canvas>
+        </div>
+        <details>
+            <summary>Rendering details · magnifies rendered pixels</summary>
+            <p>Set browser zoom to 100% for review; DPR cannot identify browser zoom.</p>
+            <pre id="details"></pre>
+        </details>
+    </body>
+</html>

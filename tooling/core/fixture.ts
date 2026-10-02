@@ -108,6 +108,8 @@ export default { build: { emptyOutDir: false, assetsInlineLimit: 0 }, plugins: [
     name: 'installed-boundary',
     moduleParsed(info) {
         const id = info.id.replaceAll('\\\\', '/');
+        if (id.includes('/dist/preview/') || id.startsWith('node:'))
+            throw Error('Preview or Node module in runtime graph: ' + id);
         if (!id.startsWith('\\0') && !id.startsWith(app) && !id.startsWith(installed))
             throw Error('Module outside installed fixture: ' + id);
     }

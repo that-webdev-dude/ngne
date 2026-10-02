@@ -5,6 +5,7 @@
     "private": true,
     "files": [
         "dist/engine",
+        "dist/preview",
         "docs/guide.md",
         "docs/contracts"
     ],
@@ -25,11 +26,12 @@
         "bench:content": "tsx tooling/commands/benchmark.ts",
         "bench:engine-content": "tsx tooling/commands/benchmark.ts",
         "test:installed": "tsx tooling/commands/verify.ts",
-        "typecheck:tooling": "tsc -p tooling/tsconfig.node.json && tsc -p tooling/tsconfig.benchmarks.json",
+        "typecheck:tooling": "tsc -p tooling/tsconfig.node.json && tsc -p tooling/tsconfig.benchmarks.json && tsc -p tooling/preview/tsconfig.node.json --noEmit && tsc -p tooling/preview/tsconfig.check.json",
         "build:package": "tsx tooling/commands/prepare.ts build",
         "prepare:package": "tsx tooling/commands/prepare.ts prepare",
         "check:prepared": "tsx tooling/commands/prepare.ts verify",
         "verify:installed": "tsx tooling/commands/verify.ts",
+        "verify:preview": "tsx tooling/commands/verify-preview.ts",
         "check:browser-transport": "tsx tooling/commands/check-browser-transport.ts",
         "verify:compatibility": "tsx tooling/commands/compatibility.ts",
         "verify:engine": "tsx tooling/commands/verify-engine.ts"
@@ -39,6 +41,9 @@
             "types": "./dist/engine/index.d.ts",
             "import": "./dist/engine/index.js"
         }
+    },
+    "bin": {
+        "ngne-preview": "dist/preview/cli.js"
     },
     "devDependencies": {
         "@types/node": "24.13.6",
