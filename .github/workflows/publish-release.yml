@@ -1,0 +1,112 @@
+name: Publish reviewed release candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_run_id:
+        description: Successful release-candidate run ID (dispatch publication at the same SHA)
+        required: true
+        type: string
+      candidate_run_attempt:
+        description: Latest candidate attempt (must have succeeded)
+        required: true
+        type: string
+
+permissions: {}
+
+# ponytail: serialize releases, including channel updates; no per-version lock needed.
+concurrency:
+  group: npm-publication
+  cancel-in-progress: false
+
+env:
+  CANDIDATE_RUN_ID: ${{ inputs.candidate_run_id }}
+  CANDIDATE_RUN_ATTEMPT: ${{ inputs.candidate_run_attempt }}
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      artifact_id: ${{ steps.select.outputs.artifact_id }}
+      artifact_digest: ${{ steps.select.outputs.artifact_digest }}
+      candidate_hash: ${{ steps.review.outputs.candidate_hash }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci --ignore-scripts
+      - name: Select successful candidate and require approval protection
+        id: select
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node node_modules/tsx/dist/cli.mjs tooling/commands/publish.ts select
+      - name: Download exact artifact and enforce GitHub archive digest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node node_modules/tsx/dist/cli.mjs tooling/commands/publish.ts download
+      - name: Validate retained bytes and summarize for approval
+        id: review
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node node_modules/tsx/dist/cli.mjs tooling/commands/publish.ts review
+      - uses: actions/upload-artifact@v4
+        with:
+          name: publication-review-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            out/publication/selection.json
+            out/publication/review.md
+          if-no-files-found: error
+
+  publish:
+    needs: review
+    runs-on: ubuntu-latest
+    environment: npm-publication
+    permissions:
+      contents: write
+      actions: read
+      id-token: write
+    env:
+      REVIEWED_ARTIFACT_ID: ${{ needs.review.outputs.artifact_id }}
+      REVIEWED_ARTIFACT_DIGEST: ${{ needs.review.outputs.artifact_digest }}
+      REVIEWED_CANDIDATE_HASH: ${{ needs.review.outputs.candidate_hash }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci --ignore-scripts
+      - name: Revalidate candidate selection after approval
+        id: select
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node node_modules/tsx/dist/cli.mjs tooling/commands/publish.ts select
+      - name: Download reviewed artifact and enforce GitHub archive digest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node node_modules/tsx/dist/cli.mjs tooling/commands/publish.ts download
+      - name: Create matching annotated tag, publish unchanged tarball with OIDC, verify registry
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node node_modules/tsx/dist/cli.mjs tooling/commands/publish.ts publish
+      - name: Retain publication result and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publication-result-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            out/publication/*.json
+            out/publication/*.log
+            out/publication/registry.tgz
+            out/publication/smoke/package.json
+            out/publication/smoke/package-lock.json
+          if-no-files-found: warn

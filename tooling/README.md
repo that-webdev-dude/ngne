@@ -123,29 +123,44 @@ does not establish browser, compatibility or performance acceptance.
 
 ## Release candidates and publication
 
-The manually dispatched [release-candidate workflow](../.github/workflows/release-candidate.yml)
-prepares one package from a selected committed revision and verifies the engine and
-previewer against the same manifest. The intended release tag matches the package
-version. The workflow creates neither tags nor publications.
+The manually dispatched [candidate workflow](../.github/workflows/release-candidate.yml)
+prepares and verifies one package at a committed revision. It retains the unchanged
+tarball, manifest, source identity, checksums and diagnostics. It creates no tag or
+publication. Failed diagnostics do not establish acceptance; an evidence archive
+does not recreate the full prepared workspace.
 
-A successful workflow retains the unchanged tarball, manifest, source identity,
-checksums and verification evidence for review. Failure diagnostics do not establish
-acceptance. Downloaded evidence does not recreate the full prepared workspace.
+The [publication workflow](../.github/workflows/publish-release.yml) selects a
+candidate run ID and its latest attempt, which must have succeeded. Dispatch it on `main` while
+the dispatch SHA equals the candidate SHA. Checking out another commit cannot
+correct npm provenance, which records the publishing run's SHA. A new candidate
+is needed when the publication dispatch would use a different SHA.
 
-Publication requires reviewed package contents and installed examples, confirmed
-account permissions and version availability, matching source/tag identity, unchanged
-artifact hashes, and explicit approval. Initial publication uses the maintainer’s npm
-login and 2FA to publish the verified tarball directly. Trusted publishing is configured
-after the package exists.
+Review the summary, candidate contents and retained verification evidence, then
+explicitly approve the `npm-publication` environment. The workflow fails unless
+required reviewers are configured and environment protection bypass is disabled.
+After approval it rechecks the reviewed artifact and metadata, creates an annotated
+remote `v<version>` tag if absent, and publishes the retained tarball using OIDC.
+An existing matching tag is accepted; conflicting tags are never overwritten.
+Prereleases use `next`; normal releases use `latest`.
 
-The first release is `@that-webdev-dude/ngne@0.2.0-alpha.1` under `next`. Registry archive identity and
-exact-version installation are checked before separately authorized consumer adoption.
-Successful evaluation leads to a newly prepared and verified `0.2.0` release under `latest`.
+The package already exists following the manual alpha publication. Configure npm's
+GitHub trusted publisher for owner `that-webdev-dude`, repository `ngne`, workflow
+`publish-release.yml`, environment `npm-publication`, with direct publishing allowed.
+Publication uses a GitHub-hosted runner and npm 11.5.1 or newer, without an npm token.
 
-Failed verification blocks publication. An uncertain publication outcome requires
-checking the exact registry version before retrying. Corrections use a new version;
-deprecation and tag changes require authorization. Existing releases and evidence
-are preserved.
+Registry errors block publication. Each approved attempt publishes at most once;
+uncertain outcomes are reconciled through registry reads. Reruns inspect the exact
+version before uploading. Existing versions must match the retained bytes, channel
+and signed provenance; otherwise use a new version or separately approve correction.
+A tag may remain after a failed upload; retries accept its matching commit.
+A rejected environment approval requires a fresh dispatch; reruns of that run fail.
+
+Success requires registry archive identity, the intended distribution tag, signed
+provenance matching the candidate source and publication workflow, and a fresh
+exact-version install/import/signature check. Review and publication artifacts are
+retained as `publication-review-<run>-<attempt>` and `publication-result-<run>-<attempt>`.
+Local tests and configuration review do not prove hosted publication. The first
+approved real publication must pass these checks. Consumer adoption remains separate.
 
 ## Consumer evidence
 

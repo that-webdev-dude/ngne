@@ -91,6 +91,20 @@ This checks identities, hashes, installed files and fixture builds without rebui
 
 Keep the complete preparation directory, including `work/`, and use the same Node version when reusing it. The manifest alone is insufficient. Prepare again after engine changes to test a new package.
 
+### Approved publication
+
+In GitHub Actions, select a successful `Prepare release candidate` run and its
+latest attempt. Run `Publish reviewed release candidate` on `main` at the same SHA,
+entering that run ID and attempt. Review the resulting summary, package contents
+and candidate evidence, then approve `npm-publication` to authorize the release tag
+and npm publication. No local package paths, hashes or publish commands are needed.
+
+Read `publication-result-<run>-<attempt>` for registry/provenance/install results.
+An uncertain upload requires registry reconciliation before another upload; reruns
+perform that check automatically. Do not overwrite tags, republish existing versions,
+or change distribution tags to bypass a failure. Setup, retry rules and evidence
+limits are in [the publication reference](README.md#release-candidates-and-publication).
+
 ## Stage 3: Browser verification
 
 Builds and Node tests cannot establish browser behavior. Browser checks exercise rendering, asset loading and engine lifecycle behavior in Chrome.
