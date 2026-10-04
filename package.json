@@ -1,6 +1,6 @@
 {
     "name": "@that-webdev-dude/ngne",
-    "version": "0.2.0-alpha.1",
+    "version": "0.2.0",
     "type": "module",
     "files": [
         "dist/engine",
@@ -64,6 +64,6 @@
     "publishConfig": {
         "registry": "https://registry.npmjs.org/",
         "access": "public",
-        "tag": "next"
+        "tag": "latest"
     }
 }

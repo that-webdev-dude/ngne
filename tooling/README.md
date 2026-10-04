@@ -142,6 +142,7 @@ After approval it rechecks the reviewed artifact and metadata, creates an annota
 remote `v<version>` tag if absent, and publishes the retained tarball using OIDC.
 An existing matching tag is accepted; conflicting tags are never overwritten.
 Prereleases use `next`; normal releases use `latest`.
+Normal `0.x` releases remain pre-1.0 and make no permanent API-stability commitment.
 
 The package already exists following the manual alpha publication. Configure npm's
 GitHub trusted publisher for owner `that-webdev-dude`, repository `ngne`, workflow

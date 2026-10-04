@@ -23,15 +23,15 @@ setup, assets and game logic, including movement, collision and progression.
 
 ## Install
 
-For registry installation, pin the exact experimental version in your application:
+For registry installation, pin an exact version in your application:
 
 ```sh
-npm install --save-exact @that-webdev-dude/ngne@0.2.0-alpha.1
+npm install --save-exact @that-webdev-dude/ngne@0.2.0
 ```
 
-The experimental release channel is `next`. Pin the version and commit your lockfile;
-upgrade deliberately as the experimental API evolves. Use Node.js 24 or newer for
-package tooling (`npm.cmd` in Windows PowerShell).
+Normal releases use `latest`; prereleases use `next`. Pin the version and commit
+your lockfile; upgrade deliberately as the experimental API evolves. Use Node.js
+24 or newer for package tooling (`npm.cmd` in Windows PowerShell).
 
 For unpublished local packages today, follow the
 [local installation guide](https://github.com/that-webdev-dude/ngne/blob/main/docs/guide.md#install-a-local-package).
@@ -118,8 +118,8 @@ The documented desktop validation envelope is **Chrome 152 on Windows 11**, with
 **Intel UHD (`gen-12lp`) or NVIDIA RTX 4060 Laptop graphics**, using **keyboard and
 mouse**. Other browsers, operating systems, GPUs and physical touch/gamepad operation
 remain unverified. CI's SwiftShader checks provide software WebGPU evidence, separate
-from physical-device validation. These existing observations do not certify the
-planned prerelease.
+from physical-device validation. These existing observations do not establish new
+physical-device acceptance for `0.2.0`.
 
 ## Documentation and examples
 

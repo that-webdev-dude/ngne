@@ -4,14 +4,15 @@ Examples assume a TypeScript browser app with a canvas. The [first scene](https:
 
 ## Install from npm
 
-For registry installation, pin the exact experimental version in your application:
+For registry installation, pin an exact version in your application:
 
 ```sh
-npm install --save-exact @that-webdev-dude/ngne@0.2.0-alpha.1
+npm install --save-exact @that-webdev-dude/ngne@0.2.0
 ```
 
-The experimental release channel is `next`. Commit your consumer lockfile and upgrade deliberately
-as the experimental API evolves. Use Node 24 or newer (`npm.cmd` in Windows PowerShell).
+Normal releases use `latest`; prereleases use `next`. Commit your consumer lockfile
+and upgrade deliberately as the experimental API evolves. Use Node 24 or newer
+(`npm.cmd` in Windows PowerShell).
 For unpublished candidates, use the local-package workflow below.
 
 ## Install a local package

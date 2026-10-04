@@ -111,7 +111,7 @@ test("release guards reject old name, mismatched lock, wrong tag/channel and sou
             f.env.RELEASE_TAG = "v0.2.0-alpha.0";
         },
         (f: ReturnType<typeof fixture>) => {
-            f.pkg.publishConfig.tag = "latest";
+            f.pkg.publishConfig.tag = f.pkg.version.includes("-") ? "latest" : "next";
         },
         (f: ReturnType<typeof fixture>) => {
             f.state.tagExists = true;
