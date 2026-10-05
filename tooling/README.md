@@ -144,10 +144,22 @@ An existing matching tag is accepted; conflicting tags are never overwritten.
 Prereleases use `next`; normal releases use `latest`.
 Normal `0.x` releases remain pre-1.0 and make no permanent API-stability commitment.
 
-Trusted publishing requires an existing package. Configure npm's GitHub trusted
-publisher on `@ngne/core` for owner `that-webdev-dude`, repository `ngne`, workflow
-`publish-release.yml`, environment `npm-publication`, with direct publishing allowed.
+Trusted publishing requires an existing package. Bootstrap a new package name once
+through npm staged publishing (npm 11.15.0 or newer, account 2FA): stage a minimal
+placeholder payload under a throwaway prerelease version, for example `npm stage
+publish --tag bootstrap --access public`, and never approve it. Staging a new
+package creates a public `0.0.0-stage` placeholder that holds `latest` until the
+first release. Then configure npm's GitHub trusted publisher with `npm trust github
+<package> --file publish-release.yml --repo that-webdev-dude/ngne --env
+npm-publication --allow-publish` and read it back with `npm trust list <package>`;
+npm also grants `stage publish`. Reject the bootstrap submission with `npm stage
+reject <id>` after the first release is verified.
 Publication uses a GitHub-hosted runner and npm 11.5.1 or newer, without an npm token.
+
+npm can take several minutes to list a new OIDC publication. Until it appears,
+verification fails closed and a rerun's upload is refused with 409 "previously
+staged version". Wait until `npm view <package>@<version>` shows it, then rerun the
+failed job; it verifies the existing version without uploading.
 
 Registry errors block publication. Each approved attempt publishes at most once;
 uncertain outcomes are reconciled through registry reads. Reruns inspect the exact
