@@ -21,7 +21,7 @@ import type { Outcome, Result, Stage } from "../evidence/schema.js";
 // Consumer-owned choices: edit these and configureCandidate when adopting this file.
 const checks = ["typecheck", "test", "build", "check:package"];
 const dependencySection = "dependencies";
-const packageName = "@that-webdev-dude/ngne";
+const packageName = "@ngne/core";
 const candidateDirectory = ".ngne-candidate";
 const omissions = [
     "No browser, rendering, native input, audible audio, performance or physical-device checks.",

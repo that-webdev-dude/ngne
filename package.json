@@ -1,6 +1,6 @@
 {
-    "name": "@that-webdev-dude/ngne",
-    "version": "0.2.0",
+    "name": "@ngne/core",
+    "version": "0.2.1",
     "type": "module",
     "files": [
         "dist/engine",

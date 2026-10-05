@@ -7,9 +7,7 @@ export default defineConfig(({ command, mode }) => ({
         alias:
             command === "serve"
                 ? {
-                      "@that-webdev-dude/ngne": fileURLToPath(
-                          new URL("./src/index.ts", import.meta.url),
-                      ),
+                      "@ngne/core": fileURLToPath(new URL("./src/index.ts", import.meta.url)),
                   }
                 : {},
     },

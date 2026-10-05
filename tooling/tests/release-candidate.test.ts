@@ -59,7 +59,7 @@ function fixture() {
         write("package-lock.json", JSON.stringify(lock));
         runInNewContext(scripts[0], { ...context });
     };
-    const filename = `that-webdev-dude-ngne-${pkg.version}.tgz`;
+    const filename = `ngne-core-${pkg.version}.tgz`;
     const manifest = {
         runId: "synthetic-release",
         provenance: { revision: state.revision, changes: "" },
@@ -85,10 +85,10 @@ test("release guards bind scoped metadata and assemble its unchanged npm filenam
     f.bind();
     f.assemble();
     const result = JSON.parse(String(f.read("out/release-candidate/candidate.json")));
-    assert.equal(result.name, "@that-webdev-dude/ngne");
+    assert.equal(result.name, "@ngne/core");
     assert.equal(result.intendedTag, `v${f.pkg.version}`);
     assert.equal(result.publicationApproved, false);
-    assert.equal(result.tarball, `that-webdev-dude-ngne-${f.pkg.version}.tgz`);
+    assert.equal(result.tarball, `ngne-core-${f.pkg.version}.tgz`);
     assert.equal(f.read(`out/release-candidate/${result.tarball}`), "candidate bytes");
     assert.match(
         String(f.read("out/release-candidate/SHA256SUMS")),
@@ -100,6 +100,9 @@ test("release guards reject old name, mismatched lock, wrong tag/channel and sou
     const mutations = [
         (f: ReturnType<typeof fixture>) => {
             f.pkg.name = "ngne";
+        },
+        (f: ReturnType<typeof fixture>) => {
+            f.pkg.name = "@that-webdev-dude/ngne";
         },
         (f: ReturnType<typeof fixture>) => {
             f.lock.packages[""].name = "ngne";

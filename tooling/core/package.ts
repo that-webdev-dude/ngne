@@ -101,7 +101,7 @@ export async function pack(
     ])
         if (!files[required]) throw Error(`Missing required package content: ${required}`);
     const pkg = object(JSON.parse(readFileSync(join(repository, "package.json"), "utf8")));
-    if (pkg.name !== "@that-webdev-dude/ngne") throw Error("Unexpected package name");
+    if (pkg.name !== "@ngne/core") throw Error("Unexpected package name");
     if (
         entry.name !== pkg.name ||
         entry.version !== pkg.version ||

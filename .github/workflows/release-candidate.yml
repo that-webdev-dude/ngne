@@ -43,7 +43,7 @@ jobs:
           const tag = process.env.RELEASE_TAG;
           if (sha !== process.env.GITHUB_SHA || git('status', '--porcelain'))
             throw Error('Candidate must use the clean dispatch revision');
-          if (pkg.name !== '@that-webdev-dude/ngne' || pkg.private === true ||
+          if (pkg.name !== '@ngne/core' || pkg.private === true ||
               lock.version !== pkg.version || lock.packages[''].version !== pkg.version ||
               lock.name !== pkg.name || lock.packages[''].name !== pkg.name ||
               tag !== `v${pkg.version}`)

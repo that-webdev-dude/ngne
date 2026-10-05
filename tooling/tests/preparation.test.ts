@@ -31,7 +31,7 @@ function temporary(t: { after: (fn: () => void) => void }): string {
 }
 const read = (path: string) => JSON.parse(readFileSync(path, "utf8"));
 
-async function prepared(root: string, packageName = "@that-webdev-dude/ngne"): Promise<Run> {
+async function prepared(root: string, packageName = "@ngne/core"): Promise<Run> {
     const run = new Run(root, "test");
     await run.execute(() =>
         run.stage("fixture", async () => {
@@ -46,11 +46,7 @@ async function prepared(root: string, packageName = "@that-webdev-dude/ngne"): P
                 "export const answer = 42;\n",
             );
             const pkg = tree("evidence/package", "engine.tgz", "controlled package bytes");
-            const workload = tree(
-                "work/installation/app",
-                "index.ts",
-                "import '@that-webdev-dude/ngne';",
-            );
+            const workload = tree("work/installation/app", "index.ts", "import '@ngne/core';");
             const dependencies = tree(
                 "work/dependencies",
                 "package-lock.json",
@@ -87,7 +83,7 @@ async function prepared(root: string, packageName = "@that-webdev-dude/ngne"): P
     return run;
 }
 
-for (const packageName of ["ngne", "@that-webdev-dude/ngne"]) {
+for (const packageName of ["ngne", "@ngne/core"]) {
     test(`prepared ${packageName} checks installation metadata outside node_modules`, async (t) => {
         const run = await prepared(temporary(t), packageName);
         const manifest = join(run.evidence, "manifest.json");
@@ -311,7 +307,7 @@ test("disposable copy verifies identities first and never edits prepared builds"
 test("added installation files and removed evidence payloads invalidate handoff", async (t) => {
     const run = await prepared(temporary(t)),
         manifest = join(run.evidence, "manifest.json");
-    const extra = join(run.root, "work/installation/node_modules/@that-webdev-dude/ngne/extra.js");
+    const extra = join(run.root, "work/installation/node_modules/@ngne/core/extra.js");
     writeFileSync(extra, "stale");
     assert.throws(() => verifyPrepared(manifest), /Changed identities/);
     rmSync(extra);

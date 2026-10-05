@@ -7,13 +7,26 @@ Examples assume a TypeScript browser app with a canvas. The [first scene](https:
 For registry installation, pin an exact version in your application:
 
 ```sh
-npm install --save-exact @that-webdev-dude/ngne@0.2.0
+npm install --save-exact @ngne/core@0.2.1
 ```
 
 Normal releases use `latest`; prereleases use `next`. Commit your consumer lockfile
 and upgrade deliberately as the experimental API evolves. Use Node 24 or newer
 (`npm.cmd` in Windows PowerShell).
 For unpublished candidates, use the local-package workflow below.
+
+## Migrate from `@that-webdev-dude/ngne`
+
+`0.2.1` renames the package to `@ngne/core`; exports, engine behavior and the
+`ngne-preview` command are unchanged. Replace the dependency:
+
+```sh
+npm uninstall @that-webdev-dude/ngne
+npm install --save-exact @ngne/core@0.2.1
+```
+
+Change imports from `"@that-webdev-dude/ngne"` to `"@ngne/core"` and commit the
+updated lockfile.
 
 ## Install a local package
 
@@ -159,7 +172,7 @@ not establish readability against game backgrounds, lighting, HUD or moving came
 ## Your first scene
 
 ```ts
-import { BrowserGame, component, f64, lerp, type SceneDefinition } from "@that-webdev-dude/ngne";
+import { BrowserGame, component, f64, lerp, type SceneDefinition } from "@ngne/core";
 
 const Position = component("position", { x: f64(40), previousX: f64(40) });
 const scene: SceneDefinition = {
@@ -250,7 +263,7 @@ See the [renderer contract](contracts/browser-and-presentation.md#renderer) for 
 ## Image sprites
 
 ```ts
-import { imageAsset, type SceneDefinition } from "@that-webdev-dude/ngne";
+import { imageAsset, type SceneDefinition } from "@ngne/core";
 
 const spark = imageAsset("spark", new URL("./spark.png", import.meta.url).href);
 const room: SceneDefinition = {
@@ -472,7 +485,7 @@ The [boundary table](contracts/browser-and-presentation.md#interpolation-and-dis
 Keep authored tiles in a scene-owned `Uint8Array` copy. Inside `setup(scene)`, with authored `level` data and a scene-owned `player` position component, initialize the camera before the first render and register follow after movement:
 
 ```ts
-import { clamp } from "@that-webdev-dude/ngne";
+import { clamp } from "@ngne/core";
 
 // Inside setup; tile size 16, viewport width 480 logical pixels.
 const tiles = scene.resource("tiles", level.tiles.slice());

@@ -6,7 +6,7 @@ import { contained, hash, type Identities } from "../../evidence/identity.js";
 /** npm's POSIX launcher is the only link allowed in this disposable consumer. */
 export function previewConsumerIdentity(root: string, platform = process.platform) {
     if (lstatSync(root).isSymbolicLink()) throw Error(`Linked consumer root: ${root}`);
-    const target = "node_modules/@that-webdev-dude/ngne/dist/preview/cli.js";
+    const target = "node_modules/@ngne/core/dist/preview/cli.js";
     const cli = contained(root, target);
     assert.ok(lstatSync(cli).isFile(), "Preview CLI must be a regular file");
     const bin = contained(root, "node_modules/.bin");
@@ -16,9 +16,7 @@ export function previewConsumerIdentity(root: string, platform = process.platfor
         const shim = contained(root, launcher);
         assert.ok(lstatSync(shim).isFile(), "Preview shim must be a regular file");
         assert.ok(
-            readFileSync(shim, "utf8").includes(
-                '"%dp0%\\..\\@that-webdev-dude\\ngne\\dist\\preview\\cli.js"',
-            ),
+            readFileSync(shim, "utf8").includes('"%dp0%\\..\\@ngne\\core\\dist\\preview\\cli.js"'),
             "Unexpected preview shim target",
         );
     } else {
@@ -27,7 +25,7 @@ export function previewConsumerIdentity(root: string, platform = process.platfor
         link = readlinkSync(shim);
         assert.equal(
             link,
-            "../@that-webdev-dude/ngne/dist/preview/cli.js",
+            "../@ngne/core/dist/preview/cli.js",
             "Unexpected preview launcher target",
         );
     }

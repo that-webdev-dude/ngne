@@ -120,8 +120,8 @@ export function validateCandidate(
         version,
         /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/,
     );
-    const filename = `that-webdev-dude-ngne-${version}.tgz`;
-    assert.equal(candidate.name, "@that-webdev-dude/ngne");
+    const filename = `ngne-core-${version}.tgz`;
+    assert.equal(candidate.name, "@ngne/core");
     assert.equal(candidate.sourceSHA, selection.sourceSHA);
     assert.equal(candidate.workflowRun, `${repositoryURL}/actions/runs/${selection.runId}`);
     assert.equal(String(candidate.runAttempt), selection.runAttempt);
@@ -358,7 +358,7 @@ const stepOutput = (key: string, value: string) => {
     appendFileSync(process.env.GITHUB_OUTPUT, `${key}=${value}\n`);
 };
 const packument = () =>
-    request(`${registry}${encodeURIComponent("@that-webdev-dude/ngne")}`, {
+    request(`${registry}${encodeURIComponent("@ngne/core")}`, {
         headers: { Accept: "application/json", "Cache-Control": "no-cache" },
     });
 
@@ -407,7 +407,7 @@ async function download(selection: ReturnType<typeof validateSelection>) {
     assert.equal(new Set(members).size, 4);
     for (const member of members)
         assert(
-            /^(candidate\.json|manifest\.json|SHA256SUMS|that-webdev-dude-ngne-[0-9A-Za-z.-]+\.tgz)$/.test(
+            /^(candidate\.json|manifest\.json|SHA256SUMS|ngne-core-[0-9A-Za-z.-]+\.tgz)$/.test(
                 member,
             ),
             "Unsafe artifact entry",

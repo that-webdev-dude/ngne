@@ -52,7 +52,7 @@ function candidateFixture(t: test.TestContext, version = "0.2.0-alpha.2") {
     const directory = mkdtempSync(path.resolve(".test-output/publication-"));
     t.after(() => rmSync(directory, { recursive: true, force: true }));
     const bytes = Buffer.from("retained candidate, never repacked"),
-        filename = `that-webdev-dude-ngne-${version}.tgz`;
+        filename = `ngne-core-${version}.tgz`;
     const manifest = {
         format: "ngne-tooling",
         schemaVersion: 1,
@@ -66,7 +66,7 @@ function candidateFixture(t: test.TestContext, version = "0.2.0-alpha.2") {
         },
     };
     const candidate = {
-        name: "@that-webdev-dude/ngne",
+        name: "@ngne/core",
         version,
         publishConfig: {
             registry: "https://registry.npmjs.org/",
@@ -128,7 +128,7 @@ function provenance(candidate: ReturnType<typeof validateCandidate>) {
         predicateType: "https://slsa.dev/provenance/v1",
         subject: [
             {
-                name: `pkg:npm/%40that-webdev-dude/ngne@${candidate.version}`,
+                name: `pkg:npm/%40ngne/core@${candidate.version}`,
                 digest: { sha512: candidate.sha512 },
             },
         ],
@@ -273,6 +273,9 @@ test("retained bytes, metadata, manifest and review hash are checked for both ch
             f.candidate.name = "ngne";
         },
         (f) => {
+            f.candidate.name = "@that-webdev-dude/ngne";
+        },
+        (f) => {
             f.candidate.sourceSHA = "d".repeat(40);
         },
         (f) => {
@@ -387,6 +390,19 @@ test("registry absence, different bytes and uncertain outcomes never cause blind
             candidate,
         ),
     );
+});
+
+test("a packument holding only the staged-bootstrap placeholder permits the absent candidate", (t) => {
+    const candidate = candidateFixture(t).read();
+    const placeholder = {
+        name: candidate.name,
+        versions: {
+            "0.0.0-stage": { name: candidate.name, version: "0.0.0-stage", dist: {} },
+        },
+        "dist-tags": { latest: "0.0.0-stage" },
+        time: { "0.0.0-stage": "staged" },
+    };
+    assert.equal(registryVersion(placeholder, candidate), null);
 });
 
 test("HTTP, authentication, JSON and network errors remain errors", async (t) => {

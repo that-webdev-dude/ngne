@@ -1,4 +1,4 @@
-import { bool, clamp, component, down, f64, lerp, pressed, u8 } from "@that-webdev-dude/ngne";
+import { bool, clamp, component, down, f64, lerp, pressed, u8 } from "@ngne/core";
 import type {
     Asset,
     Audio,
@@ -8,7 +8,7 @@ import type {
     SceneDefinition,
     SchemaComponentView,
     SchemaQuery,
-} from "@that-webdev-dude/ngne";
+} from "@ngne/core";
 
 import { CONTACT, moveX, moveY, tileAt } from "./collision.js";
 import type { Box } from "./collision.js";

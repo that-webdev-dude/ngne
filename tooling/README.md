@@ -144,8 +144,8 @@ An existing matching tag is accepted; conflicting tags are never overwritten.
 Prereleases use `next`; normal releases use `latest`.
 Normal `0.x` releases remain pre-1.0 and make no permanent API-stability commitment.
 
-The package already exists following the manual alpha publication. Configure npm's
-GitHub trusted publisher for owner `that-webdev-dude`, repository `ngne`, workflow
+Trusted publishing requires an existing package. Configure npm's GitHub trusted
+publisher on `@ngne/core` for owner `that-webdev-dude`, repository `ngne`, workflow
 `publish-release.yml`, environment `npm-publication`, with direct publishing allowed.
 Publication uses a GitHub-hosted runner and npm 11.5.1 or newer, without an npm token.
 

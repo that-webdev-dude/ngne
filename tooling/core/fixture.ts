@@ -19,7 +19,7 @@ export function verifyDeclarationResolution(app: string): void {
         throw Error("Installed fixture must not inherit source aliases");
     const parsed = ts.parseJsonConfigFileContent(config.config, ts.sys, app);
     const resolved = ts.resolveModuleName(
-        "@that-webdev-dude/ngne",
+        "@ngne/core",
         join(app, "index.ts"),
         parsed.options,
         ts.sys,
@@ -27,7 +27,7 @@ export function verifyDeclarationResolution(app: string): void {
     if (
         !resolved ||
         resolve(resolved.resolvedFileName) !==
-            resolve(app, "../node_modules/@that-webdev-dude/ngne/dist/engine/index.d.ts")
+            resolve(app, "../node_modules/@ngne/core/dist/engine/index.d.ts")
     )
         throw Error("Declarations resolved outside isolated installation");
 }
@@ -54,7 +54,7 @@ export async function installFixture(
         version: "1.0.0",
         private: true,
         type: "module",
-        dependencies: { "@that-webdev-dude/ngne": `file:vendor/${pkg.filename}` },
+        dependencies: { "@ngne/core": `file:vendor/${pkg.filename}` },
     });
     const npm = async (name: string, args: string[]) =>
         command(
@@ -75,7 +75,7 @@ export async function installFixture(
         );
     await npm("lock", ["install", "--package-lock-only"]);
     await npm("install", ["ci"]);
-    verifyIdentities(join(installation, "node_modules/@that-webdev-dude/ngne"), pkg.files);
+    verifyIdentities(join(installation, "node_modules/@ngne/core"), pkg.files);
     cpSync(fixture.source, app, { recursive: true });
     cpSync(
         join(repository, "tooling/fixtures/installed-engine/api-misuse.ts"),
@@ -103,7 +103,7 @@ export async function installFixture(
         `import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 const app = fileURLToPath(new URL('.', import.meta.url)).replaceAll('\\\\', '/');
-const installed = resolve(app, '../node_modules/@that-webdev-dude/ngne').replaceAll('\\\\', '/') + '/';
+const installed = resolve(app, '../node_modules/@ngne/core').replaceAll('\\\\', '/') + '/';
 export default { build: { emptyOutDir: false, assetsInlineLimit: 0 }, plugins: [{
     name: 'installed-boundary',
     moduleParsed(info) {
@@ -147,13 +147,13 @@ export default { build: { emptyOutDir: false, assetsInlineLimit: 0 }, plugins: [
         run,
         "resolution",
         process.execPath,
-        ["--input-type=module", "-e", 'console.log(import.meta.resolve("@that-webdev-dude/ngne"))'],
+        ["--input-type=module", "-e", 'console.log(import.meta.resolve("@ngne/core"))'],
         installation,
     );
     const { fileURLToPath } = await import("node:url");
     if (
         fileURLToPath(resolved.trim()) !==
-        join(installation, "node_modules/@that-webdev-dude/ngne/dist/engine/index.js")
+        join(installation, "node_modules/@ngne/core/dist/engine/index.js")
     )
         throw Error("Engine resolved outside isolated installation");
     const build = async (name: "root" | "nested", base: string): Promise<Tree> => {
@@ -186,8 +186,8 @@ export default { build: { emptyOutDir: false, assetsInlineLimit: 0 }, plugins: [
     return {
         package: pkg,
         installed: {
-            path: "work/installation/node_modules/@that-webdev-dude/ngne",
-            files: identities(join(installation, "node_modules/@that-webdev-dude/ngne")),
+            path: "work/installation/node_modules/@ngne/core",
+            files: identities(join(installation, "node_modules/@ngne/core")),
         },
         workload: { path: "work/installation/app", files: identities(app) },
         dependencies: { path: dependencyPath, files: identities(join(run.root, dependencyPath)) },

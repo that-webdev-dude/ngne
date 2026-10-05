@@ -19,7 +19,7 @@ import {
     type Audio,
     type Asset,
     type ImageAsset,
-} from "@that-webdev-dude/ngne";
+} from "@ngne/core";
 
 import { animationFrame, bodySprites, createEffects, drawSprite } from "./sprites.js";
 

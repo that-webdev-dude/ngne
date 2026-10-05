@@ -4,6 +4,6 @@
         "noEmit": true,
         "rootDir": "../..",
         "types": ["@webgpu/types"],
-        "paths": { "@that-webdev-dude/ngne": ["../../src/index.ts"] }
+        "paths": { "@ngne/core": ["../../src/index.ts"] }
     }
 }

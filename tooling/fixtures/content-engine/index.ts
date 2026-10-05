@@ -5,7 +5,7 @@ import {
     type Asset,
     type PreparedScene,
     type SceneDefinition,
-} from "@that-webdev-dude/ngne";
+} from "@ngne/core";
 import { observe } from "./observe.js";
 import { assertMounted, assertDisposed } from "./accounting.js";
 

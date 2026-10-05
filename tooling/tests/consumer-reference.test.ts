@@ -27,7 +27,7 @@ test("portable reference installs actual candidate bytes and retains passing and
         writeFileSync(
             join(packed, "package.json"),
             JSON.stringify({
-                name: "@that-webdev-dude/ngne",
+                name: "@ngne/core",
                 version: "9.0.0-next.1",
                 type: "module",
                 exports: "./index.js",
@@ -47,7 +47,7 @@ test("portable reference installs actual candidate bytes and retains passing and
                 name: "independent-reference-test",
                 private: true,
                 type: "module",
-                dependencies: { "@that-webdev-dude/ngne": "file:vendor/ngne-0.1.0.tgz" },
+                dependencies: { "@ngne/core": "file:vendor/ngne-0.1.0.tgz" },
                 scripts: {
                     "verify:engine": "node verification/consumer/verify-engine.ts",
                     typecheck: "node check.mjs",
@@ -70,14 +70,14 @@ test("portable reference installs actual candidate bytes and retains passing and
             `
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
-import { candidate } from '@that-webdev-dude/ngne';
+import { candidate } from '@ngne/core';
 assert.equal(candidate, 42);
 const record = JSON.parse(readFileSync('.ngne-candidate.json', 'utf8'));
 assert.equal(record.filename, 'caller-chosen-next.tgz');
 assert.equal(record.version, '9.0.0-next.1');
 assert.equal(readFileSync('vendor/ngne-0.1.0.tgz', 'utf8'), 'original archive is never installed');
 if (process.env.NGNE_REFERENCE_TEST_MODE === 'fail') throw Error('controlled consumer check failure');
-if (process.env.NGNE_REFERENCE_TEST_MODE === 'mutate') writeFileSync('node_modules/@that-webdev-dude/ngne/index.js', 'export const candidate = 42; // changed');
+if (process.env.NGNE_REFERENCE_TEST_MODE === 'mutate') writeFileSync('node_modules/@ngne/core/index.js', 'export const candidate = 42; // changed');
 `,
         );
         // Exactly the recipe's vendored files: runtime has no NGNE checkout dependency.

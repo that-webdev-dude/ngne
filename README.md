@@ -26,12 +26,15 @@ setup, assets and game logic, including movement, collision and progression.
 For registry installation, pin an exact version in your application:
 
 ```sh
-npm install --save-exact @that-webdev-dude/ngne@0.2.0
+npm install --save-exact @ngne/core@0.2.1
 ```
 
 Normal releases use `latest`; prereleases use `next`. Pin the version and commit
 your lockfile; upgrade deliberately as the experimental API evolves. Use Node.js
 24 or newer for package tooling (`npm.cmd` in Windows PowerShell).
+
+Upgrading from `@that-webdev-dude/ngne`? See the
+[migration steps](https://github.com/that-webdev-dude/ngne/blob/main/docs/guide.md#migrate-from-that-webdev-dudengne).
 
 For unpublished local packages today, follow the
 [local installation guide](https://github.com/that-webdev-dude/ngne/blob/main/docs/guide.md#install-a-local-package).
@@ -43,7 +46,7 @@ module. Serve it over HTTPS or localhost in a WebGPU-capable browser; the exampl
 uses top-level `await` and draws a square at the center of a 320 × 180 canvas.
 
 ```ts
-import { BrowserGame } from "@that-webdev-dude/ngne";
+import { BrowserGame } from "@ngne/core";
 
 const canvas = document.querySelector("canvas");
 if (!canvas) throw new Error("Canvas missing");
@@ -119,7 +122,7 @@ The documented desktop validation envelope is **Chrome 152 on Windows 11**, with
 mouse**. Other browsers, operating systems, GPUs and physical touch/gamepad operation
 remain unverified. CI's SwiftShader checks provide software WebGPU evidence, separate
 from physical-device validation. These existing observations do not establish new
-physical-device acceptance for `0.2.0`.
+physical-device acceptance for `0.2.1`.
 
 ## Documentation and examples
 

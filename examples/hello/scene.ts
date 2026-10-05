@@ -5,7 +5,7 @@ import {
     type ImageAsset,
     type SceneDefinition,
     type Sprite,
-} from "@that-webdev-dude/ngne";
+} from "@ngne/core";
 
 const Position = component("position", { x: f64(40), previousX: f64(40) });
 

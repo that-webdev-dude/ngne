@@ -11,8 +11,8 @@ import {
     type PreparedScene,
     type SceneSetup,
     type SystemContext,
-} from "@that-webdev-dude/ngne";
-import * as engine from "@that-webdev-dude/ngne";
+} from "@ngne/core";
+import * as engine from "@ngne/core";
 
 // Compiled against source during typecheck and emitted declarations during build.
 function authoringBoundary(
