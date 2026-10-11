@@ -1,0 +1,769 @@
+{
+    "date": "2026-10-11",
+    "branch": "codex/descriptor-attribution",
+    "decision": "retain",
+    "reason": "Primary gate passed with no demonstrated control regressions",
+    "change": "Only the fixed outer descriptor Object.defineProperties call is replaced with four equivalent Object.defineProperty calls; one focused property/expiry regression added.",
+    "baselineSourceSha256": "b5935cb4536a031e852acc21739f883f01358e643a07b81d40e8a2485ad685cc",
+    "candidateSourceSha256": "cc3d2c00b14484d63beb561bc80259a21dbb4d8c114321dbab21767c1908e86a",
+    "plan": {
+        "createdAt": "2026-10-11T15:52:52.025Z",
+        "baselineHash": "b5935cb4536a031e852acc21739f883f01358e643a07b81d40e8a2485ad685cc",
+        "candidateHash": "cc3d2c00b14484d63beb561bc80259a21dbb4d8c114321dbab21767c1908e86a",
+        "order": ["B1", "C1", "C2", "B2", "B3", "C3"],
+        "head": "ab06ca009c29d92a8ca85eac53856965e71a52ab",
+        "acceptance": "Primary 128K traversal-only first traversal must improve in every pair, have non-overlapping fresh-process p50 ranges, and median improvement larger than both ranges. Revert on a failed primary gate or demonstrated control regression. Control regression: all pairs worse, non-overlapping p50 ranges, median worsening larger than both ranges.",
+        "preMeasurementAdjustment": "Parent clarified before any measurement: 128K is the established primary target; smaller density sizes are scaling controls and need no clear gain.",
+        "controls": "Other density traversal sizes; all density arithmetic/commit/sameEpoch/plain; CPU ordinary ECS/Chaos/grid, epoch and small queries first/sameEpoch/commit/simulatedTick.",
+        "processes": 12,
+        "diagnostics": false,
+        "nodeOptions": null,
+        "node": "v24.15.0",
+        "harnessHashes": {
+            "density": "ccbd242729e9fe2c5b0dcaf8f78ee3198ad975e81aabcdbbd219c092eaff31b2",
+            "benchmark": "44861b35746053ff4233132e7e202e75b843e332f24f9dd43df10ce0c29e7755"
+        }
+    },
+    "recovery": {
+        "excluded": "B2 density failed with EPERM renaming evidence manifest",
+        "replacement": "B2-replacement density, 13th and final launch",
+        "note": "One authorized environmental recovery; original failed output preserved, no successful sample discarded. Pair 2 density is no longer adjacent in actual run order."
+    },
+    "environment": {
+        "node": "v24.15.0",
+        "platform": "win32",
+        "osRelease": "10.0.26200",
+        "arch": "x64",
+        "cpu": "12th Gen Intel(R) Core(TM) i7-12650H",
+        "logicalCores": 16,
+        "memoryGiB": 16
+    },
+    "primary": {
+        "baseline": {
+            "values": [0.7618999999999687, 0.8144999999999527, 0.8020999999998821],
+            "median": 0.8020999999998821,
+            "min": 0.7618999999999687,
+            "max": 0.8144999999999527,
+            "range": 0.05259999999998399
+        },
+        "candidate": {
+            "values": [0.6675999999999931, 0.6744000000001051, 0.7078000000001339],
+            "median": 0.6744000000001051,
+            "min": 0.6675999999999931,
+            "max": 0.7078000000001339,
+            "range": 0.04020000000014079
+        },
+        "improvementMs": 0.127699999999777,
+        "improvementPercent": 15.92070814110407,
+        "pairs": [
+            {
+                "pair": 1,
+                "baseline": 0.7618999999999687,
+                "candidate": 0.6675999999999931,
+                "candidateMinusBaseline": -0.09429999999997563,
+                "improvementPercent": 12.376952355949534
+            },
+            {
+                "pair": 2,
+                "baseline": 0.8144999999999527,
+                "candidate": 0.6744000000001051,
+                "candidateMinusBaseline": -0.14009999999984757,
+                "improvementPercent": 17.200736648232745
+            },
+            {
+                "pair": 3,
+                "baseline": 0.8020999999998821,
+                "candidate": 0.7078000000001339,
+                "candidateMinusBaseline": -0.09429999999974825,
+                "improvementPercent": 11.756638823059731
+            }
+        ],
+        "clearlyFaster": true,
+        "demonstratedRegression": false
+    },
+    "controls": {
+        "cpu.ecs": {
+            "baseline": {
+                "values": [0.19060000000001764, 0.1897999999999911, 0.19830000000001746],
+                "median": 0.19060000000001764,
+                "min": 0.1897999999999911,
+                "max": 0.19830000000001746,
+                "range": 0.008500000000026375
+            },
+            "candidate": {
+                "values": [0.1939000000000135, 0.19519999999999982, 0.213799999999992],
+                "median": 0.19519999999999982,
+                "min": 0.1939000000000135,
+                "max": 0.213799999999992,
+                "range": 0.01989999999997849
+            },
+            "improvementMs": -0.004599999999982174,
+            "improvementPercent": -2.413431269665135,
+            "pairs": [
+                {
+                    "pair": 1,
+                    "baseline": 0.19060000000001764,
+                    "candidate": 0.1939000000000135,
+                    "candidateMinusBaseline": 0.003299999999995862,
+                    "improvementPercent": -1.7313746065034399
+                },
+                {
+                    "pair": 2,
+                    "baseline": 0.1897999999999911,
+                    "candidate": 0.19519999999999982,
+                    "candidateMinusBaseline": 0.005400000000008731,
+                    "improvementPercent": -2.845100105378812
+                },
+                {
+                    "pair": 3,
+                    "baseline": 0.19830000000001746,
+                    "candidate": 0.213799999999992,
+                    "candidateMinusBaseline": 0.015499999999974534,
+                    "improvementPercent": -7.816439737757523
+                }
+            ],
+            "clearlyFaster": false,
+            "demonstratedRegression": false
+        },
+        "cpu.chaos": {
+            "baseline": {
+                "values": [0.6012000000000626, 0.6200000000000045, 0.5979000000000951],
+                "median": 0.6012000000000626,
+                "min": 0.5979000000000951,
+                "max": 0.6200000000000045,
+                "range": 0.022099999999909414
+            },
+            "candidate": {
+                "values": [0.5883999999999787, 0.5784999999999627, 0.6130000000000564],
+                "median": 0.5883999999999787,
+                "min": 0.5784999999999627,
+                "max": 0.6130000000000564,
+                "range": 0.03450000000009368
+            },
+            "improvementMs": 0.012800000000083855,
+            "improvementPercent": 2.129075182981125,
+            "pairs": [
+                {
+                    "pair": 1,
+                    "baseline": 0.6012000000000626,
+                    "candidate": 0.5883999999999787,
+                    "candidateMinusBaseline": -0.012800000000083855,
+                    "improvementPercent": 2.129075182981125
+                },
+                {
+                    "pair": 2,
+                    "baseline": 0.6200000000000045,
+                    "candidate": 0.5784999999999627,
+                    "candidateMinusBaseline": -0.04150000000004184,
+                    "improvementPercent": 6.6935483871034736
+                },
+                {
+                    "pair": 3,
+                    "baseline": 0.5979000000000951,
+                    "candidate": 0.6130000000000564,
+                    "candidateMinusBaseline": 0.015099999999961256,
+                    "improvementPercent": -2.525505937440852
+                }
+            ],
+            "clearlyFaster": false,
+            "demonstratedRegression": false
+        },
+        "cpu.manySmallQueries.noOpCommitMs": {
+            "baseline": {
+                "values": [0.00021875000003035439, 0.0002250000000287855, 0.00023749999998301519],
+                "median": 0.0002250000000287855,
+                "min": 0.00021875000003035439,
+                "max": 0.00023749999998301519,
+                "range": 0.0000187499999526608
+            },
+            "candidate": {
+                "values": [0.00020624999997664872, 0.00021250000000350155, 0.0002687499999751708],
+                "median": 0.00021250000000350155,
+                "min": 0.00020624999997664872,
+                "max": 0.0002687499999751708,
+                "range": 0.00006249999999852207
+            },
+            "improvementMs": 0.000012500000025283953,
+            "improvementPercent": 5.5555555660821145,
+            "pairs": [
+                {
+                    "pair": 1,
+                    "baseline": 0.00021875000003035439,
+                    "candidate": 0.00020624999997664872,
+                    "candidateMinusBaseline": -0.000012500000053705662,
+                    "improvementPercent": 5.714285738043944
+                },
+                {
+                    "pair": 2,
+                    "baseline": 0.0002250000000287855,
+                    "candidate": 0.00021250000000350155,
+                    "candidateMinusBaseline": -0.000012500000025283953,
+                    "improvementPercent": 5.5555555660821145
+                },
+                {
+                    "pair": 3,
+                    "baseline": 0.00023749999998301519,
+                    "candidate": 0.0002687499999751708,
+                    "candidateMinusBaseline": 0.00003124999999215561,
+                    "improvementPercent": -13.157894734480191
+                }
+            ],
+            "clearlyFaster": false,
+            "demonstratedRegression": false
+        },
+        "cpu.manySmallQueries.firstTraversalAfterCommitMs": {
+            "baseline": {
+                "values": [0.04843125000007831, 0.04726875000000064, 0.050668749999971396],
+                "median": 0.04843125000007831,
+                "min": 0.04726875000000064,
+                "max": 0.050668749999971396,
+                "range": 0.0033999999999707597
+            },
+            "candidate": {
+                "values": [0.043468749999973966, 0.04183749999999975, 0.04483750000005671],
+                "median": 0.043468749999973966,
+                "min": 0.04183749999999975,
+                "max": 0.04483750000005671,
+                "range": 0.003000000000056957
+            },
+            "improvementMs": 0.004962500000104342,
+            "improvementPercent": 10.246483417414,
+            "pairs": [
+                {
+                    "pair": 1,
+                    "baseline": 0.04843125000007831,
+                    "candidate": 0.043468749999973966,
+                    "candidateMinusBaseline": -0.004962500000104342,
+                    "improvementPercent": 10.246483417414
+                },
+                {
+                    "pair": 2,
+                    "baseline": 0.04726875000000064,
+                    "candidate": 0.04183749999999975,
+                    "candidateMinusBaseline": -0.005431250000000887,
+                    "improvementPercent": 11.49014941161087
+                },
+                {
+                    "pair": 3,
+                    "baseline": 0.050668749999971396,
+                    "candidate": 0.04483750000005671,
+                    "candidateMinusBaseline": -0.005831249999914689,
+                    "improvementPercent": 11.508572838126026
+                }
+            ],
+            "clearlyFaster": true,
+            "demonstratedRegression": false
+        },
+        "cpu.manySmallQueries.secondTraversalSameEpochMs": {
+            "baseline": {
+                "values": [0.0037125000000060027, 0.0036562499999490683, 0.0038250000000061846],
+                "median": 0.0037125000000060027,
+                "min": 0.0036562499999490683,
+                "max": 0.0038250000000061846,
+                "range": 0.00016875000005711627
+            },
+            "candidate": {
+                "values": [0.0037062499999933607, 0.0035812499999821057, 0.003906250000014211],
+                "median": 0.0037062499999933607,
+                "min": 0.0035812499999821057,
+                "max": 0.003906250000014211,
+                "range": 0.00032500000003210516
+            },
+            "improvementMs": 0.000006250000012641976,
+            "improvementPercent": 0.16835016869042074,
+            "pairs": [
+                {
+                    "pair": 1,
+                    "baseline": 0.0037125000000060027,
+                    "candidate": 0.0037062499999933607,
+                    "candidateMinusBaseline": -0.000006250000012641976,
+                    "improvementPercent": 0.16835016869042074
+                },
+                {
+                    "pair": 2,
+                    "baseline": 0.0036562499999490683,
+                    "candidate": 0.0035812499999821057,
+                    "candidateMinusBaseline": -0.0000749999999669626,
+                    "improvementPercent": 2.0512820504070386
+                },
+                {
+                    "pair": 3,
+                    "baseline": 0.0038250000000061846,
+                    "candidate": 0.003906250000014211,
+                    "candidateMinusBaseline": 0.00008125000000802629,
+                    "improvementPercent": -2.1241830067423506
+                }
+            ],
+            "clearlyFaster": false,
+            "demonstratedRegression": false
+        },
+        "cpu.manySmallQueries.pairedDeltaMs": {
+            "baseline": {
+                "values": [0.044525000000049886, 0.04331875000001162, 0.046637500000002774],
+                "median": 0.044525000000049886,
+                "min": 0.04331875000001162,
+                "max": 0.046637500000002774,
+                "range": 0.003318749999991155
+            },
+            "candidate": {
+                "values": [0.039687499999914166, 0.03826249999997344, 0.0409874999999289],
+                "median": 0.039687499999914166,
+                "min": 0.03826249999997344,
+                "max": 0.0409874999999289,
+                "range": 0.0027249999999554575
+            },
+            "improvementMs": 0.004837500000135719,
+            "improvementPercent": 10.864682762785623,
+            "pairs": [
+                {
+                    "pair": 1,
+                    "baseline": 0.044525000000049886,
+                    "candidate": 0.039687499999914166,
+                    "candidateMinusBaseline": -0.004837500000135719,
+                    "improvementPercent": 10.864682762785623
+                },
+                {
+                    "pair": 2,
+                    "baseline": 0.04331875000001162,
+                    "candidate": 0.03826249999997344,
+                    "candidateMinusBaseline": -0.005056250000038176,
+                    "improvementPercent": 11.672197374201286
+                },
+                {
+                    "pair": 3,
+                    "baseline": 0.046637500000002774,
+                    "candidate": 0.0409874999999289,
+                    "candidateMinusBaseline": -0.005650000000073874,
+                    "improvementPercent": 12.114714553896624
+                }
+            ],
+            "clearlyFaster": true,
+            "demonstratedRegression": false
+        },
+        "cpu.manySmallQueries.simulatedTickMs": {
+            "baseline": {
+                "values": [0.05231875000012565, 0.05110000000000525, 0.05485624999997185],
+                "median": 0.05231875000012565,
+                "min": 0.05110000000000525,
+                "max": 0.05485624999997185,
+                "range": 0.003756249999966599
+            },
+            "candidate": {
+                "values": [0.04738749999999925, 0.04563125000002799, 0.04915624999993895],
+                "median": 0.04738749999999925,
+                "min": 0.04563125000002799,
+                "max": 0.04915624999993895,
+                "range": 0.0035249999999109605
+            },
+            "improvementMs": 0.004931250000126397,
+            "improvementPercent": 9.425397204854004,
+            "pairs": [
+                {
+                    "pair": 1,
+                    "baseline": 0.05231875000012565,
+                    "candidate": 0.04738749999999925,
+                    "candidateMinusBaseline": -0.004931250000126397,
+                    "improvementPercent": 9.425397204854004
+                },
+                {
+                    "pair": 2,
+                    "baseline": 0.05110000000000525,
+                    "candidate": 0.04563125000002799,
+                    "candidateMinusBaseline": -0.005468749999977263,
+                    "improvementPercent": 10.702054794474952
+                },
+                {
+                    "pair": 3,
+                    "baseline": 0.05485624999997185,
+                    "candidate": 0.04915624999993895,
+                    "candidateMinusBaseline": -0.005700000000032901,
+                    "improvementPercent": 10.390794121063372
+                }
+            ],
+            "clearlyFaster": true,
+            "demonstratedRegression": false
+        }
+    },
+    "controlCaveats": [
+        "Ordinary ECS median worsened 2.41%, with all three pairs slower; overlapping run ranges and improvement smaller than spread mean the predeclared demonstrated-regression gate was not met. This does not prove no regression.",
+        "128K arithmetic baseline B3 was 2.3432 ms versus 1.0166/1.0714 ms in other baseline processes; arithmetic improvement is inconclusive under the spread rule."
+    ],
+    "limits": [
+        "Three fresh processes per variant on one Windows/Node host; p50 run ranges are descriptive, not statistical confidence intervals.",
+        "Clean internal-source CPU workloads; no allocation, installed-package, consumer FPS, browser or GPU performance claim.",
+        "Existing density stage raw samples and CPU raw samples retained unchanged.",
+        "No profiling or NGNE_DIAGNOSTICS during timings; runners unmodified."
+    ],
+    "focusedVerification": {
+        "command": "node --import tsx --test tests/ecs-soa.test.ts tests/ownership.test.ts",
+        "exitCode": 0,
+        "tests": 21,
+        "passed": 21,
+        "failed": 0
+    },
+    "additionalChecks": {
+        "restricted": [
+            {
+                "command": "npm.cmd run typecheck:tooling",
+                "exitCode": 0,
+                "log": "out/outer-descriptor-experiment-2026-10-11/check-typecheck-tooling.log"
+            },
+            {
+                "command": "npm.cmd run typecheck",
+                "exitCode": 0,
+                "log": "out/outer-descriptor-experiment-2026-10-11/check-typecheck.log"
+            },
+            {
+                "command": "npm.cmd run build",
+                "exitCode": 1,
+                "log": "out/outer-descriptor-experiment-2026-10-11/check-build.log"
+            }
+        ],
+        "buildRecovery": {
+            "commands": ["npm.cmd run build", "npm.cmd run build:browser"],
+            "exitCodes": [0, 0],
+            "reason": "Restricted Vite build failed EPERM realpath existing examples/hello/spark.png; both escalated builds passed."
+        },
+        "manual": [
+            {
+                "stage": "prepare",
+                "command": [
+                    "C:\\Program Files\\nodejs\\node.exe",
+                    "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+                    "run",
+                    "prepare:package",
+                    "--",
+                    "--output",
+                    "C:\\Users\\jfabi\\Documents\\Projects\\tests\\ngne\\out\\outer-descriptor-experiment-2026-10-11\\manual-preparation"
+                ],
+                "beganAt": "2026-10-11T16:01:40.775Z",
+                "endedAt": "2026-10-11T16:02:04.253Z",
+                "exitCode": 0,
+                "signal": null
+            },
+            {
+                "stage": "prepared",
+                "command": [
+                    "C:\\Program Files\\nodejs\\node.exe",
+                    "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+                    "run",
+                    "check:prepared",
+                    "--",
+                    "--manifest",
+                    "C:\\Users\\jfabi\\Documents\\Projects\\tests\\ngne\\out\\outer-descriptor-experiment-2026-10-11\\manual-preparation\\evidence\\manifest.json"
+                ],
+                "beganAt": "2026-10-11T16:02:04.256Z",
+                "endedAt": "2026-10-11T16:02:05.244Z",
+                "exitCode": 0,
+                "signal": null
+            },
+            {
+                "stage": "transport",
+                "command": [
+                    "C:\\Program Files\\nodejs\\node.exe",
+                    "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+                    "run",
+                    "check:browser-transport"
+                ],
+                "beganAt": "2026-10-11T16:02:05.244Z",
+                "endedAt": "2026-10-11T16:02:16.107Z",
+                "exitCode": 0,
+                "signal": null
+            },
+            {
+                "stage": "installed",
+                "command": [
+                    "C:\\Program Files\\nodejs\\node.exe",
+                    "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+                    "run",
+                    "verify:installed",
+                    "--",
+                    "--manifest",
+                    "C:\\Users\\jfabi\\Documents\\Projects\\tests\\ngne\\out\\outer-descriptor-experiment-2026-10-11\\manual-preparation\\evidence\\manifest.json"
+                ],
+                "beganAt": "2026-10-11T16:02:16.108Z",
+                "endedAt": "2026-10-11T16:02:30.175Z",
+                "exitCode": 0,
+                "signal": null
+            },
+            {
+                "stage": "browser",
+                "command": [
+                    "C:\\Program Files\\nodejs\\node.exe",
+                    "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+                    "run",
+                    "test:browser"
+                ],
+                "beganAt": "2026-10-11T16:02:30.176Z",
+                "endedAt": "2026-10-11T16:02:30.714Z",
+                "exitCode": 1,
+                "signal": null
+            },
+            {
+                "stage": "serial-tests",
+                "command": [
+                    "C:\\Program Files\\nodejs\\node.exe",
+                    "--import",
+                    "tsx",
+                    "--test",
+                    "--test-concurrency=1",
+                    "tests/asset-retention.test.ts",
+                    "tests/audio.test.ts",
+                    "tests/content-churn.test.ts",
+                    "tests/content-ownership.test.ts",
+                    "tests/ecs-soa.test.ts",
+                    "tests/engine.test.ts",
+                    "tests/frame-layout.test.ts",
+                    "tests/image-readiness.test.ts",
+                    "tests/input.test.ts",
+                    "tests/interpolation.test.ts",
+                    "tests/lifecycle.test.ts",
+                    "tests/ownership.test.ts",
+                    "tests/simulation.contract.test.ts",
+                    "tests/state.test.ts",
+                    "tests/webgpu-recovery.test.ts",
+                    "tests/webgpu-renderer.test.ts",
+                    "demo/tests/game.test.ts",
+                    "demo/tests/ownership.test.ts",
+                    "demo/tests/sprites.test.ts",
+                    "examples/hello/tests/scene.test.ts",
+                    "examples/platformer/tests/platformer.test.ts",
+                    "tooling/tests/benchmark-compact.test.ts",
+                    "tooling/tests/benchmark-output.test.ts",
+                    "tooling/tests/benchmark-policy.test.ts",
+                    "tooling/tests/benchmark-runner.test.ts",
+                    "tooling/tests/browser-content-cleanup.test.ts",
+                    "tooling/tests/browser-session.test.ts",
+                    "tooling/tests/compatibility.test.ts",
+                    "tooling/tests/consumer-contract.test.ts",
+                    "tooling/tests/consumer-reference.test.ts",
+                    "tooling/tests/content-engine.test.ts",
+                    "tooling/tests/content-measurement.test.ts",
+                    "tooling/tests/devtools.test.ts",
+                    "tooling/tests/installed.test.ts",
+                    "tooling/tests/investigation-summary.test.ts",
+                    "tooling/tests/legacy-formats.test.ts",
+                    "tooling/tests/preparation.test.ts",
+                    "tooling/tests/preview-consumer.test.ts",
+                    "tooling/tests/preview.test.ts",
+                    "tooling/tests/publication.test.ts",
+                    "tooling/tests/release-candidate.test.ts",
+                    "tooling/tests/runner-cleanup.test.ts",
+                    "tooling/tests/verify-engine.test.ts"
+                ],
+                "beganAt": "2026-10-11T16:02:30.718Z",
+                "endedAt": "2026-10-11T16:04:28.656Z",
+                "exitCode": 1,
+                "signal": null
+            }
+        ],
+        "compositeAccepted": false,
+        "note": "Neither verify:engine composition passed. Individual stage and serial-test coverage is recorded separately, not relabeled as a passed composition.",
+        "browserRecovery": {
+            "reason": "Corrected wrapper artifact directory to repository-relative after pre-startup ENOENT",
+            "command": "npm.cmd run test:browser",
+            "artifactDirectory": "out/outer-descriptor-experiment-2026-10-11/manual-browser",
+            "exitCode": 0,
+            "adapter": "swiftshader"
+        },
+        "serialInitial": {
+            "tests": 337,
+            "pass": 328,
+            "fail": 3,
+            "skipped": 6,
+            "reason": "Direct node invocation omitted npm_execpath. Three tooling tests requiring npm CLI context failed; no engine assertion failed. Complete logs retained."
+        },
+        "npmContextRecovery": {
+            "command": "npm.cmd exec --call \"node --import tsx --test --test-concurrency=1 tooling/tests/compatibility.test.ts tooling/tests/consumer-reference.test.ts\"",
+            "exitCode": 0,
+            "reason": "Complete affected test files with npm CLI environment, preserving original serial run"
+        },
+        "browser": {
+            "status": "passed",
+            "renderer": "software",
+            "passed": 217,
+            "failures": [],
+            "skipped": ["hardware-backed WebGPU execution evidence"],
+            "cleanup": [
+                {
+                    "resource": "browser session",
+                    "status": "passed",
+                    "detail": [
+                        {
+                            "resource": "DevTools close",
+                            "status": "passed"
+                        },
+                        {
+                            "resource": "browser terminate/verify",
+                            "status": "passed",
+                            "detail": {
+                                "resource": "browser PID 36340",
+                                "attempts": [
+                                    "terminate: Command failed: taskkill.exe /PID 36340 /PID 31268 /PID 27704 /PID 6628 /PID 18172 /PID 10308 /PID 35420 /PID 33992 /PID 32784 /PID 11844 /T\nERROR: The process with PID 18172 (child process of PID 36340) could not be terminated.\r\nReason: This process can only be terminated forcefully (with /F option).\r\nERROR: The process with PID 10308 (child process of PID 36340) could not be terminated.\r\nReason: This process can only be terminated forcefully (with /F option).\r\nERROR: The process with PID 35420 (child process of PID 36340) could not be terminated.\r\nReason: This process can only be terminated forcefully (with /F option).\r\nERROR: The process with PID 33992 (child process of PID 36340) could not be terminated.\r\nReason: This process can only be terminated forcefully (with /F option).\r\nERROR: The process with PID 32784 (child process of PID 36340) could not be terminated.\r\nReason: This process can only be terminated forcefully (with /F option).\r\nERROR: The process with PID 11844 (child process of PID 36340) could not be terminated.\r\nReason: This process can only be terminated forcefully (with /F option).\r\nERROR: The process with PID 36340 (child process of PID 25528) could not be terminated.\r\nReason: One or more child processes of this process were still running.\r\n",
+                                    "force"
+                                ],
+                                "survivors": []
+                            }
+                        },
+                        {
+                            "resource": "preview terminate/verify",
+                            "status": "passed",
+                            "detail": {
+                                "resource": "preview PID 34584",
+                                "attempts": [
+                                    "terminate: Command failed: taskkill.exe /PID 34584 /PID 22740 /PID 3264 /T\nERROR: The process with PID 22740 (child process of PID 34584) could not be terminated.\r\nReason: This process can only be terminated forcefully (with /F option).\r\nERROR: The process with PID 3264 (child process of PID 34584) could not be terminated.\r\nReason: This process can only be terminated forcefully (with /F option).\r\nERROR: The process with PID 34584 (child process of PID 25528) could not be terminated.\r\nReason: One or more child processes of this process were still running.\r\n",
+                                    "force"
+                                ],
+                                "survivors": []
+                            }
+                        },
+                        {
+                            "resource": "temporary profile remove",
+                            "status": "passed"
+                        }
+                    ]
+                },
+                {
+                    "resource": "controlled cleanup failure",
+                    "status": "passed"
+                }
+            ],
+            "browserVersion": {
+                "protocolVersion": "1.3",
+                "product": "Chrome/154.0.8037.98",
+                "revision": "@b859317bf11f6be47f9b7799ec690a0a42a1fb33",
+                "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+                "jsVersion": "15.4.80.20"
+            }
+        }
+    },
+    "verification": [
+        {
+            "originalEvidence": "C:\\Users\\jfabi\\Documents\\Projects\\tests\\ngne\\out\\runs\\2026-10-11T15-56-07.171Z-verification-a99c3f0c-4a37-4e0c-b0d0-4eb3e06efe35\\evidence",
+            "result": {
+                "format": "ngne-tooling",
+                "documentType": "result",
+                "schemaVersion": 1,
+                "runId": "2026-10-11T15-56-07.171Z-verification-a99c3f0c-4a37-4e0c-b0d0-4eb3e06efe35",
+                "execution": "failed",
+                "correctness": "failed",
+                "budgets": "not evaluated",
+                "cleanup": "failed",
+                "evidence": "complete",
+                "stages": [
+                    {
+                        "execution": "completed",
+                        "correctness": "passed",
+                        "budgets": "not evaluated",
+                        "cleanup": "failed",
+                        "evidence": "complete",
+                        "id": "format",
+                        "required": true
+                    },
+                    {
+                        "execution": "failed",
+                        "correctness": "failed",
+                        "budgets": "not evaluated",
+                        "cleanup": "failed",
+                        "evidence": "complete",
+                        "id": "tests",
+                        "required": true
+                    }
+                ],
+                "failures": [
+                    {
+                        "kind": "scenario",
+                        "message": "tests: command timeout"
+                    },
+                    {
+                        "kind": "cleanup",
+                        "message": "format terminate/verify: format PID 20144: terminate/verify failed: Command failed: powershell.exe -NoProfile -NonInteractive -Command Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,@{Name='Born';Expression={$_.CreationDate.ToUniversalTime().ToString('o')}} | ConvertTo-Json -Compress\nGet-CimInstance : Access to a CIM resource was not available to the client.\r\nAt line:1 char:1\r\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...\r\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : NotSpecified: (:) [Get-CimInstance], CimException\r\n    + FullyQualifiedErrorId : Microsoft.Management.Infrastructure.CimException,Microsoft.Management.Infrastructure.Cim \r\n   Cmdlets.GetCimInstanceCommand\r\n \r\n"
+                    },
+                    {
+                        "kind": "cleanup",
+                        "message": "tests terminate/verify: tests PID 3304: terminate/verify failed: Command failed: powershell.exe -NoProfile -NonInteractive -Command Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,@{Name='Born';Expression={$_.CreationDate.ToUniversalTime().ToString('o')}} | ConvertTo-Json -Compress\nGet-CimInstance : Access to a CIM resource was not available to the client.\r\nAt line:1 char:1\r\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...\r\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : NotSpecified: (:) [Get-CimInstance], CimException\r\n    + FullyQualifiedErrorId : Microsoft.Management.Infrastructure.CimException,Microsoft.Management.Infrastructure.Cim \r\n   Cmdlets.GetCimInstanceCommand\r\n \r\n"
+                    }
+                ],
+                "cleanupRecords": [
+                    {
+                        "resource": "format terminate/verify",
+                        "status": "failed",
+                        "error": "format PID 20144: terminate/verify failed: Command failed: powershell.exe -NoProfile -NonInteractive -Command Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,@{Name='Born';Expression={$_.CreationDate.ToUniversalTime().ToString('o')}} | ConvertTo-Json -Compress\nGet-CimInstance : Access to a CIM resource was not available to the client.\r\nAt line:1 char:1\r\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...\r\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : NotSpecified: (:) [Get-CimInstance], CimException\r\n    + FullyQualifiedErrorId : Microsoft.Management.Infrastructure.CimException,Microsoft.Management.Infrastructure.Cim \r\n   Cmdlets.GetCimInstanceCommand\r\n \r\n"
+                    },
+                    {
+                        "resource": "tests terminate/verify",
+                        "status": "failed",
+                        "error": "tests PID 3304: terminate/verify failed: Command failed: powershell.exe -NoProfile -NonInteractive -Command Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,@{Name='Born';Expression={$_.CreationDate.ToUniversalTime().ToString('o')}} | ConvertTo-Json -Compress\nGet-CimInstance : Access to a CIM resource was not available to the client.\r\nAt line:1 char:1\r\n+ Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcess ...\r\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : NotSpecified: (:) [Get-CimInstance], CimException\r\n    + FullyQualifiedErrorId : Microsoft.Management.Infrastructure.CimException,Microsoft.Management.Infrastructure.Cim \r\n   Cmdlets.GetCimInstanceCommand\r\n \r\n"
+                    }
+                ],
+                "accepted": false
+            },
+            "command": "NGNE_WEBGPU_ADAPTER=swiftshader npm.cmd run verify:engine"
+        },
+        {
+            "originalEvidence": "C:\\Users\\jfabi\\Documents\\Projects\\tests\\ngne\\out\\runs\\2026-10-11T15-58-47.104Z-verification-827504e0-6e18-40b6-813c-2e05c22e5038\\evidence",
+            "result": {
+                "format": "ngne-tooling",
+                "documentType": "result",
+                "schemaVersion": 1,
+                "runId": "2026-10-11T15-58-47.104Z-verification-827504e0-6e18-40b6-813c-2e05c22e5038",
+                "execution": "failed",
+                "correctness": "failed",
+                "budgets": "not evaluated",
+                "cleanup": "passed",
+                "evidence": "complete",
+                "stages": [
+                    {
+                        "execution": "completed",
+                        "correctness": "passed",
+                        "budgets": "not evaluated",
+                        "cleanup": "passed",
+                        "evidence": "complete",
+                        "id": "format",
+                        "required": true
+                    },
+                    {
+                        "execution": "failed",
+                        "correctness": "failed",
+                        "budgets": "not evaluated",
+                        "cleanup": "passed",
+                        "evidence": "complete",
+                        "id": "tests",
+                        "required": true
+                    }
+                ],
+                "failures": [
+                    {
+                        "kind": "scenario",
+                        "message": "tests: exit 5; see C:\\Users\\jfabi\\Documents\\Projects\\tests\\ngne\\out\\runs\\2026-10-11T15-58-47.104Z-verification-827504e0-6e18-40b6-813c-2e05c22e5038\\evidence\\stages\\tests\\logs\\command.log"
+                    }
+                ],
+                "cleanupRecords": [
+                    {
+                        "resource": "format terminate/verify",
+                        "status": "passed",
+                        "detail": {
+                            "resource": "format PID 23168",
+                            "attempts": [],
+                            "survivors": []
+                        }
+                    },
+                    {
+                        "resource": "tests terminate/verify",
+                        "status": "passed",
+                        "detail": {
+                            "resource": "tests PID 26896",
+                            "attempts": [],
+                            "survivors": []
+                        }
+                    }
+                ],
+                "accepted": false
+            },
+            "command": "NGNE_WEBGPU_ADAPTER=swiftshader npm.cmd run verify:engine"
+        }
+    ],
+    "finalState": "Candidate retained without commit or push; original baseline and candidate preserved.",
+    "archive": "outer-descriptor-experiment-2026-10-11.zip",
+    "archiveNote": "Raw timings, failure/recovery records, exact source variants and patch, verification logs/results/packages, scripts and per-file SHA-256 inventory. Disposable package work installation excluded."
+}

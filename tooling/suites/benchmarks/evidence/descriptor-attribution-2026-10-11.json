@@ -1,0 +1,435 @@
+{
+    "date": "2026-10-11",
+    "decision": "no-engine-change; one future bounded experiment justified",
+    "recommendation": "If another optimisation experiment is authorised, target only the fixed four-property outer descriptor construction: replace its Object.defineProperties call with four equivalent Object.defineProperty calls while keeping property flags, own-property layout, closures/captured epochs, detached entityAt behavior, views/Map, freeze and invalidation unchanged. This removes the outer descriptor-map literal and bulk enumeration but may be slower; retain only if clean paired timings beat fresh-process spread without regressions. No candidate was implemented and no gain is established.",
+    "confidence": {
+        "propertyDefinitionCostCenter": "high within these Node diagnostic workloads",
+        "individualClosureOrTransientObjectCpuCost": "not isolated",
+        "sampledAllocationTotals": "statistical estimates from one run/workload",
+        "snapshotOwnedObjectShape": "directly observed for 12 live one-component numeric small-query descriptors",
+        "futureImplementationBenefit": "unknown"
+    },
+    "measurementLaunches": 10,
+    "provenance": {
+        "revision": "ab06ca009c29d92a8ca85eac53856965e71a52ab",
+        "branch": "codex/descriptor-attribution",
+        "status": "?? .plans/\n",
+        "protectedSourceHashes": {
+            "src/ecs.ts": "b5935cb4536a031e852acc21739f883f01358e643a07b81d40e8a2485ad685cc",
+            "docs/contracts/simulation.md": "899a36c959416a9a5754667fb1cf94963bb0490e88a1021e00c86c553bfd8726",
+            "docs/contracts/ownership-and-inspection.md": "03f6c2fee8f471d033f2e80d01ba332c2c3a2be18dd9ab7972d1e20970a139be",
+            "tooling/suites/benchmarks/cpu/density.ts": "ccbd242729e9fe2c5b0dcaf8f78ee3198ad975e81aabcdbbd219c092eaff31b2",
+            "tooling/suites/benchmarks/cpu/benchmark.ts": "44861b35746053ff4233132e7e202e75b843e332f24f9dd43df10ce0c29e7755",
+            "package.json": "ca540175b711381c16376845a3202bb0e8139dd5ef260c23858483dcd3d74906",
+            "package-lock.json": "8b257b69ca7fd282bd5019f4c99e57f713020b30987df34843dd5036454c5123"
+        },
+        "harnessSha256": "545149b02a4a168d4bbf0efcfd5310a26fba4758f8b8157c68fe49ef0b21aebc",
+        "initialTimingHarnessSha256": "7cc6495ec986afa80e26bb4134ea87dae679b40aecbebe9fcd28d5b22399e569",
+        "initialHarnessNote": "First three tsx timing runs preceded one diagnostics-only addition to capture Debugger source. measure-timing-v1.mjs is reconstructed by removing that exact added line; the timing path is unchanged.",
+        "priorEvidenceChecks": [
+            {
+                "path": "baseline-ecs.ts",
+                "sha256": "b5935cb4536a031e852acc21739f883f01358e643a07b81d40e8a2485ad685cc",
+                "inventoryMatch": true
+            },
+            {
+                "path": "candidate-ecs.ts",
+                "sha256": "04e945b290cc211ceeadd4900635d4006ee8996bff8ea930ad483b29612e1172",
+                "inventoryMatch": true
+            },
+            {
+                "path": "candidate.patch",
+                "sha256": "d81f1125e936bf161926d78d7d169aaa22629565341c5495be94df863d0b8d57",
+                "inventoryMatch": true
+            },
+            {
+                "path": "summary.json",
+                "sha256": "22ffbd0a9a108e74a3ac4a04d68cdea8394b0dc6718e5ecf73ff632acf43c81d",
+                "inventoryMatch": true
+            },
+            {
+                "path": "runs/baseline-1-density/evidence/stages/n128000-traversal/measurements.json",
+                "sha256": "86b4739bfad2201b62afcfcb5297554d5b6df9aa07200ccf70f0c397a4bcb05c",
+                "inventoryMatch": true
+            },
+            {
+                "path": "runs/baseline-profile-density/evidence/stages/n128000-traversal/measurements.json",
+                "sha256": "19d9b92c8680fdb951c2b112b9df281818bfb596dbe4274af6f6d97fa27021c7",
+                "inventoryMatch": true
+            }
+        ],
+        "priorDensityBaseline1MedianFirstMs": 0.7726999999999862,
+        "priorBaselineSourceMatchesCurrent": true
+    },
+    "workloads": {
+        "density": {
+            "entities": 128000,
+            "chunks": 250,
+            "queries": 1,
+            "fields": 7,
+            "arithmetic": false
+        },
+        "small": {
+            "entities": 192,
+            "queries": 12,
+            "entitiesPerQuery": 16,
+            "fields": 8,
+            "traversalsPerPass": 13,
+            "descriptorsPerEpoch": 12,
+            "arithmetic": true
+        }
+    },
+    "timing": [
+        {
+            "name": "clean-tsx-1",
+            "workload": "density",
+            "commit": {
+                "p50": 0.0006999999999379725,
+                "p95": 0.0026000000000294676,
+                "mean": 0.0010780000000062274
+            },
+            "first": {
+                "p50": 0.7836000000000922,
+                "p95": 1.070100000000025,
+                "mean": 0.9274546666666639
+            },
+            "sameEpoch": {
+                "p50": 0.021200000000021646,
+                "p95": 0.029599999999959437,
+                "mean": 0.02319899999999696
+            },
+            "delta": {
+                "p50": 0.7615000000000691,
+                "p95": 1.0428000000000566,
+                "mean": 0.9042556666666669
+            }
+        },
+        {
+            "name": "clean-tsx-1",
+            "workload": "small",
+            "commit": {
+                "p50": 0.00021250000003192326,
+                "p95": 0.0003312500000021146,
+                "mean": 0.00022814583333418645
+            },
+            "first": {
+                "p50": 0.046531250000015234,
+                "p95": 0.05445000000000988,
+                "mean": 0.05355622916666633
+            },
+            "sameEpoch": {
+                "p50": 0.0037750000000045247,
+                "p95": 0.004406250000002387,
+                "mean": 0.003875395833334565
+            },
+            "delta": {
+                "p50": 0.04278124999996891,
+                "p95": 0.050424999999997056,
+                "mean": 0.04968083333333176
+            }
+        },
+        {
+            "name": "clean-tsx-2",
+            "workload": "density",
+            "commit": {
+                "p50": 0.0006999999999379725,
+                "p95": 0.002299999999991087,
+                "mean": 0.0009720000000027084
+            },
+            "first": {
+                "p50": 0.8094999999999573,
+                "p95": 0.9353999999999587,
+                "mean": 0.8938289999999974
+            },
+            "sameEpoch": {
+                "p50": 0.021000000000015007,
+                "p95": 0.027500000000031832,
+                "mean": 0.03767566666666672
+            },
+            "delta": {
+                "p50": 0.7883999999999673,
+                "p95": 0.9066000000001395,
+                "mean": 0.8561533333333307
+            }
+        },
+        {
+            "name": "clean-tsx-2",
+            "workload": "small",
+            "commit": {
+                "p50": 0.00020625000000507043,
+                "p95": 0.0003062500000154955,
+                "mean": 0.00022041666666664146
+            },
+            "first": {
+                "p50": 0.04605625000000657,
+                "p95": 0.06020000000001602,
+                "mean": 0.05226247916666731
+            },
+            "sameEpoch": {
+                "p50": 0.0037374999999855163,
+                "p95": 0.004699999999992599,
+                "mean": 0.0038712916666667732
+            },
+            "delta": {
+                "p50": 0.04236874999998008,
+                "p95": 0.05610624999999203,
+                "mean": 0.04839118750000054
+            }
+        },
+        {
+            "name": "clean-tsx-3",
+            "workload": "density",
+            "commit": {
+                "p50": 0.0007000000000516593,
+                "p95": 0.0027000000000043656,
+                "mean": 0.0012036666666695812
+            },
+            "first": {
+                "p50": 0.7742999999999256,
+                "p95": 0.9791999999999916,
+                "mean": 0.8961349999999978
+            },
+            "sameEpoch": {
+                "p50": 0.01920000000006894,
+                "p95": 0.02559999999999718,
+                "mean": 0.019932333333333645
+            },
+            "delta": {
+                "p50": 0.7549000000001342,
+                "p95": 0.9541999999999575,
+                "mean": 0.8762026666666641
+            }
+        },
+        {
+            "name": "clean-tsx-3",
+            "workload": "small",
+            "commit": {
+                "p50": 0.00021249999999639613,
+                "p95": 0.0003875000000164164,
+                "mean": 0.0002449166666657258
+            },
+            "first": {
+                "p50": 0.04694375000000406,
+                "p95": 0.05775625000000417,
+                "mean": 0.05322695833333455
+            },
+            "sameEpoch": {
+                "p50": 0.0038999999999944635,
+                "p95": 0.004668750000014654,
+                "mean": 0.004020395833333126
+            },
+            "delta": {
+                "p50": 0.0430250000000143,
+                "p95": 0.053381249999986835,
+                "mean": 0.049206562500001425
+            }
+        },
+        {
+            "name": "clean-native-1",
+            "workload": "density",
+            "commit": {
+                "p50": 0.0006000000000199179,
+                "p95": 0.0017000000000280124,
+                "mean": 0.0008826666666703886
+            },
+            "first": {
+                "p50": 0.7034999999999627,
+                "p95": 0.8229000000000042,
+                "mean": 0.8063693333333324
+            },
+            "sameEpoch": {
+                "p50": 0.02070000000003347,
+                "p95": 0.02729999999996835,
+                "mean": 0.021665333333327225
+            },
+            "delta": {
+                "p50": 0.6822999999999979,
+                "p95": 0.7914000000000669,
+                "mean": 0.7847040000000052
+            }
+        },
+        {
+            "name": "clean-native-1",
+            "workload": "small",
+            "commit": {
+                "p50": 0.0002187500000374598,
+                "p95": 0.00036250000000848104,
+                "mean": 0.00023987499999928257
+            },
+            "first": {
+                "p50": 0.043525000000038006,
+                "p95": 0.05388749999998055,
+                "mean": 0.048658458333333716
+            },
+            "sameEpoch": {
+                "p50": 0.004174999999996487,
+                "p95": 0.004725000000000534,
+                "mean": 0.004270958333332828
+            },
+            "delta": {
+                "p50": 0.039262500000013745,
+                "p95": 0.049056250000028,
+                "mean": 0.04438750000000089
+            }
+        }
+    ],
+    "cpu": [
+        {
+            "workload": "density",
+            "descriptorBuilderWeightedSamplePercent": 75.13078887755599,
+            "descriptorBuilderWeightedSampleMs": 14735.044,
+            "allWeightedSampleMs": 19612.524,
+            "allSampleCount": 26830,
+            "builderSourcePositionTicks": 20760,
+            "definitionCallSitePositionTicks": {
+                "fields": 7004,
+                "componentLookup": 1854,
+                "fixedOuterDescriptor": 8234
+            },
+            "definitionCallsPercentOfBuilderPositionTicks": 82.33140655105973,
+            "fixedOuterDescriptorPercentOfBuilderPositionTicks": 39.66281310211946,
+            "mapConstructorPositionTicks": 179,
+            "mapConstructorPercentOfBuilderPositionTicks": 0.8622350674373795,
+            "gcObservedDurationMs": 1434.5414994359016,
+            "gcObservedPercentOfLoop": 7.326404660510136,
+            "loopElapsedMs": 19580.429500000002,
+            "iterations": 8000
+        },
+        {
+            "workload": "small",
+            "descriptorBuilderWeightedSamplePercent": 64.36628065719162,
+            "descriptorBuilderWeightedSampleMs": 9186.866,
+            "allWeightedSampleMs": 14272.793,
+            "allSampleCount": 19719,
+            "builderSourcePositionTicks": 12860,
+            "definitionCallSitePositionTicks": {
+                "fields": 4651,
+                "componentLookup": 1296,
+                "fixedOuterDescriptor": 4576
+            },
+            "definitionCallsPercentOfBuilderPositionTicks": 81.82737169517885,
+            "fixedOuterDescriptorPercentOfBuilderPositionTicks": 35.58320373250389,
+            "mapConstructorPositionTicks": 82,
+            "mapConstructorPercentOfBuilderPositionTicks": 0.6376360808709176,
+            "gcObservedDurationMs": 762.2590998411179,
+            "gcObservedPercentOfLoop": 5.345444066955183,
+            "loopElapsedMs": 14259.9771,
+            "iterations": 96000
+        }
+    ],
+    "heap": [
+        {
+            "workload": "density",
+            "totalSampledBytes": 1274239472,
+            "sampleCount": 153165,
+            "expectedDescriptors": 500000,
+            "bytesPerExpectedDescriptor": 2548.478944,
+            "elapsed": 2061.0745,
+            "gc": {
+                "count": 26,
+                "total": 168.3571000099182
+            },
+            "attributedSampledBytes": {
+                "builderSelf": 1163442184,
+                "mapUnderBuilder": 91147728,
+                "arrayFlatMapSelf": 14038752,
+                "arrayMapSelf": 4252768,
+                "refreshCallbacksSelf": 189960
+            },
+            "percentages": {
+                "builderSelf": 91.30483002334745,
+                "mapUnderBuilder": 7.153108187500881,
+                "arrayFlatMapSelf": 1.10173576541035,
+                "arrayMapSelf": 0.3337495104687826,
+                "refreshCallbacksSelf": 0.014907715870851629
+            }
+        },
+        {
+            "workload": "small",
+            "totalSampledBytes": 894985872,
+            "sampleCount": 107891,
+            "expectedDescriptors": 288000,
+            "bytesPerExpectedDescriptor": 3107.5898333333334,
+            "elapsed": 1429.3347,
+            "gc": {
+                "count": 23,
+                "total": 99.27310001850128
+            },
+            "attributedSampledBytes": {
+                "builderSelf": 696477296,
+                "mapUnderBuilder": 54366616,
+                "arrayFlatMapSelf": 52858760,
+                "arrayMapSelf": 49248,
+                "refreshCallbacksSelf": 43965400
+            },
+            "percentages": {
+                "builderSelf": 77.81992071490487,
+                "mapUnderBuilder": 6.074578124737147,
+                "arrayFlatMapSelf": 5.906099934502653,
+                "arrayMapSelf": 0.00550265669445115,
+                "refreshCallbacksSelf": 4.912412740298542
+            }
+        }
+    ],
+    "liveSnapshot": {
+        "descriptorCount": 12,
+        "totals": {
+            "closures": {
+                "count": 72,
+                "shallowBytes": 4032
+            },
+            "contexts": {
+                "count": 24,
+                "shallowBytes": 1440
+            },
+            "wrappers": {
+                "count": 36,
+                "shallowBytes": 1248
+            },
+            "mapAndTable": {
+                "count": 24,
+                "shallowBytes": 2208
+            },
+            "accessorPairs": {
+                "count": 48,
+                "shallowBytes": 1152
+            },
+            "propertyBacking": {
+                "count": 36,
+                "shallowBytes": 5760
+            }
+        },
+        "shallowBytesPerSelectedDescriptor": 1320,
+        "notTotalTransientAllocation": true
+    },
+    "harnessDifferences": [
+        "Clean timings directly import unchanged engine through installed tsx; callbacks are retained instead of allocated inside every traverse (density and small), extra visit/row counters validate topology, density omits unused plain-array control and its timings, and small batches are reconstructed by averaging 16 per-tick triples. These are fresh attribution controls, not exact historical benchmark reruns.",
+        "Native diagnostics import the unchanged src/ecs.ts with experimental transform-types; retained executed source and inline source maps identify generated positions. Native clean medians were lower than tsx controls, so do not pool loaders or treat native diagnostic percentages as exact production percentages.",
+        "Timing does commit/first/same-epoch; CPU and heap loops do commit/first only after same fixed warmup. Snapshot is after sampling and forced GC, separately from sampled allocation totals."
+    ],
+    "limits": [
+        "CPU profiler requested 100 microseconds but delivered roughly 0.73 ms/sample on Windows; observed loop elapsed per iteration was approximately 3.0-3.1 times native clean first+commit mean, an approximate perturbation signal because loop shapes differ. Weighted-time percentages divide by all profile timeDeltas; source-position percentages divide by builder positionTicks and are not CPU-time percentages.",
+        "Native operations are generally charged to caller source sites. DefineProperty call-site ticks include surrounding descriptor literal/function creation and native property work; they cannot split property definition vs closure/context allocation. Inlining can shift allocations or time into caller frames.",
+        "Heap sampling interval 8192 includes objects collected by both minor and major GC. Bytes are statistically scaled allocation samples, not exact counts/live heap, and selfSize is not CPU time. One heap run/workload gives no repeated-run uncertainty interval.",
+        "Snapshot shallow bytes/counts inventory only specified live descriptor graph nodes, excluding shared code/shapes/strings, engine arrays/world, query arrays and dead temporaries. It cannot quantify transient object allocation or CPU cost.",
+        "GC durations belong to the whole diagnostic loop; profiler/collector interaction prevents converting these percentages into clean production GC costs.",
+        "Both workloads use one numeric component per descriptor. Entity-reference subviews and multiple-component shape costs were not measured. Browser, consumer FPS, devices, cross-engine/version behavior and end-to-end game gain are untested."
+    ],
+    "verification": {
+        "engineEdited": false,
+        "testsDocsToolingEdited": false,
+        "cleanTrackedDiff": true,
+        "userPlansUntouched": true,
+        "checks": "Fixture row/chunk counts, typed-array constructors, frozen non-enumerable wrappers, same-epoch identity and old-borrow expiry before/after rebuild; no full engine suite necessary for untouched source.",
+        "cleanup": "cleanup.json"
+    },
+    "artifacts": {
+        "analysis": "profile-analysis.json",
+        "snapshot": "snapshot-analysis.json",
+        "rawCpu": ["cpu-density-density.cpuprofile", "cpu-small-small.cpuprofile"],
+        "rawHeap": ["heap-density-density.heapprofile", "heap-small-small.heapprofile"],
+        "liveHeap": "heap-small-small.heapsnapshot",
+        "commands": "executions.json",
+        "hashes": "provenance.json"
+    }
+}
