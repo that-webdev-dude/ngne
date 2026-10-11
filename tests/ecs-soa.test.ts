@@ -431,6 +431,55 @@ test("typed query borrows are nested, exception-safe, visible, and invalidated b
     assert.throws(() => freshViews!.position, /expired/);
 });
 
+test("chunk outer properties preserve opaque frozen shape and detached epoch guards", () => {
+    const Position = component("position", { x: f64() });
+    const world = new World();
+    const entity = world.spawn(Position.of());
+    world.commit();
+    const query = world.query(Position);
+    const capture = () => {
+        let borrowed: Parameters<Parameters<typeof query.eachChunk>[0]>[0] | undefined;
+        query.eachChunk((chunk) => (borrowed = chunk));
+        assert.ok(borrowed);
+        assert.deepEqual(Reflect.ownKeys(borrowed), ["count", "capacity", "views", "entityAt"]);
+        assert.deepEqual(Object.keys(borrowed), []);
+        assert.equal(Object.isFrozen(borrowed), true);
+        const properties = Object.getOwnPropertyDescriptors(borrowed);
+        for (const name of ["count", "capacity", "views"]) {
+            const property = properties[name];
+            assert.deepEqual(Object.keys(property), ["get", "set", "enumerable", "configurable"]);
+            assert.equal(typeof property.get, "function");
+            assert.equal(property.set, undefined);
+            assert.equal(property.enumerable, false);
+            assert.equal(property.configurable, false);
+        }
+        const entityAt = borrowed.entityAt;
+        assert.deepEqual(properties.entityAt, {
+            value: entityAt,
+            writable: false,
+            enumerable: false,
+            configurable: false,
+        });
+        assert.equal(entityAt(0), entity);
+        return { borrowed, properties, entityAt };
+    };
+    const first = capture();
+    assert.equal(capture().borrowed, first.borrowed);
+    world.commit();
+    const second = capture();
+    assert.notEqual(second.borrowed, first.borrowed);
+    assert.notEqual(second.entityAt, first.entityAt);
+    for (const name of ["count", "capacity", "views"]) {
+        assert.notEqual(second.properties[name].get, first.properties[name].get);
+        assert.throws(() => first.properties[name].get!(), /expired/);
+    }
+    assert.throws(() => first.entityAt(0), /expired/);
+    world.dispose();
+    for (const name of ["count", "capacity", "views"])
+        assert.throws(() => second.properties[name].get!(), /expired/);
+    assert.throws(() => second.entityAt(0), /expired/);
+});
+
 test("same-query nested traversal visits the chunk cross product in creation, chunk and row order", () => {
     const Position = component("nested-position", { x: f64() });
     const world = new World();

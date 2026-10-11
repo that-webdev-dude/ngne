@@ -754,32 +754,30 @@ function createChunkDescriptor<Types extends readonly AnySchemaComponent[]>(
         });
     Object.freeze(views);
     const descriptor = {};
-    Object.defineProperties(descriptor, {
-        count: {
-            get() {
-                assertValid();
-                return chunk.count;
-            },
+    Object.defineProperty(descriptor, "count", {
+        get() {
+            assertValid();
+            return chunk.count;
         },
-        capacity: {
-            get() {
-                assertValid();
-                return CHUNK_CAPACITY;
-            },
+    });
+    Object.defineProperty(descriptor, "capacity", {
+        get() {
+            assertValid();
+            return CHUNK_CAPACITY;
         },
-        views: {
-            get() {
-                assertValid();
-                return views;
-            },
+    });
+    Object.defineProperty(descriptor, "views", {
+        get() {
+            assertValid();
+            return views;
         },
-        entityAt: {
-            value(row: number) {
-                assertValid();
-                if (!Number.isInteger(row) || row < 0 || row >= chunk.count)
-                    throw new Error("Schema chunk row is outside the live range");
-                return chunk.entities[row]!;
-            },
+    });
+    Object.defineProperty(descriptor, "entityAt", {
+        value(row: number) {
+            assertValid();
+            if (!Number.isInteger(row) || row < 0 || row >= chunk.count)
+                throw new Error("Schema chunk row is outside the live range");
+            return chunk.entities[row]!;
         },
     });
     return Object.freeze(descriptor) as SchemaChunk<Types>;
