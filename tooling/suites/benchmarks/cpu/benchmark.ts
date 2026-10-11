@@ -56,6 +56,7 @@ const g = new Game<Progress, ProgressCommand>({
 await g.start(await g.prepare(arena({ stress: true }), { key: "chaos" }));
 const frame = new Frame();
 const full: number[] = [];
+const orderSamples: { tick: number; quads: number; firstReorderedIndex: number }[] = [];
 let peak = 0;
 for (let i = 0; i < CHAOS_TICKS; i++) {
     const start = performance.now();
@@ -64,6 +65,14 @@ for (let i = 0; i < CHAOS_TICKS; i++) {
     g.render(frame, 0.5);
     frame.sort();
     const time = performance.now() - start;
+    // Observe canonical output without changing the scene or accessing private sort keys.
+    // Packing starts with identity order, so any moved index requires sort/gather.
+    // Keep this applicability scan outside the existing timed interval.
+    orderSamples.push({
+        tick: i + 1,
+        quads: frame.count,
+        firstReorderedIndex: frame.order.findIndex((index, position) => index !== position),
+    });
     if (i >= CHAOS_WARMUP) full.push(time);
     peak = Math.max(peak, frame.count);
 }
@@ -101,6 +110,14 @@ console.log(
                 rawMs: full,
                 tickBudgetMs: TICK_BUDGET_MS,
                 ticksOverBudget: full.filter((time) => time > TICK_BUDGET_MS).length,
+                submissionOrder: {
+                    criterion: "Canonical sorted active order is identity (order[i] === i)",
+                    instrumentation:
+                        "After the timed interval; CPU applicability, not browser performance",
+                    allFrames: summarizeOrder(orderSamples),
+                    postWarmupFrames: summarizeOrder(orderSamples.slice(CHAOS_WARMUP)),
+                    raw: orderSamples,
+                },
             },
             collisionGrid: grid.result,
             epochTraversal: epoch,
@@ -115,6 +132,24 @@ console.log(
 g.dispose();
 world.dispose();
 grid.dispose();
+
+function summarizeOrder(samples: typeof orderSamples) {
+    const eligible = samples.filter((sample) => sample.firstReorderedIndex === -1);
+    const sizes = (frames: typeof orderSamples) =>
+        frames.length
+            ? {
+                  min: Math.min(...frames.map((s) => s.quads)),
+                  max: Math.max(...frames.map((s) => s.quads)),
+              }
+            : null;
+    return {
+        frames: samples.length,
+        eligibleFrames: eligible.length,
+        eligibleFraction: eligible.length / samples.length,
+        quads: sizes(samples),
+        eligibleQuads: sizes(eligible),
+    };
+}
 
 function runCollisionGridBenchmark() {
     const GridPosition = component("benchmark-grid-position", { x: f64(), y: f64() });
