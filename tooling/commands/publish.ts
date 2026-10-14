@@ -309,7 +309,7 @@ export async function request(url: string, options: RequestInit = {}): Promise<u
     const response = await fetch(url, {
         redirect: "error",
         ...options,
-        signal: AbortSignal.timeout(30_000),
+        signal: options.signal ?? AbortSignal.timeout(30_000),
     });
     if (!response.ok) throw Error(`HTTP ${response.status}: ${url}`);
     return response.json();
@@ -357,9 +357,10 @@ const stepOutput = (key: string, value: string) => {
     assert(process.env.GITHUB_OUTPUT);
     appendFileSync(process.env.GITHUB_OUTPUT, `${key}=${value}\n`);
 };
-const packument = () =>
+const packument = (timeoutMs = 30_000) =>
     request(`${registry}${encodeURIComponent("@ngne/core")}`, {
         headers: { Accept: "application/json", "Cache-Control": "no-cache" },
+        signal: AbortSignal.timeout(timeoutMs),
     });
 
 export async function publishOnce(
@@ -374,6 +375,61 @@ export async function publishOnce(
         return { attempted: true, commandSucceeded: true };
     } catch {
         return { attempted: true, commandSucceeded: false };
+    }
+}
+
+export async function waitForRegistryListing(
+    candidate: Candidate,
+    publication: { attempted: boolean },
+    read: (timeoutMs: number) => Promise<unknown>,
+    record: (observation: {
+        attempt: number;
+        elapsedMs: number;
+        status: "absent" | "listed" | "failed";
+        document?: unknown;
+        error?: string;
+    }) => void,
+    clock = {
+        now: () => performance.now(),
+        sleep: (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)),
+    },
+): Promise<unknown> {
+    const started = clock.now(),
+        windowMs = publication.attempted ? 10 * 60_000 : 0;
+    const beforeDeadline = () =>
+        assert(
+            clock.now() - started < windowMs,
+            "Exact version is absent; registry listing deadline reached; do not retry publication within this attempt",
+        );
+    for (let attempt = 0; ; attempt++) {
+        if (attempt > 0) beforeDeadline();
+        let document: unknown;
+        let listed: boolean;
+        try {
+            document = await read(
+                publication.attempted
+                    ? Math.min(30_000, Math.max(1, Math.floor(windowMs - (clock.now() - started))))
+                    : 30_000,
+            );
+            listed = registryVersion(document, candidate) !== null;
+        } catch (error) {
+            record({
+                attempt,
+                elapsedMs: clock.now() - started,
+                status: "failed",
+                document,
+                error: String(error),
+            });
+            throw error;
+        }
+        const elapsedMs = clock.now() - started;
+        record({ attempt, elapsedMs, status: listed ? "listed" : "absent", document });
+        if (listed) {
+            if (publication.attempted) beforeDeadline();
+            return document;
+        }
+        beforeDeadline();
+        await clock.sleep(Math.min(15_000, windowMs - elapsedMs));
     }
 }
 
@@ -651,19 +707,11 @@ async function publish(selection: ReturnType<typeof validateSelection>, candidat
         }
     });
     save("publish-attempt.json", publication);
-    let origin: Awaited<ReturnType<typeof verifyRegistry>> | undefined;
-    for (let attempt = 0; attempt < 5; attempt++) {
-        try {
-            document = await packument();
-            origin = await verifyRegistry(candidate, document, publication);
-            break;
-        } catch (error) {
-            save("registry-failure.json", { attempt, error: String(error) });
-            if (attempt === 4) throw error;
-            await new Promise((resolve) => setTimeout(resolve, 2_000 * (attempt + 1)));
-        }
-    }
+    document = await waitForRegistryListing(candidate, publication, packument, (observation) =>
+        save(`registry-read-${observation.attempt}.json`, observation),
+    );
     save("registry.json", document);
+    const origin = await verifyRegistry(candidate, document, publication);
     const smoke = `${output}/smoke`;
     mkdirSync(smoke); // Fresh workspace and cache; never reuse an earlier installation.
     writeFileSync(
