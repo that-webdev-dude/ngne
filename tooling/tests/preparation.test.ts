@@ -315,6 +315,16 @@ test("added installation files and removed evidence payloads invalidate handoff"
     assert.throws(() => verifyPrepared(manifest), /Changed evidence inventory/);
 });
 
+for (const path of ["extra.txt", "builds/nested/extra.txt"]) {
+    test(`prepared handoff rejects an unrelated unlisted file: ${path}`, async (t) => {
+        const run = await prepared(temporary(t));
+        const manifest = join(run.evidence, "manifest.json");
+        assert.doesNotThrow(() => verifyPrepared(manifest));
+        writeFileSync(join(run.evidence, path), "unlisted payload");
+        assert.throws(() => verifyPrepared(manifest), /Changed evidence inventory/);
+    });
+}
+
 test("required stages not evaluated cannot produce successful acceptance", async (t) => {
     const run = new Run(temporary(t), "required");
     await run.execute(async () => {

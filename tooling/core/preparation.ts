@@ -1,7 +1,13 @@
 import { execFileSync } from "node:child_process";
 import { cpSync, mkdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
-import { contained, hash, identities, verifyIdentities } from "../evidence/identity.js";
+import {
+    contained,
+    hash,
+    identities,
+    verifyArtifactInventory,
+    verifyIdentities,
+} from "../evidence/identity.js";
 import { readArtifacts, readManifest, readResult, type Manifest } from "../evidence/schema.js";
 import { Run } from "./run.js";
 import { pack } from "./package.js";
@@ -96,13 +102,10 @@ export function verifyPrepared(manifestPath: string): Manifest {
     for (const path of required)
         if (!artifacts.files.some((file) => file.path === path))
             throw Error(`Missing required artifact: ${path}`);
-    const actual = identities(evidence);
-    delete actual["artifacts.json"];
-    if (
-        JSON.stringify(Object.keys(actual).sort()) !==
-        JSON.stringify(artifacts.files.map((f) => f.path).sort())
-    )
-        throw Error("Changed evidence inventory");
+    verifyArtifactInventory(
+        evidence,
+        artifacts.files.map((f) => f.path),
+    );
     for (const file of artifacts.files) {
         const path = contained(evidence, file.path);
         if (hash(readFileSync(path)) !== file.sha256 || statSync(path).size !== file.bytes)

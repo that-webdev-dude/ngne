@@ -10,7 +10,7 @@ import {
     readResult,
     readArtifacts,
 } from "../../../evidence/schema.js";
-import { contained, hash } from "../../../evidence/identity.js";
+import { contained, hash, verifyArtifactInventory } from "../../../evidence/identity.js";
 import { readMeasurement } from "./measurement.js";
 
 export interface EnvironmentProfile {
@@ -169,6 +169,10 @@ export function baselineEvidence(evidence: string) {
     ])
         if (!artifacts.files.some((f) => f.path === required))
             throw Error(`Missing baseline inventory ${required}`);
+    verifyArtifactInventory(
+        evidence,
+        artifacts.files.map((f) => f.path),
+    );
     const p95Ms = Array.from({ length: 3 }, (_, i) => {
         if (
             !result.stages.some(

@@ -145,6 +145,19 @@ test("consumer contract rejects linked payload directories", (t) => {
     assert.throws(() => validateConsumerResponse(f.output, f.selected, 0), /Linked/);
 });
 
+for (const path of ["extra.txt", "package/extra.txt"]) {
+    test(`consumer contract rejects an unrelated unlisted file: ${path}`, (t) => {
+        const f = fixture(t);
+        assert.equal(stub(f.args), 0);
+        assert.equal(validateConsumerResponse(f.output, f.selected, 0).accepted, true);
+        writeFileSync(join(f.output, "evidence", path), "unlisted payload");
+        assert.throws(
+            () => validateConsumerResponse(f.output, f.selected, 0),
+            /Changed evidence inventory/,
+        );
+    });
+}
+
 test("consumer stub CLI runs independently twice and returns invalid-input status on reuse", (t) => {
     for (let i = 0; i < 2; i++) {
         const f = fixture(t);

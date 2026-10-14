@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { contained, hash, safePath } from "./identity.js";
+import { contained, hash, safePath, verifyArtifactInventory } from "./identity.js";
 import {
     object,
     readArtifacts,
@@ -89,6 +89,10 @@ export function loadBenchmarkRun(input: string, role: string): ReturnType<typeof
     }
     for (const name of ["manifest.json", "result.json", "report.md"])
         if (!listed.has(name)) throw Error(`Missing required artifact: ${name}`);
+    verifyArtifactInventory(
+        directory,
+        artifacts.files.map((f) => f.path),
+    );
     const result = readResult(readJson(contained(directory, "result.json")));
     if (result.runId !== manifest.runId) throw Error("Result run identity mismatch");
     if (result.evidence !== "complete") throw Error("Incomplete benchmark evidence");
