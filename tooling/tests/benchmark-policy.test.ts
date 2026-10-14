@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+    mkdtempSync,
+    mkdirSync,
+    readFileSync,
+    writeFileSync,
+    unlinkSync,
+    symlinkSync,
+} from "node:fs";
 import { resolve, join } from "node:path";
 import { Run } from "../core/run.js";
 import { benchmarkOptions } from "../suites/benchmarks/options.js";
@@ -178,7 +185,7 @@ test("over-budget sampling completes all repetitions and cleanup with independen
     );
 });
 
-test("baseline loading verifies retained bytes and recomputes complete raw measurement metrics", async () => {
+async function baselineFixture() {
     const parent = resolve(".test-output/benchmark-policy");
     mkdirSync(parent, { recursive: true });
     const run = new Run(
@@ -281,6 +288,39 @@ test("baseline loading verifies retained bytes and recomputes complete raw measu
                 });
             });
     });
+    return run;
+}
+
+for (const path of ["extra.txt", "stages/repetition-0/extra.txt"]) {
+    test(`baseline reader rejects an unrelated unlisted file: ${path}`, async () => {
+        const run = await baselineFixture();
+        assert.deepEqual(baselineEvidence(run.evidence).row.p95Ms, [10, 10, 10]);
+        writeFileSync(join(run.evidence, path), "unlisted payload");
+        assert.throws(() => baselineEvidence(run.evidence), /Changed evidence inventory/);
+        unlinkSync(join(run.evidence, path));
+        assert.deepEqual(baselineEvidence(run.evidence).row.p95Ms, [10, 10, 10]);
+    });
+}
+
+test("baseline reader rejects unlisted linked directories", async () => {
+    const run = await baselineFixture();
+    symlinkSync(join(run.evidence, "package"), join(run.evidence, "linked"), "junction");
+    assert.throws(() => baselineEvidence(run.evidence), /Linked inventory entry/);
+});
+
+test("baseline reader requires measurements even when omitted from disk and inventory", async () => {
+    const run = await baselineFixture();
+    const path = "stages/repetition-0/measurements.json";
+    unlinkSync(join(run.evidence, path));
+    const inventoryPath = join(run.evidence, "artifacts.json"),
+        inventory = JSON.parse(readFileSync(inventoryPath, "utf8"));
+    inventory.files = inventory.files.filter((f: { path: string }) => f.path !== path);
+    writeFileSync(inventoryPath, JSON.stringify(inventory));
+    assert.throws(() => baselineEvidence(run.evidence), /Missing baseline inventory stages/);
+});
+
+test("baseline loading verifies retained bytes and recomputes complete raw measurement metrics", async () => {
+    const run = await baselineFixture();
     assert.deepEqual(baselineEvidence(run.evidence).row.p95Ms, [10, 10, 10]);
     const originalInventory = readFileSync(join(run.evidence, "artifacts.json"));
     const missingPackage = JSON.parse(originalInventory.toString());

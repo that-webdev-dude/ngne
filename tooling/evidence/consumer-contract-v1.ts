@@ -1,6 +1,12 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { contained, hash, identities, type Identities } from "./identity.js";
+import {
+    contained,
+    hash,
+    identities,
+    verifyArtifactInventory,
+    type Identities,
+} from "./identity.js";
 import {
     files,
     object,
@@ -90,8 +96,10 @@ export function validateConsumerResponse(
         throw Error("Incomplete consumer result");
     if (![0, 1].includes(exitCode) || (exitCode === 0) !== result.accepted)
         throw Error("Exit/outcome mismatch");
-    const actual = identities(root);
-    delete actual["artifacts.json"];
+    const actual = verifyArtifactInventory(
+        root,
+        artifacts.files.map((f) => f.path),
+    );
     const expected = Object.fromEntries(artifacts.files.map((f) => [f.path, f.sha256]));
     if (!same(actual, expected)) throw Error("Artifact inventory mismatch");
     for (const required of ["manifest.json", "result.json", "report.md", manifest.package.path])

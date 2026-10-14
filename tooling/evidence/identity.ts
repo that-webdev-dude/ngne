@@ -50,6 +50,15 @@ export function identities(root: string): Identities {
     return files;
 }
 
+/** Exact evidence file set; the inventory excludes only its own artifacts.json. */
+export function verifyArtifactInventory(root: string, paths: readonly string[]): Identities {
+    const actual = identities(root);
+    delete actual["artifacts.json"];
+    if (JSON.stringify(Object.keys(actual).sort()) !== JSON.stringify([...paths].sort()))
+        throw Error("Changed evidence inventory");
+    return actual;
+}
+
 export function verifyIdentities(root: string, expected: Identities): void {
     const actual = identities(root);
     const keys = Object.keys(expected).sort();

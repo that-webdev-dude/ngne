@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync, unlinkSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, unlinkSync, symlinkSync } from "node:fs";
 import { join, resolve, dirname } from "node:path";
 import { evidenceFixture, measured } from "./fixtures/benchmark-evidence.js";
 import { loadBenchmarkRun } from "../evidence/benchmark-results.js";
@@ -17,6 +17,13 @@ function reseal(directory: string, path: string) {
     file.sha256 = hash(bytes);
     writeFileSync(join(directory, "artifacts.json"), JSON.stringify(inventory));
 }
+
+test("current reader rejects unlisted linked directories", async () => {
+    const run = evidenceFixture();
+    await run.execute(() => measured(run));
+    symlinkSync(join(run.evidence, "stages/churn"), join(run.evidence, "linked"), "junction");
+    assert.throws(() => loadBenchmarkRun(run.root, "candidate"), /Linked inventory entry/);
+});
 
 test("current run roots and evidence paths share canonical measurements; historical metrics match", async () => {
     const run = evidenceFixture();
@@ -56,6 +63,16 @@ test("comparison CLI links canonical reports and rejects tampered current eviden
         /Changed artifact/,
     );
 });
+
+for (const path of ["extra.txt", "stages/churn/diagnostics/extra.txt"]) {
+    test(`current reader rejects an unrelated unlisted file: ${path}`, async () => {
+        const run = evidenceFixture();
+        await run.execute(() => measured(run));
+        assert.doesNotThrow(() => loadBenchmarkRun(run.root, "candidate"));
+        writeFileSync(join(run.evidence, path), "unlisted payload");
+        assert.throws(() => loadBenchmarkRun(run.root, "candidate"), /Changed evidence inventory/);
+    });
+}
 
 test("current reader rejects corrupt, missing, unlisted and cross-run evidence", async () => {
     for (const kind of [
