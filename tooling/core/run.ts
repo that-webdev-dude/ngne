@@ -152,14 +152,15 @@ export class Run {
         };
         r.correctness = checks("correctness");
         r.budgets = checks("budgets");
+        const evidence = r.failures.some((f) => f.kind === "evidence") ? "partial" : "complete";
         for (const stage of r.stages) {
             stage.cleanup = r.cleanup;
-            stage.evidence = "complete";
+            stage.evidence = evidence;
         }
         // Persist a nonterminal record before attempting the final evidence transaction.
         this.persist();
         try {
-            r.evidence = "complete";
+            r.evidence = evidence;
             r.accepted =
                 accepts(r) &&
                 r.stages.length > 0 &&

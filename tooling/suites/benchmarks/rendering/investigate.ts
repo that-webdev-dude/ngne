@@ -9,6 +9,7 @@ import { serve } from "../../../core/server.js";
 import { BrowserSession } from "../../../core/browser/session.js";
 import { hash, identities } from "../../../evidence/identity.js";
 import { summarizeFrames, type FrameMeasurements } from "./investigation-summary.js";
+import { investigationCase } from "./investigation-case.js";
 
 // Explicit fixture selection: engine fixtures never discover or import a consumer.
 const [rootArg, entry, casesArg = "count=64000", repeatsArg = "5"] = process.argv.slice(2);
@@ -89,13 +90,16 @@ const result = await run.execute(async () => {
     for (let repeat = 0; repeat < repeats; repeat++) {
         for (const query of repeat % 2 ? [...cases].reverse() : cases) {
             const id = `r${repeat + 1}-c${cases.indexOf(query) + 1}`;
-            await run.stage(id, async () => {
-                const folder = join(run.evidence, "stages", id);
-                mkdirSync(folder, { recursive: true });
-                const session = new BrowserSession();
-                let payload: Record<string, unknown> | undefined;
-                const errors: unknown[] = [];
-                try {
+            const folder = join(run.evidence, "stages", id);
+            mkdirSync(folder, { recursive: true });
+            const session = new BrowserSession();
+            let payload: Record<string, unknown> | undefined;
+            const errors: unknown[] = [];
+            const passed = await investigationCase(
+                run,
+                id,
+                session,
+                async () => {
                     const page = await session.start({
                         flags: [
                             "--no-first-run",
@@ -206,13 +210,10 @@ const result = await run.execute(async () => {
                             `Invalid sample: ${JSON.stringify({ visibility, hidden: payload.hidden, error: payload.error, errors })}`,
                         );
                     await session.screenshot(join(folder, "frame.png"));
-                } finally {
-                    const cleanup = await session.close();
-                    run.record(id, "measurements", { ...payload, errors, cleanup });
-                    if (cleanup.some((record) => record.status === "failed"))
-                        throw Error("Browser cleanup failed");
-                }
-            });
+                },
+                () => ({ ...payload, errors }),
+            );
+            if (!passed) return;
         }
     }
 });
