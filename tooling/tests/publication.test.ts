@@ -5,6 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import {
     publishOnce,
+    waitForRegistryListing,
     publicationInventory,
     registryVersion,
     request,
@@ -405,6 +406,233 @@ test("a packument holding only the staged-bootstrap placeholder permits the abse
     assert.equal(registryVersion(placeholder, candidate), null);
 });
 
+function listingClock() {
+    let elapsedMs = 0;
+    const sleeps: number[] = [];
+    return {
+        sleeps,
+        now: () => elapsedMs,
+        advance: (ms: number) => {
+            elapsedMs += ms;
+        },
+        sleep: async (ms: number) => {
+            sleeps.push(ms);
+            elapsedMs += ms;
+        },
+    };
+}
+
+test("late registry listing reconciles successful and uncertain uploads without another upload", async (t) => {
+    const candidate = candidateFixture(t).read();
+    for (const commandSucceeded of [true, false]) {
+        const clock = listingClock();
+        const observations: Parameters<Parameters<typeof waitForRegistryListing>[3]>[0][] = [];
+        let sends = 0;
+        const read = async () => registry(candidate, clock.now() >= 360_000);
+        const publication = await publishOnce(candidate, read, () => {
+            sends++;
+            if (!commandSucceeded) throw Error("Upload response lost");
+        });
+        assert.equal(publication.commandSucceeded, commandSucceeded);
+        const document = await waitForRegistryListing(
+            candidate,
+            publication,
+            read,
+            (value) => observations.push(value),
+            clock,
+        );
+        assert.equal(registryVersion(document, candidate)?.version, candidate.version);
+        assert.equal(sends, 1);
+        assert.equal(clock.now(), 360_000);
+        assert.equal(observations.length, 25);
+        assert.deepEqual(
+            observations.map(({ attempt }) => attempt),
+            Array.from({ length: 25 }, (_, i) => i),
+        );
+        assert(
+            observations
+                .slice(0, -1)
+                .every(
+                    ({ status, document }) =>
+                        status === "absent" && registryVersion(document, candidate) === null,
+                ),
+        );
+        assert.equal(observations.at(-1)?.status, "listed");
+        assert(clock.sleeps.every((ms) => ms === 15_000));
+    }
+});
+
+test("registry absence fails closed at ten minutes with one upload and retained reads", async (t) => {
+    const candidate = candidateFixture(t).read(),
+        clock = listingClock();
+    let sends = 0,
+        reads = 0,
+        observations = 0;
+    const read = async () => {
+        reads++;
+        return registry(candidate, false);
+    };
+    const publication = await publishOnce(candidate, read, () => {
+        sends++;
+    });
+    await assert.rejects(
+        () =>
+            waitForRegistryListing(
+                candidate,
+                publication,
+                read,
+                (observation) => {
+                    observations++;
+                    assert.equal(observation.status, "absent");
+                },
+                clock,
+            ),
+        /registry listing deadline reached/,
+    );
+    assert.equal(clock.now(), 600_000);
+    assert.equal(sends, 1);
+    assert.equal(reads, 41); // One pre-upload probe and forty post-upload reads.
+    assert.equal(observations, 40);
+    assert.equal(clock.sleeps.length, 40);
+});
+
+test("registry reads and sleeps share the listing deadline", async (t) => {
+    const candidate = candidateFixture(t).read(),
+        clock = listingClock();
+    let reads = 0;
+    await assert.rejects(
+        () =>
+            waitForRegistryListing(
+                candidate,
+                { attempted: true },
+                async (timeoutMs) => {
+                    reads++;
+                    assert.equal(timeoutMs, reads === 14 ? 15_000 : 30_000);
+                    clock.advance(timeoutMs);
+                    return registry(candidate, false);
+                },
+                () => {},
+                clock,
+            ),
+        /registry listing deadline reached/,
+    );
+    assert.equal(reads, 14);
+    assert.equal(clock.now(), 600_000);
+    assert.equal(clock.sleeps.length, 13);
+});
+
+test("registry errors and byte mismatches stop polling and retain the failing read", async (t) => {
+    const candidate = candidateFixture(t).read();
+    const mismatch = registry(candidate);
+    object(object(mismatch.versions)[candidate.version]).dist = { integrity: "wrong" };
+    const unpublished = {
+        ...registry(candidate, false),
+        time: { [candidate.version]: "old publication" },
+    };
+    for (const value of [Error("HTTP 503"), mismatch, unpublished]) {
+        const clock = listingClock();
+        const observations: Parameters<Parameters<typeof waitForRegistryListing>[3]>[0][] = [];
+        let reads = 0;
+        await assert.rejects(() =>
+            waitForRegistryListing(
+                candidate,
+                { attempted: true },
+                async () => {
+                    if (reads++ === 0) return registry(candidate, false);
+                    if (value instanceof Error) throw value;
+                    return value;
+                },
+                (observation) => observations.push(observation),
+                clock,
+            ),
+        );
+        assert.equal(reads, 2);
+        assert.equal(clock.now(), 15_000);
+        assert.equal(observations[0].status, "absent");
+        assert.equal(observations[1].status, "failed");
+        assert(observations[1].error);
+    }
+});
+
+test("polling accepts the final interval but rejects a response after the deadline", async (t) => {
+    const candidate = candidateFixture(t).read();
+    const clock = listingClock();
+    await waitForRegistryListing(
+        candidate,
+        { attempted: true },
+        async () => registry(candidate, clock.now() >= 585_000),
+        () => {},
+        clock,
+    );
+    assert.equal(clock.now(), 585_000);
+    const lateClock = listingClock();
+    await assert.rejects(
+        () =>
+            waitForRegistryListing(
+                candidate,
+                { attempted: true },
+                async () => {
+                    lateClock.advance(600_001);
+                    return registry(candidate);
+                },
+                () => {},
+                lateClock,
+            ),
+        /registry listing deadline reached/,
+    );
+});
+
+test("fractional monotonic time produces valid integer request timeouts within the bound", async (t) => {
+    const candidate = candidateFixture(t).read(),
+        clock = listingClock();
+    const timeouts: number[] = [];
+    await assert.rejects(
+        () =>
+            waitForRegistryListing(
+                candidate,
+                { attempted: true },
+                async (timeoutMs) => {
+                    assert(Number.isInteger(timeoutMs) && timeoutMs > 0 && timeoutMs <= 30_000);
+                    timeouts.push(timeoutMs);
+                    clock.advance(timeoutMs - 0.5);
+                    return registry(candidate, false);
+                },
+                () => {},
+                clock,
+            ),
+        /registry listing deadline reached/,
+    );
+    assert.equal(clock.now(), 600_000);
+    assert(timeouts.at(-1)! < 30_000);
+});
+
+test("existing versions are read immediately and disappearance does not start an upload wait", async (t) => {
+    const candidate = candidateFixture(t).read(),
+        clock = listingClock();
+    assert.deepEqual(
+        await waitForRegistryListing(
+            candidate,
+            { attempted: false },
+            async () => registry(candidate),
+            () => {},
+            clock,
+        ),
+        registry(candidate),
+    );
+    await assert.rejects(
+        () =>
+            waitForRegistryListing(
+                candidate,
+                { attempted: false },
+                async () => registry(candidate, false),
+                () => {},
+                clock,
+            ),
+        /registry listing deadline reached/,
+    );
+    assert.equal(clock.sleeps.length, 0);
+});
+
 test("HTTP, authentication, JSON and network errors remain errors", async (t) => {
     const original = globalThis.fetch;
     t.after(() => {
@@ -512,6 +740,8 @@ test("final evidence inventories only uploaded files and hashes the final accept
     writeFileSync(path.join(directory, "smoke/package.json"), "{}");
     writeFileSync(path.join(directory, "smoke/package-lock.json"), "{}");
     writeFileSync(path.join(directory, "result.json"), '{"accepted":false}\n');
+    writeFileSync(path.join(directory, "registry-read-0.json"), '{"status":"absent"}\n');
+    writeFileSync(path.join(directory, "registry-read-1.json"), '{"status":"listed"}\n');
     const accepted = '{"accepted":true}\n';
     const inventory = publicationInventory(directory, accepted);
     assert(
@@ -521,6 +751,11 @@ test("final evidence inventories only uploaded files and hashes the final accept
     );
     assert.equal(inventory.find((file) => file.path === "result.json")?.sha256, hash(accepted));
     assert(inventory.some((file) => file.path === "smoke/package-lock.json"));
+    for (const filename of ["registry-read-0.json", "registry-read-1.json"])
+        assert.equal(
+            inventory.find((file) => file.path === filename)?.sha256,
+            hash(readFileSync(path.join(directory, filename))),
+        );
 });
 
 test("workflow exposes review before the approval job and confines publication credentials", () => {
@@ -542,4 +777,5 @@ test("workflow exposes review before the approval job and confines publication c
             !workflow.includes("push:"),
     );
     assert.match(workflow, /cancel-in-progress: false/);
+    assert.match(workflow, /out\/publication\/\*\.json/);
 });

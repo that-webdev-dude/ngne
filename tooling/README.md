@@ -156,10 +156,13 @@ npm also grants `stage publish`. Reject the bootstrap submission with `npm stage
 reject <id>` after the first release is verified.
 Publication uses a GitHub-hosted runner and npm 11.5.1 or newer, without an npm token.
 
-npm can take several minutes to list a new OIDC publication. Until it appears,
-verification fails closed and a rerun's upload is refused with 409 "previously
-staged version". Wait until `npm view <package>@<version>` shows it, then rerun the
-failed job; it verifies the existing version without uploading.
+After an attempted upload, verification waits up to ten minutes for npm to list the
+exact version, polling every fifteen seconds with each read limited by the remaining
+deadline. Every read is retained in the publication diagnostics. Registry errors and
+identity, channel or provenance mismatches fail closed. No second upload occurs
+within the attempt. If the version remains absent at the deadline, wait until
+`npm view <package>@<version>` shows it, then rerun the failed job to verify the
+existing version without uploading.
 
 Registry errors block publication. Each approved attempt publishes at most once;
 uncertain outcomes are reconciled through registry reads. Reruns inspect the exact
