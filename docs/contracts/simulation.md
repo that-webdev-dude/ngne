@@ -131,6 +131,10 @@ Private mounting owns a reverse cleanup stack before setup runs. Setup binds res
 and named RNG, registers the immutable system schedule, initial entities and frame
 preparation.
 
+Each scene has one render callback. Calling `scene.render()` again during setup
+replaces the previous callback; compose drawing functions inside one registration.
+`scene.system()` and `scene.resetInterpolation()` registrations accumulate in order.
+
 Every acquired or created item registers one cleanup action as mounting proceeds. Normal unmount and failed mount use the same teardown stack, unwound in reverse registration order. Cleanup is best-effort: every action is attempted and failures are reported together. A partly disposed scene is never republished.
 
 For `set`, the replacement mounts successfully before old scenes are removed. A failed private mount never changes the published stack.

@@ -1,4 +1,4 @@
-# Tooling guide v02
+# Tooling guide
 
 Detailed prerequisites and evidence rules are in the [tooling reference](README.md).
 
@@ -40,7 +40,7 @@ $env:NGNE_WEBGPU_ADAPTER = "swiftshader"
 npm.cmd run verify:engine
 ```
 
-This runs 12 existing stages: formatting, tests, tooling types, tooling migration validation, engine types, production build, browser-test build, package preparation, preparation integrity, browser transport, installed-package browser checks, and repository browser tests.
+This runs formatting, tests, tooling types, engine types, production build, browser-test build, package preparation, preparation integrity, browser transport, installed-package browser checks, and repository browser tests.
 
 It stops at the first required failure. Results go under `out/runs/*-verification-*/`; success means `accepted: true` in `evidence/result.json`. Benchmarks and separate-game compatibility are not included. See stage 3 for the limits of software browser checks.
 

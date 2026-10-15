@@ -2,6 +2,10 @@
 
 Examples assume a TypeScript browser app with a canvas. The [first scene](https://github.com/that-webdev-dude/ngne/tree/main/examples/hello) provides a complete example. Application setup and game code remain consumer-owned.
 
+[First scene](#your-first-scene) · [Sprites](#image-sprites) · [Input](#browser-input) ·
+[Scenes](#scene-authoring) · [Assets and audio](#assets-sprites-and-audio) ·
+[Sprite previewer](#sprite-and-animation-inspection)
+
 ## Install from npm
 
 For registry installation, pin an exact version in your application:
@@ -13,39 +17,9 @@ npm install --save-exact @ngne/core@0.2.1
 Normal releases use `latest`; prereleases use `next`. Commit your consumer lockfile
 and upgrade deliberately as the experimental API evolves. Use Node 24 or newer
 (`npm.cmd` in Windows PowerShell).
-For unpublished candidates, use the local-package workflow below.
+For unpublished candidates, use [a local package](#install-a-local-package).
 
-## Migrate from `@that-webdev-dude/ngne`
-
-`0.2.1` renames the package to `@ngne/core`; exports, engine behavior and the
-`ngne-preview` command are unchanged. Replace the dependency:
-
-```sh
-npm uninstall @that-webdev-dude/ngne
-npm install --save-exact @ngne/core@0.2.1
-```
-
-Change imports from `"@that-webdev-dude/ngne"` to `"@ngne/core"` and commit the
-updated lockfile.
-
-## Install a local package
-
-From the engine checkout, install locked dependencies and prepare the package:
-
-```powershell
-npm ci
-npm run prepare:package
-```
-
-The command prints the exact preparation manifest path. Copy the tarball identified
-by that manifest into the separate application's `vendor` directory and install it
-there with `npm install ./vendor/<actual-tarball-filename>`, replacing the placeholder
-with the emitted filename including `.tgz`. Commit the tarball and consumer lockfile together;
-subsequent clean installs use `npm ci`. Retain the preparation manifest, source revision
-(`git rev-parse HEAD`), any engine changes and the tarball hash (`Get-FileHash`).
-See [package preparation](https://github.com/that-webdev-dude/ngne/blob/main/tooling/README.md#package-preparation)
-for the authoritative commands, output selection and manifest semantics.
-Do not use a workspace link, source alias, or imports from engine `src`.
+## Configure your application
 
 Your application owns its commands and fixtures. For either installation method,
 a Vite application should use TypeScript with `moduleResolution: "Bundler"`, DOM
@@ -60,116 +34,10 @@ Browser WebGPU, Web Audio, fetch and image decoding remain platform requirements
 Check the production preview at both bases, click to unlock audio, and record
 visible rendering and audible playback separately from successful decoding.
 
-## Sprite and animation inspection
-
-The installed package includes `ngne-preview`, a local development tool using that
-same installation's WebGPU renderer. Node 24+ and a WebGPU-capable desktop browser
-are required. After installing NGNE in your application, add this consumer npm script:
-
-```json
-{ "scripts": { "preview:assets": "ngne-preview ./preview.config.mjs" } }
-```
-
-Create `preview.config.mjs` beside the consumer's `package.json`, adjusting the
-image and rectangles to match your artwork:
-
-```js
-export default {
-    images: [{ id: "sheet", src: new URL("./assets/sheet.png", import.meta.url) }],
-    frames: [
-        {
-            id: "idle",
-            image: "sheet",
-            x: 0,
-            y: 0,
-            width: 32,
-            height: 32,
-            destinationWidth: 16,
-            destinationHeight: 16,
-        },
-        {
-            id: "blink",
-            image: "sheet",
-            x: 32,
-            y: 0,
-            width: 32,
-            height: 32,
-            destinationWidth: 16,
-            destinationHeight: 16,
-        },
-    ],
-    animations: [
-        {
-            id: "blink",
-            playback: "loop",
-            entries: [
-                { frame: "idle", ms: 800 },
-                { frame: "blink", ms: 120 },
-            ],
-        },
-    ],
-    display: { density: 2, scale: 1, pixelSnap: true },
-};
-```
-
-Run `npm run preview:assets` (`npm.cmd` on Windows) and open the printed loopback
-URL. Ctrl+C stops the host. This uses the installed executable, with no tool download,
-Vite or tsx dependency. The config argument resolves from the invocation directory;
-adapter imports follow Node ESM rules. The adapter executes in Node and may translate
-consumer metadata with consumer-owned dependencies. Only normalized data reaches the
-browser. Images and data are snapshotted at startup: restart after edits, then reload.
-
-| Field        | Supported input                                                                                                                                                                                                                                                                |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `images`     | Array of unique nonempty `id`s and local `file:` URL objects or strings in `src`; no remote URLs or relative path strings.                                                                                                                                                     |
-| `frames`     | Nonempty array of unique `id`s, existing `image` ID, nonnegative safe-integer `x/y`, positive safe-integer `width/height` in source pixels, and positive finite `destinationWidth/destinationHeight` in logical units. Decoded image dimensions bound the crop.                |
-| `animations` | Array (may be empty) of unique `id`s, `playback: "loop"` or `"once"`, and nonempty ordered `entries` of existing `frame` IDs with positive finite `ms`. Repeated frame references remain distinct entries. Total duration must remain finite with every entry distinguishable. |
-| `display`    | Required positive finite `density` (render pixels/logical unit), positive finite `scale` (baseline CSS pixels/render pixel), and boolean `pixelSnap`.                                                                                                                          |
-
-IDs are unique within their own collection. Invalid inputs are rejected with field
-diagnostics; rectangles and timings are never guessed or clamped. Translation from
-an exporter's schema remains the adapter author's responsibility. Startup errors
-appear in the terminal; image decode/bounds/upload and renderer errors appear in the page.
-
-Select a frame for a still image, or an animation to start at entry 1 paused.
-Play/Pause preserves elapsed time within the current entry. Timing uses elapsed
-visible time with start-inclusive/end-exclusive intervals, not callback counts.
-Loops retain their remainder; once animations hold their final entry and stop,
-and Play restarts them. Hiding the tab pauses; returning requires Play.
-Previous/Next work only while paused, move one entry and clamp at both ends even
-for loops. Each step resets the selected entry's elapsed time, including at a clamped
-endpoint or after once completion, so it receives its full duration on resume.
-
-Inspection magnification offers 1× (baseline), 2×, 4× and 8×. The Baseline button
-restores 1× and centers the canvas. Controls stay above a viewport bounded by the
-window; artwork is never fitted. Left-click and drag to pan, or focus the viewport
-and use arrow keys (Shift for larger steps). Wheel up/down steps zoom through 1×,
-2×, 4× and 8×, capped at the supported limits. Ctrl/Command-wheel remains
-browser-controlled.
-Panning can bring any canvas edge to the viewport center. Magnification retains the
-canvas point at that center, including when resizing the window. Rendering details
-expand below the viewport. Magnification scales the rendered canvas
-with pixelated CSS; it never changes destination dimensions, backing resolution or
-timing, and cannot recover discarded source detail. Baseline size is destination ×
-density × scale; inspection adds only the magnification factor. Set browser zoom to
-100% for review. DPR is reported but never automatically applied to render dimensions.
-
-The stage has a fixed center and size across all frames, with a checkerboard for
-transparency and measured-size labels. Its rectangle covers every frame, so small
-frames can have empty margins; panning changes only the inspection position. Derived sprite
-dimensions must be representable positive float32 values no larger than 8190 pixels;
-the padded even-sized canvas is at most 8192. Baseline CSS dimensions must lie within
-1/64–16777216 pixels; magnifications exceeding the upper limit are disabled. Browser
-layout or GPU limits can still reject a preview visibly.
-
-Limitations: no fallback renderer, live reload, TypeScript adapter execution, custom
-origins, composite scenes, gameplay or state-machine interpretation. Very short entries
-may receive no physical display refresh. Inspect external frames and motion at baseline
-and magnified sizes and record actual observations plus approve/revise decisions;
-valid metadata and automated checks cannot approve artwork. Isolated inspection does
-not establish readability against game backgrounds, lighting, HUD or moving cameras.
-
 ## Your first scene
+
+Add `<canvas></canvas>` and `<pre role="alert"></pre>` to your page, then run this
+from your application's TypeScript module:
 
 ```ts
 import { BrowserGame, component, f64, lerp, type SceneDefinition } from "@ngne/core";
@@ -248,6 +116,9 @@ try {
 ```
 
 Rectangles and sprites use **center coordinates**. Distances are logical canvas pixels; `dt` is seconds. Composition is fixed when an entity spawns. Schema queries invoke one callback per nonempty 512-row chunk; hoist the inferred typed columns and read `chunk.count` once before the row loop to avoid repeating the borrow check for every row.
+
+Compose drawing functions inside one `scene.render()` registration; see the
+[render callback contract](contracts/simulation.md#private-mounting-and-cleanup).
 
 Use a secure origin (localhost or HTTPS) and a WebGPU-capable browser with hardware
 acceleration. See the [README's Status and platform support section](../README.md#status-and-platform-support)
@@ -520,3 +391,144 @@ const room: SceneDefinition = {
 ```
 
 The browser host flushes requests after simulation commit. Disposing the scene removes its queued and active voices before its asset leases release. Cleanup failures are aggregated and leave the scope terminal. For complete consumers, read [Starfall](https://github.com/that-webdev-dude/ngne/blob/main/demo/game.ts), its [browser entry](https://github.com/that-webdev-dude/ngne/blob/main/demo/main.ts), and the [platformer](https://github.com/that-webdev-dude/ngne/blob/main/examples/platformer/README.md).
+
+## Sprite and animation inspection
+
+The installed package includes `ngne-preview`, a local development tool using that
+same installation's WebGPU renderer. Node 24+ and a WebGPU-capable desktop browser
+are required. After installing NGNE in your application, add this consumer npm script:
+
+```json
+{ "scripts": { "preview:assets": "ngne-preview ./preview.config.mjs" } }
+```
+
+Create `preview.config.mjs` beside the consumer's `package.json`, adjusting the
+image and rectangles to match your artwork:
+
+```js
+export default {
+    images: [{ id: "sheet", src: new URL("./assets/sheet.png", import.meta.url) }],
+    frames: [
+        {
+            id: "idle",
+            image: "sheet",
+            x: 0,
+            y: 0,
+            width: 32,
+            height: 32,
+            destinationWidth: 16,
+            destinationHeight: 16,
+        },
+        {
+            id: "blink",
+            image: "sheet",
+            x: 32,
+            y: 0,
+            width: 32,
+            height: 32,
+            destinationWidth: 16,
+            destinationHeight: 16,
+        },
+    ],
+    animations: [
+        {
+            id: "blink",
+            playback: "loop",
+            entries: [
+                { frame: "idle", ms: 800 },
+                { frame: "blink", ms: 120 },
+            ],
+        },
+    ],
+    display: { density: 2, scale: 1, pixelSnap: true },
+};
+```
+
+Run `npm run preview:assets` (`npm.cmd` on Windows) and open the printed loopback
+URL. Ctrl+C stops the host. This uses the installed executable, with no tool download,
+Vite or tsx dependency. The config argument resolves from the invocation directory;
+adapter imports follow Node ESM rules. The adapter executes in Node and may translate
+consumer metadata with consumer-owned dependencies. Only normalized data reaches the
+browser. Images and data are snapshotted at startup: restart after edits, then reload.
+
+| Field        | Supported input                                                                                                                                                                                                                                                                |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `images`     | Array of unique nonempty `id`s and local `file:` URL objects or strings in `src`; no remote URLs or relative path strings.                                                                                                                                                     |
+| `frames`     | Nonempty array of unique `id`s, existing `image` ID, nonnegative safe-integer `x/y`, positive safe-integer `width/height` in source pixels, and positive finite `destinationWidth/destinationHeight` in logical units. Decoded image dimensions bound the crop.                |
+| `animations` | Array (may be empty) of unique `id`s, `playback: "loop"` or `"once"`, and nonempty ordered `entries` of existing `frame` IDs with positive finite `ms`. Repeated frame references remain distinct entries. Total duration must remain finite with every entry distinguishable. |
+| `display`    | Required positive finite `density` (render pixels/logical unit), positive finite `scale` (baseline CSS pixels/render pixel), and boolean `pixelSnap`.                                                                                                                          |
+
+IDs are unique within their own collection. Invalid inputs are rejected with field
+diagnostics; rectangles and timings are never guessed or clamped. Translation from
+an exporter's schema remains the adapter author's responsibility. Startup errors
+appear in the terminal; image decode/bounds/upload and renderer errors appear in the page.
+
+Select a frame for a still image, or an animation to start at entry 1 paused.
+Play/Pause preserves elapsed time within the current entry. Timing uses elapsed
+visible time with start-inclusive/end-exclusive intervals, not callback counts.
+Loops retain their remainder; once animations hold their final entry and stop,
+and Play restarts them. Hiding the tab pauses; returning requires Play.
+Previous/Next work only while paused, move one entry and clamp at both ends even
+for loops. Each step resets the selected entry's elapsed time, including at a clamped
+endpoint or after once completion, so it receives its full duration on resume.
+
+Inspection magnification offers 1× (baseline), 2×, 4× and 8×. The Baseline button
+restores 1× and centers the canvas. Controls stay above a viewport bounded by the
+window; artwork is never fitted. Left-click and drag to pan, or focus the viewport
+and use arrow keys (Shift for larger steps). Wheel up/down steps zoom through 1×,
+2×, 4× and 8×, capped at the supported limits. Ctrl/Command-wheel remains
+browser-controlled.
+Panning can bring any canvas edge to the viewport center. Magnification retains the
+canvas point at that center, including when resizing the window. Rendering details
+expand below the viewport. Magnification scales the rendered canvas
+with pixelated CSS; it never changes destination dimensions, backing resolution or
+timing, and cannot recover discarded source detail. Baseline size is destination ×
+density × scale; inspection adds only the magnification factor. Set browser zoom to
+100% for review. DPR is reported but never automatically applied to render dimensions.
+
+The stage has a fixed center and size across all frames, with a checkerboard for
+transparency and measured-size labels. Its rectangle covers every frame, so small
+frames can have empty margins; panning changes only the inspection position. Derived sprite
+dimensions must be representable positive float32 values no larger than 8190 pixels;
+the padded even-sized canvas is at most 8192. Baseline CSS dimensions must lie within
+1/64–16777216 pixels; magnifications exceeding the upper limit are disabled. Browser
+layout or GPU limits can still reject a preview visibly.
+
+Limitations: no fallback renderer, live reload, TypeScript adapter execution, custom
+origins, composite scenes, gameplay or state-machine interpretation. Very short entries
+may receive no physical display refresh. Inspect external frames and motion at baseline
+and magnified sizes and record actual observations plus approve/revise decisions;
+valid metadata and automated checks cannot approve artwork. Isolated inspection does
+not establish readability against game backgrounds, lighting, HUD or moving cameras.
+
+## Migrate from `@that-webdev-dude/ngne`
+
+`0.2.1` renames the package to `@ngne/core`; exports, engine behavior and the
+`ngne-preview` command are unchanged. Replace the dependency:
+
+```sh
+npm uninstall @that-webdev-dude/ngne
+npm install --save-exact @ngne/core@0.2.1
+```
+
+Change imports from `"@that-webdev-dude/ngne"` to `"@ngne/core"` and commit the
+updated lockfile.
+
+## Install a local package
+
+From the engine checkout, install locked dependencies and prepare the package:
+
+```powershell
+npm ci
+npm run prepare:package
+```
+
+The command prints the exact preparation manifest path. Copy the tarball identified
+by that manifest into the separate application's `vendor` directory and install it
+there with `npm install ./vendor/<actual-tarball-filename>`, replacing the placeholder
+with the emitted filename including `.tgz`. Commit the tarball and consumer lockfile together;
+subsequent clean installs use `npm ci`. Retain the preparation manifest, source revision
+(`git rev-parse HEAD`), any engine changes and the tarball hash (`Get-FileHash`).
+See [package preparation](https://github.com/that-webdev-dude/ngne/blob/main/tooling/README.md#package-preparation)
+for the authoritative commands, output selection and manifest semantics.
+Do not use a workspace link, source alias, or imports from engine `src`.

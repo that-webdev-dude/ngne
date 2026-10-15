@@ -2,9 +2,9 @@
 
 Run from the repository root with Node 24. Keep benchmark Chrome windows visible.
 The entry point uses Node; use `npm.cmd` in Windows PowerShell. Windows execution
-was verified in the [dated evidence](../../../docs/evidence/benchmark-migration.md).
-Linux benchmark execution is unvalidated and out of scope for the current tooling
-migration; no Linux benchmark portability or performance claim is made.
+was verified in the [2026-09-24 migration evidence](https://github.com/that-webdev-dude/ngne/blob/a127e594de11b190f7d218364d0f4db08a1f9c69/docs/evidence/benchmark-migration.md).
+That record is historical and does not validate later revisions. Linux benchmark
+execution remains unvalidated; no Linux benchmark portability or performance claim is made.
 
 For installed engine resource churn, use
 [`npm.cmd run bench:content -- --explore`](content/README.md).

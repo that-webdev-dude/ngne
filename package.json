@@ -5,6 +5,7 @@
     "files": [
         "dist/engine",
         "dist/preview",
+        "docs/architecture.md",
         "docs/guide.md",
         "docs/contracts"
     ],

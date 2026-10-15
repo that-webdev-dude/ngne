@@ -36,7 +36,7 @@ your lockfile; upgrade deliberately as the experimental API evolves. Use Node.js
 Upgrading from `@that-webdev-dude/ngne`? See the
 [migration steps](https://github.com/that-webdev-dude/ngne/blob/main/docs/guide.md#migrate-from-that-webdev-dudengne).
 
-For unpublished local packages today, follow the
+For unpublished candidates, follow the
 [local installation guide](https://github.com/that-webdev-dude/ngne/blob/main/docs/guide.md#install-a-local-package).
 
 ## First scene
@@ -86,13 +86,26 @@ shows startup, diagnostics, image loading, ECS movement and interpolation. See t
 [guide](https://github.com/that-webdev-dude/ngne/blob/main/docs/guide.md) for TypeScript
 and build settings, scene lifecycle and asset ownership.
 
+## Run the examples
+
+From a clone of this repository, with Node 24+:
+
+```sh
+npm ci
+npm run dev
+```
+
+Open the printed local URL for Starfall '89, `/examples/hello/` for the first scene,
+or `/examples/platformer/` for the two-level platformer. Use `npm.cmd` in Windows
+PowerShell. These examples require a WebGPU-capable browser with hardware acceleration.
+
 ## Inspect sprites and animations
 
 The package includes `ngne-preview`, a local tool for inspecting frames and animation
 timing through the installed engine's WebGPU renderer.
 
 Create `preview.config.mjs` beside your application's `package.json`, using the
-[adapter example](docs/guide.md#sprite-and-animation-inspection).
+[adapter example](https://github.com/that-webdev-dude/ngne/blob/main/docs/guide.md#sprite-and-animation-inspection).
 Your application supplies local images, frame rectangles and animation timings.
 Add this npm script:
 
@@ -117,20 +130,24 @@ Rendering requires WebGPU with hardware acceleration on a secure origin (HTTPS o
 localhost). Browser Web Audio, fetch and image decoding are also platform requirements;
 audio playback requires a user gesture.
 
-The documented desktop validation envelope is **Chrome 152 on Windows 11**, with
-**Intel UHD (`gen-12lp`) or NVIDIA RTX 4060 Laptop graphics**, using **keyboard and
-mouse**. Other browsers, operating systems, GPUs and physical touch/gamepad operation
-remain unverified. CI's SwiftShader checks provide software WebGPU evidence, separate
-from physical-device validation. These existing observations do not establish new
-physical-device acceptance for `0.2.1`.
+Historical desktop validation on **2026-09-18** (revision `5d0a824`) covered
+**Chrome 152 on Windows 11**, with **Intel UHD (`gen-12lp`) or NVIDIA RTX 4060 Laptop
+graphics**, using **keyboard and mouse**. Other browsers, operating systems, GPUs and
+physical touch/gamepad operation remain unverified. CI's SwiftShader checks provide
+software WebGPU evidence, separate from physical-device validation. These observations
+apply to the recorded revision; they do not establish acceptance for later releases.
 
 ## Documentation and examples
+
+Documentation on `main` tracks current development. For an installed release, use its
+bundled guide and contracts or browse the matching Git tag.
 
 - [Engine guide](https://github.com/that-webdev-dude/ngne/blob/main/docs/guide.md) — installation, scenes, assets, input and audio.
 - [Architecture](https://github.com/that-webdev-dude/ngne/blob/main/docs/architecture.md) — runtime structure and ownership.
 - [API and runtime contracts](https://github.com/that-webdev-dude/ngne/blob/main/docs/contracts/NGNE.md) — precise semantics.
 - [Hello example](https://github.com/that-webdev-dude/ngne/tree/main/examples/hello) — a small first scene.
 - [Platformer example](https://github.com/that-webdev-dude/ngne/blob/main/examples/platformer/README.md) — a two-level game and its controls.
+- [Changelog](https://github.com/that-webdev-dude/ngne/blob/main/CHANGELOG.md) — unreleased changes and release notes.
 
 ## Contributing
 

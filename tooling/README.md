@@ -1,5 +1,7 @@
 # Tooling commands and evidence
 
+For a command walkthrough, start with the [tooling guide](GUIDE.md).
+
 Run from the repository root with Node 24 and dependencies installed using `npm ci`:
 
 ```sh
@@ -17,7 +19,7 @@ Extend its includes when introducing additional Node modules; browser code needs
 its own checked target. No public engine export changes are needed.
 
 Browser and benchmark prerequisites are documented in
-[repository verification guidance](../README.md), [benchmarks](suites/benchmarks/README.md)
+[tooling guide](GUIDE.md#before-starting), [benchmarks](suites/benchmarks/README.md)
 and [engine resource measurements](suites/benchmarks/content/README.md).
 
 ## Local engine verification
