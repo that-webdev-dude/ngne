@@ -62,7 +62,7 @@ The command prints a preparation path under `out/runs/`:
 
 | Path inside that run                   | Purpose                                                       |
 | -------------------------------------- | ------------------------------------------------------------- |
-| `evidence/package/ngne-core-0.2.1.tgz` | The package another game installs                             |
+| `evidence/package/ngne-core-0.2.2.tgz` | The package another game installs                             |
 | `evidence/builds/root/`, `nested/`     | Fixture builds for two URL locations                          |
 | `evidence/report.md`, `result.json`    | Readable and machine-readable outcomes                        |
 | `evidence/manifest.json`               | Identifies this exact preparation, its inputs and environment |
@@ -74,14 +74,14 @@ The command prints a preparation path under `out/runs/`:
 To use the package, run this **from the separate game's directory**:
 
 ```powershell
-npm.cmd install "C:\path\to\ngne-core-0.2.1.tgz"
+npm.cmd install "C:\path\to\ngne-core-0.2.2.tgz"
 ```
 
 The game imports public exports from `@ngne/core`. It only needs the `.tgz`, not the rest of the preparation. Install a newly generated `.tgz` to try a later engine build.
 
 ### Reuse a preparation
 
-Save the printed `evidence/manifest.json` path. **A manifest is not a package version**: two different engine builds can both be called `@ngne/core@0.2.1`. The manifest and recorded hashes identify the exact preparation.
+Save the printed `evidence/manifest.json` path. **A manifest is not a package version**: two different engine builds can both be called `@ngne/core@0.2.2`. The manifest and recorded hashes identify the exact preparation.
 
 ```powershell
 npm.cmd run check:prepared -- --manifest "<manifest>"

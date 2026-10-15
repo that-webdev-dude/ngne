@@ -11,7 +11,7 @@ Examples assume a TypeScript browser app with a canvas. The [first scene](https:
 For registry installation, pin an exact version in your application:
 
 ```sh
-npm install --save-exact @ngne/core@0.2.1
+npm install --save-exact @ngne/core@0.2.2
 ```
 
 Normal releases use `latest`; prereleases use `next`. Commit your consumer lockfile
@@ -503,12 +503,13 @@ not establish readability against game backgrounds, lighting, HUD or moving came
 
 ## Migrate from `@that-webdev-dude/ngne`
 
-`0.2.1` renames the package to `@ngne/core`; exports, engine behavior and the
-`ngne-preview` command are unchanged. Replace the dependency:
+`0.2.1` renamed the package to `@ngne/core` without changing exports, engine
+behavior or the `ngne-preview` command. To migrate to the current version, replace
+the dependency:
 
 ```sh
 npm uninstall @that-webdev-dude/ngne
-npm install --save-exact @ngne/core@0.2.1
+npm install --save-exact @ngne/core@0.2.2
 ```
 
 Change imports from `"@that-webdev-dude/ngne"` to `"@ngne/core"` and commit the

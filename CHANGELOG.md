@@ -2,9 +2,12 @@
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-10-15
+
 ### Changed
 
 - Reduced ECS chunk descriptor construction time by defining its four outer properties individually, preserving borrow lifetimes and same-epoch reuse. The measured 128K-entity Node benchmark's first-traversal median improved by 15.9%; this does not establish an allocation reduction or game/FPS gain. See the [paired results and limitations](tooling/suites/benchmarks/evidence/outer-descriptor-experiment-2026-10-11.json).
+- Refreshed onboarding, example instructions and documentation links; included architecture documentation in the package.
 
 ### Fixed
 
