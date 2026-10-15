@@ -16,6 +16,7 @@
 
 ### Fixed
 
+- Allow preview startup when package path casing differs from disk, while still rejecting linked engine files and directories.
 - Allow up to ten minutes for npm to list an attempted OIDC publication, retaining every registry read and preserving single-upload and identity/provenance checks.
 - Preserve investigation workload and measurement-writing errors alongside browser cleanup failures, and include each case's cleanup in aggregate acceptance.
 - Reject unlisted evidence files in current benchmark and content-baseline readers, sharing the exact artifact inventory check with package preparation and consumer validation.

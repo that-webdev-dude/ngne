@@ -1,5 +1,5 @@
 import { createServer } from "node:http";
-import { readFile, readdir, realpath, stat } from "node:fs/promises";
+import { lstat, readFile, readdir, realpath, stat } from "node:fs/promises";
 import { join, resolve, extname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { object, validate } from "./model.js";
@@ -41,7 +41,10 @@ export async function startPreview(
     for (const name of ["browser.js", "model.js", "playback.js", "inspection.js"])
         await add(`/${name}`, join(packageRoot, "dist/preview", name), "text/javascript");
     await add("/", join(packageRoot, "dist/preview/index.html"), "text/html; charset=utf-8");
-    const engine = join(packageRoot, "dist/engine");
+    const enginePath = join(packageRoot, "dist/engine");
+    if ((await lstat(enginePath)).isSymbolicLink()) throw Error("Linked engine module");
+    // Walk from native disk casing so realpath comparisons detect links, not casing aliases.
+    const engine = await realpath(enginePath);
     const modules = async (directory: string, prefix: string) => {
         for (const entry of await readdir(directory, { withFileTypes: true })) {
             const path = join(directory, entry.name);
