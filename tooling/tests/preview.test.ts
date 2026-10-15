@@ -1,8 +1,17 @@
 import assert from "node:assert/strict";
-import test from "node:test";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import test, { type TestContext } from "node:test";
+import {
+    mkdtempSync,
+    mkdirSync,
+    writeFileSync,
+    rmSync,
+    realpathSync,
+    existsSync,
+    renameSync,
+    symlinkSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { validate, validateBounds, stageSize } from "../preview/model.js";
 import { Playback } from "../preview/playback.js";
@@ -330,7 +339,7 @@ test("single-entry stepping resets a completed once animation without changing i
     assert.equal(player.elapsed, 0);
     assert.equal(player.playing, false);
 });
-test("host serves only registered snapshots and packaged modules; local adapter diagnostics", async (t) => {
+function hostFixture(t: TestContext) {
     const root = mkdtempSync(join(tmpdir(), "ngne-preview-test-"));
     t.after(() => rmSync(root, { recursive: true, force: true }));
     for (const dir of ["dist/preview", "dist/engine"])
@@ -344,6 +353,11 @@ test("host serves only registered snapshots and packaged modules; local adapter 
     value.images[0].src = pathToFileURL(join(root, "image.png")).href;
     const config = join(root, "preview.mjs");
     writeFileSync(config, `export default ${JSON.stringify(value)}`);
+    return { root, config, value };
+}
+
+test("host serves only registered snapshots and packaged modules; local adapter diagnostics", async (t) => {
+    const { root, config, value } = hostFixture(t);
     const server = await startPreview(config, root);
     t.after(() => server.close());
     assert.equal(await (await fetch(server.url + "images/0")).text(), "registered image bytes");
@@ -376,6 +390,70 @@ test("host serves only registered snapshots and packaged modules; local adapter 
     writeFileSync(join(root, "missing.mjs"), `export default ${JSON.stringify(value)}`);
     await assert.rejects(loadAdapter(join(root, "missing.mjs")), /image sheet.src/);
 });
+
+test("host accepts package path casing differences on a case-insensitive filesystem", async (t) => {
+    const { root, config } = hostFixture(t);
+    const canonical = realpathSync.native(root);
+    const alternate = join(dirname(canonical), basename(canonical).toUpperCase());
+    if (!existsSync(alternate) || realpathSync.native(alternate) !== canonical) {
+        t.skip("Fixture filesystem is case-sensitive");
+        return;
+    }
+    assert.notEqual(alternate, canonical);
+    mkdirSync(join(root, "dist/engine/nested"));
+    writeFileSync(join(root, "dist/engine/nested/module.js"), "export const nested = 2;");
+    const server = await startPreview(config, alternate);
+    t.after(() => server.close());
+    for (const [route, contents] of [
+        ["engine/index.js", "export const marker = 1;"],
+        ["engine/nested/module.js", "export const nested = 2;"],
+    ]) {
+        const response = await fetch(server.url + route);
+        assert.equal(response.status, 200);
+        assert.equal(await response.text(), contents);
+    }
+    assert.equal((await fetch(server.url + "secret.txt")).status, 404);
+});
+
+for (const location of ["root", "directory", "file"] as const)
+    test(`host rejects a linked engine ${location}`, async (t) => {
+        const fixture = hostFixture(t);
+        const root = realpathSync.native(fixture.root);
+        const config = fixture.config;
+        const engine = join(root, "dist/engine");
+        let target: string, link: string;
+        if (location === "root") {
+            target = join(root, "engine-target");
+            renameSync(engine, target);
+            rmSync(join(target, "index.js")); // Even an empty linked root must be rejected.
+            link = engine;
+        } else if (location === "directory") {
+            target = join(root, "engine-target");
+            mkdirSync(target);
+            writeFileSync(join(target, "module.js"), "export const linked = 1;");
+            link = join(engine, "linked");
+        } else {
+            target = join(root, "external.js");
+            writeFileSync(target, "export const linked = 1;");
+            link = join(engine, "linked.js");
+        }
+        try {
+            symlinkSync(target, link, location === "file" ? "file" : "junction");
+        } catch (error) {
+            if (
+                location !== "file" ||
+                process.platform !== "win32" ||
+                (error as NodeJS.ErrnoException).code !== "EPERM"
+            )
+                throw error;
+            t.skip("Windows symlink creation requires permission");
+            return;
+        }
+        await assert.rejects(async () => {
+            const server = await startPreview(config, root);
+            t.after(() => server.close());
+        }, /Linked engine module/);
+    });
 
 test("inspection retains the same canvas point at viewport center across zoom changes", () => {
     const view = new Inspection(482, 130);
