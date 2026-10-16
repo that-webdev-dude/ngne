@@ -142,22 +142,24 @@ export class Frame {
             depth = this.depths[0];
         if (!Number.isFinite(scene) || !Number.isFinite(depth)) return false;
         let min = layers[0],
-            max = min;
+            max = min,
+            ordered = true;
         // Do not mutate order or allocate scratch until every fallback guard passes.
         for (let i = 0; i < count; i++) {
             const layer = layers[i];
-            if (
-                order[i] !== i ||
-                this.scenes[i] !== scene ||
-                this.depths[i] !== depth ||
-                !Number.isSafeInteger(layer)
-            )
+            if (order[i] !== i || this.scenes[i] !== scene || !Number.isSafeInteger(layer))
                 return false;
+            if (this.depths[i] !== depth)
+                return ordered && this.isDepthTailOrdered(i, scene, min, max);
+            // With a common depth, nondecreasing layers prove insertion-order input sorted.
+            // Interleaved input stops this comparison at its first inversion.
+            if (ordered && layer < max) ordered = false;
             if (layer < min) min = layer;
             if (layer > max) max = layer;
         }
         const span = max - min + 1;
         if (!Number.isSafeInteger(span) || span > 64) return false;
+        if (ordered) return true;
         let indices = this.sortIndices;
         if (!indices || indices.length < count) {
             let capacity = indices?.length ?? 32768;
@@ -177,6 +179,30 @@ export class Frame {
         for (let i = 0; i < count; i++) indices[cursors[layers[i] - min]++] = i;
         for (let i = 0; i < count; i++) order[i] = indices[i];
         return true;
+    }
+    /** The checked prefix has one finite depth and nondecreasing layers. */
+    private isDepthTailOrdered(start: number, scene: number, min: number, max: number): boolean {
+        let previousLayer = this.layers[start - 1],
+            previousDepth = this.depths[start - 1];
+        for (let i = start; i < this.count; i++) {
+            const layer = this.layers[i],
+                depth = this.depths[i];
+            if (
+                this.order[i] !== i ||
+                this.scenes[i] !== scene ||
+                !Number.isSafeInteger(layer) ||
+                !Number.isFinite(depth) ||
+                layer < previousLayer ||
+                (layer === previousLayer && depth < previousDepth)
+            )
+                return false;
+            if (layer < min) min = layer;
+            if (layer > max) max = layer;
+            previousLayer = layer;
+            previousDepth = depth;
+        }
+        const span = max - min + 1;
+        return Number.isSafeInteger(span) && span <= 64;
     }
 }
 /**

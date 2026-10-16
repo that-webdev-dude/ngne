@@ -57,6 +57,88 @@ function scratch(frame: Frame): Uint32Array | undefined {
     assert.ok(value === undefined || value instanceof Uint32Array);
     return value;
 }
+function observeComparator(frame: Frame): () => number {
+    let calls = 0;
+    const sort = frame.order.sort.bind(frame.order);
+    Object.defineProperty(frame.order, "sort", {
+        value: (compare?: (a: number, b: number) => number) => {
+            calls++;
+            return sort(compare);
+        },
+    });
+    return () => calls;
+}
+
+test("ordered finite input skips both sorting paths, including early/middle/late depth changes", () => {
+    for (const change of [1, 16384, 32767, 32768]) {
+        const frame = new Frame();
+        fill(frame, 32768, (i) => Math.floor(i / 8192) - 2);
+        const depths = keys(frame, "depths");
+        for (let i = change; i < frame.count; i++) depths[i] = 0.25;
+        const calls = observeComparator(frame);
+        verify(frame);
+        verify(frame);
+        assert.equal(calls(), 0);
+        assert.equal(scratch(frame), undefined);
+    }
+    const frame = new Frame();
+    fill(frame, 32768, (i) => Math.floor(i / 8192));
+    const depths = keys(frame, "depths");
+    for (let i = 0; i < frame.count; i++) depths[i] = (i % 8192) * 0.25;
+    const calls = observeComparator(frame);
+    verify(frame);
+    assert.equal(calls(), 0, "depth may decrease when the layer increases");
+});
+
+test("ordered-prefix shortcut rejects inversions, nonfinite keys, wide spans and changed order", () => {
+    const changes: ((frame: Frame) => void)[] = [
+        (f) => {
+            keys(f, "depths")[32767] = -1;
+        },
+        (f) => {
+            keys(f, "depths")[1] = -1;
+        },
+        (f) => {
+            keys(f, "depths")[16384] = 1;
+        },
+        (f) => {
+            keys(f, "depths").fill(0.25, 1);
+            keys(f, "layers")[32767] = -10;
+        },
+        ...[NaN, Infinity, -Infinity].map((depth) => (f: Frame) => {
+            keys(f, "depths")[32767] = depth;
+        }),
+        (f) => {
+            keys(f, "depths").fill(0.25, 1);
+            keys(f, "scenes")[32767] = 1;
+        },
+        (f) => {
+            keys(f, "depths")[32767] = 0.25;
+            keys(f, "layers")[32767] = 65;
+        },
+        (f) => {
+            keys(f, "depths")[32767] = 0.25;
+            f.order[32767] = 0;
+        },
+        (f) => {
+            keys(f, "depths")[32767] = 0.25;
+            delete f.order[32767];
+        },
+        (f) => {
+            keys(f, "depths").fill(0.25, 1);
+            f.order.reverse();
+        },
+    ];
+    for (const change of changes) {
+        const frame = new Frame();
+        fill(frame, 32768, (i) => Math.floor(i / 8192));
+        change(frame);
+        const calls = observeComparator(frame);
+        verify(frame);
+        assert.equal(calls(), 1);
+        assert.equal(scratch(frame), undefined);
+    }
+});
 
 test("bounded layer sort matches canonical indices at count/span limits and signed layers", () => {
     const frame = new Frame();

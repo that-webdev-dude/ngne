@@ -14,7 +14,16 @@ export async function startOrderInvestigation(): Promise<void> {
     const chaos = params.get("workload") === "chaos";
     const audit = params.get("audit") === "1";
     const keys = params.get("keys") ?? "layers";
-    if (!["layers", "mixed-depth", "late-depth", "wide-layers", "scenes"].includes(keys))
+    if (
+        ![
+            "layers",
+            "mixed-depth",
+            "late-depth",
+            "late-depth-down",
+            "wide-layers",
+            "scenes",
+        ].includes(keys)
+    )
         throw Error("Invalid key fixture");
     const width = chaos ? W : 1440,
         height = chaos ? H : 900;
@@ -158,7 +167,7 @@ export async function startOrderInvestigation(): Promise<void> {
                 // Both orders submit identical per-layer geometry and stable within-layer order.
                 const layer = shuffled ? i % 4 : Math.floor((i * 4) / count);
                 const row = shuffled ? Math.floor(i / 4) : i % (count / 4);
-                if (keys === "mixed-depth" || keys === "late-depth")
+                if (keys === "mixed-depth" || keys === "late-depth" || keys === "late-depth-down")
                     frame.sprite({
                         x: (row % 360) * 4 + 2,
                         y: (Math.floor(row / 360) % 225) * 4 + 2,
@@ -168,7 +177,14 @@ export async function startOrderInvestigation(): Promise<void> {
                         alpha: 0.5,
                         layer,
                         screen: true,
-                        depth: keys === "mixed-depth" ? (i % 3) * 0.25 : i === count - 1 ? 0.25 : 0,
+                        depth:
+                            keys === "mixed-depth"
+                                ? (i % 3) * 0.25
+                                : i === count - 1
+                                  ? keys === "late-depth-down"
+                                      ? -0.25
+                                      : 0.25
+                                  : 0,
                     });
                 else
                     frame.rect(
