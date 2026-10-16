@@ -12,7 +12,7 @@ void start().catch((error: unknown) => {
 });
 
 async function start(): Promise<void> {
-    if (workload === "ordering") return startOrderInvestigation();
+    if (workload === "ordering" || workload === "chaos") return startOrderInvestigation();
     if (workload !== "renderer-webgpu")
         throw new Error(`Unknown browser benchmark workload: ${workload ?? "none"}`);
     await startRendererBenchmark("webgpu");
