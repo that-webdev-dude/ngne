@@ -26,6 +26,8 @@ export class Frame {
     private layers: number[] = [];
     private depths: number[] = [];
     private scenes: number[] = [];
+    private sortIndices?: Uint32Array;
+    private layerCursors?: Uint32Array;
     private sceneIndex = -1;
     private camera = { x: 0, y: 0 };
     private snap = true;
@@ -122,6 +124,7 @@ export class Frame {
     sort() {
         this.order.length = this.count;
         this.textures.length = this.count;
+        if (this.count >= 32768 && this.count <= 262144 && this.sortLayers()) return;
         this.order.sort(
             (a, b) =>
                 this.scenes[a] - this.scenes[b] ||
@@ -129,6 +132,77 @@ export class Frame {
                 this.depths[a] - this.depths[b] ||
                 a - b,
         );
+    }
+    /** Single-scene/common-depth identity input reduces the key to layer -> insertion. */
+    private sortLayers(): boolean {
+        const count = this.count,
+            order = this.order,
+            layers = this.layers,
+            scene = this.scenes[0],
+            depth = this.depths[0];
+        if (!Number.isFinite(scene) || !Number.isFinite(depth)) return false;
+        let min = layers[0],
+            max = min,
+            ordered = true;
+        // Do not mutate order or allocate scratch until every fallback guard passes.
+        for (let i = 0; i < count; i++) {
+            const layer = layers[i];
+            if (order[i] !== i || this.scenes[i] !== scene || !Number.isSafeInteger(layer))
+                return false;
+            if (this.depths[i] !== depth)
+                return ordered && this.isDepthTailOrdered(i, scene, min, max);
+            // With a common depth, nondecreasing layers prove insertion-order input sorted.
+            // Interleaved input stops this comparison at its first inversion.
+            if (ordered && layer < max) ordered = false;
+            if (layer < min) min = layer;
+            if (layer > max) max = layer;
+        }
+        const span = max - min + 1;
+        if (!Number.isSafeInteger(span) || span > 64) return false;
+        if (ordered) return true;
+        let indices = this.sortIndices;
+        if (!indices || indices.length < count) {
+            let capacity = indices?.length ?? 32768;
+            while (capacity < count) capacity *= 2;
+            indices = this.sortIndices = new Uint32Array(capacity);
+        }
+        const cursors = (this.layerCursors ??= new Uint32Array(64));
+        cursors.fill(0, 0, span);
+        for (let i = 0; i < count; i++) cursors[layers[i] - min]++;
+        let offset = 0;
+        for (let bucket = 0; bucket < span; bucket++) {
+            const size = cursors[bucket];
+            cursors[bucket] = offset;
+            offset += size;
+        }
+        // Ascending source indices preserve insertion ties and adjacent texture runs.
+        for (let i = 0; i < count; i++) indices[cursors[layers[i] - min]++] = i;
+        for (let i = 0; i < count; i++) order[i] = indices[i];
+        return true;
+    }
+    /** The checked prefix has one finite depth and nondecreasing layers. */
+    private isDepthTailOrdered(start: number, scene: number, min: number, max: number): boolean {
+        let previousLayer = this.layers[start - 1],
+            previousDepth = this.depths[start - 1];
+        for (let i = start; i < this.count; i++) {
+            const layer = this.layers[i],
+                depth = this.depths[i];
+            if (
+                this.order[i] !== i ||
+                this.scenes[i] !== scene ||
+                !Number.isSafeInteger(layer) ||
+                !Number.isFinite(depth) ||
+                layer < previousLayer ||
+                (layer === previousLayer && depth < previousDepth)
+            )
+                return false;
+            if (layer < min) min = layer;
+            if (layer > max) max = layer;
+            previousLayer = layer;
+            previousDepth = depth;
+        }
+        const span = max - min + 1;
+        return Number.isSafeInteger(span) && span <= 64;
     }
 }
 /**

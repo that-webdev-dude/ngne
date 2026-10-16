@@ -22,6 +22,31 @@ export interface FrameMeasurements {
     end: number;
 }
 
+/** Startup occlusion is separate from visibility throughout the selected sample window. */
+export function visibleWindow(events: unknown, begin: number, end: number): boolean | null {
+    if (events === undefined) return null;
+    if (!Array.isArray(events) || !(end > begin)) throw Error("Invalid visibility evidence");
+    let visible = false,
+        previousTime = -Infinity;
+    for (const event of events) {
+        if (
+            !event ||
+            typeof event !== "object" ||
+            !("time" in event) ||
+            typeof event.time !== "number" ||
+            !Number.isFinite(event.time) ||
+            event.time < previousTime ||
+            !("state" in event) ||
+            typeof event.state !== "string"
+        )
+            throw Error("Invalid visibility evidence");
+        previousTime = event.time;
+        if (event.time <= begin) visible = event.state === "visible";
+        else if (event.time < end && event.state !== "visible") return false;
+    }
+    return visible;
+}
+
 export function summarizeFrames(input: FrameMeasurements) {
     const { columns, begin, end } = input;
     if (columns[0] !== "time" || !(end > begin)) throw Error("Invalid measurement window");

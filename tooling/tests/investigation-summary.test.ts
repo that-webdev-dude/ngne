@@ -1,6 +1,42 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { summarizeFrames } from "../suites/benchmarks/rendering/investigation-summary.js";
+import {
+    summarizeFrames,
+    visibleWindow,
+} from "../suites/benchmarks/rendering/investigation-summary.js";
+
+test("visibility rejects occlusion inside the window while retaining startup and later transitions", () => {
+    const events = [
+        { time: 0, state: "hidden" },
+        { time: 5, state: "visible" },
+        { time: 20, state: "hidden" },
+    ];
+    assert.equal(visibleWindow(events, 10, 20), true);
+    assert.equal(visibleWindow(events, 10, 21), false);
+    assert.equal(visibleWindow(events, 0, 4), false);
+    assert.equal(
+        visibleWindow(
+            [
+                { time: 0, state: "visible" },
+                { time: 10, state: "hidden" },
+            ],
+            10,
+            20,
+        ),
+        false,
+    );
+    assert.equal(visibleWindow(undefined, 10, 20), null);
+    assert.throws(() =>
+        visibleWindow(
+            [
+                { time: 10, state: "visible" },
+                { time: 0, state: "hidden" },
+            ],
+            10,
+            20,
+        ),
+    );
+});
 
 test("investigation uses executed ticks and cumulative-drop differences within the sample window", () => {
     const result = summarizeFrames({

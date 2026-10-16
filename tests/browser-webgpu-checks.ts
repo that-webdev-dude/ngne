@@ -219,6 +219,85 @@ export async function checkWebGPUCore(
         ordered.rect(32, 32, 64, 64, 0x00ff00, 0.5);
         await readFrame(ordered);
         check(quad.stats.drawCalls === 3, "WebGPU A/B/A remains three adjacent runs");
+        const large = new Frame(),
+            referenceFrame = new Frame();
+        const layerKeys: number[] = [];
+        for (const input of [large, referenceFrame]) {
+            for (let i = 0; i < 32765; i++) input.rect(-100, -100, 1, 1, 0xffffff, 1, -1);
+            input.sprite({
+                x: 32,
+                y: 32,
+                width: 32,
+                height: 32,
+                color: 0xff0000,
+                alpha: 0.5,
+                layer: 2,
+            });
+            input.sprite({ x: 32, y: 32, width: 32, height: 32, texture: "blue", layer: 0 });
+            input.sprite({
+                x: 32,
+                y: 32,
+                width: 32,
+                height: 32,
+                color: 0x00ff00,
+                alpha: 0.5,
+                layer: 1,
+            });
+        }
+        for (let i = 0; i < 32765; i++) layerKeys.push(-1);
+        layerKeys.push(2, 0, 1);
+        referenceFrame.sort = () => {
+            referenceFrame.order.length = referenceFrame.textures.length = referenceFrame.count;
+            referenceFrame.order.sort((a, b) => layerKeys[a] - layerKeys[b] || a - b);
+        };
+        const referencePixel = await readFrame(referenceFrame),
+            referenceDraws = quad.stats.drawCalls;
+        const candidatePixel = await readFrame(large);
+        check(
+            large.order.every((source, index) => source === referenceFrame.order[index]) &&
+                candidatePixel.join() === referencePixel.join() &&
+                candidatePixel.join() === overlap.join() &&
+                quad.stats.drawCalls === referenceDraws &&
+                referenceDraws === 3,
+            "WebGPU 32K layer fast path matches comparator indices, translucent pixels and adjacent texture runs",
+        );
+        for (const depth of [0.25, -0.25, NaN]) {
+            const depthOrdered = new Frame(),
+                smallReference = new Frame();
+            for (let i = 0; i < 32765; i++) depthOrdered.rect(-100, -100, 1, 1, 0xffffff);
+            for (const input of [depthOrdered, smallReference]) {
+                input.sprite({ x: 32, y: 32, width: 32, height: 32, texture: "blue", layer: 1 });
+                input.sprite({
+                    x: 32,
+                    y: 32,
+                    width: 32,
+                    height: 32,
+                    color: 0x00ff00,
+                    alpha: 0.5,
+                    layer: 1,
+                });
+                input.sprite({
+                    x: 32,
+                    y: 32,
+                    width: 32,
+                    height: 32,
+                    color: 0xff0000,
+                    alpha: 0.5,
+                    layer: 1,
+                    depth,
+                });
+            }
+            const referencePixel = await readFrame(smallReference);
+            const largePixel = await readFrame(depthOrdered);
+            check(
+                largePixel.join() === referencePixel.join() &&
+                    depthOrdered.order
+                        .slice(-3)
+                        .every((source, i) => source === smallReference.order[i] + 32765) &&
+                    quad.stats.drawCalls === 3,
+                `WebGPU 32K depth-tail ${depth} matches comparator translucent pixels, indices and texture runs`,
+            );
+        }
         ordered.reset();
         const empty = await readFrame(ordered);
         check(
