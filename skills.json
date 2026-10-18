@@ -1,10 +1,8 @@
 {
   "source": "skills-manager",
-  "pin": "08a383524e3bde1d1e7a320108f72ddbbbbed893",
+  "pin": "494c2f9a22c254000393cae6d30c3e6d809105ba",
   "skills": {
     "handoff": ["agents"],
-    "loopex": ["agents"],
-    "ponytail": ["agents"],
-    "ticket": ["agents"]
+    "ponytail": ["agents"]
   }
 }

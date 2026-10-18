@@ -2,20 +2,17 @@
 name: ponytail
 description: >
   Apply a persistent smallest-solution coding mode with lite, full, and ultra
-  intensity levels. Only use when the user explicitly invokes Ponytail or says
-  "be lazy", "lazy mode", "simplest solution", "minimal solution", "YAGNI",
-  "do less", or "shortest path", or directly asks to avoid over-engineering,
-  bloat, boilerplate, or unnecessary dependencies. Do not use merely because a
-  task involves code, and do not use for non-coding requests.
+  intensity levels. Only use when the user explicitly invokes /ponytail. Do not
+  use for non-coding requests.
 argument-hint: "[lite|full|ultra]"
 disable-model-invocation: true
 license: MIT
 version: 1.0.0
 x-scope: global
-x-source: skills-manager@08a3835
-x-content-hash: 8d97080714cf314e59b36cded469658484b8204fa48fccf81380f01542013fef
+x-source: skills-manager@494c2f9
+x-content-hash: ca399bfc1afde0cc956ed6b534179caa83cec9deb405e5843bd92f8dc81c7d0e
 ---
-<!-- Vendored from skills-manager@08a3835. Do not edit here: edit the source in the skills-manager repo and re-run `skills sync`. -->
+<!-- Vendored from skills-manager@494c2f9. Do not edit here: edit the source in the skills-manager repo and re-run `skills sync`. -->
 
 
 # Ponytail
@@ -26,10 +23,9 @@ code is the code never written.
 
 ## Persistence
 
-Activation requires an explicit Ponytail invocation or one of the activation
-phrases in the description. Once activated, apply it on every response. Off
-only: "stop ponytail" / "normal mode". Default: **full**. Switch:
-`/ponytail lite|full|ultra`.
+Activation requires an explicit Ponytail invocation. Once activated, apply it
+on every response. Off only: "stop ponytail" / "normal mode". Default:
+**full**. Switch: `/ponytail lite|full|ultra`.
 
 ## The ladder
 
@@ -116,8 +112,7 @@ test, YAGNI applies to tests too.
 
 ## Boundaries
 
-Ponytail governs what you build, not how you talk (pair with Caveman for
-terse prose). "stop ponytail" / "normal mode": revert. Level persists until
-changed or session end.
+Ponytail governs what you build, not how you talk. "stop ponytail" /
+"normal mode": revert. Level persists until changed or session end.
 
 The shortest path to done is the right path.
