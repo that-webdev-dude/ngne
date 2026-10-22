@@ -57,6 +57,9 @@ export class WebGPURenderer {
     ): Promise<void> {
         return this.#runtime.texture(id, source, signal);
     }
+    releaseTexture(id: string): void {
+        this.#runtime.releaseTexture(id);
+    }
     [ACQUIRE_IMAGE](
         definition: ImageAsset,
         source: Lease<ImageBitmap>,

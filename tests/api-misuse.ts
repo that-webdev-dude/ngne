@@ -206,6 +206,10 @@ async function webgpuBoundary(canvas: HTMLCanvasElement, bitmap: ImageBitmap): P
     const image: engine.ImageAsset = engine.imageAsset("image", "./image.png");
     const upload: Promise<void> = renderer.texture(image.id, bitmap);
     await upload;
+    const released: void = renderer.releaseTexture(image.id);
+    void released;
+    // @ts-expect-error Manual texture release takes a string ID.
+    renderer.releaseTexture(image);
     const submitted: void = renderer.render(new engine.Frame());
     const status: engine.RendererStatus = renderer.status;
     void submitted;

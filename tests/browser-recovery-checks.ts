@@ -6,6 +6,7 @@ export async function checkBrowserRecovery(
     const real = navigator.gpu,
         devices: GPUDevice[] = [],
         diagnostics: unknown[] = [];
+    let deviceWait: Promise<void> | undefined;
     const gpu = {
         wgslLanguageFeatures: real.wgslLanguageFeatures,
         getPreferredCanvasFormat: () => real.getPreferredCanvasFormat(),
@@ -16,6 +17,7 @@ export async function checkBrowserRecovery(
                 get(target, key) {
                     if (key === "requestDevice")
                         return async (descriptor?: GPUDeviceDescriptor) => {
+                            await deviceWait;
                             const device = await target.requestDevice(descriptor);
                             devices.push(device);
                             return device;
@@ -56,6 +58,7 @@ export async function checkBrowserRecovery(
         new AbortController().signal,
     );
     await runtime.texture("manual", source);
+    await runtime.texture("survivor", source);
     paint.fillStyle = "blue";
     paint.fillRect(0, 0, 2, 2);
     const { Frame } = await import("../src/renderer.js");
@@ -84,7 +87,7 @@ export async function checkBrowserRecovery(
         await devices[0].lost;
         check(
             runtime.status === "recovering",
-            "controlled device.destroy enters recovery on real hardware",
+            "controlled device.destroy enters recovery on the selected WebGPU adapter",
         );
         runtime.render(frame, 0);
         check(
@@ -95,11 +98,63 @@ export async function checkBrowserRecovery(
         const after = pixels();
         check(
             devices.length === 2 && runtime.status === "ready" && after.join() === before.join(),
-            "controlled hardware-device loss rebuilds both image routes and restores exact canvas pixels",
+            "controlled device loss rebuilds both image routes and restores exact canvas pixels",
         );
         check(
             diagnostics.length === 0 && released === 0,
             "successful device replacement preserves source consumers without validation errors",
+        );
+        runtime.releaseTexture("manual");
+        runtime.releaseTexture("manual");
+        let inspection = runtime.inspect();
+        check(
+            inspection.sources === 2 &&
+                inspection.textures === 3 &&
+                inspection.manualSources === 1 &&
+                inspection.entries.every((entry) => entry.id !== "manual"),
+            "manual release removes registration and ownership estimates while keeping leased and other manual sources",
+        );
+        frame.textures[1] = "survivor";
+        check(
+            pixels().join() === before.join(),
+            "leased and other manual texture pixels survive manual release",
+        );
+        await runtime.texture("manual", source); // source is now blue, unlike its original snapshot
+        frame.textures[1] = "manual";
+        check(
+            pixels().join() === "192,64,128,255,0,0,255,255",
+            "released manual ID accepts a new source and draws its exact pixels",
+        );
+        let resume!: () => void;
+        deviceWait = new Promise<void>((resolve) => {
+            resume = resolve;
+        });
+        devices[1].destroy();
+        await devices[1].lost;
+        check(
+            runtime.status === "recovering",
+            "second controlled loss pauses replacement for manual release",
+        );
+        runtime.releaseTexture("manual");
+        paint.fillStyle = "#40c080";
+        paint.fillRect(0, 0, 2, 2);
+        const reused = runtime.texture("manual", source);
+        resume();
+        await runtime.ready();
+        await reused;
+        inspection = runtime.inspect();
+        check(
+            devices.length === 3 &&
+                inspection.sources === 3 &&
+                inspection.textures === 4 &&
+                inspection.leasedSources === 1 &&
+                inspection.manualSources === 2 &&
+                pixels().join() === "192,64,128,255,64,192,128,255",
+            "release and ID reuse during controlled recovery publish only the new manual pixels",
+        );
+        check(
+            diagnostics.length === 0 && released === 0,
+            "manual release and reuse across device generations preserve leased ownership without validation errors",
         );
     } finally {
         runtime.dispose();

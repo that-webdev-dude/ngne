@@ -153,6 +153,11 @@ tick the room. Reuse the same ImageAsset definition for shared consumers; setup 
 remain CPU values. The host releases GPU registrations with their scene/candidate.
 The [hello example](https://github.com/that-webdev-dude/ngne/blob/main/examples/hello/main.ts) combines an image sprite and a solid quad.
 
+Direct renderer callers can upload with `await renderer.texture('preview', canvas)`
+and release with `renderer.releaseTexture('preview')` when finished. See the
+[manual-texture lifetime contract](contracts/browser-and-presentation.md#assets-and-audio)
+for cancellation, ID reuse and reserved/leased IDs.
+
 ## Browser input
 
 Give the game canvas `tabindex="0"` and focus it after the player starts or resumes the

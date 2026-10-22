@@ -60,6 +60,10 @@ in published or rebuilding generations are counted once per texture. Upload-loca
 allocations awaiting validation and unpublished manual snapshots are excluded;
 pending counts expose that observation limit.
 
+Manual release removes registered ownership immediately; invalidated asynchronous
+work may still be settling and its unpublished allocations remain outside the
+registered-resource estimates.
+
 These are payload estimates, not process or driver memory: object/definition tables,
 consumer snapshots retained by closures, compressed/network data, allocator padding,
 GPU buffers, bindings, pipelines, render targets and driver allocations are excluded.

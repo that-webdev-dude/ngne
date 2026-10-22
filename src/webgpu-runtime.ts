@@ -430,6 +430,15 @@ export class WebGpuRuntime {
             throw error;
         }
     }
+    releaseTexture(id: string): void {
+        this.assertAlive();
+        const entry = this.entries.get(id);
+        if (!id || entry?.definition) throw new Error("Texture ID is reserved or leased: " + id);
+        // Invalidate even a first upload still awaiting its snapshot. Token identity keeps
+        // its late completion/finally from publishing over or removing an explicit reuse.
+        this.replacements.delete(id);
+        if (entry) this.releaseEntry(entry);
+    }
     async texture(
         id: string,
         source: ImageBitmap | HTMLCanvasElement,
@@ -457,6 +466,8 @@ export class WebGpuRuntime {
                 await this.ready();
                 this.assertAlive();
                 signal?.throwIfAborted();
+                if (this.replacements.get(id) !== token)
+                    throw new Error("Texture replacement superseded: " + id);
                 const generation = this.generation;
                 if (!generation) continue;
                 let result: { texture: GPUTexture; binding: GPUBindGroup };

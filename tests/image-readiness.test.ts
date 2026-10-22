@@ -7,6 +7,177 @@ import { Game, PREPARE_ASSET } from "../src/scene.js";
 import { WebGpuRuntime } from "../src/webgpu-runtime.js";
 import { deferred, fakeBitmap, fakePlatform } from "./gpu-fixture.js";
 
+test("manual release removes only its resources, is idempotent and permits corrected frames and reuse", async () => {
+    const platform = fakePlatform(),
+        snapshots: ReturnType<typeof fakeBitmap>[] = [],
+        diagnostics: unknown[] = [],
+        caller = fakeBitmap(),
+        leased = fakeBitmap();
+    let leaseReleases = 0;
+    const runtime = await WebGpuRuntime.create(
+        platform.canvas,
+        64,
+        64,
+        (e) => diagnostics.push(e),
+        {
+            ...platform,
+            snapshot: async () => {
+                const bitmap = fakeBitmap();
+                snapshots.push(bitmap);
+                return bitmap.image;
+            },
+        },
+    );
+    const releaseLease = await runtime.acquire(
+        { id: "leased", kind: "image", load: async () => leased.image },
+        {
+            id: "leased",
+            value: leased.image,
+            release: () => {
+                leaseReleases++;
+            },
+        },
+        new AbortController().signal,
+    );
+    await runtime.texture("manual", caller.image);
+    await runtime.texture("survivor", caller.image);
+    const before = runtime.inspect(),
+        device = platform.devices[0],
+        frame = new Frame();
+    frame.sprite({ x: 1, y: 1, width: 1, height: 1, texture: "manual" });
+    runtime.render(frame, 0);
+    const submissions = device.submissions;
+    assert.equal(runtime.stats?.bindings, 4);
+    runtime.releaseTexture("manual");
+    runtime.releaseTexture("manual");
+    runtime.releaseTexture("absent");
+    assert.equal(runtime.stats?.bindings, 3);
+    assert.equal(snapshots[0].closes, 1);
+    assert.equal(snapshots[1].closes, 0);
+    assert.equal(device.textures[2].destroyed, 1);
+    assert.deepEqual(runtime.inspect(), {
+        ...before,
+        sources: 2,
+        manualSources: 1,
+        consumers: 2,
+        textures: 3,
+        estimatedSourceBytes: 32,
+        estimatedTextureBytes: 36,
+        entries: before.entries.filter((entry) => entry.id !== "manual"),
+    });
+    // A detached inspection does not change when ownership does.
+    assert.equal(before.sources, 3);
+    for (const id of ["", "leased"])
+        assert.throws(() => runtime.releaseTexture(id), /reserved or leased/);
+    assert.equal(leaseReleases, 0);
+    runtime.render(frame, 0);
+    runtime.render(frame, 0);
+    assert.equal(device.submissions, submissions);
+    assert.equal(diagnostics.length, 1);
+    for (const texture of ["survivor", "leased"]) {
+        frame.textures[0] = texture;
+        runtime.render(frame, 0);
+        assert.equal(runtime.drawCalls, 1);
+    }
+    frame.textures[0] = "manual";
+    runtime.render(frame, 0);
+    assert.equal(diagnostics.length, 2);
+    await runtime.texture("manual", caller.image);
+    runtime.render(frame, 0);
+    assert.equal(runtime.drawCalls, 1);
+    releaseLease();
+    runtime.dispose();
+    runtime.dispose();
+    assert.equal(leaseReleases, 1);
+    assert.equal(caller.closes, 0);
+    assert.ok(snapshots.every((bitmap) => bitmap.closes === 1));
+    assert.ok(device.textures.every((texture) => texture.destroyed === 1));
+    assert.equal(runtime.inspect().sources, 0);
+    assert.equal(runtime.inspect().textures, 0);
+    assert.throws(() => runtime.releaseTexture("manual"), /disposed/);
+    assert.throws(() => runtime.releaseTexture("absent"), /disposed/);
+});
+
+for (const stage of ["snapshot", "upload"] as const)
+    for (const replacing of [false, true])
+        for (const oldFirst of [false, true])
+            test(`release during ${replacing ? "replacement" : "first"} ${stage}, old finishes ${oldFirst ? "first" : "last"}`, async () => {
+                const platform = fakePlatform(),
+                    snapshots: ReturnType<typeof fakeBitmap>[] = [],
+                    snapshotGate = deferred<ImageBitmap>(),
+                    uploadGate = deferred<GPUError | null>();
+                let holdSnapshot = false;
+                const runtime = await WebGpuRuntime.create(platform.canvas, 64, 64, () => {}, {
+                    ...platform,
+                    snapshot: () => {
+                        const bitmap = fakeBitmap();
+                        snapshots.push(bitmap);
+                        return holdSnapshot ? snapshotGate.promise : Promise.resolve(bitmap.image);
+                    },
+                });
+                const device = platform.devices[0];
+                if (replacing) await runtime.texture("id", fakeBitmap().image);
+                holdSnapshot = stage === "snapshot";
+                if (stage === "upload") device.scopeWait = uploadGate.promise;
+                const old = runtime.texture("id", fakeBitmap().image),
+                    rejected = assert.rejects(old, /superseded/);
+                await new Promise((resolve) => setImmediate(resolve));
+                const oldSnapshot = snapshots.at(-1)!;
+                runtime.releaseTexture("id");
+                assert.equal(runtime.inspect().manualReplacements, 0);
+                assert.equal(runtime.inspect().sources, 0);
+                holdSnapshot = false;
+                device.scopeWait = undefined;
+                // Hold the new upload at validation when old work must finish first.
+                const newUploadGate = deferred<GPUError | null>();
+                if (oldFirst) device.scopeWait = newUploadGate.promise;
+                const reused = runtime.texture("id", fakeBitmap().image);
+                await new Promise((resolve) => setImmediate(resolve));
+                device.scopeWait = undefined;
+                if (!oldFirst) await reused;
+                snapshotGate.resolve(oldSnapshot.image);
+                uploadGate.resolve(null);
+                await rejected;
+                assert.equal(oldSnapshot.closes, 1);
+                if (oldFirst) {
+                    assert.equal(runtime.inspect().manualReplacements, 1);
+                    newUploadGate.resolve(null);
+                    await reused;
+                }
+                const frame = new Frame();
+                frame.sprite({ x: 1, y: 1, width: 1, height: 1, texture: "id" });
+                runtime.render(frame, 0);
+                assert.equal(runtime.drawCalls, 1);
+                assert.equal(runtime.inspect().manualSources, 1);
+                assert.equal(runtime.inspect().textures, 2);
+                assert.equal(runtime.inspect().manualReplacements, 0);
+                runtime.dispose();
+                assert.ok(snapshots.every((bitmap) => bitmap.closes === 1));
+                assert.ok(device.textures.every((texture) => texture.destroyed === 1));
+            });
+
+test("manual release cannot cancel an asset-leased first upload", async () => {
+    const platform = fakePlatform(),
+        assets = new Assets(),
+        bitmap = fakeBitmap();
+    const runtime = await WebGpuRuntime.create(platform.canvas, 64, 64, () => {}, platform);
+    const gate = deferred<GPUError | null>();
+    platform.devices[0].scopeWait = gate.promise;
+    const definition: ImageAsset = { id: "leased", kind: "image", load: async () => bitmap.image };
+    const acquired = runtime.acquire(
+        definition,
+        await assets.acquire(definition),
+        new AbortController().signal,
+    );
+    assert.throws(() => runtime.releaseTexture("leased"), /reserved or leased/);
+    gate.resolve(null);
+    const release = await acquired;
+    assert.equal(runtime.inspect().leasedSources, 1);
+    release();
+    runtime.dispose();
+    assets.dispose();
+});
+
 test("image consumers share upload, cancel independently and release GPU before decoded cache disposal", async () => {
     const platform = fakePlatform(),
         bitmap = fakeBitmap(),

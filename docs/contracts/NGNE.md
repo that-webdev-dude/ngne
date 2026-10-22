@@ -61,7 +61,7 @@ Public types: `Lifecycle`, `SceneInspection`, `SceneStateInspection`,
 and `RendererResourceInspection`.
 
 Public resource operations: `Assets.inspect`, `WebGPURenderer.inspect`,
-`Assets.trim` and `Assets.evict`.
+`Assets.trim`, `Assets.evict` and `WebGPURenderer.releaseTexture`.
 
 Tests, benchmark capacity reporting and diagnostics consume this surface. See
 [public inspection](ownership-and-inspection.md#public-inspection),

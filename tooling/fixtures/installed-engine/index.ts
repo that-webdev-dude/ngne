@@ -2,6 +2,7 @@ import {
     BrowserGame,
     imageAsset,
     audioAsset,
+    Frame,
     type Asset,
     type PreparedScene,
     type SceneDefinition,
@@ -147,6 +148,30 @@ async function run() {
         overlapping.release();
         overlapping.release();
         check("candidate-release-preserves-survivor", host.renderer!.inspect().consumers === 1);
+        const renderer = host.renderer!,
+            manualSource = document.createElement("canvas");
+        manualSource.width = manualSource.height = 2;
+        const paint = manualSource.getContext("2d")!;
+        paint.fillStyle = "#40c080";
+        paint.fillRect(0, 0, 2, 2);
+        const manualFrame = new Frame();
+        manualFrame.sprite({ x: 32, y: 32, width: 64, height: 64, texture: "manual" });
+        await renderer.texture("manual", manualSource);
+        renderer.render(manualFrame, 0);
+        check("public-manual-texture-draws", pixel().join() === "64,192,128,255");
+        renderer.releaseTexture("manual");
+        renderer.releaseTexture("manual");
+        renderer.releaseTexture("absent");
+        check(
+            "public-manual-release-preserves-leased-source",
+            renderer.inspect().sources === 1 && renderer.inspect().manualSources === 0,
+        );
+        paint.fillStyle = "blue";
+        paint.fillRect(0, 0, 2, 2);
+        await renderer.texture("manual", manualSource);
+        renderer.render(manualFrame, 0);
+        check("public-manual-id-reuse-draws-new-pixels", pixel().join() === "0,0,255,255");
+        renderer.releaseTexture("manual");
         check(
             "leased-working-set-protected-from-retention",
             host.game.assets.inspect().protectedOverBudget,

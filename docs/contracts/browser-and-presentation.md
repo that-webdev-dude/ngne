@@ -262,10 +262,20 @@ Validation and out-of-memory scopes finish before readiness is published, includ
 when the copy throws synchronously. Failed uploads permit explicit retry.
 
 `WebGPURenderer.texture(id, bitmapOrCanvas, signal?)` snapshots the caller's image
-and retains its own bitmap until replacement/disposal. The caller can close or change
+and retains its own bitmap until replacement, release or disposal. The caller can close or change
 its original after resolution. Replacement is transactional; cancellation/failure
 preserves the old ready binding. Already-premultiplied inputs may have lost precision
 before snapshotting; the renderer cannot reconstruct those original bytes.
+
+`WebGPURenderer.releaseTexture(id)` synchronously removes a manual registration,
+destroys its registered GPU textures and closes its retained snapshot. It also
+invalidates pending manual work for that ID, including an unpublished first upload;
+late results are cleaned up when they settle. Absent IDs and repeated releases are
+no-ops. The empty white-texture ID and asset-leased IDs throw without changing
+ownership. Calls in failed or disposed states throw. Release is allowed during
+recovery. The ID may be explicitly registered again; older work cannot publish over
+or remove that registration. Frames referencing a released ID follow the existing
+missing-image fault behavior.
 
 Asset identity must map to one definition object per service. Leases release once; loaded entries follow the retention policy. Cancelling one consumer does not abort a load still needed by another. The last cancelled pending consumer aborts the loader. Late completion after cancellation disposes its returned value and cannot activate a scene.
 
