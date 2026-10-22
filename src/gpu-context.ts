@@ -29,9 +29,10 @@ export async function createGpuContext(
         throw new Error("WebGPU adapter unavailable. Enable browser hardware acceleration");
     const device = await adapter.requestDevice();
     let disposed = false;
+    let disposalFailure: AggregateError | undefined;
     let configured = false;
     let lost = false;
-    const format = gpu.getPreferredCanvasFormat();
+    let format: GPUTextureFormat;
     const assertReady = () => {
         signal.throwIfAborted();
         if (disposed || lost) throw new Error("WebGPU device is no longer available");
@@ -47,8 +48,12 @@ export async function createGpuContext(
         })
         .catch(onError);
     const dispose = () => {
-        if (disposed) return;
+        if (disposed) {
+            if (disposalFailure) throw disposalFailure;
+            return;
+        }
         disposed = true;
+        signal.removeEventListener("abort", abort);
         device.removeEventListener("uncapturederror", uncaptured);
         const errors: unknown[] = [];
         if (configured) {
@@ -64,10 +69,22 @@ export async function createGpuContext(
         } catch (error) {
             errors.push(error);
         }
-        if (errors.length) throw new AggregateError(errors, "WebGPU context disposal failed");
+        if (errors.length) {
+            disposalFailure = new AggregateError(errors, "WebGPU context disposal failed");
+            throw disposalFailure;
+        }
     };
+    const abort = () => {
+        try {
+            dispose();
+        } catch (error) {
+            onError(error);
+        }
+    };
+    signal.addEventListener("abort", abort, { once: true });
     try {
         assertReady();
+        format = gpu.getPreferredCanvasFormat();
         context.configure({ device, format, alphaMode: "premultiplied" });
         configured = true;
         // Observe an already-resolved lost promise before publishing acquisition.

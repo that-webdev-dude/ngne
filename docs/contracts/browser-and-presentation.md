@@ -99,11 +99,35 @@ assignment.
 
 ## Renderer
 
-`WebGPURenderer.create(canvas, width, height, onError?)` asynchronously publishes a
+`WebGPURenderer.create(canvas, width, height, onError?, signal?)` asynchronously publishes a
 complete renderer. Its synchronous `render(frame, clear?)`, `drawCalls`, `sprites`,
 idempotent `dispose()` and readonly presentation `status` are separate from Game
 lifecycle. Public-reachable declarations require no ambient WebGPU types; internal
 device, encoder, registry and upload modules are not package subpaths.
+
+Creation accepts creation-only cancellation. Abort rejects with `signal.reason`
+promptly, prevents publication, and cleans up late resources; abort after successful
+creation has no effect. One pending or active renderer exclusively owns a canvas,
+including during recovery and terminal failure, until cancellation, failed creation
+or `dispose()` releases it. Conflicting creation rejects before GPU acquisition;
+different canvases are independent.
+
+`ready(signal?)` resolves when the current generation and all live retained images
+are drawable in subsequent submissions; it does not promise display presentation or
+completion of pending manual replacements. Already-ready calls resolve asynchronously;
+recovery waits through replacement, failure rejects with the terminal recovery error,
+and disposal rejects promptly. Cancelling one wait rejects with `signal.reason`
+without changing renderer lifetime or other waits.
+
+`onLifecycle(observer)` returns an idempotent unsubscribe function. It observes future
+`recovering`, `ready` and `failed` transitions, with `error` on `failed`; read `status`
+for current state. Delivery is synchronous, in transition and registration order,
+after state/readiness publication and before readiness waiters resume. Successful
+repeated recovery emits another `recovering`/`ready` pair. Subscriptions added during
+delivery start with the next transition. Unsubscription and disposal prevent subsequent
+calls, including remaining delivery in progress. Observer exceptions are contained
+and reported through `onError`. Disposal clears observers and emits no event;
+`status` remains `disposed`.
 
 `BrowserGame` always renders through WebGPU; `BrowserGame.renderer` is a
 `WebGPURenderer` once acquired. Unsupported WebGPU rejects with an actionable message and

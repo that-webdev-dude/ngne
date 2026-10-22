@@ -407,11 +407,17 @@ async function run() {
         state.samples.replacementRms = platform.rms();
         const snapshot = JSON.stringify(host.game.enumerate());
         const old = platform.devices.at(-1)!;
+        const recoveryEvents: string[] = [];
+        const restored = deferred<void>();
+        const unsubscribeRecovery = host.renderer!.onLifecycle((event) => {
+            recoveryEvents.push(event.status);
+            if (event.status === "ready") restored.resolve();
+        });
         old.destroy();
-        await until(
-            () => platform.devices.at(-1) !== old && host.renderer?.status === "ready",
-            "ordinary device recovery",
-        );
+        await restored.promise;
+        await host.renderer!.ready();
+        unsubscribeRecovery();
+        check("public-recovery-observation", recoveryEvents.join() === "recovering,ready");
         check("recovery-preserves-simulation", JSON.stringify(host.game.enumerate()) === snapshot);
         check("recovery-restores-live-source", host.renderer!.inspect().sources === 1);
         const count = platform.submissions;
@@ -490,10 +496,7 @@ async function run() {
         recoveryAbort.abort();
         recoveryGate.release();
         await recoveryCancellation;
-        await until(
-            () => platform.devices.at(-1) !== stoppedDevice && host.renderer?.status === "ready",
-            "stopped recovery",
-        );
+        await host.renderer!.ready();
         check("stopped-recovery-does-not-schedule", callbacks.size === 0);
         check(
             "recovery-cancellation-preserves-mounted-owner",

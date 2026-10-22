@@ -399,6 +399,8 @@ for (const stage of ["adapter", "device", "pipeline", "snapshot", "upload"] as c
             abort.abort();
             wait.resolve();
             assert.ok((await handled) instanceof Error);
+            // Cancellation settles before an unabortable browser promise and its late cleanup.
+            await new Promise((resolve) => setImmediate(resolve));
         } else {
             const runtime = await creation;
             if (stage === "upload") {

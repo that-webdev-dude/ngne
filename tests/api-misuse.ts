@@ -203,6 +203,28 @@ void committedStateBoundary;
 
 async function webgpuBoundary(canvas: HTMLCanvasElement, bitmap: ImageBitmap): Promise<void> {
     const renderer = await engine.WebGPURenderer.create(canvas, 640, 360);
+    const abort = new AbortController();
+    const pending: Promise<engine.WebGPURenderer> = engine.WebGPURenderer.create(
+        canvas,
+        640,
+        360,
+        undefined,
+        abort.signal,
+    );
+    void pending;
+    const ready: Promise<void> = renderer.ready(abort.signal);
+    void ready;
+    const unsubscribe: () => void = renderer.onLifecycle((event: engine.RendererLifecycleEvent) => {
+        if (event.status === "failed") {
+            const error: Error = event.error;
+            void error;
+        }
+        // @ts-expect-error Events are readonly.
+        event.status = "ready";
+    });
+    unsubscribe();
+    // @ts-expect-error Readiness takes an AbortSignal.
+    renderer.ready({});
     const image: engine.ImageAsset = engine.imageAsset("image", "./image.png");
     const upload: Promise<void> = renderer.texture(image.id, bitmap);
     await upload;

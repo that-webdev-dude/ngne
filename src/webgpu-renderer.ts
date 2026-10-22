@@ -5,6 +5,9 @@ import { WebGpuRuntime } from "./webgpu-runtime.js";
 import type { RendererResourceInspection } from "./resource-inspection.js";
 
 export type RendererStatus = "ready" | "recovering" | "failed" | "disposed";
+export type RendererLifecycleEvent =
+    | { readonly status: "recovering" | "ready" }
+    | { readonly status: "failed"; readonly error: Error };
 
 /** GPU-free public declaration boundary; resources live in the private runtime. */
 export class WebGPURenderer {
@@ -23,8 +26,9 @@ export class WebGPURenderer {
         width: number,
         height: number,
         onError: (error: unknown) => void = console.error,
+        signal?: AbortSignal,
     ): Promise<WebGPURenderer> {
-        return this[CREATE_RENDERER](canvas, width, height, onError);
+        return this[CREATE_RENDERER](canvas, width, height, onError, signal);
     }
     static async [CREATE_RENDERER](
         canvas: HTMLCanvasElement,
@@ -34,6 +38,10 @@ export class WebGPURenderer {
         signal?: AbortSignal,
     ): Promise<WebGPURenderer> {
         const runtime = await WebGpuRuntime.create(canvas, width, height, onError, { signal });
+        if (signal?.aborted) {
+            runtime.dispose();
+            signal.throwIfAborted();
+        }
         return new WebGPURenderer(canvas, width, height, runtime);
     }
     get status(): RendererStatus {
@@ -68,7 +76,13 @@ export class WebGPURenderer {
         return this.#runtime.acquire(definition, source, signal);
     }
     [RENDERER_READY](): Promise<void> {
-        return this.#runtime.ready();
+        return this.ready();
+    }
+    ready(signal?: AbortSignal): Promise<void> {
+        return this.#runtime.ready(signal);
+    }
+    onLifecycle(observer: (event: RendererLifecycleEvent) => void): () => void {
+        return this.#runtime.onLifecycle(observer);
     }
     render(frame: Frame, clear = 0x090e20): void {
         this.#runtime.render(frame, clear);

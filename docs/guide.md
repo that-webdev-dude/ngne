@@ -158,6 +158,28 @@ and release with `renderer.releaseTexture('preview')` when finished. See the
 [manual-texture lifetime contract](contracts/browser-and-presentation.md#assets-and-audio)
 for cancellation, ID reuse and reserved/leased IDs.
 
+For a direct renderer host:
+
+```ts
+const creation = new AbortController();
+const renderer = await WebGPURenderer.create(canvas, 640, 360, console.error, creation.signal);
+const unsubscribe = renderer.onLifecycle((event) => {
+    if (event.status === "ready") requestRedraw();
+    if (event.status === "failed") showFailure(event.error);
+});
+const wait = new AbortController();
+await renderer.ready(wait.signal);
+// When the host finishes:
+unsubscribe();
+renderer.dispose();
+```
+
+Creation cancellation ends at successful creation. Readiness cancellation affects
+only that wait. Subscribe before triggering work; `status` supplies current state.
+A canvas has one renderer owner until disposal. See the
+[renderer contract](contracts/browser-and-presentation.md#renderer) for ordering,
+recovery and failure semantics.
+
 ## Browser input
 
 Give the game canvas `tabindex="0"` and focus it after the player starts or resumes the

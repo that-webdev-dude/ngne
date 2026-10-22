@@ -114,7 +114,6 @@ export class BrowserGame<S, C> {
         const acquisition = ++this.acquisition;
         const abort = new AbortController();
         this.acquisitionAbort = abort;
-        this.restoreBackingSize();
         const promise = WebGPURenderer[CREATE_RENDERER](
             this.options.canvas,
             this.width,
@@ -128,6 +127,7 @@ export class BrowserGame<S, C> {
                     throw new Error("Renderer acquisition cancelled");
                 }
                 this.renderer = renderer;
+                this.restoreBackingSize();
                 return renderer;
             })
             .catch((error: unknown) => {

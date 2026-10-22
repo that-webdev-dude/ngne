@@ -4,6 +4,10 @@ import { createQuadRenderer, type QuadRenderer } from "./quad-renderer.js";
 import type { Frame } from "./renderer.js";
 import { uploadImage } from "./texture-assets.js";
 import type { RendererResourceInspection } from "./resource-inspection.js";
+import type { RendererLifecycleEvent } from "./webgpu-renderer.js";
+
+// Ownership spans acquisition and all replacement generations, including failed owners.
+const canvasOwners = new WeakMap<HTMLCanvasElement, WebGpuRuntime>();
 
 interface ImageEntry {
     readonly id: string;
@@ -42,8 +46,11 @@ export class WebGpuRuntime {
     private replacements = new Map<string, object>();
     private faults = new Set<string>();
     private failure?: Error;
+    private readonly lifetime = new AbortController();
+    private readonly observers = new Set<{ notify: (event: RendererLifecycleEvent) => void }>();
     private readonly ownerAbort = () => {
         try {
+            this.lifetime.abort(this.platform.signal?.reason);
             this.dispose();
         } catch (error) {
             this.report(error);
@@ -72,11 +79,14 @@ export class WebGpuRuntime {
         )
             throw new Error("Invalid WebGPU logical dimensions");
         platform.signal?.throwIfAborted();
+        if (canvasOwners.has(canvas)) throw new Error("WebGPU canvas already has a renderer owner");
         const runtime = new WebGpuRuntime(canvas, width, height, diagnostic, platform);
+        canvasOwners.set(canvas, runtime);
         platform.signal?.addEventListener("abort", runtime.ownerAbort, { once: true });
         runtime.readiness = runtime.initialize();
         try {
-            await runtime.readiness;
+            await abortable(runtime.readiness, runtime.lifetime.signal);
+            runtime.assertAlive();
             return runtime;
         } catch (error) {
             try {
@@ -85,6 +95,8 @@ export class WebGpuRuntime {
                 throw new AggregateError([error, cleanup], "WebGPU initialization cleanup failed");
             }
             throw error;
+        } finally {
+            platform.signal?.removeEventListener("abort", runtime.ownerAbort);
         }
     }
     private report(error: unknown): void {
@@ -95,7 +107,6 @@ export class WebGpuRuntime {
         }
     }
     private assertAlive(): void {
-        this.platform.signal?.throwIfAborted();
         if (this.status === "disposed") throw new Error("WebGPU renderer is disposed");
         if (this.status === "failed")
             throw this.failure ?? new Error("WebGPU renderer failed; reload required");
@@ -105,10 +116,41 @@ export class WebGpuRuntime {
         generation.abort.signal.throwIfAborted();
         generation.context?.assertReady();
     }
-    async ready(): Promise<void> {
-        this.assertAlive();
-        await this.readiness;
-        this.assertAlive();
+    async ready(signal?: AbortSignal): Promise<void> {
+        signal?.throwIfAborted();
+        const waitSignal = signal
+            ? AbortSignal.any([signal, this.lifetime.signal])
+            : this.lifetime.signal;
+        for (;;) {
+            this.assertAlive();
+            const readiness = this.readiness;
+            await abortable(readiness, waitSignal);
+            waitSignal.throwIfAborted();
+            this.assertAlive();
+            if (readiness === this.readiness && this.status === "ready") return;
+        }
+    }
+    onLifecycle(notify: (event: RendererLifecycleEvent) => void): () => void {
+        if (this.status === "disposed") return () => {};
+        const observer = { notify };
+        this.observers.add(observer);
+        return () => {
+            this.observers.delete(observer);
+        };
+    }
+    private notify(event: RendererLifecycleEvent): void {
+        Object.freeze(event);
+        for (const observer of [...this.observers]) {
+            if (!this.observers.has(observer)) continue;
+            try {
+                // Contain returned promise rejections without delaying ordered delivery.
+                void Promise.resolve(observer.notify(event)).catch((error: unknown) =>
+                    this.report(error),
+                );
+            } catch (error) {
+                this.report(error);
+            }
+        }
     }
     /** Internal diagnostics used by the sustained renderer harness. Stable until generation changes. */
     get stats(): Readonly<QuadRenderer["stats"]> | undefined {
@@ -239,6 +281,7 @@ export class WebGpuRuntime {
             this.generation = generation;
             this.pending = undefined;
             this.status = "ready";
+            this.notify({ status: "ready" });
         } catch (error) {
             if (this.pending === generation) this.pending = undefined;
             try {
@@ -267,11 +310,13 @@ export class WebGpuRuntime {
                 ),
             });
             this.report(this.failure);
+            this.notify({ status: "failed", error: this.failure });
             throw this.failure;
         });
         void this.readiness.catch(() => {
             /* Failure is reported once; readiness consumers also receive it. */
         });
+        this.notify({ status: "recovering" });
     }
     private async upload(
         generation: Generation,
@@ -534,6 +579,8 @@ export class WebGpuRuntime {
     dispose(): void {
         if (this.status === "disposed") return;
         this.status = "disposed";
+        this.observers.clear();
+        this.lifetime.abort(new Error("WebGPU renderer is disposed"));
         this.drawCalls = this.sprites = 0;
         this.platform.signal?.removeEventListener("abort", this.ownerAbort);
         const generations = [this.generation, this.pending];
@@ -544,7 +591,11 @@ export class WebGpuRuntime {
         for (const entry of this.entries.values()) actions.push(() => this.releaseEntry(entry));
         for (const generation of generations)
             if (generation) actions.push(() => disposeGeneration(generation));
-        runCleanup(actions, "WebGPU disposal failed");
+        try {
+            runCleanup(actions, "WebGPU disposal failed");
+        } finally {
+            if (canvasOwners.get(this.canvas) === this) canvasOwners.delete(this.canvas);
+        }
     }
 }
 
@@ -580,9 +631,16 @@ function runCleanup(actions: readonly (() => void)[], message: string): void {
 }
 function abortable<T>(work: Promise<T>, signal: AbortSignal): Promise<T> {
     return new Promise<T>((resolve, reject) => {
-        const abort = () => reject(signal.reason);
+        const finish = (action: () => void) => {
+            signal.removeEventListener("abort", abort);
+            action();
+        };
+        const abort = () => finish(() => reject(signal.reason));
         signal.addEventListener("abort", abort, { once: true });
         if (signal.aborted) abort();
-        void work.then(resolve, reject).finally(() => signal.removeEventListener("abort", abort));
+        void work.then(
+            (value) => finish(() => resolve(value)),
+            (error: unknown) => finish(() => reject(error)),
+        );
     });
 }

@@ -47,12 +47,16 @@ Scene authors use this surface for explicitly acquired or injected values. See
 Public symbols: `Game`, `BrowserGame`, `Assets`, `Input`, `Frame`,
 `WebGPURenderer`, `Audio`, `FixedStep`, `emptyInput`; types `GameOptions`,
 `SceneCandidates`, `SceneCandidateOptions`, `BrowserOptions`, `FrameScheduler`,
-`DisplaySnapshot`, `InputSnapshot`, `Stats`, `RendererStatus`, `AssetRetention`,
+`DisplaySnapshot`, `InputSnapshot`, `Stats`, `RendererStatus`, `RendererLifecycleEvent`, `AssetRetention`,
 `AssetsOptions` and `AssetClaim`.
 
 The browser host, headless runners, renderer/audio/asset tests and benchmarks
 consume this surface. Host lifecycle, candidate coordination, tick, render and
 service operations are intentional integration APIs.
+
+Public renderer lifecycle operations: `WebGPURenderer.create` with optional creation
+signal, `ready(signal?)` and `onLifecycle(observer)`. Exact lifecycle semantics belong
+to the [browser and presentation contract](browser-and-presentation.md#renderer).
 
 ### Inspection
 

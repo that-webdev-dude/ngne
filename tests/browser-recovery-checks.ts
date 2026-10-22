@@ -1,4 +1,5 @@
 import { WebGpuRuntime } from "../src/webgpu-runtime.js";
+import { WebGPURenderer } from "../src/index.js";
 
 export async function checkBrowserRecovery(
     check: (condition: unknown, message: string) => void,
@@ -7,6 +8,8 @@ export async function checkBrowserRecovery(
         devices: GPUDevice[] = [],
         diagnostics: unknown[] = [];
     let deviceWait: Promise<void> | undefined;
+    let deviceEntered = () => {};
+    let deviceReturned = (_device: GPUDevice) => {};
     const gpu = {
         wgslLanguageFeatures: real.wgslLanguageFeatures,
         getPreferredCanvasFormat: () => real.getPreferredCanvasFormat(),
@@ -17,9 +20,11 @@ export async function checkBrowserRecovery(
                 get(target, key) {
                     if (key === "requestDevice")
                         return async (descriptor?: GPUDeviceDescriptor) => {
+                            deviceEntered();
                             await deviceWait;
                             const device = await target.requestDevice(descriptor);
                             devices.push(device);
+                            deviceReturned(device);
                             return device;
                         };
                     const value = Reflect.get(target, key, target);
@@ -162,4 +167,118 @@ export async function checkBrowserRecovery(
         canvas.remove();
     }
     check(released === 1, "recovered renderer releases its retained source once at disposal");
+
+    const descriptor = Object.getOwnPropertyDescriptor(navigator, "gpu");
+    Object.defineProperty(navigator, "gpu", { configurable: true, value: gpu });
+    deviceWait = undefined;
+    let renderer: WebGPURenderer | undefined;
+    try {
+        const observerFault = new Error("Controlled async observer failure");
+        const observerReports = Promise.withResolvers<void>();
+        let observerFailures = 0;
+        renderer = await WebGPURenderer.create(canvas, 64, 64, (error) => {
+            if (error !== observerFault) {
+                diagnostics.push(error);
+                return;
+            }
+            if (++observerFailures === 4) observerReports.resolve();
+            throw new Error("Controlled diagnostic failure");
+        });
+        await renderer.texture("public", source);
+        const frame = new Frame();
+        frame.sprite({ x: 32, y: 32, width: 64, height: 64, texture: "public" });
+        const events: string[] = [];
+        const restoredPixels: string[] = [];
+        const draw = () => {
+            renderer!.render(frame, 0);
+            reader.drawImage(canvas, 0, 0);
+            return Array.from(reader.getImageData(32, 32, 1, 1).data).join();
+        };
+        const before = draw();
+        const unsubscribeAsync = renderer.onLifecycle(async (event) => {
+            if (event.status === "ready") await renderer!.ready();
+            throw observerFault;
+        });
+        const unsubscribe = renderer.onLifecycle((event) => {
+            events.push(event.status);
+            if (event.status === "ready") restoredPixels.push(draw());
+        });
+        for (let round = 0; round < 2; round++) {
+            const entered = Promise.withResolvers<void>(),
+                gate = Promise.withResolvers<void>();
+            deviceEntered = entered.resolve;
+            deviceWait = gate.promise;
+            devices.at(-1)!.destroy();
+            await entered.promise;
+            const abort = new AbortController();
+            const cancelled = rejects(renderer.ready(abort.signal));
+            const ready = renderer.ready();
+            abort.abort();
+            await cancelled;
+            check(
+                renderer.status === "recovering",
+                "public readiness cancellation leaves recovery pending",
+            );
+            gate.resolve();
+            await ready;
+        }
+        await observerReports.promise;
+        check(
+            observerFailures === 4 && diagnostics.length === 0 && renderer.status === "ready",
+            "async lifecycle observer rejections reach diagnostics without blocking recovery, later observers or rendering, even when diagnostics throw",
+        );
+        check(
+            events.join() === "recovering,ready,recovering,ready" &&
+                restoredPixels.length === 2 &&
+                restoredPixels.every((pixel) => pixel === before) &&
+                before === "64,192,128,255",
+            "public lifecycle observes repeated controlled loss and exact restored pixels before readiness resumes",
+        );
+        unsubscribe();
+        unsubscribeAsync();
+        renderer.dispose();
+        const gate = Promise.withResolvers<void>(),
+            entered = Promise.withResolvers<void>();
+        deviceWait = gate.promise;
+        deviceEntered = entered.resolve;
+        const abort = new AbortController();
+        const old = WebGPURenderer.create(canvas, 64, 64, undefined, abort.signal);
+        const cancelled = rejects(old);
+        await entered.promise;
+        abort.abort();
+        await cancelled; // The real requestDevice wrapper is still gated.
+        deviceWait = undefined;
+        renderer = await WebGPURenderer.create(canvas, 64, 64);
+        const lateDevice = Promise.withResolvers<GPUDevice>();
+        // The old request resumes after a new renderer has configured the same canvas.
+        deviceReturned = lateDevice.resolve;
+        gate.resolve();
+        await (
+            await lateDevice.promise
+        ).lost;
+        const solid = new Frame();
+        solid.rect(32, 32, 64, 64, 0x40c080);
+        renderer.render(solid, 0);
+        reader.drawImage(canvas, 0, 0);
+        check(
+            Array.from(reader.getImageData(32, 32, 1, 1).data).join() === before &&
+                renderer.status === "ready" &&
+                diagnostics.length === 0 &&
+                events.length === 4,
+            "public creation cancels before gated device arrival; late cleanup preserves subsequent same-canvas rendering and unsubscribed observers",
+        );
+    } finally {
+        renderer?.dispose();
+        if (descriptor) Object.defineProperty(navigator, "gpu", descriptor);
+        else Reflect.deleteProperty(navigator, "gpu");
+    }
+}
+
+async function rejects(work: Promise<unknown>): Promise<void> {
+    try {
+        await work;
+    } catch {
+        return;
+    }
+    throw new Error("Expected cancellation rejection");
 }
