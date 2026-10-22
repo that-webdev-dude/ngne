@@ -275,3 +275,80 @@ test("release invalidates a manual upload waiting for recovery readiness", async
     assert.equal(runtime.inspect().sources, 0);
     runtime.dispose();
 });
+
+test("a lost-generation upload completing after release and ID reuse cannot affect the new registration", async () => {
+    const platform = fakePlatform(),
+        snapshots: ReturnType<typeof fakeBitmap>[] = [],
+        diagnostics: unknown[] = [];
+    const runtime = await WebGpuRuntime.create(
+        platform.canvas,
+        64,
+        64,
+        (e) => diagnostics.push(e),
+        {
+            ...platform,
+            snapshot: async () => {
+                const bitmap = fakeBitmap();
+                snapshots.push(bitmap);
+                return bitmap.image;
+            },
+        },
+    );
+    const uploadGate = deferred<GPUError | null>(),
+        recoveryGate = deferred<void>(),
+        original = platform.devices[0];
+    original.scopeWait = uploadGate.promise;
+    const oldUpload = runtime.texture("id", fakeBitmap().image),
+        rejected = assert.rejects(oldUpload, /superseded/);
+    await turn();
+    assert.equal(original.copies, 1);
+    const oldTexture = original.textures[1];
+    assert.equal(oldTexture.destroyed, 0);
+    assert.equal(runtime.inspect().manualReplacements, 1);
+
+    // Hold both the old upload's validation and the replacement device independently.
+    platform.delayDevice(recoveryGate.promise);
+    original.loss.resolve({ reason: "unknown", message: "Controlled in-flight upload loss" });
+    await turn();
+    assert.equal(runtime.status, "recovering");
+    runtime.releaseTexture("id");
+    const reused = runtime.texture("id", fakeBitmap().image);
+    recoveryGate.resolve();
+    await runtime.ready();
+    await reused;
+    assert.equal(platform.devices.length, 2);
+    assert.equal(snapshots[0].closes, 0); // The old upload still owns its unsettled snapshot.
+    assert.equal(snapshots[1].closes, 0);
+    const replacement = platform.devices[1],
+        newTexture = replacement.textures[1],
+        live = runtime.inspect(),
+        frame = new Frame();
+    assert.equal(live.manualSources, 1);
+    assert.equal(live.textures, 2); // White plus the explicitly reused ID.
+    assert.equal(live.manualReplacements, 0);
+    assert.equal(oldTexture.destroyed, 0);
+    frame.sprite({ x: 1, y: 1, width: 1, height: 1, texture: "id" });
+    runtime.render(frame, 0);
+    assert.equal(runtime.drawCalls, 1);
+
+    // Finish the old device's work only after the new registration has drawn.
+    uploadGate.resolve(null);
+    await rejected;
+    assert.equal(snapshots[0].closes, 1);
+    assert.equal(oldTexture.destroyed, 1);
+    assert.equal(snapshots[1].closes, 0);
+    assert.equal(newTexture.destroyed, 0);
+    assert.deepEqual(runtime.inspect(), live);
+    runtime.render(frame, 0);
+    assert.equal(runtime.drawCalls, 1);
+    assert.equal(runtime.status, "ready");
+    assert.equal(replacement.copies, 1);
+    assert.equal(diagnostics.length, 0);
+    runtime.dispose();
+    runtime.dispose();
+    assert.ok(snapshots.every((bitmap) => bitmap.closes === 1));
+    for (const device of platform.devices) {
+        assert.equal(device.destroyed, 1);
+        assert.ok(device.textures.every((texture) => texture.destroyed === 1));
+    }
+});
