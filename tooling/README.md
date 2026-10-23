@@ -143,6 +143,9 @@ required reviewers are configured and environment protection bypass is disabled.
 After approval it rechecks the reviewed artifact and metadata, creates an annotated
 remote `v<version>` tag if absent, and publishes the retained tarball using OIDC.
 An existing matching tag is accepted; conflicting tags are never overwritten.
+After registry verification passes, it creates the `v<version>` GitHub release from
+that version's CHANGELOG section and the verified publication result, retained as
+`github-release-<run>-<attempt>`. An existing release is accepted and never overwritten.
 Prereleases use `next`; normal releases use `latest`.
 Normal `0.x` releases remain pre-1.0 and make no permanent API-stability commitment.
 

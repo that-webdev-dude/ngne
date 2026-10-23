@@ -6,7 +6,7 @@ Detailed prerequisites and evidence rules are in the [tooling reference](README.
 
 Run from the NGNE repository root with Node 24 or newer. Install dependencies with `npm ci` if needed. Browser checks require Chrome. Run commands sequentially; do not run competing builds in this checkout.
 
-Examples use POSIX shell syntax. In Windows PowerShell, use `npm.cmd` instead of `npm`, `$env:NAME = "value"` instead of `export NAME=value`, and `Remove-Item Env:NAME` instead of `unset NAME`.
+Examples use POSIX shell syntax. In Windows PowerShell, use `npm.cmd` instead of `npm`, `$env:NAME = "value"` instead of `export NAME=value`, and `Remove-Item Env:NAME` instead of `unset NAME`. Use a backtick (`` ` ``) instead of `\` to continue a line, and `$name = command` instead of `name=$(command)`.
 
 Replace `<placeholders>` with actual values, without angle brackets. In npm commands, `--` forwards the remaining arguments to the script.
 
