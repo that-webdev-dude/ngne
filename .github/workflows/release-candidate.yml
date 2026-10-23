@@ -32,39 +32,7 @@ jobs:
         with:
           node-version: 24
       - name: Bind source, package and intended tag
-        run: |
-          node <<'NODE'
-          const fs = require('node:fs');
-          const { execFileSync, spawnSync } = require('node:child_process');
-          const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim();
-          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-          const lock = JSON.parse(fs.readFileSync('package-lock.json', 'utf8'));
-          const sha = git('rev-parse', 'HEAD');
-          const tag = process.env.RELEASE_TAG;
-          if (sha !== process.env.GITHUB_SHA || git('status', '--porcelain'))
-            throw Error('Candidate must use the clean dispatch revision');
-          if (pkg.name !== '@ngne/core' || pkg.private === true ||
-              lock.version !== pkg.version || lock.packages[''].version !== pkg.version ||
-              lock.name !== pkg.name || lock.packages[''].name !== pkg.name ||
-              tag !== `v${pkg.version}`)
-            throw Error('Package, lockfile and intended release tag must agree');
-          if (pkg.publishConfig?.registry !== 'https://registry.npmjs.org/' ||
-              pkg.publishConfig?.access !== 'public' ||
-              pkg.publishConfig?.tag !== (pkg.version.includes('-') ? 'next' : 'latest'))
-            throw Error('Unexpected registry, access or distribution tag');
-          const exists = spawnSync('git', ['show-ref', '--verify', '--quiet', `refs/tags/${tag}`]);
-          if (![0, 1].includes(exists.status)) throw Error('Cannot inspect intended tag');
-          if (exists.status === 0 && git('rev-parse', `refs/tags/${tag}^{commit}`) !== sha)
-            throw Error('Existing release tag points to another commit');
-          fs.mkdirSync('out', { recursive: true });
-          fs.writeFileSync('out/release-source.json', JSON.stringify({
-            name: pkg.name, version: pkg.version, publishConfig: pkg.publishConfig,
-            sourceSHA: sha, intendedTag: tag,
-            tagStatus: exists.status === 0 ? 'matches-source' : 'not-created',
-            workflowRun: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
-            runAttempt: process.env.GITHUB_RUN_ATTEMPT,
-          }, null, 2) + '\n');
-          NODE
+        run: node tooling/commands/release-candidate.ts bind
       - run: npm ci
       - run: npm run format:check
       - run: npm test
@@ -89,47 +57,7 @@ jobs:
       - name: Recheck preparation integrity after verification
         run: npm run check:prepared -- --manifest "$PREPARATION_MANIFEST"
       - name: Assemble immutable candidate for review
-        run: |
-          node <<'NODE'
-          const fs = require('node:fs');
-          const path = require('node:path');
-          const { createHash } = require('node:crypto');
-          const { execFileSync } = require('node:child_process');
-          const hash = file => createHash('sha256').update(fs.readFileSync(file)).digest('hex');
-          const source = JSON.parse(fs.readFileSync('out/release-source.json', 'utf8'));
-          const manifestPath = path.resolve(process.env.PREPARATION_MANIFEST);
-          const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-          const result = JSON.parse(fs.readFileSync(path.join(path.dirname(manifestPath), 'result.json'), 'utf8'));
-          if (result.accepted !== true || manifest.provenance.revision !== source.sourceSHA ||
-              manifest.provenance.changes.trim() ||
-              execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim() !== source.sourceSHA ||
-              execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim())
-            throw Error('Preparation must be accepted and match the clean source');
-          const pkg = manifest.prepared.package;
-          const tarball = path.resolve(path.dirname(manifestPath), '..', pkg.path);
-          const expectedFilename = `${source.name.replace(/^@/, '').replace('/', '-')}-${source.version}.tgz`;
-          if (pkg.filename !== expectedFilename || hash(tarball) !== pkg.sha256)
-            throw Error('Prepared tarball identity mismatch');
-          const destination = 'out/release-candidate';
-          fs.mkdirSync(destination);
-          fs.copyFileSync(tarball, path.join(destination, pkg.filename));
-          fs.copyFileSync(manifestPath, path.join(destination, 'manifest.json'));
-          const identity = {
-            ...source, verification: 'workflow-checks-passed', publicationApproved: false,
-            preparationRunId: manifest.runId, tarball: pkg.filename, tarballSHA256: pkg.sha256,
-            manifestSHA256: hash(manifestPath),
-            evidenceArtifact: `release-diagnostics-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}`,
-            limits: 'Automated Linux/SwiftShader evidence. Review and final publication approval required. Evidence archive is not a resumable prepared workspace.',
-          };
-          fs.writeFileSync(path.join(destination, 'candidate.json'), JSON.stringify(identity, null, 2) + '\n');
-          const sums = [pkg.filename, 'manifest.json', 'candidate.json']
-            .map(file => `${hash(path.join(destination, file))}  ${file}`).join('\n') + '\n';
-          fs.writeFileSync(path.join(destination, 'SHA256SUMS'), sums);
-          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
-            `Candidate ${source.name}@${source.version}, source ${source.sourceSHA}, intended tag ${source.intendedTag} (${source.tagStatus}).\n\n` +
-            `Tarball SHA-256: ${pkg.sha256}\n\n` +
-            'Review only: require a successful whole job, inspect evidence/contents and recheck hashes and tag before explicit publication approval. Publish the downloaded .tgz without rebuilding or repacking. No publication occurred.\n');
-          NODE
+        run: node tooling/commands/release-candidate.ts assemble
       - name: Retain diagnostic evidence (not publication approval)
         if: always()
         uses: actions/upload-artifact@v4

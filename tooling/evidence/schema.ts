@@ -1,4 +1,4 @@
-import { safePath, type Identities } from "./identity.js";
+import { safePath, type Identities } from "./identity.ts";
 import type { CleanupRecord } from "../core/cleanup.mjs";
 
 export interface Header {

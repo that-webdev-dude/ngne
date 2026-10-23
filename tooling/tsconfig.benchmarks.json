@@ -4,6 +4,7 @@
         "types": ["node", "@webgpu/types"],
         "lib": ["ES2024", "DOM", "DOM.Iterable"],
         "allowJs": true,
+        "allowImportingTsExtensions": true,
         "checkJs": true
     },
     "include": [
