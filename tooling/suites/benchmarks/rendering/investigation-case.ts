@@ -37,10 +37,16 @@ export async function investigationCase(
         run.record(id, "measurements", { ...measurements(), cleanup: session.records });
     } catch (error) {
         recorded = false;
-        run.result.failures.push({
-            kind: "evidence",
-            message: `${id} measurements: ${failureText(error)}`,
-        });
+        const message = failureText(error);
+        const existing = run.result.failures.find(
+            (f) => f.kind === "evidence" && f.message === message,
+        );
+        if (existing) existing.message = `${id} measurements: ${message}`;
+        else
+            run.result.failures.push({
+                kind: "evidence",
+                message: `${id} measurements: ${message}`,
+            });
     }
     if (workloadFailed) throw workloadError;
     return recorded && session.records.every((record) => record.status === "passed");
