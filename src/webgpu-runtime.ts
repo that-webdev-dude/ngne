@@ -46,6 +46,7 @@ export class WebGpuRuntime {
     private replacements = new Map<string, object>();
     private faults = new Set<string>();
     private failure?: Error;
+    private hasResized = false;
     private readonly lifetime = new AbortController();
     private readonly observers = new Set<{ notify: (event: RendererLifecycleEvent) => void }>();
     private readonly ownerAbort = () => {
@@ -58,8 +59,8 @@ export class WebGpuRuntime {
     };
     private constructor(
         private readonly canvas: HTMLCanvasElement,
-        private readonly width: number,
-        private readonly height: number,
+        private logicalWidth: number,
+        private logicalHeight: number,
         private readonly diagnostic: (error: unknown) => void,
         private readonly platform: RendererPlatform,
     ) {}
@@ -71,13 +72,7 @@ export class WebGpuRuntime {
         diagnostic: (error: unknown) => void,
         platform: RendererPlatform = {},
     ): Promise<WebGpuRuntime> {
-        if (
-            !Number.isSafeInteger(width) ||
-            width <= 0 ||
-            !Number.isSafeInteger(height) ||
-            height <= 0
-        )
-            throw new Error("Invalid WebGPU logical dimensions");
+        validateDimensions(width, height);
         platform.signal?.throwIfAborted();
         if (canvasOwners.has(canvas)) throw new Error("WebGPU canvas already has a renderer owner");
         const runtime = new WebGpuRuntime(canvas, width, height, diagnostic, platform);
@@ -115,6 +110,28 @@ export class WebGpuRuntime {
         this.assertAlive();
         generation.abort.signal.throwIfAborted();
         generation.context?.assertReady();
+    }
+    get width(): number {
+        return this.logicalWidth;
+    }
+    get height(): number {
+        return this.logicalHeight;
+    }
+    resize(width: number, height: number): void {
+        this.assertAlive();
+        const generation = this.generation;
+        if (this.status !== "ready" || !generation?.context)
+            throw new Error(
+                "WebGPU resize requires a ready renderer; await ready() before retrying",
+            );
+        this.assertGeneration(generation);
+        validateDimensions(width, height, generation.context.device.limits.maxTextureDimension2D);
+        // Validate both axes before mutating either owner; no asynchronous GPU work is needed.
+        if (this.canvas.width !== width) this.canvas.width = width;
+        if (this.canvas.height !== height) this.canvas.height = height;
+        this.logicalWidth = width;
+        this.logicalHeight = height;
+        this.hasResized = true;
     }
     async ready(signal?: AbortSignal): Promise<void> {
         signal?.throwIfAborted();
@@ -246,6 +263,14 @@ export class WebGpuRuntime {
             );
             generation.context = context;
             this.assertGeneration(generation);
+            // Creation keeps projection independent of backing size. Only an accepted resize
+            // establishes dimensions that must fit a replacement device's texture limit.
+            if (this.hasResized)
+                validateDimensions(
+                    this.width,
+                    this.height,
+                    context.device.limits.maxTextureDimension2D,
+                );
             const quad = await createQuadRenderer(context.device, context.format);
             generation.quad = quad;
             this.assertGeneration(generation);
@@ -597,6 +622,18 @@ export class WebGpuRuntime {
             if (canvasOwners.get(this.canvas) === this) canvasOwners.delete(this.canvas);
         }
     }
+}
+
+function validateDimensions(width: number, height: number, limit = Infinity): void {
+    if (
+        !Number.isSafeInteger(width) ||
+        width <= 0 ||
+        !Number.isSafeInteger(height) ||
+        height <= 0 ||
+        width > limit ||
+        height > limit
+    )
+        throw new Error("Invalid WebGPU logical dimensions or device limit");
 }
 
 function disposeGeneration(generation: Generation): void {

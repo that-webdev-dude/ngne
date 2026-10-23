@@ -7,6 +7,144 @@ import { WebGpuRuntime } from "../src/webgpu-runtime.js";
 import { deferred, fakeBitmap, fakePlatform } from "./gpu-fixture.js";
 
 const turn = () => new Promise<void>((resolve) => setImmediate(resolve));
+
+test("recovery preserves logical dimensions above the texture limit with independent backing dimensions", async () => {
+    for (const [width, height] of [
+        [16384, 64],
+        [64, 16384],
+    ]) {
+        const platform = fakePlatform(),
+            source = fakeBitmap(),
+            diagnostics: unknown[] = [];
+        const runtime = await WebGpuRuntime.create(
+            platform.canvas,
+            width,
+            height,
+            (e) => diagnostics.push(e),
+            {
+                ...platform,
+                snapshot: async () => source.image,
+            },
+        );
+        try {
+            await runtime.texture("retained", source.image);
+            const frame = new Frame();
+            frame.sprite({ x: width / 2, y: height / 2, width, height, texture: "retained" });
+            runtime.render(frame, 0);
+            const inspection = runtime.inspect();
+            // A rejected resize must not opt this legacy projection into resize recovery bounds.
+            assert.throws(() => runtime.resize(width, height), /dimensions|limit/);
+            platform.devices[0].loss.resolve({
+                reason: "unknown",
+                message: "Independent dimensions",
+            });
+            await turn();
+            await runtime.ready();
+            const replacement = platform.devices[1];
+            assert.equal(runtime.status, "ready");
+            assert.ok(Math.max(width, height) > replacement.limits.maxTextureDimension2D);
+            assert.deepEqual(
+                [runtime.width, runtime.height, platform.canvas.width, platform.canvas.height],
+                [width, height, 64, 64],
+            );
+            runtime.render(frame, 0);
+            assert.equal(replacement.submissions, 1);
+            assert.equal(runtime.sprites, 1);
+            assert.deepEqual(replacement.writes.at(-2)?.prefix.slice(0, 2), [width, height]);
+            assert.equal(replacement.copies, 1);
+            assert.deepEqual(runtime.inspect(), inspection);
+            assert.equal(source.closes, 0);
+            assert.equal(diagnostics.length, 0);
+        } finally {
+            runtime.dispose();
+        }
+        assert.equal(source.closes, 1);
+    }
+});
+
+test("resize rejects throughout recovery and the latest accepted dimensions survive repeated replacement", async () => {
+    const platform = fakePlatform(),
+        source = fakeBitmap(),
+        diagnostics: unknown[] = [];
+    const runtime = await WebGpuRuntime.create(
+        platform.canvas,
+        64,
+        64,
+        (e) => diagnostics.push(e),
+        {
+            ...platform,
+            snapshot: async () => source.image,
+        },
+    );
+    try {
+        await runtime.texture("retained", source.image);
+        const frame = new Frame();
+        frame.sprite({ x: 8, y: 8, width: 8, height: 8, texture: "retained" });
+        for (const [width, height] of [
+            [160, 96],
+            [32, 24],
+        ]) {
+            runtime.resize(width, height);
+            const gate = deferred<void>();
+            platform.delayDevice(gate.promise);
+            platform.devices
+                .at(-1)!
+                .loss.resolve({ reason: "unknown", message: "Resize recovery" });
+            await turn();
+            assert.equal(runtime.status, "recovering");
+            const snapshot = runtime.inspect();
+            assert.throws(() => runtime.resize(20, 20), /ready/);
+            assert.throws(() => runtime.resize(width, height), /ready/);
+            assert.deepEqual(runtime.inspect(), snapshot);
+            assert.deepEqual(
+                [runtime.width, runtime.height, platform.canvas.width, platform.canvas.height],
+                [width, height, width, height],
+            );
+            gate.resolve();
+            await runtime.ready();
+            runtime.render(frame, 0);
+            const replacement = platform.devices.at(-1)!;
+            assert.equal(runtime.sprites, 1);
+            assert.deepEqual(replacement.writes.at(-2)?.prefix.slice(0, 2), [width, height]);
+            assert.equal(replacement.copies, 1);
+            assert.equal(source.closes, 0);
+        }
+        assert.equal(platform.devices.length, 3);
+        assert.equal(diagnostics.length, 0);
+    } finally {
+        runtime.dispose();
+    }
+    assert.equal(source.closes, 1);
+});
+
+test("a replacement with a smaller viewport limit fails without mutating accepted dimensions", async () => {
+    const platform = fakePlatform(),
+        diagnostics: unknown[] = [];
+    const runtime = await WebGpuRuntime.create(
+        platform.canvas,
+        64,
+        64,
+        (e) => diagnostics.push(e),
+        platform,
+    );
+    runtime.resize(128, 96);
+    platform.configureDevice((device) => {
+        device.limits.maxTextureDimension2D = 64;
+    });
+    platform.devices[0].loss.resolve({ reason: "unknown", message: "Smaller replacement limit" });
+    await turn();
+    await assert.rejects(runtime.ready(), /recovery failed/);
+    assert.equal(runtime.status, "failed");
+    assert.equal(platform.devices[1].destroyed, 1);
+    assert.equal(platform.devices[1].pipelines.length, 0);
+    assert.equal(diagnostics.length, 1);
+    assert.throws(() => runtime.resize(32, 32), /recovery failed/);
+    assert.deepEqual(
+        [runtime.width, runtime.height, platform.canvas.width, platform.canvas.height],
+        [128, 96, 128, 96],
+    );
+    runtime.dispose();
+});
 function imageSource(id: string) {
     const bitmap = fakeBitmap();
     let releases = 0;

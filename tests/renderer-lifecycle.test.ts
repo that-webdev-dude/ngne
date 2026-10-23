@@ -26,6 +26,59 @@ function snapshotFor(t: TestContext, image: ImageBitmap): void {
     });
 }
 
+test("creation preserves logical dimensions above the texture limit with independent backing dimensions", async (t) => {
+    const platform = platformFor(t);
+    for (const [width, height] of [
+        [16384, 64],
+        [64, 16384],
+    ]) {
+        const renderer = await WebGPURenderer.create(platform.canvas, width, height),
+            device = platform.devices.at(-1)!,
+            frame = new Frame();
+        try {
+            assert.ok(Math.max(width, height) > device.limits.maxTextureDimension2D);
+            assert.deepEqual(
+                [renderer.width, renderer.height, platform.canvas.width, platform.canvas.height],
+                [width, height, 64, 64],
+            );
+            frame.rect(width / 2, height / 2, width, height, 0xffffff);
+            renderer.render(frame);
+            assert.equal(device.submissions, 1);
+            assert.equal(renderer.sprites, 1);
+            assert.deepEqual(device.writes.at(-2)?.prefix.slice(0, 2), [width, height]);
+            assert.throws(() => renderer.resize(width, height), /dimensions|limit/);
+            assert.deepEqual(
+                [renderer.width, renderer.height, platform.canvas.width, platform.canvas.height],
+                [width, height, 64, 64],
+            );
+        } finally {
+            renderer.dispose();
+        }
+    }
+});
+
+test("public resize exposes current readonly dimensions and preserves create backing-size compatibility", async (t) => {
+    const platform = platformFor(t);
+    platform.canvas.width = 128;
+    const renderer = await WebGPURenderer.create(platform.canvas, 64, 64);
+    t.after(() => renderer.dispose());
+    assert.deepEqual([renderer.width, renderer.height, platform.canvas.width], [64, 64, 128]);
+    renderer.resize(96, 80);
+    assert.deepEqual(
+        [renderer.width, renderer.height, platform.canvas.width, platform.canvas.height],
+        [96, 80, 96, 80],
+    );
+    assert.throws(() => renderer.resize(100, 0), /dimensions/);
+    assert.deepEqual(
+        [renderer.width, renderer.height, platform.canvas.width, platform.canvas.height],
+        [96, 80, 96, 80],
+    );
+    assert.equal(Reflect.set(renderer, "width", 100), false);
+    assert.equal(Reflect.set(renderer, "height", 100), false);
+    renderer.render(new Frame());
+    assert.equal(platform.devices[0].submissions, 1);
+});
+
 for (const stage of ["adapter", "device", "pipeline"] as const)
     test(
         `public creation aborts promptly during ${stage}; late cleanup preserves a new owner`,

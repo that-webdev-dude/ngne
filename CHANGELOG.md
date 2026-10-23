@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+
+- Direct renderer resizing with `WebGPURenderer.resize(width, height)`, preserving GPU resources and textures.
+- Manual texture release with `WebGPURenderer.releaseTexture(id)`, including safe ID reuse across pending uploads and device recovery.
+- Cancellable renderer creation, `ready(signal?)` waits and `onLifecycle()` subscriptions, with exclusive canvas ownership.
+
 ### Changed
 
 - Accelerated large frame ordering with a guarded stable layer-counting sort and an already-ordered input check, preserving canonical scene/layer/depth/insertion order and the existing comparator fallback. Three rotated hardware-WebGPU rounds measured 48.9–54.6% lower synchronous frame CPU time at 64K interleaved quads and 57.6–60.4% at 128K; the ordered late-depth case improved by 12.7–15.9%. Unsupported inputs can still pay eligibility-scan overhead; these fixture results do not establish universal FPS or consumer gains. See the [three-version measurements, reproduction sources and limitations](tooling/suites/benchmarks/evidence/frame-sort-three-version-2026-10-16.zip).

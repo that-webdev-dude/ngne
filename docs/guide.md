@@ -169,10 +169,14 @@ const unsubscribe = renderer.onLifecycle((event) => {
 });
 const wait = new AbortController();
 await renderer.ready(wait.signal);
+renderer.resize(960, 540); // Updates projection and backing size; preserves uploaded images.
 // When the host finishes:
 unsubscribe();
 renderer.dispose();
 ```
+
+Resize requires a ready renderer. If recovery is in progress, await `renderer.ready()`
+and retry. BrowserGame keeps its fixed display dimensions.
 
 Creation cancellation ends at successful creation. Readiness cancellation affects
 only that wait. Subscribe before triggering work; `status` supplies current state.

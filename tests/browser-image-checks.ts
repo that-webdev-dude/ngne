@@ -107,6 +107,16 @@ export async function checkBrowserImages(
         canvas.width === 64 && canvas.height === 64 && app.renderer?.drawCalls === 1,
         "host restores fixed backing dimensions after external/CSS resize",
     );
+    app.renderer?.resize(96, 80);
+    callback(233);
+    check(
+        canvas.width === 64 &&
+            canvas.height === 64 &&
+            app.renderer?.width === 64 &&
+            app.renderer.height === 64 &&
+            app.renderer.drawCalls === 1,
+        "BrowserGame restores fixed logical projection and backing size after renderer resize",
+    );
     const teardown: string[] = [];
     if (!app.renderer) throw new Error("Renderer missing");
     const disposeRenderer = app.renderer.dispose.bind(app.renderer),

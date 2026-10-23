@@ -5,7 +5,140 @@ import { Frame } from "../src/renderer.js";
 import { createGpuContext } from "../src/gpu-context.js";
 import { createResourceRegistry } from "../src/resource-registry.js";
 import { WebGpuRuntime } from "../src/webgpu-runtime.js";
-import { deferred, fakePlatform } from "./gpu-fixture.js";
+import { deferred, fakeBitmap, fakePlatform } from "./gpu-fixture.js";
+
+test("resize changes projection and backing size while retaining all owned GPU resources", async () => {
+    const platform = fakePlatform(),
+        source = fakeBitmap(),
+        diagnostics: unknown[] = [];
+    const runtime = await WebGpuRuntime.create(
+        platform.canvas,
+        64,
+        64,
+        (e) => diagnostics.push(e),
+        {
+            ...platform,
+            snapshot: async () => source.image,
+        },
+    );
+    try {
+        await runtime.texture("image", source.image);
+        const device = platform.devices[0],
+            inspection = runtime.inspect(),
+            buffers = [...device.buffers],
+            textures = [...device.textures],
+            bindings = [...device.bindings],
+            pipeline = device.pipelines[0],
+            frame = new Frame();
+        frame.sprite({ x: 8, y: 8, width: 8, height: 8, texture: "image" });
+        let backingWrites = 0,
+            width = platform.canvas.width,
+            height = platform.canvas.height;
+        Object.defineProperties(platform.canvas, {
+            width: {
+                get: () => width,
+                set(value: number) {
+                    width = value;
+                    backingWrites++;
+                },
+            },
+            height: {
+                get: () => height,
+                set(value: number) {
+                    height = value;
+                    backingWrites++;
+                },
+            },
+        });
+        for (const [w, h] of [
+            [128, 96],
+            [32, 16],
+            [32, 16],
+            [8192, 1],
+            [64, 64],
+        ]) {
+            const unchanged = w === width && h === height,
+                before = backingWrites;
+            runtime.resize(w, h);
+            assert.deepEqual([runtime.width, runtime.height, width, height], [w, h, w, h]);
+            if (unchanged) assert.equal(backingWrites, before);
+            runtime.render(frame, 0x204060);
+            assert.equal(runtime.sprites, 1);
+            assert.deepEqual(device.writes.at(-2)?.prefix.slice(0, 2), [w, h]);
+            assert.equal(device.usedPipelines.at(-1), pipeline);
+            assert.equal(device.usedBindings.at(-1), bindings[1]);
+            assert.deepEqual(runtime.inspect(), inspection);
+        }
+        platform.canvas.width = 12;
+        platform.canvas.height = 13;
+        runtime.resize(64, 64); // Same logical size must still restore caller-modified backing size.
+        assert.deepEqual([width, height], [64, 64]);
+        assert.deepEqual(device.buffers, buffers);
+        assert.deepEqual(device.textures, textures);
+        assert.deepEqual(device.bindings, bindings);
+        assert.equal(device.pipelines.length, 1);
+        assert.equal(platform.devices.length, 1);
+        assert.equal(platform.surface.configureCalls, 1);
+        assert.equal(device.copies, 1);
+        assert.equal(source.closes, 0);
+        assert.equal(diagnostics.length, 0);
+    } finally {
+        runtime.dispose();
+    }
+    assert.equal(source.closes, 1);
+    assert.ok(platform.devices[0].buffers.every((buffer) => buffer.destroyed === 1));
+    assert.ok(platform.devices[0].textures.every((texture) => texture.destroyed === 1));
+});
+
+test("invalid resizes reject both axes before changing dimensions or the last usable configuration", async () => {
+    const platform = fakePlatform(),
+        diagnostics: unknown[] = [];
+    const runtime = await WebGpuRuntime.create(
+        platform.canvas,
+        64,
+        64,
+        (e) => diagnostics.push(e),
+        platform,
+    );
+    try {
+        runtime.resize(128, 96);
+        const inspection = runtime.inspect(),
+            frame = new Frame();
+        frame.rect(4, 4, 4, 4, 0xffffff);
+        for (const invalid of [
+            0,
+            -1,
+            1.5,
+            NaN,
+            Infinity,
+            -Infinity,
+            Number.MAX_SAFE_INTEGER + 1,
+            8193,
+        ]) {
+            for (const [width, height] of [
+                [invalid, 32],
+                [32, invalid],
+            ]) {
+                assert.throws(() => runtime.resize(width, height), /dimensions|limit/);
+                assert.deepEqual(
+                    [runtime.width, runtime.height, platform.canvas.width, platform.canvas.height],
+                    [128, 96, 128, 96],
+                );
+                assert.deepEqual(runtime.inspect(), inspection);
+                runtime.render(frame, 0);
+                assert.equal(runtime.sprites, 1);
+            }
+        }
+        assert.equal(diagnostics.length, 0); // Explicit operation errors go to the caller.
+    } finally {
+        runtime.dispose();
+    }
+    assert.throws(() => runtime.resize(64, 64), /disposed/);
+    assert.deepEqual(
+        [runtime.width, runtime.height, platform.canvas.width, platform.canvas.height],
+        [128, 96, 128, 96],
+    );
+});
 
 test("a cancelled late device cannot unconfigure a newer owner of the same canvas", async () => {
     const platform = fakePlatform(),

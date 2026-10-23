@@ -214,6 +214,16 @@ async function webgpuBoundary(canvas: HTMLCanvasElement, bitmap: ImageBitmap): P
     void pending;
     const ready: Promise<void> = renderer.ready(abort.signal);
     void ready;
+    const resized: void = renderer.resize(960, 540);
+    const dimensions: readonly number[] = [renderer.width, renderer.height];
+    void resized;
+    void dimensions;
+    // @ts-expect-error Logical dimensions are observable but readonly.
+    renderer.width = 100;
+    // @ts-expect-error Logical dimensions are observable but readonly.
+    renderer.height = 100;
+    // @ts-expect-error Resize requires numeric dimensions.
+    renderer.resize("960", 540);
     const unsubscribe: () => void = renderer.onLifecycle((event: engine.RendererLifecycleEvent) => {
         if (event.status === "failed") {
             const error: Error = event.error;

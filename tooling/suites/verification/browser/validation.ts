@@ -11,6 +11,7 @@ import { checkBrowserImages } from "../../../../tests/browser-image-checks.js";
 import { checkBrowserRecovery } from "../../../../tests/browser-recovery-checks.js";
 import { checkBrowserRetention } from "../../../../tests/browser-retention-checks.js";
 import { checkBrowserGpuHost } from "../../../../tests/browser-gpu-host-checks.js";
+import { checkBrowserResize } from "../../../../tests/browser-resize-checks.js";
 import {
     checkWebGPUEnvironment,
     checkWebGPUCore,
@@ -62,6 +63,7 @@ async function main() {
     await checkBrowserRecovery(check);
     await checkBrowserRetention(check);
     await checkBrowserGpuHost(check);
+    await checkBrowserResize(check);
     await checkBrowserInput((condition, message) => check(condition, "WebGPU " + message));
     await checkBrowserInterpolation(check);
     validation.status = "passed";

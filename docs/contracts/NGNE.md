@@ -58,6 +58,11 @@ Public renderer lifecycle operations: `WebGPURenderer.create` with optional crea
 signal, `ready(signal?)` and `onLifecycle(observer)`. Exact lifecycle semantics belong
 to the [browser and presentation contract](browser-and-presentation.md#renderer).
 
+Public renderer viewport operation: `resize(width, height)`; readonly `width`/`height`
+report the current logical dimensions. See the
+[browser and presentation contract](browser-and-presentation.md#renderer) for dimension
+ownership and rejection rules.
+
 ### Inspection
 
 Public types: `Lifecycle`, `SceneInspection`, `SceneStateInspection`,

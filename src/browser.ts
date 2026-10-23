@@ -138,6 +138,11 @@ export class BrowserGame<S, C> {
         return promise;
     }
     private restoreBackingSize(): void {
+        if (
+            this.renderer?.status === "ready" &&
+            (this.renderer.width !== this.width || this.renderer.height !== this.height)
+        )
+            this.renderer.resize(this.width, this.height);
         if (this.options.canvas.width !== this.width) this.options.canvas.width = this.width;
         if (this.options.canvas.height !== this.height) this.options.canvas.height = this.height;
     }

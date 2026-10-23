@@ -142,8 +142,19 @@ Stop invalidates a still-pending acquisition without mounted consumers. A later 
 can acquire again. Disposal invalidates renderer ownership before Game/Assets close
 decoded sources, attempts every independent teardown and aggregates failures.
 
-BrowserGame alone restores its fixed logical backing dimensions before rendering;
-CSS resize scales presentation only. Direct renderer callers own canvas dimensions.
+For direct callers, synchronous `resize(width, height)` sets both logical projection
+and canvas backing dimensions. Readonly `width`/`height` reflect the latest accepted
+size. Dimensions must be positive safe integers no larger than the current device's
+`maxTextureDimension2D`. Resize throws during recovery and after failure/disposal;
+validation and state rejections leave logical and backing dimensions unchanged.
+Await `ready()` before retrying during recovery. Unchanged-size calls restore backing
+dimensions if needed. Resize retains the device, pipeline, buffers, bindings and image
+sources without re-uploading textures. The latest accepted logical size is validated
+against each replacement device before readiness; an unsupported size fails recovery.
+Creation keeps its existing caller-owned backing-size behavior. BrowserGame restores
+its fixed logical and backing dimensions before rendering; CSS scaling and pointer
+mapping are unchanged.
+
 Invalid dimensions/count/limits, unavailable image IDs and synchronous frame faults
 skip the entire submission and report once per consecutive fault episode. A successful
 frame resets suppression. Diagnostics cannot throw into simulation. Uncaptured device

@@ -14,8 +14,6 @@ export class WebGPURenderer {
     #runtime: WebGpuRuntime;
     private constructor(
         readonly canvas: HTMLCanvasElement,
-        readonly width: number,
-        readonly height: number,
         runtime: WebGpuRuntime,
     ) {
         this.#runtime = runtime;
@@ -42,7 +40,13 @@ export class WebGPURenderer {
             runtime.dispose();
             signal.throwIfAborted();
         }
-        return new WebGPURenderer(canvas, width, height, runtime);
+        return new WebGPURenderer(canvas, runtime);
+    }
+    get width(): number {
+        return this.#runtime.width;
+    }
+    get height(): number {
+        return this.#runtime.height;
     }
     get status(): RendererStatus {
         const status = this.#runtime.status;
@@ -86,6 +90,9 @@ export class WebGPURenderer {
     }
     render(frame: Frame, clear = 0x090e20): void {
         this.#runtime.render(frame, clear);
+    }
+    resize(width: number, height: number): void {
+        this.#runtime.resize(width, height);
     }
     dispose(): void {
         this.#runtime.dispose();

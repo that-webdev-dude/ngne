@@ -106,7 +106,11 @@ export class FakeDevice extends EventTarget {
     failEncode = false;
     readonly buffers: { size: number; destroyed: number }[] = [];
     readonly textures: { destroyed: number }[] = [];
-    readonly writes: { size: number | undefined; dataLength: number }[] = [];
+    readonly pipelines: object[] = [];
+    readonly bindings: object[] = [];
+    readonly usedPipelines: object[] = [];
+    readonly usedBindings: object[] = [];
+    readonly writes: { size: number | undefined; dataLength: number; prefix: number[] }[] = [];
     readonly queue = {
         writeBuffer: (
             _buffer: unknown,
@@ -115,7 +119,11 @@ export class FakeDevice extends EventTarget {
             _dataOffset?: number,
             size?: number,
         ) => {
-            this.writes.push({ size, dataLength: data.length });
+            this.writes.push({
+                size,
+                dataLength: data.length,
+                prefix: Array.from(data.slice(0, 12)),
+            });
         },
         writeTexture() {},
         copyExternalImageToTexture: () => {
@@ -167,20 +175,28 @@ export class FakeDevice extends EventTarget {
     }
     async createRenderPipelineAsync() {
         await this.pipelineWait;
-        return {};
+        const pipeline = {};
+        this.pipelines.push(pipeline);
+        return pipeline;
     }
     createBindGroup() {
-        return {};
+        const binding = {};
+        this.bindings.push(binding);
+        return binding;
     }
     createCommandEncoder() {
         return {
             beginRenderPass: () => {
                 this.passes++;
                 return {
-                    setPipeline() {},
+                    setPipeline: (pipeline: object) => {
+                        this.usedPipelines.push(pipeline);
+                    },
                     setVertexBuffer() {},
                     setIndexBuffer() {},
-                    setBindGroup() {},
+                    setBindGroup: (_index: number, binding: object) => {
+                        this.usedBindings.push(binding);
+                    },
                     drawIndexed: () => {
                         if (this.failEncode) throw new Error("Injected encode failure");
                     },
