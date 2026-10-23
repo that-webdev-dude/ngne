@@ -1554,7 +1554,7 @@ test("platformer deterministic reference walkthrough completes both authored lev
 });
 
 /**
- * Canonical state hashes captured by the NGNE-27 phase 0 parity probe on the pre-migration
+ * Canonical state hashes captured by a parity probe on the pre-migration
  * legacy-bridge revision 12b727e, at simulation ticks 0 (after mount), 60, ..., 1,440.
  */
 const PRE_MIGRATION_WALKTHROUGH_HASHES = [

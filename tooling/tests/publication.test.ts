@@ -4,7 +4,9 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSyn
 import path from "node:path";
 import test from "node:test";
 import {
+    changelogSection,
     publishOnce,
+    releaseNotes,
     waitForRegistryListing,
     publicationInventory,
     registryVersion,
@@ -778,4 +780,101 @@ test("workflow exposes review before the approval job and confines publication c
     );
     assert.match(workflow, /cancel-in-progress: false/);
     assert.match(workflow, /out\/publication\/\*\.json/);
+    // The release is created only after publication evidence is retained.
+    const retained = workflow.indexOf("name: publication-result-");
+    const release = workflow.indexOf("tooling/commands/publish.ts release");
+    assert(retained > 0 && release > retained);
+});
+
+const changelog = `# Changelog
+
+## [Unreleased]
+
+- Pending.
+
+## [0.3.0] - 2026-10-23
+
+### Added
+
+- Feature. See the [contract](docs/contracts/NGNE.md#x), [local](./docs/guide.md), [evidence](https://example.com/e.zip) and [anchor](#top).
+
+## [0.2.2] - 2026-10-15
+
+- Older.
+`;
+
+test("changelog sections are exact and pin relative links to the release tag", () => {
+    const section = changelogSection(changelog, "0.3.0", "v0.3.0");
+    assert(
+        section.startsWith("### Added") &&
+            !section.includes("Older") &&
+            !section.includes("Pending"),
+    );
+    assert(
+        section.includes(
+            "(https://github.com/that-webdev-dude/ngne/blob/v0.3.0/docs/contracts/NGNE.md#x)",
+        ),
+    );
+    assert(
+        section.includes("(https://github.com/that-webdev-dude/ngne/blob/v0.3.0/docs/guide.md)"),
+    );
+    assert(section.includes("(https://example.com/e.zip)") && section.includes("(#top)"));
+    assert.equal(changelogSection(changelog.replace(/\n/g, "\r\n"), "0.2.2", "v0.2.2"), "- Older.");
+    assert.throws(() => changelogSection(changelog, "0.3.1", "v0.3.1"), /no 0\.3\.1 section/);
+    assert.throws(() => changelogSection("## [0.4.0]\n\n## [0.3.0]\n", "0.4.0", "v0.4.0"), /empty/);
+});
+
+test("release notes require the accepted result of this run and describe its outcome", () => {
+    const candidate = {
+        name: "@ngne/core",
+        version: "0.3.0",
+        channel: "latest",
+        tag: "v0.3.0",
+        filename: "ngne-core-0.3.0.tgz",
+        sourceSHA: sha,
+        sha256: "b".repeat(64),
+        limits: "Automated Linux/SwiftShader evidence.",
+        files: { LICENSE: "c", "README.md": "d" },
+    };
+    const result = {
+        runId: "900",
+        accepted: true,
+        publication: "published",
+        provenance: { runId: "900", runAttempt: "1", ref: "refs/heads/main" },
+        selection: { runId: "800", runAttempt: "2" },
+        candidate,
+    };
+    const run = { id: "900", attempt: "2" };
+    const notes = releaseNotes(result, changelog, run);
+    assert.equal(notes.tag, "v0.3.0");
+    assert.equal(notes.prerelease, false);
+    for (const text of [
+        "npm install --save-exact @ngne/core@0.3.0",
+        "### Added",
+        "runs/800/attempts/2); [publication verification run 900, attempt 2]",
+        "matched all 2 files",
+        "uploaded once; signed provenance identifies [run 900, attempt 1]",
+        "b".repeat(64),
+    ])
+        assert(notes.body.includes(text), text);
+    const next = { ...result, candidate: { ...candidate, channel: "next" } };
+    assert.equal(releaseNotes(next, changelog, run).prerelease, true);
+    assert.match(
+        releaseNotes({ ...result, publication: "existing" }, changelog, run).body,
+        /already existed on npm/,
+    );
+    assert.throws(
+        () => releaseNotes({ ...result, accepted: false }, changelog, run),
+        /not accepted/,
+    );
+    assert.throws(
+        () => releaseNotes(result, changelog, { id: "901", attempt: "1" }),
+        /another run/,
+    );
+    assert.throws(
+        () => releaseNotes({ ...result, publication: "skipped" }, changelog, run),
+        /Unknown/,
+    );
+    const hardware = { ...result, candidate: { ...candidate, limits: "Hardware." } };
+    assert.throws(() => releaseNotes(hardware, changelog, run));
 });

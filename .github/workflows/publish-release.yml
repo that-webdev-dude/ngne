@@ -14,7 +14,7 @@ on:
 
 permissions: {}
 
-# ponytail: serialize releases, including channel updates; no per-version lock needed.
+# serialize releases, including channel updates; no per-version lock needed.
 concurrency:
   group: npm-publication
   cancel-in-progress: false
@@ -110,3 +110,14 @@ jobs:
             out/publication/smoke/package.json
             out/publication/smoke/package-lock.json
           if-no-files-found: warn
+      - name: Create GitHub release from the verified publication and changelog
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node node_modules/tsx/dist/cli.mjs tooling/commands/publish.ts release
+      - name: Retain release notes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-release-${{ github.run_id }}-${{ github.run_attempt }}
+          path: out/release/
+          if-no-files-found: ignore

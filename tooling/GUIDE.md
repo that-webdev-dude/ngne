@@ -4,40 +4,42 @@ Detailed prerequisites and evidence rules are in the [tooling reference](README.
 
 ## Before starting
 
-Run from the NGNE repository root in Windows PowerShell, with Node 24 or newer. Install dependencies with `npm.cmd ci` if needed. Browser checks require Chrome. Run commands sequentially; do not run competing builds in this checkout.
+Run from the NGNE repository root with Node 24 or newer. Install dependencies with `npm ci` if needed. Browser checks require Chrome. Run commands sequentially; do not run competing builds in this checkout.
+
+Examples use POSIX shell syntax. In Windows PowerShell, use `npm.cmd` instead of `npm`, `$env:NAME = "value"` instead of `export NAME=value`, and `Remove-Item Env:NAME` instead of `unset NAME`.
 
 Replace `<placeholders>` with actual values, without angle brackets. In npm commands, `--` forwards the remaining arguments to the script.
 
 ## What runs against what?
 
-| Check                          | Target                                          | Purpose                                                 |
-| ------------------------------ | ----------------------------------------------- | ------------------------------------------------------- |
-| Everyday checks                | Repository source                               | Catch type, test, formatting and build errors           |
-| `check:prepared`               | A saved package preparation                     | Check that its files and recorded identities are intact |
-| `verify:installed`             | The generated, installed package                | Check its test app in Chrome                            |
-| `test:browser`                 | A browser test app built from repository source | Check engine integration in Chrome                      |
-| `bench:all -- -Workload churn` | Engine source, directly in Node.js              | Measure entity creation/removal cost                    |
-| `verify:compatibility`         | A separate game using the selected package      | Check whether that game's verification still passes     |
+| Check                           | Target                                          | Purpose                                                 |
+| ------------------------------- | ----------------------------------------------- | ------------------------------------------------------- |
+| Everyday checks                 | Repository source                               | Catch type, test, formatting and build errors           |
+| `check:prepared`                | A saved package preparation                     | Check that its files and recorded identities are intact |
+| `verify:installed`              | The generated, installed package                | Check its test app in Chrome                            |
+| `test:browser`                  | A browser test app built from repository source | Check engine integration in Chrome                      |
+| `bench:all -- --workload churn` | Engine source, directly in Node.js              | Measure entity creation/removal cost                    |
+| `verify:compatibility`          | A separate game using the selected package      | Check whether that game's verification still passes     |
 
 ## Stage 1: Everyday checks
 
-```powershell
-npm.cmd run typecheck
-npm.cmd run typecheck:tooling
-npm.cmd test
-npm.cmd run format:check
-npm.cmd run build
+```sh
+npm run typecheck
+npm run typecheck:tooling
+npm test
+npm run format:check
+npm run build
 ```
 
 These check engine types, tooling/benchmark types, regression tests, formatting, then type/API checks and the production build. Successful builds write the engine to `dist/engine/` and the site to `dist/`.
 
-`format:check` only reports problems. `npm.cmd run format` rewrites files across the configured directories; review its changes.
+`format:check` only reports problems. `npm run format` rewrites files across the configured directories; review its changes.
 
 ### Comprehensive engine verification
 
-```powershell
-$env:NGNE_WEBGPU_ADAPTER = "swiftshader"
-npm.cmd run verify:engine
+```sh
+export NGNE_WEBGPU_ADAPTER=swiftshader
+npm run verify:engine
 ```
 
 This runs formatting, tests, tooling types, engine types, production build, browser-test build, package preparation, preparation integrity, browser transport, installed-package browser checks, and repository browser tests.
@@ -50,8 +52,8 @@ A package is what another game installs: compiled engine JavaScript, TypeScript 
 
 Generate one to check distribution works or to try an engine update in another game. This does not publish anything to npm.
 
-```powershell
-npm.cmd run prepare:package
+```sh
+npm run prepare:package
 ```
 
 The command builds the engine, creates an npm `.tgz`, installs it in isolation, validates installed files/types, and builds a **fixture**: a small test app using the installed engine. It does not run that app in a browser yet.
@@ -60,31 +62,31 @@ The command builds the engine, creates an npm `.tgz`, installs it in isolation, 
 
 The command prints a preparation path under `out/runs/`:
 
-| Path inside that run                   | Purpose                                                       |
-| -------------------------------------- | ------------------------------------------------------------- |
-| `evidence/package/ngne-core-0.2.2.tgz` | The package another game installs                             |
-| `evidence/builds/root/`, `nested/`     | Fixture builds for two URL locations                          |
-| `evidence/report.md`, `result.json`    | Readable and machine-readable outcomes                        |
-| `evidence/manifest.json`               | Identifies this exact preparation, its inputs and environment |
-| `evidence/artifacts.json`              | Output-file inventory                                         |
-| `evidence/stages/`                     | Per-step logs and outputs                                     |
-| `work/installation/`                   | Isolated test app, installed engine and dependencies          |
-| `work/dependencies/`, `work/cache/`    | Dependency manifests/lockfile and npm cache/logs              |
+| Path inside that run                       | Purpose                                                       |
+| ------------------------------------------ | ------------------------------------------------------------- |
+| `evidence/package/ngne-core-<version>.tgz` | The package another game installs                             |
+| `evidence/builds/root/`, `nested/`         | Fixture builds for two URL locations                          |
+| `evidence/report.md`, `result.json`        | Readable and machine-readable outcomes                        |
+| `evidence/manifest.json`                   | Identifies this exact preparation, its inputs and environment |
+| `evidence/artifacts.json`                  | Output-file inventory                                         |
+| `evidence/stages/`                         | Per-step logs and outputs                                     |
+| `work/installation/`                       | Isolated test app, installed engine and dependencies          |
+| `work/dependencies/`, `work/cache/`        | Dependency manifests/lockfile and npm cache/logs              |
 
 To use the package, run this **from the separate game's directory**:
 
-```powershell
-npm.cmd install "C:\path\to\ngne-core-0.2.2.tgz"
+```sh
+npm install "/path/to/ngne-core-<version>.tgz"
 ```
 
 The game imports public exports from `@ngne/core`. It only needs the `.tgz`, not the rest of the preparation. Install a newly generated `.tgz` to try a later engine build.
 
 ### Reuse a preparation
 
-Save the printed `evidence/manifest.json` path. **A manifest is not a package version**: two different engine builds can both be called `@ngne/core@0.2.2`. The manifest and recorded hashes identify the exact preparation.
+Save the printed `evidence/manifest.json` path. **A manifest is not a package version**: two different engine builds can both be called the same `@ngne/core` version. The manifest and recorded hashes identify the exact preparation.
 
-```powershell
-npm.cmd run check:prepared -- --manifest "<manifest>"
+```sh
+npm run check:prepared -- --manifest "<manifest>"
 ```
 
 This checks identities, hashes, installed files and fixture builds without rebuilding or launching a browser. Success means the saved preparation is intact.
@@ -111,9 +113,9 @@ Builds and Node tests cannot establish browser behavior. Browser checks exercise
 
 ### Generated package
 
-```powershell
-$env:NGNE_WEBGPU_ADAPTER = "swiftshader"
-npm.cmd run verify:installed -- --manifest "<manifest>"
+```sh
+export NGNE_WEBGPU_ADAPTER=swiftshader
+npm run verify:installed -- --manifest "<manifest>"
 ```
 
 Unlike `check:prepared`, this executes the installed-package fixture in Chrome. It serves the app at two temporary local URLs:
@@ -127,9 +129,9 @@ Results go into a new `out/runs/` directory. Read `evidence/report.md`; success 
 
 ### Repository source
 
-```powershell
-npm.cmd run build:browser
-npm.cmd run test:browser
+```sh
+npm run build:browser
+npm run test:browser
 ```
 
 These do **not** use the generated package. They build the repository's browser test app into `dist-browser/`, then run integration checks including game launch/pause/resume. Results go to `.test-output/browser/`; success means zero failed checks and successful process cleanup.
@@ -138,14 +140,14 @@ These do **not** use the generated package. They build the repository's browser 
 
 The setting stays active in this terminal. Keep it for stage 5, or clear it when finished:
 
-```powershell
-Remove-Item Env:NGNE_WEBGPU_ADAPTER
+```sh
+unset NGNE_WEBGPU_ADAPTER
 ```
 
 ## Stage 4: Benchmarks
 
-```powershell
-npm.cmd run bench:all -- -Workload churn
+```sh
+npm run bench:all -- --workload churn
 ```
 
 This is a **synthetic workload, not a game**. It runs engine source directly in Node.js: keep 10,000 entities alive, repeatedly replace 1,000, and time component authoring, queued despawns/spawns and `World.commit()` per batch. It uses 100 warmup batches followed by 1,000 measured batches.
@@ -177,8 +179,8 @@ Times are milliseconds per batch, not game FPS or GPU time. `accepted: true` mea
 
 Run the same benchmark again, then pass **baseline first, candidate second**:
 
-```powershell
-npm.cmd run bench:compare -- "out/runs/<baseline-run>" "out/runs/<candidate-run>"
+```sh
+npm run bench:compare -- "out/runs/<baseline-run>" "out/runs/<candidate-run>"
 ```
 
 This reads saved results; it does not rerun benchmarks. Reports are written under `.test-output/comparisons/` as `report.md` and `comparison.json`.
@@ -195,14 +197,14 @@ Unlike `verify:installed`, which uses NGNE's own fixture, this invokes the separ
 
 Example for the platformer, run from the **NGNE repository root**:
 
-```powershell
-$env:NGNE_WEBGPU_ADAPTER = "swiftshader"
-$consumer = "C:\path\to\ngne-platformer"
-$revision = git -C $consumer rev-parse HEAD
+```sh
+export NGNE_WEBGPU_ADAPTER=swiftshader
+consumer="/path/to/ngne-platformer"
+revision=$(git -C "$consumer" rev-parse HEAD)
 
-npm.cmd run verify:compatibility -- `
-  --consumer "$consumer" `
-  --revision $revision `
+npm run verify:compatibility -- \
+  --consumer "$consumer" \
+  --revision "$revision" \
   --manifest "<manifest>"
 ```
 

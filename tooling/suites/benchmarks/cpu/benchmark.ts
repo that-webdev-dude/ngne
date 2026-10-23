@@ -319,7 +319,7 @@ function runSmallQueriesBenchmark() {
             });
     });
     smallWorld.commit();
-    // ponytail: repeat the same retained query, so sharing cannot count as a rebuild.
+    // repeat the same retained query, so sharing cannot count as a rebuild.
     const traverse = () => {
         for (const system of systems) system();
         systems[0]();

@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- The publication workflow creates the GitHub release after registry verification passes, using the version's changelog section and the verified publication result. An existing release is accepted and never overwritten.
+
 ## [0.3.0] - 2026-10-23
 
 ### Added
@@ -14,7 +18,7 @@
 ### Changed
 
 - Moved release-candidate source binding and immutable assembly from workflow scripts into checked TypeScript tooling, preserving validation before dependency installation, artifact identity checks and explicit publication approval.
-- Accelerated large frame ordering with a guarded stable layer-counting sort and an already-ordered input check, preserving canonical scene/layer/depth/insertion order and the existing comparator fallback. Three rotated hardware-WebGPU rounds measured 48.9–54.6% lower synchronous frame CPU time at 64K interleaved quads and 57.6–60.4% at 128K; the ordered late-depth case improved by 12.7–15.9%. Unsupported inputs can still pay eligibility-scan overhead; these fixture results do not establish universal FPS or consumer gains. See the [three-version measurements, reproduction sources and limitations](tooling/suites/benchmarks/evidence/frame-sort-three-version-2026-10-16.zip).
+- Accelerated large frame ordering with a guarded stable layer-counting sort and an already-ordered input check, preserving canonical scene/layer/depth/insertion order and the existing comparator fallback. Three rotated hardware-WebGPU rounds measured 48.9–54.6% lower synchronous frame CPU time at 64K interleaved quads and 57.6–60.4% at 128K; the ordered late-depth case improved by 12.7–15.9%. Unsupported inputs can still pay eligibility-scan overhead; these fixture results do not establish universal FPS or consumer gains. See the [three-version measurements, reproduction sources and limitations](https://github.com/that-webdev-dude/ngne/releases/download/v0.3.0/frame-sort-three-version-2026-10-16.zip).
 
 ### Fixed
 
@@ -25,7 +29,7 @@
 
 ### Changed
 
-- Reduced ECS chunk descriptor construction time by defining its four outer properties individually, preserving borrow lifetimes and same-epoch reuse. The measured 128K-entity Node benchmark's first-traversal median improved by 15.9%; this does not establish an allocation reduction or game/FPS gain. See the [paired results and limitations](tooling/suites/benchmarks/evidence/outer-descriptor-experiment-2026-10-11.json).
+- Reduced ECS chunk descriptor construction time by defining its four outer properties individually, preserving borrow lifetimes and same-epoch reuse. The measured 128K-entity Node benchmark's first-traversal median improved by 15.9%; this does not establish an allocation reduction or game/FPS gain. See the [paired results and limitations](https://github.com/that-webdev-dude/ngne/releases/download/v0.2.2/outer-descriptor-experiment-2026-10-11.json).
 - Refreshed onboarding, example instructions and documentation links; included architecture documentation in the package.
 
 ### Fixed

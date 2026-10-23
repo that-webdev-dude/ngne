@@ -24,7 +24,7 @@ import { join, relative } from "node:path";
  * NGNE_WARMUP_SECONDS (default 10), NGNE_DURATION_SECONDS (default 60).
  * The browser window must stay visible; hidden tabs throttle requestAnimationFrame.
  *
- * Optional measurement controls (NGNE-12); without them the run and its output fields are unchanged:
+ * Optional measurement controls; without them the run and its output fields are unchanged:
  * - NGNE_CDP_PORT: DevTools port (default 9333). Each run gets a fresh profile directory.
  * - NGNE_SERVE_DIR: export root whose `vite preview` the run starts on the NGNE_URL port with
  *   `--strictPort` and NGNE_SERVE_OUT_DIR (default `dist`), and terminates afterwards.
@@ -65,7 +65,7 @@ const WORKLOAD = new URL(URL_UNDER_TEST).searchParams.get("workload");
 const IS_PLATFORMER = new URL(URL_UNDER_TEST).pathname.includes("/examples/platformer/");
 const IS_RENDERER = WORKLOAD === "renderer-webgpu";
 const SOFTWARE_RENDERER = /SwiftShader|WARP|llvmpipe|Basic Render/i;
-// Chrome 152 categories proven to align GPU-process events with rAF frames (NGNE-12 phase 0).
+// Chrome 152 categories proven to align GPU-process events with rAF frames.
 const TRACE_CATEGORIES = [
     "devtools.timeline",
     "gpu",

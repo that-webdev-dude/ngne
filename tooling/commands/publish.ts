@@ -191,7 +191,7 @@ export function registryVersion(
     const pkg = object(packument);
     assert.equal(pkg.name, candidate.name);
     const versions = object(pkg.versions);
-    // ponytail: only a successful package response proves absence; every HTTP error fails closed.
+    // only a successful package response proves absence; every HTTP error fails closed.
     if (!Object.hasOwn(versions, candidate.version)) {
         assert(
             !pkg.time || !Object.hasOwn(object(pkg.time), candidate.version),
@@ -790,13 +790,139 @@ async function publish(selection: ReturnType<typeof validateSelection>, candidat
     };
 }
 
+export function changelogSection(changelog: string, version: string, tag: string): string {
+    const lines = changelog.split(/\r?\n/);
+    const start = lines.findIndex((line) => line.startsWith(`## [${version}]`));
+    assert(start >= 0, `CHANGELOG.md has no ${version} section`);
+    const end = lines.findIndex((line, index) => index > start && line.startsWith("## "));
+    const section = lines
+        .slice(start + 1, end < 0 ? undefined : end)
+        .join("\n")
+        .trim();
+    assert(section, `CHANGELOG.md ${version} section is empty`);
+    // Release pages have no repository base URL; pin relative links to the release tag.
+    return section.replace(
+        /\]\((?!https?:|#|mailto:)(?:\.\/)?([^)\s]+)\)/g,
+        `](${repositoryURL}/blob/${tag}/$1)`,
+    );
+}
+
+export function releaseNotes(
+    value: unknown,
+    changelog: string,
+    run: { id: string; attempt: string },
+) {
+    const result = object(value);
+    assert.equal(result.accepted, true, "Publication was not accepted");
+    assert.equal(result.runId, run.id, "Publication result belongs to another run");
+    const candidate = object(result.candidate);
+    const selection = object(result.selection);
+    const provenance = object(result.provenance);
+    const [name, version, tag, channel, source, sha256, filename] = [
+        candidate.name,
+        candidate.version,
+        candidate.tag,
+        candidate.channel,
+        candidate.sourceSHA,
+        candidate.sha256,
+        candidate.filename,
+    ].map(string);
+    // The fixed limitation sentence below is only true for SwiftShader candidate evidence.
+    assert.match(string(candidate.limits), /Linux\/SwiftShader/);
+    const fileCount = Object.keys(object(candidate.files)).length;
+    const runLink = (id: unknown, attempt: unknown) =>
+        `${repositoryURL}/actions/runs/${positive(id)}/attempts/${positive(attempt)}`;
+    const upload = {
+        published: `Publication uploaded once; signed provenance identifies [run ${positive(provenance.runId)}, attempt ${positive(provenance.runAttempt)}](${runLink(provenance.runId, provenance.runAttempt)}).`,
+        reconciled:
+            "The upload outcome was uncertain and was reconciled through registry reads, without a second upload.",
+        existing: "The version already existed on npm and was verified without another upload.",
+    }[string(result.publication)];
+    assert(upload, "Unknown publication outcome");
+    const body = `[npm package](https://www.npmjs.com/package/${name}/v/${version}) · [Changelog](${repositoryURL}/blob/${tag}/CHANGELOG.md)
+
+\`\`\`sh
+npm install --save-exact ${name}@${version}
+\`\`\`
+
+${changelogSection(changelog, version, tag)}
+
+## Verified publication
+
+- Source: [\`${source}\`](${repositoryURL}/commit/${source}); tag \`${tag}\`.
+- [Candidate run ${positive(selection.runId)}, attempt ${positive(selection.runAttempt)}](${runLink(selection.runId, selection.runAttempt)}); [publication verification run ${run.id}, attempt ${run.attempt}](${runLink(run.id, run.attempt)}).
+- npm \`${channel}\` points to \`${version}\`. The registry tarball matches the retained candidate exactly. A fresh registry install matched all ${fileCount} files and passed public ESM import, registry-signature and signed-provenance verification.
+- ${upload}
+
+Tarball: \`${filename}\`. SHA-256:
+
+\`\`\`text
+${sha256}
+\`\`\`
+
+Candidate browser validation used Linux/SwiftShader. It does not establish new physical-device, manual visual/audio or consumer acceptance.
+`;
+    return { tag, prerelease: channel !== "latest", body };
+}
+
+async function release() {
+    const run = {
+        id: positive(process.env.GITHUB_RUN_ID),
+        attempt: positive(process.env.GITHUB_RUN_ATTEMPT),
+    };
+    const notes = releaseNotes(
+        json(`${output}/result.json`),
+        readFileSync("CHANGELOG.md", "utf8"),
+        run,
+    );
+    const directory = "out/release";
+    mkdirSync(directory, { recursive: true });
+    writeFileSync(`${directory}/release-notes.md`, notes.body);
+    let existing: unknown = null;
+    try {
+        existing = await github(`releases/tags/${notes.tag}`);
+    } catch (error) {
+        if (!String(error).startsWith("Error: HTTP 404")) throw error;
+    }
+    // Like tags, an existing release is accepted and never overwritten.
+    const created = !existing;
+    const releaseDocument = object(
+        existing ??
+            (await github("releases", "POST", {
+                tag_name: notes.tag,
+                name: notes.tag,
+                body: notes.body,
+                draft: false,
+                prerelease: notes.prerelease,
+                make_latest: notes.prerelease ? "false" : "true",
+            })),
+    );
+    assert.equal(releaseDocument.tag_name, notes.tag);
+    writeFileSync(
+        `${directory}/release.json`,
+        JSON.stringify(
+            { tag: notes.tag, created, url: string(releaseDocument.html_url) },
+            null,
+            2,
+        ) + "\n",
+    );
+    appendFileSync(
+        string(process.env.GITHUB_STEP_SUMMARY),
+        `GitHub release ${notes.tag}: ${created ? "created" : "already existed"} (${string(releaseDocument.html_url)}).\n`,
+    );
+}
+
 async function main() {
     mkdirSync(output, { recursive: true });
     const mode = process.argv[2];
     assert(
-        ["select", "download", "review", "publish"].includes(mode),
-        "Use select, download, review or publish",
+        ["select", "download", "review", "publish", "release"].includes(mode),
+        "Use select, download, review, publish or release",
     );
+    if (mode === "release") {
+        await release();
+        return;
+    }
     if (mode === "select") {
         await select();
         return;

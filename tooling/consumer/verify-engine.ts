@@ -48,7 +48,7 @@ function configureCandidate(app: string, candidate: Candidate): void {
     assert(pkg[dependencySection]?.[packageName], `Expected ${dependencySection}.${packageName}`);
     pkg[dependencySection][packageName] = candidate.dependency;
     writeFileSync(path, JSON.stringify(pkg, null, 2) + "\n");
-    // ponytail: a separate candidate record lets vendor checks preserve historical engine evidence.
+    // a separate candidate record lets vendor checks preserve historical engine evidence.
     writeFileSync(join(app, ".ngne-candidate.json"), JSON.stringify(candidate, null, 2) + "\n");
 }
 

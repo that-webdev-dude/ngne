@@ -26,7 +26,7 @@ export async function verifyEngine(repository: string): Promise<Run> {
         compatibility: false,
     };
     const previous = process.env.NGNE_BROWSER_ARTIFACT_DIR;
-    // ponytail: reuse the browser harness environment contract; no second browser runner.
+    // reuse the browser harness environment contract; no second browser runner.
     process.env.NGNE_BROWSER_ARTIFACT_DIR = relative(repository, join(run.evidence, "browser"));
     try {
         await run.execute(async () => {
