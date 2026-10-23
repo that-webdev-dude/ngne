@@ -5,7 +5,9 @@ export async function checkBrowserTextureUpdates(
 ): Promise<void> {
     const devices: GPUDevice[] = [];
     const originalRequest = GPUAdapter.prototype.requestDevice;
+    let deviceWait: Promise<void> | undefined;
     GPUAdapter.prototype.requestDevice = async function (descriptor) {
+        await deviceWait;
         const device = await originalRequest.call(this, descriptor);
         devices.push(device);
         return device;
@@ -21,6 +23,7 @@ export async function checkBrowserTextureUpdates(
     const diagnostics: unknown[] = [];
     let renderer: WebGPURenderer | undefined;
     let releaseScopes = () => {};
+    let releaseDevice = () => {};
     try {
         renderer = await WebGPURenderer.create(canvas, 4, 4, (error) => diagnostics.push(error));
         await renderer.createTexture("edit", 4, 4);
@@ -89,7 +92,7 @@ export async function checkBrowserTextureUpdates(
         );
         paint.clearRect(0, 0, 4, 4);
         await renderer.updateTexture("edit", source, { ...rect, width: 1, height: 1 });
-        const accepted = draw();
+        let accepted = draw();
         check(
             accepted.slice(0, 4).join() === "0,0,0,255",
             "transparent patch replaces previous content without source-over compositing",
@@ -102,7 +105,43 @@ export async function checkBrowserTextureUpdates(
             "controlled loss restores every accepted opaque, semitransparent and transparent patch exactly",
         );
 
-        const device = devices[1],
+        deviceWait = new Promise<void>((resolve) => {
+            releaseDevice = resolve;
+        });
+        devices[1].destroy();
+        await devices[1].lost;
+        paint.fillStyle = "#123456";
+        paint.fillRect(0, 0, 4, 4);
+        let settled = 0;
+        const waiting = Promise.all([
+            renderer.updateTexture("edit", source, { ...rect, width: 1, height: 1 }),
+            renderer.createTexture("waiting", 2, 2),
+        ]).finally(() => settled++);
+        void waiting.catch(() => {});
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        check(
+            renderer.status === "recovering" && devices.length === 2 && settled === 0,
+            "unsubmitted update and editable initialization wait for gated replacement readiness",
+        );
+        releaseDevice();
+        await waiting;
+        const patched = draw();
+        check(
+            patched.slice(0, 4).join() === "18,52,86,255" &&
+                patched.slice(4).join() === accepted.slice(4).join(),
+            "unsubmitted update applies once after recovery and preserves neighbouring pixels",
+        );
+        renderer.releaseTexture("waiting");
+        accepted = patched;
+        devices[2].destroy();
+        await devices[2].lost;
+        await renderer.ready();
+        check(
+            draw().join() === accepted.join(),
+            "patch accepted after waiting for recovery survives another device replacement",
+        );
+
+        const device = devices.at(-1)!,
             pop = device.popErrorScope.bind(device);
         const gate = new Promise<void>((resolve) => {
             releaseScopes = resolve;
@@ -144,6 +183,7 @@ export async function checkBrowserTextureUpdates(
             "edits continue after recovery without validation diagnostics",
         );
     } finally {
+        releaseDevice();
         releaseScopes();
         renderer?.dispose();
         GPUAdapter.prototype.requestDevice = originalRequest;

@@ -13,7 +13,7 @@ const region: TextureRegion = {
     destinationY: 0,
 };
 const tick = () => new Promise<void>((resolve) => setImmediate(resolve));
-async function fixture() {
+async function fixture(afterRead: () => void = () => {}) {
     const platform = fakePlatform();
     const reads: TextureRegion[] = [];
     let readGate: Promise<void> | undefined;
@@ -25,6 +25,7 @@ async function fixture() {
             reads.push(rect);
             const captured = value;
             await readGate;
+            afterRead();
             return new Uint8Array(rect.width * rect.height * 4).fill(captured);
         },
     });
@@ -353,6 +354,165 @@ test("unsubmitted edit joins recovery and commits only after a complete restored
         assert.equal(f.devices[1].textureWrites[1].data[0], 1);
         assert.equal(f.devices[1].textureWrites[2].data[0], 12);
     } finally {
+        f.runtime.dispose();
+    }
+});
+
+test("loss in the readiness continuation gap preserves captured edits and their call order", async () => {
+    let lose = () => {};
+    const f = await fixture(() => lose());
+    const gate = deferred<void>();
+    try {
+        await f.runtime.createTexture("edit", 2, 2);
+        const device = f.devices[0];
+        f.delayDevice(gate.promise);
+        lose = () => {
+            lose = () => {};
+            queueMicrotask(() => queueMicrotask(() => queueMicrotask(() => device.destroy())));
+        };
+        f.value(7);
+        const coordinates = { ...region };
+        const first = f.runtime.updateTexture("edit", f.source, coordinates);
+        let settled = false;
+        const outcome = first.finally(() => (settled = true));
+        void outcome.catch(() => {});
+        coordinates.destinationX = 1;
+        const second = f.runtime.updateTexture("edit", f.source, region);
+        void second.catch(() => {});
+        await tick();
+        assert.equal(f.runtime.status, "recovering");
+        assert.equal(settled, false);
+        assert.equal(device.textureWrites.length, 2); // White and initialization only.
+        assert.equal(f.reads.length, 1);
+        f.value(9);
+        gate.resolve();
+        await Promise.all([outcome, second]);
+        assert.equal(f.reads.length, 2); // The first patch was captured exactly once.
+        assert.deepEqual(
+            f.devices[1].textureWrites.map((write) => write.data[0]),
+            [255, 0, 7, 9],
+        );
+        assert.deepEqual(f.devices[1].textureWrites[2].destination.origin, [0, 0]);
+        f.devices[1].destroy();
+        await f.devices[1].lost;
+        await f.runtime.ready();
+        assert.equal(f.devices[2].textureWrites[1].data[0], 9);
+        assert.equal(f.runtime.inspect().manualSources, 1);
+    } finally {
+        gate.resolve();
+        f.runtime.dispose();
+    }
+    assert.ok(f.devices.every((device) => device.textures.every((t) => t.destroyed === 1)));
+});
+
+test("editable initialization rejoins loss in the readiness continuation gap before publication", async () => {
+    const f = await fixture();
+    const gate = deferred<void>();
+    try {
+        const device = f.devices[0];
+        f.delayDevice(gate.promise);
+        const creation = f.runtime.createTexture("edit", 2, 2);
+        let settled = false;
+        const outcome = creation.finally(() => (settled = true));
+        void outcome.catch(() => {});
+        queueMicrotask(() => device.destroy());
+        await tick();
+        assert.equal(f.runtime.status, "recovering");
+        assert.equal(settled, false);
+        assert.equal(device.textureWrites.length, 1);
+        assert.equal(f.runtime.inspect().manualSources, 0);
+        assert.equal(f.runtime.inspect().manualReplacements, 1);
+        gate.resolve();
+        await outcome;
+        assert.equal(f.runtime.inspect().manualSources, 1);
+        assert.equal(f.runtime.inspect().manualReplacements, 0);
+        assert.equal(f.devices[1].textureWrites.length, 2);
+        assert.ok(f.devices[1].textureWrites[1].data.every((byte) => byte === 0));
+        await f.runtime.updateTexture("edit", f.source, region);
+    } finally {
+        gate.resolve();
+        f.runtime.dispose();
+    }
+    assert.ok(f.devices.every((device) => device.textures.every((t) => t.destroyed === 1)));
+});
+
+for (const operation of ["create", "update"] as const)
+    for (const action of ["abort", "release", "reuse", "dispose", "failure"] as const)
+        test(`${operation} waiting after readiness gap respects ${action} and cannot affect ID reuse`, async () => {
+            let lose = () => {};
+            const f = await fixture(() => lose());
+            const gate = deferred<void>();
+            try {
+                if (operation === "update") await f.runtime.createTexture("edit", 2, 2);
+                const device = f.devices[0],
+                    abort = new AbortController();
+                f.delayDevice(gate.promise);
+                lose = () => {
+                    lose = () => {};
+                    queueMicrotask(() =>
+                        queueMicrotask(() => queueMicrotask(() => device.destroy())),
+                    );
+                };
+                const work =
+                    operation === "create"
+                        ? f.runtime.createTexture("edit", 2, 2, abort.signal)
+                        : f.runtime.updateTexture("edit", f.source, region, abort.signal);
+                const rejected = assert.rejects(work);
+                if (operation === "create") queueMicrotask(() => device.destroy());
+                await tick();
+                assert.equal(f.runtime.status, "recovering");
+                if (action === "abort") abort.abort();
+                if (action === "release" || action === "reuse") f.runtime.releaseTexture("edit");
+                const replacement =
+                    action === "reuse" ? f.runtime.texture("edit", f.source) : undefined;
+                if (action === "dispose") f.runtime.dispose();
+                if (action === "failure") gate.reject(new Error("Replacement device unavailable"));
+                else gate.resolve();
+                await Promise.all([rejected, replacement]);
+                if (action === "dispose" || action === "failure") {
+                    assert.equal(f.runtime.status, action === "dispose" ? "disposed" : "failed");
+                } else {
+                    await f.runtime.ready();
+                    assert.equal(f.runtime.inspect().manualReplacements, 0);
+                    if (action === "reuse") {
+                        await assert.rejects(
+                            f.runtime.updateTexture("edit", f.source, region),
+                            /createTexture/,
+                        );
+                        f.runtime.releaseTexture("edit");
+                    } else if (operation === "update" && action === "abort") {
+                        assert.equal(f.devices[1].textureWrites[1].data[0], 0);
+                        f.runtime.releaseTexture("edit");
+                    }
+                    await f.runtime.createTexture("edit", 2, 2);
+                    await f.runtime.updateTexture("edit", f.source, region);
+                    assert.equal(f.runtime.inspect().manualSources, 1);
+                }
+            } finally {
+                gate.resolve();
+                f.runtime.dispose();
+            }
+            assert.ok(f.devices.every((d) => d.textures.every((t) => t.destroyed === 1)));
+        });
+
+test("initialization after a readiness gap validates the replacement device dimensions", async () => {
+    const f = await fixture();
+    const gate = deferred<void>();
+    try {
+        const device = f.devices[0];
+        f.configureDevice((replacement) => (replacement.limits.maxTextureDimension2D = 1));
+        f.delayDevice(gate.promise);
+        const creation = f.runtime.createTexture("edit", 2, 2);
+        const rejected = assert.rejects(creation, /device limit/);
+        queueMicrotask(() => device.destroy());
+        await tick();
+        gate.resolve();
+        await rejected;
+        assert.equal(f.runtime.inspect().manualSources, 0);
+        assert.equal(f.runtime.inspect().manualReplacements, 0);
+        assert.equal(f.devices[1].textureWrites.length, 1);
+    } finally {
+        gate.resolve();
         f.runtime.dispose();
     }
 });

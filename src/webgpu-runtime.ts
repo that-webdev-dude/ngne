@@ -528,12 +528,20 @@ export class WebGpuRuntime {
         const token = {};
         this.replacements.set(id, token);
         try {
-            await this.ready(signal);
-            const device = this.generation?.context?.device;
-            if (!device) throw new Error("WebGPU generation is not ready");
+            let device: GPUDevice;
+            for (;;) {
+                await this.ready(signal);
+                this.assertAlive();
+                signal?.throwIfAborted();
+                if (this.replacements.get(id) !== token)
+                    throw new Error("Texture replacement superseded: " + id);
+                // Loss can supersede readiness before this continuation selects a device.
+                const current = this.generation?.context?.device;
+                if (!current) continue;
+                device = current;
+                break;
+            }
             validateDimensions(width, height, device.limits.maxTextureDimension2D);
-            if (this.replacements.get(id) !== token)
-                throw new Error("Texture replacement superseded: " + id);
             const source: TexturePixels = {
                 width,
                 height,
@@ -582,13 +590,20 @@ export class WebGpuRuntime {
             signal?.throwIfAborted();
             if (pixels.byteLength !== rect.width * rect.height * 4)
                 throw new Error("Invalid texture patch byte length");
-            await this.ready(signal);
-            assertCurrent();
-            signal?.throwIfAborted();
-            const generation = this.generation;
-            const device = generation?.context?.device;
-            const texture = generation?.images.get(entry);
-            if (!generation || !device || !texture) throw new Error("Texture update is not ready");
+            let generation: Generation;
+            for (;;) {
+                await this.ready(signal);
+                assertCurrent();
+                signal?.throwIfAborted();
+                // Rejoin recovery without recapturing the patch or retrying submitted work.
+                const current = this.generation;
+                if (!current) continue;
+                generation = current;
+                break;
+            }
+            const device = generation.context?.device;
+            const texture = generation.images.get(entry);
+            if (!device || !texture) throw new Error("Texture update is not ready");
             this.assertGeneration(generation);
             try {
                 // From this point cancellation cannot roll back the submitted write. Keep
