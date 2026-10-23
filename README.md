@@ -26,7 +26,7 @@ setup, assets and game logic, including movement, collision and progression.
 For registry installation, pin an exact version in your application:
 
 ```sh
-npm install --save-exact @ngne/core@0.2.2
+npm install --save-exact @ngne/core@0.3.0
 ```
 
 Normal releases use `latest`; prereleases use `next`. Pin the version and commit
