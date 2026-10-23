@@ -16,6 +16,7 @@
 
 ### Fixed
 
+- Retry transient Windows evidence-file replacement failures, clean up temporary files and preserve evidence and cleanup errors without accepting incomplete runs.
 - Preserve unsubmitted editable-texture updates and initialization across readiness races during device recovery, without replaying submitted patches.
 
 ## [0.2.2] - 2026-10-15
