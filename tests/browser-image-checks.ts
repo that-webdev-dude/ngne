@@ -1,5 +1,6 @@
 import { BrowserGame, WebGPURenderer, type ImageAsset } from "../src/index.js";
 import { uploadImage } from "../src/texture-assets.js";
+import { checkBrowserTextureUpdates } from "./browser-texture-update-checks.js";
 
 export async function checkBrowserImages(
     check: (condition: unknown, message: string) => void,
@@ -189,6 +190,7 @@ export async function checkBrowserImages(
     bitmap.close();
     device.destroy();
     check(true, "real-device upload scopes recover after a synchronously throwing copy");
+    await checkBrowserTextureUpdates(check);
 }
 async function expectFailure(work: Promise<unknown>): Promise<void> {
     let failed = false;

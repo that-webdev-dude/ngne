@@ -4,6 +4,7 @@
 
 ### Added
 
+- Editable manual textures with `WebGPURenderer.createTexture()`, `updateTexture()` and `TextureRegion`, reusing fixed-size GPU storage and bindings for ordered dirty-region updates and retaining accepted edits for device recovery. Existing `texture()` replacement remains transactional. See the [ownership, cancellation and failure semantics](docs/contracts/browser-and-presentation.md#editable-manual-textures).
 - Direct renderer resizing with `WebGPURenderer.resize(width, height)`, preserving GPU resources and textures.
 - Manual texture release with `WebGPURenderer.releaseTexture(id)`, including safe ID reuse across pending uploads and device recovery.
 - Cancellable renderer creation, `ready(signal?)` waits and `onLifecycle()` subscriptions, with exclusive canvas ownership.

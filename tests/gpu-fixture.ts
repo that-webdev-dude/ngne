@@ -102,6 +102,7 @@ export class FakeDevice extends EventTarget {
     scopeWait?: Promise<GPUError | null>;
     scopeDepth = 0;
     failCopy = false;
+    textureDestroyError?: Error;
     failSubmit = false;
     failEncode = false;
     readonly buffers: { size: number; destroyed: number }[] = [];
@@ -111,6 +112,11 @@ export class FakeDevice extends EventTarget {
     readonly usedPipelines: object[] = [];
     readonly usedBindings: object[] = [];
     readonly writes: { size: number | undefined; dataLength: number; prefix: number[] }[] = [];
+    readonly textureWrites: {
+        destination: GPUImageCopyTexture;
+        data: Uint8Array;
+        size: GPUExtent3D;
+    }[] = [];
     readonly queue = {
         writeBuffer: (
             _buffer: unknown,
@@ -125,7 +131,15 @@ export class FakeDevice extends EventTarget {
                 prefix: Array.from(data.slice(0, 12)),
             });
         },
-        writeTexture() {},
+        writeTexture: (
+            destination: GPUImageCopyTexture,
+            data: Uint8Array,
+            _layout: GPUImageDataLayout,
+            size: GPUExtent3D,
+        ) => {
+            this.textureWrites.push({ destination, data: data.slice(), size });
+            if (this.failCopy) throw new Error("Injected texture write failure");
+        },
         copyExternalImageToTexture: () => {
             this.copies++;
             if (this.failCopy) throw new Error("Injected texture copy failure");
@@ -153,11 +167,13 @@ export class FakeDevice extends EventTarget {
     }
     createTexture() {
         const record = { destroyed: 0 };
+        const device = this;
         this.textures.push(record);
         return {
             createView: () => ({}),
             destroy() {
                 record.destroyed++;
+                if (device.textureDestroyError) throw device.textureDestroyError;
             },
         };
     }

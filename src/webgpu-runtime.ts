@@ -1,10 +1,10 @@
 import type { ImageAsset, Lease } from "./assets.js";
-import { createGpuContext, type GpuContext } from "./gpu-context.js";
+import { createGpuContext, validateGpuOperation, type GpuContext } from "./gpu-context.js";
 import { createQuadRenderer, type QuadRenderer } from "./quad-renderer.js";
 import type { Frame } from "./renderer.js";
-import { uploadImage } from "./texture-assets.js";
+import { uploadImage, type TexturePixels } from "./texture-assets.js";
 import type { RendererResourceInspection } from "./resource-inspection.js";
-import type { RendererLifecycleEvent } from "./webgpu-renderer.js";
+import type { RendererLifecycleEvent, TextureRegion } from "./webgpu-renderer.js";
 
 // Ownership spans acquisition and all replacement generations, including failed owners.
 const canvasOwners = new WeakMap<HTMLCanvasElement, WebGpuRuntime>();
@@ -12,10 +12,11 @@ const canvasOwners = new WeakMap<HTMLCanvasElement, WebGpuRuntime>();
 interface ImageEntry {
     readonly id: string;
     readonly definition?: ImageAsset;
-    readonly source: ImageBitmap;
+    readonly source: ImageBitmap | TexturePixels;
     readonly releaseSource: () => void;
     refs: number;
     released: boolean;
+    updates?: { tail: Promise<void>; pending: number };
 }
 interface Generation {
     readonly abort: AbortController;
@@ -33,6 +34,10 @@ export interface RendererPlatform {
     readonly gpu?: GPU;
     readonly signal?: AbortSignal;
     readonly snapshot?: (source: ImageBitmap | HTMLCanvasElement) => Promise<ImageBitmap>;
+    readonly readRegion?: (
+        source: ImageBitmap | HTMLCanvasElement,
+        region: TextureRegion,
+    ) => Promise<Uint8Array<ArrayBuffer>>;
 }
 
 export class WebGpuRuntime {
@@ -184,7 +189,7 @@ export class WebGpuRuntime {
             uploads = 0,
             estimatedTextureBytes = 0;
         const entries: RendererResourceInspection["entries"][number][] = [];
-        const sources = new Set<ImageBitmap>();
+        const sources = new Set<ImageBitmap | TexturePixels>();
         const gpuTextures = new Set<GPUTexture>();
         for (const entry of this.entries.values()) {
             const bytes = entry.source.width * entry.source.height * 4;
@@ -345,7 +350,7 @@ export class WebGpuRuntime {
     }
     private async upload(
         generation: Generation,
-        source: ImageBitmap,
+        source: ImageBitmap | TexturePixels,
     ): Promise<{ texture: GPUTexture; binding: GPUBindGroup }> {
         this.assertGeneration(generation);
         const { context, quad } = generation;
@@ -509,6 +514,127 @@ export class WebGpuRuntime {
         this.replacements.delete(id);
         if (entry) this.releaseEntry(entry);
     }
+    async createTexture(
+        id: string,
+        width: number,
+        height: number,
+        signal?: AbortSignal,
+    ): Promise<void> {
+        this.assertAlive();
+        signal?.throwIfAborted();
+        if (!id || this.entries.has(id) || this.replacements.has(id))
+            throw new Error("Texture ID is reserved or already registered: " + id);
+        validateDimensions(width, height);
+        const token = {};
+        this.replacements.set(id, token);
+        try {
+            await this.ready(signal);
+            const device = this.generation?.context?.device;
+            if (!device) throw new Error("WebGPU generation is not ready");
+            validateDimensions(width, height, device.limits.maxTextureDimension2D);
+            if (this.replacements.get(id) !== token)
+                throw new Error("Texture replacement superseded: " + id);
+            const source: TexturePixels = {
+                width,
+                height,
+                pixels: new Uint8Array(width * height * 4),
+            };
+            await this.publishTexture(
+                id,
+                source,
+                () => {
+                    source.pixels = new Uint8Array(0);
+                },
+                token,
+                signal,
+            );
+        } finally {
+            if (this.replacements.get(id) === token) this.replacements.delete(id);
+        }
+    }
+    async updateTexture(
+        id: string,
+        source: ImageBitmap | HTMLCanvasElement,
+        region: TextureRegion,
+        signal?: AbortSignal,
+    ): Promise<void> {
+        this.assertAlive();
+        signal?.throwIfAborted();
+        const entry = this.entries.get(id);
+        if (!id || !entry || entry.definition || !("pixels" in entry.source))
+            throw new Error("Texture update requires a createTexture registration: " + id);
+        // Copy caller-owned coordinates before queuing; queued calls cannot be retargeted.
+        const rect = { ...region };
+        validateRegion(source, entry.source, rect);
+        const updates = (entry.updates ??= { tail: Promise.resolve(), pending: 0 });
+        if (updates.pending >= 32) throw new Error("Texture update queue is full: " + id);
+        updates.pending++;
+        const assertCurrent = () => {
+            this.assertAlive();
+            if (entry.released || this.entries.get(id) !== entry)
+                throw new Error("Texture update registration released or replaced: " + id);
+        };
+        const work = updates.tail.then(async () => {
+            assertCurrent();
+            signal?.throwIfAborted();
+            const pixels = await (this.platform.readRegion ?? readRegion)(source, rect);
+            assertCurrent();
+            signal?.throwIfAborted();
+            if (pixels.byteLength !== rect.width * rect.height * 4)
+                throw new Error("Invalid texture patch byte length");
+            await this.ready(signal);
+            assertCurrent();
+            signal?.throwIfAborted();
+            const generation = this.generation;
+            const device = generation?.context?.device;
+            const texture = generation?.images.get(entry);
+            if (!generation || !device || !texture) throw new Error("Texture update is not ready");
+            this.assertGeneration(generation);
+            try {
+                // From this point cancellation cannot roll back the submitted write. Keep
+                // validation and CPU commit ordered even if the caller aborts meanwhile.
+                await validateGpuOperation(device, () =>
+                    device.queue.writeTexture(
+                        { texture, origin: [rect.destinationX, rect.destinationY] },
+                        pixels,
+                        { bytesPerRow: rect.width * 4 },
+                        [rect.width, rect.height],
+                    ),
+                );
+                this.assertGeneration(generation);
+                assertCurrent();
+                const retained = entry.source;
+                if (!("pixels" in retained)) throw new Error("Missing mutable texture source");
+                for (let row = 0; row < rect.height; row++) {
+                    const start = row * rect.width * 4;
+                    retained.pixels.set(
+                        pixels.subarray(start, start + rect.width * 4),
+                        ((rect.destinationY + row) * retained.width + rect.destinationX) * 4,
+                    );
+                }
+            } catch (error) {
+                // A write may already be visible. Never advertise this registration as
+                // usable after an uncertain write. A lost generation instead restores
+                // the last accepted CPU image, excluding this unvalidated patch.
+                if (generation === this.generation && !entry.released)
+                    try {
+                        this.releaseEntry(entry);
+                    } catch (cleanup) {
+                        throw new AggregateError([error, cleanup], "Texture update cleanup failed");
+                    }
+                throw error;
+            }
+        });
+        updates.tail = work.then(
+            () => {},
+            () => {},
+        );
+        try {
+            await work;
+        } finally {
+            updates.pending--;
+        }
+    }
     async texture(
         id: string,
         source: ImageBitmap | HTMLCanvasElement,
@@ -520,14 +646,27 @@ export class WebGpuRuntime {
             throw new Error("Texture ID is reserved or leased: " + id);
         const token = {};
         this.replacements.set(id, token);
-        let snapshot: ImageBitmap | undefined;
         try {
-            snapshot = await (this.platform.snapshot
+            const snapshot = await (this.platform.snapshot
                 ? this.platform.snapshot(source)
                 : createImageBitmap(source, {
                       premultiplyAlpha: "none",
                       colorSpaceConversion: "none",
                   }));
+            await this.publishTexture(id, snapshot, () => snapshot.close(), token, signal);
+        } finally {
+            if (this.replacements.get(id) === token) this.replacements.delete(id);
+        }
+    }
+    private async publishTexture(
+        id: string,
+        source: ImageBitmap | TexturePixels,
+        releaseSource: () => void,
+        token: object,
+        signal?: AbortSignal,
+    ): Promise<void> {
+        let owned = true;
+        try {
             for (;;) {
                 this.assertAlive();
                 signal?.throwIfAborted();
@@ -542,7 +681,7 @@ export class WebGpuRuntime {
                 if (!generation) continue;
                 let result: { texture: GPUTexture; binding: GPUBindGroup };
                 try {
-                    result = await this.upload(generation, snapshot);
+                    result = await this.upload(generation, source);
                 } catch (error) {
                     if (this.status === "recovering" || generation !== this.generation) continue;
                     throw error;
@@ -554,11 +693,10 @@ export class WebGpuRuntime {
                     if (this.replacements.get(id) !== token)
                         throw new Error("Texture replacement superseded: " + id);
                     if (generation !== this.generation || this.status !== "ready") continue;
-                    const owned = snapshot;
                     const entry: ImageEntry = {
                         id,
-                        source: owned,
-                        releaseSource: () => owned.close(),
+                        source,
+                        releaseSource,
                         refs: 1,
                         released: false,
                     };
@@ -566,7 +704,7 @@ export class WebGpuRuntime {
                     const previous = this.entries.get(id);
                     this.entries.set(id, entry);
                     generation.images.set(entry, result.texture);
-                    snapshot = undefined;
+                    owned = false;
                     published = true;
                     if (previous) this.releaseEntry(previous);
                     return;
@@ -575,8 +713,7 @@ export class WebGpuRuntime {
                 }
             }
         } finally {
-            if (this.replacements.get(id) === token) this.replacements.delete(id);
-            snapshot?.close();
+            if (owned) releaseSource();
         }
     }
     render(frame: Frame, clear: number): void {
@@ -621,6 +758,59 @@ export class WebGpuRuntime {
         } finally {
             if (canvasOwners.get(this.canvas) === this) canvasOwners.delete(this.canvas);
         }
+    }
+}
+
+function validateRegion(
+    source: { width: number; height: number },
+    destination: TexturePixels,
+    rect: TextureRegion,
+): void {
+    const { sourceX, sourceY, destinationX, destinationY, width, height } = rect;
+    if (
+        ![sourceX, sourceY, destinationX, destinationY, width, height].every(
+            Number.isSafeInteger,
+        ) ||
+        sourceX < 0 ||
+        sourceY < 0 ||
+        destinationX < 0 ||
+        destinationY < 0 ||
+        width <= 0 ||
+        height <= 0 ||
+        sourceX + width > source.width ||
+        sourceY + height > source.height ||
+        destinationX + width > destination.width ||
+        destinationY + height > destination.height
+    )
+        throw new Error("Invalid texture update region");
+}
+
+async function readRegion(
+    source: ImageBitmap | HTMLCanvasElement,
+    rect: TextureRegion,
+): Promise<Uint8Array<ArrayBuffer>> {
+    const bitmap = await createImageBitmap(
+        source,
+        rect.sourceX,
+        rect.sourceY,
+        rect.width,
+        rect.height,
+        { premultiplyAlpha: "none", colorSpaceConversion: "none" },
+    );
+    let canvas: OffscreenCanvas | undefined;
+    try {
+        canvas = new OffscreenCanvas(rect.width, rect.height);
+        const context = canvas.getContext("2d", { colorSpace: "srgb" });
+        if (!context) throw new Error("Missing texture patch 2D context");
+        context.globalCompositeOperation = "copy";
+        context.drawImage(bitmap, 0, 0);
+        // 2D readback produces straight-alpha sRGB bytes. The identical bytes feed
+        // both the GPU and retained image, avoiding recovery round-trip drift.
+        const data = context.getImageData(0, 0, rect.width, rect.height).data;
+        return new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+    } finally {
+        bitmap.close();
+        if (canvas) canvas.width = canvas.height = 0;
     }
 }
 

@@ -302,6 +302,51 @@ its original after resolution. Replacement is transactional; cancellation/failur
 preserves the old ready binding. Already-premultiplied inputs may have lost precision
 before snapshotting; the renderer cannot reconstruct those original bytes.
 
+### Editable manual textures
+
+`WebGPURenderer.createTexture(id, width, height, signal?)` initializes a transparent,
+fixed-size manual texture with reusable GPU storage and binding. Dimensions must be
+positive safe integers within the current device limit; allocation can still fail.
+The ID must be nonempty, absent and have no pending manual initialization/replacement.
+Publication waits for upload and binding validation. Cancellation or failure before
+publication leaves no registration. Concurrent `texture()` or `releaseTexture()`
+supersedes pending initialization.
+
+`updateTexture(id, bitmapOrCanvas, region, signal?)` requires a live registration
+created by `createTexture`. `TextureRegion` contains `sourceX`, `sourceY`, `width`,
+`height`, `destinationX` and `destinationY`. Coordinates are nonnegative safe integers;
+width and height are positive safe integers. The source and destination rectangles
+must fit their images; no clipping, scaling or resizing occurs. Empty, absent,
+asset-leased and ordinary `texture()` registrations reject. Successful `texture()`
+replacement changes an editable registration into an ordinary snapshot registration.
+
+Updates to one registration execute in call order, including source capture and
+overlapping writes. At most 32 calls, including the active call, may be pending;
+excess calls reject without copying. Coordinates are copied at invocation. Keep the
+source open and unchanged until the returned promise settles; afterwards the caller
+may change or close it. Capture/read failures and cancellation before submission
+leave accepted content unchanged. Queued cancellation is observed when its turn
+arrives; outstanding browser operations must settle before their cleanup completes.
+
+After submission, cancellation cannot undo a write and is ignored: the promise
+waits for validation and reports the write's actual result. Submitted pixels may be
+drawn before that promise settles. Validation or copy failure removes the uncertain
+registration; reinitialize explicitly before retrying. This in-place failure policy
+is separate from `texture()` transactional replacement, which preserves its previous
+binding on failure. Replacement, release or disposal invalidates older pending
+updates; late work cannot affect a new registration with the same ID.
+
+One renderer-owned straight-alpha sRGB byte image retains all accepted edits;
+there is no retained patch history. Initialization and recovery transfer the full
+image; ordinary edits capture, transfer and commit only the requested rectangle,
+reusing storage and binding. Source capture uses browser 2D sRGB readback, including
+its alpha precision limits; the same resulting bytes feed the GPU and recovery image.
+Transparent pixels replace destination pixels rather than blending with them.
+During recovery, unsubmitted updates wait for readiness. Loss during submitted
+validation rejects that update and restores the previous accepted image before
+reporting ready; callers can explicitly retry. A recovered texture keeps its fixed
+dimensions. Release/disposal also releases the retained byte image.
+
 `WebGPURenderer.releaseTexture(id)` synchronously removes a manual registration,
 destroys its registered GPU textures and closes its retained snapshot. It also
 invalidates pending manual work for that ID, including an unpublished first upload;

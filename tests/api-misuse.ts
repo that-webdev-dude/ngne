@@ -238,6 +238,20 @@ async function webgpuBoundary(canvas: HTMLCanvasElement, bitmap: ImageBitmap): P
     const image: engine.ImageAsset = engine.imageAsset("image", "./image.png");
     const upload: Promise<void> = renderer.texture(image.id, bitmap);
     await upload;
+    await renderer.createTexture("editable", 64, 64);
+    const patch: engine.TextureRegion = {
+        sourceX: 0,
+        sourceY: 0,
+        width: 2,
+        height: 2,
+        destinationX: 3,
+        destinationY: 4,
+    };
+    await renderer.updateTexture("editable", bitmap, patch, new AbortController().signal);
+    // @ts-expect-error Patch dimensions and both origins are required.
+    renderer.updateTexture("editable", bitmap, { width: 2, height: 2 });
+    // @ts-expect-error Patch dimensions are readonly.
+    patch.width = 4;
     const released: void = renderer.releaseTexture(image.id);
     void released;
     // @ts-expect-error Manual texture release takes a string ID.

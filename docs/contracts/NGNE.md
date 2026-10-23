@@ -48,7 +48,7 @@ Public symbols: `Game`, `BrowserGame`, `Assets`, `Input`, `Frame`,
 `WebGPURenderer`, `Audio`, `FixedStep`, `emptyInput`; types `GameOptions`,
 `SceneCandidates`, `SceneCandidateOptions`, `BrowserOptions`, `FrameScheduler`,
 `DisplaySnapshot`, `InputSnapshot`, `Stats`, `RendererStatus`, `RendererLifecycleEvent`, `AssetRetention`,
-`AssetsOptions` and `AssetClaim`.
+`AssetsOptions`, `AssetClaim` and `TextureRegion`.
 
 The browser host, headless runners, renderer/audio/asset tests and benchmarks
 consume this surface. Host lifecycle, candidate coordination, tick, render and
@@ -62,6 +62,12 @@ Public renderer viewport operation: `resize(width, height)`; readonly `width`/`h
 report the current logical dimensions. See the
 [browser and presentation contract](browser-and-presentation.md#renderer) for dimension
 ownership and rejection rules.
+
+Public manual texture operations: `texture(id, source, signal?)`,
+`createTexture(id, width, height, signal?)`, `updateTexture(id, source, region, signal?)`
+and `releaseTexture(id)`; `TextureRegion` describes source and destination rectangles.
+See [editable manual textures](browser-and-presentation.md#editable-manual-textures)
+for initialization, ordering, ownership, validation, cancellation and recovery.
 
 ### Inspection
 

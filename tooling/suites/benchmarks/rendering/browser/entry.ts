@@ -1,5 +1,6 @@
 import { startRendererBenchmark } from "../renderer-fixture.js";
 import { startOrderInvestigation } from "../order-fixture.js";
+import { startTextureUpdateBenchmark } from "../texture-update-fixture.js";
 
 const workload = new URLSearchParams(location.search).get("workload");
 
@@ -12,6 +13,7 @@ void start().catch((error: unknown) => {
 });
 
 async function start(): Promise<void> {
+    if (workload === "texture-updates") return startTextureUpdateBenchmark();
     if (workload === "ordering" || workload === "chaos") return startOrderInvestigation();
     if (workload !== "renderer-webgpu")
         throw new Error(`Unknown browser benchmark workload: ${workload ?? "none"}`);

@@ -5,6 +5,14 @@ import { WebGpuRuntime } from "./webgpu-runtime.js";
 import type { RendererResourceInspection } from "./resource-inspection.js";
 
 export type RendererStatus = "ready" | "recovering" | "failed" | "disposed";
+export interface TextureRegion {
+    readonly sourceX: number;
+    readonly sourceY: number;
+    readonly width: number;
+    readonly height: number;
+    readonly destinationX: number;
+    readonly destinationY: number;
+}
 export type RendererLifecycleEvent =
     | { readonly status: "recovering" | "ready" }
     | { readonly status: "failed"; readonly error: Error };
@@ -71,6 +79,17 @@ export class WebGPURenderer {
     }
     releaseTexture(id: string): void {
         this.#runtime.releaseTexture(id);
+    }
+    createTexture(id: string, width: number, height: number, signal?: AbortSignal): Promise<void> {
+        return this.#runtime.createTexture(id, width, height, signal);
+    }
+    updateTexture(
+        id: string,
+        source: ImageBitmap | HTMLCanvasElement,
+        region: TextureRegion,
+        signal?: AbortSignal,
+    ): Promise<void> {
+        return this.#runtime.updateTexture(id, source, region, signal);
     }
     [ACQUIRE_IMAGE](
         definition: ImageAsset,

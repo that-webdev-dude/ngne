@@ -2,7 +2,16 @@
 // at 34458a987f03b00894e98a40d39fc0ae666194f6. Device is supplied per generation.
 import { validateGpuOperation } from "./gpu-context.js";
 
-export async function uploadImage(device: GPUDevice, source: ImageBitmap): Promise<GPUTexture> {
+export interface TexturePixels {
+    readonly width: number;
+    readonly height: number;
+    pixels: Uint8Array<ArrayBuffer>;
+}
+
+export async function uploadImage(
+    device: GPUDevice,
+    source: ImageBitmap | TexturePixels,
+): Promise<GPUTexture> {
     const { width, height } = source;
     if (
         !Number.isSafeInteger(width) ||
@@ -24,11 +33,17 @@ export async function uploadImage(device: GPUDevice, source: ImageBitmap): Promi
                     GPUTextureUsage.COPY_DST |
                     GPUTextureUsage.RENDER_ATTACHMENT,
             });
-            device.queue.copyExternalImageToTexture(
-                { source, flipY: false },
-                { texture, colorSpace: "srgb", premultipliedAlpha: false },
-                [width, height],
-            );
+            if ("pixels" in source)
+                device.queue.writeTexture({ texture }, source.pixels, { bytesPerRow: width * 4 }, [
+                    width,
+                    height,
+                ]);
+            else
+                device.queue.copyExternalImageToTexture(
+                    { source, flipY: false },
+                    { texture, colorSpace: "srgb", premultipliedAlpha: false },
+                    [width, height],
+                );
         });
         if (!texture) throw new Error("Image upload produced no texture");
         return texture;

@@ -158,6 +158,28 @@ and release with `renderer.releaseTexture('preview')` when finished. See the
 [manual-texture lifetime contract](contracts/browser-and-presentation.md#assets-and-audio)
 for cancellation, ID reuse and reserved/leased IDs.
 
+For repeated edits, initialize reusable storage, then await each dirty rectangle:
+
+```ts
+await renderer.createTexture("preview-edit", 256, 256); // Initially transparent.
+await renderer.updateTexture("preview-edit", canvas, {
+    sourceX: 8,
+    sourceY: 12,
+    width: 16,
+    height: 16,
+    destinationX: 8,
+    destinationY: 12,
+});
+renderer.releaseTexture("preview-edit");
+```
+
+Keep the source open and unchanged until the update settles. Updates reuse the
+fixed-size texture and binding; `texture()` remains the transactional replacement
+operation. Cancellation only prevents an update before submission; a submitted
+write finishes validation, and failure removes the uncertain registration. See
+the [editable manual texture contract](contracts/browser-and-presentation.md#editable-manual-textures)
+for queue limits, ID restrictions and recovery semantics.
+
 For a direct renderer host:
 
 ```ts
