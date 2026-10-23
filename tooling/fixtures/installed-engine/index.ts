@@ -6,6 +6,7 @@ import {
     type Asset,
     type PreparedScene,
     type SceneDefinition,
+    type TextureRegion,
 } from "@ngne/core";
 import { observe } from "./observe.js";
 
@@ -405,6 +406,68 @@ async function run() {
             platform.voices.length === 2 && platform.voices[1].stops === 0,
         );
         state.samples.replacementRms = platform.rms();
+        const editableSource = document.createElement("canvas");
+        editableSource.width = editableSource.height = 3;
+        const editablePaint = editableSource.getContext("2d")!;
+        editablePaint.fillStyle = "magenta";
+        editablePaint.fillRect(0, 0, 3, 3);
+        editablePaint.fillStyle = "#4080c0";
+        editablePaint.fillRect(1, 0, 1, 2);
+        const editableFrame = new Frame();
+        editableFrame.sprite({
+            x: 2,
+            y: 2,
+            width: 4,
+            height: 4,
+            texture: "editable",
+            screen: true,
+        });
+        const capture = document.createElement("canvas");
+        const reader = capture.getContext("2d")!;
+        const drawEditable = () => {
+            renderer.render(editableFrame, 0x102030);
+            capture.width = canvas.width;
+            capture.height = canvas.height;
+            reader.drawImage(canvas, 0, 0);
+            return [...reader.getImageData(0, 0, 4, 4).data];
+        };
+        const transparent = Array.from({ length: 16 }, () => [16, 32, 48, 255]).flat();
+        await renderer.createTexture("editable", 4, 4);
+        check(
+            "editable-texture-initializes-transparent",
+            drawEditable().join() === transparent.join(),
+        );
+        const region: TextureRegion = {
+            sourceX: 1,
+            sourceY: 0,
+            width: 1,
+            height: 2,
+            destinationX: 2,
+            destinationY: 1,
+        };
+        await renderer.updateTexture("editable", editableSource, region);
+        const acceptedEdit = drawEditable();
+        state.samples.editablePixels = acceptedEdit;
+        const expectedEdit = transparent.slice();
+        for (const y of [1, 2]) expectedEdit.splice((y * 4 + 2) * 4, 4, 64, 128, 192, 255);
+        check(
+            "editable-region-patch-preserves-transparent-neighbours",
+            acceptedEdit.join() === expectedEdit.join(),
+        );
+        editablePaint.clearRect(0, 0, 3, 3);
+        renderer.resize(96, 80);
+        check(
+            "direct-resize-reports-logical-and-backing-dimensions",
+            renderer.width === 96 &&
+                renderer.height === 80 &&
+                canvas.width === 96 &&
+                canvas.height === 80,
+        );
+        check(
+            "direct-resize-preserves-editable-image-and-projection",
+            drawEditable().join() === acceptedEdit.join() &&
+                [...reader.getImageData(95, 79, 1, 1).data].join() === "16,32,48,255",
+        );
         const snapshot = JSON.stringify(host.game.enumerate());
         const old = platform.devices.at(-1)!;
         const recoveryEvents: string[] = [];
@@ -419,10 +482,37 @@ async function run() {
         unsubscribeRecovery();
         check("public-recovery-observation", recoveryEvents.join() === "recovering,ready");
         check("recovery-preserves-simulation", JSON.stringify(host.game.enumerate()) === snapshot);
-        check("recovery-restores-live-source", host.renderer!.inspect().sources === 1);
+        check(
+            "recovery-restores-live-sources",
+            renderer.inspect().sources === 2 && renderer.inspect().manualSources === 1,
+        );
+        const recoveredEdit = drawEditable();
+        state.samples.recoveredEditablePixels = recoveredEdit;
+        check(
+            "recovery-restores-accepted-edits-and-resized-dimensions",
+            recoveredEdit.join() === acceptedEdit.join() &&
+                renderer.width === 96 &&
+                renderer.height === 80 &&
+                canvas.width === 96 &&
+                canvas.height === 80,
+        );
+        renderer.releaseTexture("editable");
+        check(
+            "editable-release-preserves-leased-registration",
+            renderer.inspect().sources === 1 &&
+                renderer.inspect().manualSources === 0 &&
+                renderer.inspect().consumers === 1,
+        );
         const count = platform.submissions;
         step();
         check("recovered-frame-submits", platform.submissions > count);
+        check(
+            "browser-host-restores-fixed-logical-and-backing-dimensions",
+            renderer.width === 64 &&
+                renderer.height === 64 &&
+                canvas.width === 64 &&
+                canvas.height === 64,
+        );
         const recoveredPixel = pixel();
         state.samples.recoveredPixel = recoveredPixel;
         check(
