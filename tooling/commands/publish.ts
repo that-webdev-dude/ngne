@@ -24,6 +24,8 @@ const positive = (value: unknown): string => {
     assert(Number.isSafeInteger(Number(result)), "Invalid numeric identity");
     return result;
 };
+const runLink = (id: unknown, attempt: unknown) =>
+    `${repositoryURL}/actions/runs/${positive(id)}/attempts/${positive(attempt)}`;
 
 export function validateSelection(
     latest: unknown,
@@ -655,6 +657,7 @@ async function publish(selection: ReturnType<typeof validateSelection>, candidat
     let document = await packument();
     const existing = registryVersion(document, candidate);
     if (existing) await verifyRegistry(candidate, document);
+    await currentRelease(candidate.tag); // Fail on a conflicting draft before any tag or upload.
     const tagState = validateTag(await remoteTag(candidate), candidate.sourceSHA);
     // Re-read bytes and packed metadata immediately before either irreversible action.
     assert.deepEqual(await inspect(selection), candidate);
@@ -790,6 +793,19 @@ async function publish(selection: ReturnType<typeof validateSelection>, candidat
     };
 }
 
+export function existingRelease(releases: unknown, tag: string): Record<string, unknown> | null {
+    assert(Array.isArray(releases), "Release listing is not an array");
+    const matches = releases.map(object).filter((entry) => entry.tag_name === tag);
+    assert(matches.length <= 1, `Multiple releases exist for ${tag}`);
+    // The tag lookup endpoint hides drafts; a draft would otherwise be duplicated.
+    assert(!matches[0]?.draft, `A draft release exists for ${tag}; publish or delete it first`);
+    return matches[0] ?? null;
+}
+
+// Drafts are listed first and are only visible with contents: write.
+const currentRelease = async (tag: string) =>
+    existingRelease(await github("releases?per_page=100"), tag);
+
 export function changelogSection(changelog: string, version: string, tag: string): string {
     const lines = changelog.split(/\r?\n/);
     const start = lines.findIndex((line) => line.startsWith(`## [${version}]`));
@@ -801,10 +817,14 @@ export function changelogSection(changelog: string, version: string, tag: string
         .trim();
     assert(section, `CHANGELOG.md ${version} section is empty`);
     // Release pages have no repository base URL; pin relative links to the release tag.
-    return section.replace(
-        /\]\((?!https?:|#|mailto:)(?:\.\/)?([^)\s]+)\)/g,
-        `](${repositoryURL}/blob/${tag}/$1)`,
-    );
+    const base = `${repositoryURL}/blob/${tag}/`;
+    const relative = String.raw`(?!https?:|#|mailto:)(?:\.\/)?`;
+    return section
+        .replace(
+            new RegExp(String.raw`\]\(${relative}([^)\s]+)(\s+"[^"]*")?\)`, "g"),
+            `](${base}$1$2)`,
+        )
+        .replace(new RegExp(String.raw`^(\s*\[[^\]]+\]:\s+)${relative}(\S+)`, "gm"), `$1${base}$2`);
 }
 
 export function releaseNotes(
@@ -830,15 +850,14 @@ export function releaseNotes(
     // The fixed limitation sentence below is only true for SwiftShader candidate evidence.
     assert.match(string(candidate.limits), /Linux\/SwiftShader/);
     const fileCount = Object.keys(object(candidate.files)).length;
-    const runLink = (id: unknown, attempt: unknown) =>
-        `${repositoryURL}/actions/runs/${positive(id)}/attempts/${positive(attempt)}`;
     const upload = {
-        published: `Publication uploaded once; signed provenance identifies [run ${positive(provenance.runId)}, attempt ${positive(provenance.runAttempt)}](${runLink(provenance.runId, provenance.runAttempt)}).`,
+        published: "Publication uploaded once.",
         reconciled:
             "The upload outcome was uncertain and was reconciled through registry reads, without a second upload.",
         existing: "The version already existed on npm and was verified without another upload.",
     }[string(result.publication)];
     assert(upload, "Unknown publication outcome");
+    const origin = `Signed provenance identifies the uploading [run ${positive(provenance.runId)}, attempt ${positive(provenance.runAttempt)}](${runLink(provenance.runId, provenance.runAttempt)}).`;
     const body = `[npm package](https://www.npmjs.com/package/${name}/v/${version}) · [Changelog](${repositoryURL}/blob/${tag}/CHANGELOG.md)
 
 \`\`\`sh
@@ -852,7 +871,7 @@ ${changelogSection(changelog, version, tag)}
 - Source: [\`${source}\`](${repositoryURL}/commit/${source}); tag \`${tag}\`.
 - [Candidate run ${positive(selection.runId)}, attempt ${positive(selection.runAttempt)}](${runLink(selection.runId, selection.runAttempt)}); [publication verification run ${run.id}, attempt ${run.attempt}](${runLink(run.id, run.attempt)}).
 - npm \`${channel}\` points to \`${version}\`. The registry tarball matches the retained candidate exactly. A fresh registry install matched all ${fileCount} files and passed public ESM import, registry-signature and signed-provenance verification.
-- ${upload}
+- ${upload} ${origin}
 
 Tarball: \`${filename}\`. SHA-256:
 
@@ -878,12 +897,7 @@ async function release() {
     const directory = "out/release";
     mkdirSync(directory, { recursive: true });
     writeFileSync(`${directory}/release-notes.md`, notes.body);
-    let existing: unknown = null;
-    try {
-        existing = await github(`releases/tags/${notes.tag}`);
-    } catch (error) {
-        if (!String(error).startsWith("Error: HTTP 404")) throw error;
-    }
+    const existing = await currentRelease(notes.tag);
     // Like tags, an existing release is accepted and never overwritten.
     const created = !existing;
     const releaseDocument = object(
@@ -942,7 +956,7 @@ async function main() {
             );
         validateTag(await remoteTag(candidate), candidate.sourceSHA);
         stepOutput("candidate_hash", candidate.candidateHash);
-        const summary = `Package: ${candidate.name}@${candidate.version}\n\nSource: ${candidate.sourceSHA}\n\nTag: ${candidate.tag}; npm channel: ${candidate.channel}\n\nTarball SHA-256: ${candidate.sha256}\n\nCandidate: ${repositoryURL}/actions/runs/${selection.runId}/attempts/${selection.runAttempt}; artifact ${selection.artifactId} (${selection.artifactDigest})\n\nRegistry version: ${version ? "already exists; full identity/provenance verification required" : "absent"}\n\nEvidence: release-diagnostics-${selection.runId}-${selection.runAttempt}\n\n${candidate.limits}\n\nReview package contents and existing evidence, then approve the npm-publication environment to authorize the tag and publication.\n`;
+        const summary = `Package: ${candidate.name}@${candidate.version}\n\nSource: ${candidate.sourceSHA}\n\nTag: ${candidate.tag}; npm channel: ${candidate.channel}\n\nTarball SHA-256: ${candidate.sha256}\n\nCandidate: ${runLink(selection.runId, selection.runAttempt)}; artifact ${selection.artifactId} (${selection.artifactDigest})\n\nRegistry version: ${version ? "already exists; full identity/provenance verification required" : "absent"}\n\nEvidence: release-diagnostics-${selection.runId}-${selection.runAttempt}\n\n${candidate.limits}\n\nReview package contents and existing evidence, then approve the npm-publication environment to authorize the tag and publication.\n`;
         writeFileSync(`${output}/review.md`, summary);
         appendFileSync(string(process.env.GITHUB_STEP_SUMMARY), summary);
         return;

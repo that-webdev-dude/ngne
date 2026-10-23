@@ -5,6 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import {
     changelogSection,
+    existingRelease,
     publishOnce,
     releaseNotes,
     waitForRegistryListing,
@@ -797,6 +798,10 @@ const changelog = `# Changelog
 ### Added
 
 - Feature. See the [contract](docs/contracts/NGNE.md#x), [local](./docs/guide.md), [evidence](https://example.com/e.zip) and [anchor](#top).
+- Titled [spec](docs/contracts/simulation.md "Simulation") and [reference][arch] links.
+
+[arch]: docs/architecture.md
+[site]: https://example.com/
 
 ## [0.2.2] - 2026-10-15
 
@@ -819,6 +824,17 @@ test("changelog sections are exact and pin relative links to the release tag", (
         section.includes("(https://github.com/that-webdev-dude/ngne/blob/v0.3.0/docs/guide.md)"),
     );
     assert(section.includes("(https://example.com/e.zip)") && section.includes("(#top)"));
+    assert(
+        section.includes(
+            '(https://github.com/that-webdev-dude/ngne/blob/v0.3.0/docs/contracts/simulation.md "Simulation")',
+        ),
+    );
+    assert(
+        section.includes(
+            "[arch]: https://github.com/that-webdev-dude/ngne/blob/v0.3.0/docs/architecture.md",
+        ),
+    );
+    assert(section.includes("[site]: https://example.com/"));
     assert.equal(changelogSection(changelog.replace(/\n/g, "\r\n"), "0.2.2", "v0.2.2"), "- Older.");
     assert.throws(() => changelogSection(changelog, "0.3.1", "v0.3.1"), /no 0\.3\.1 section/);
     assert.throws(() => changelogSection("## [0.4.0]\n\n## [0.3.0]\n", "0.4.0", "v0.4.0"), /empty/);
@@ -853,15 +869,16 @@ test("release notes require the accepted result of this run and describe its out
         "### Added",
         "runs/800/attempts/2); [publication verification run 900, attempt 2]",
         "matched all 2 files",
-        "uploaded once; signed provenance identifies [run 900, attempt 1]",
+        "Publication uploaded once. Signed provenance identifies the uploading [run 900, attempt 1]",
         "b".repeat(64),
     ])
         assert(notes.body.includes(text), text);
     const next = { ...result, candidate: { ...candidate, channel: "next" } };
     assert.equal(releaseNotes(next, changelog, run).prerelease, true);
+    // A rerun after a failed release step still names the run that uploaded the version.
     assert.match(
         releaseNotes({ ...result, publication: "existing" }, changelog, run).body,
-        /already existed on npm/,
+        /already existed on npm and was verified without another upload\. Signed provenance identifies the uploading \[run 900, attempt 1\]/,
     );
     assert.throws(
         () => releaseNotes({ ...result, accepted: false }, changelog, run),
@@ -877,4 +894,17 @@ test("release notes require the accepted result of this run and describe its out
     );
     const hardware = { ...result, candidate: { ...candidate, limits: "Hardware." } };
     assert.throws(() => releaseNotes(hardware, changelog, run));
+});
+
+test("release lookup sees drafts and never duplicates or overwrites a release", () => {
+    const published = { tag_name: "v0.3.0", draft: false, html_url: "https://example.com/r" };
+    assert.equal(existingRelease([], "v0.3.0"), null);
+    assert.equal(existingRelease([{ tag_name: "v0.2.2", draft: true }], "v0.3.0"), null);
+    assert.deepEqual(existingRelease([published], "v0.3.0"), published);
+    assert.throws(
+        () => existingRelease([{ ...published, draft: true }], "v0.3.0"),
+        /draft release exists/,
+    );
+    assert.throws(() => existingRelease([published, published], "v0.3.0"), /Multiple releases/);
+    assert.throws(() => existingRelease({ message: "Not Found" }, "v0.3.0"), /not an array/);
 });
