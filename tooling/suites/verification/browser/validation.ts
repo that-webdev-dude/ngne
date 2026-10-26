@@ -1,4 +1,3 @@
-import { checkBrowserGames } from "../../../../demo/tests/browser-checks.js";
 import { checkPlatformerUnsupported } from "../../../../examples/platformer/tests/browser-checks.js";
 import { checkHelloCapability } from "../../../../examples/hello/tests/browser-checks.js";
 import { checkBrowserHost } from "../../../../tests/browser-validation.js";
@@ -58,7 +57,6 @@ async function main() {
     await checkBrowserImages(check);
     await checkHelloCapability(check, "unsupported");
     await checkHelloCapability(check, "recovery");
-    await checkBrowserGames(check);
     await checkPlatformerUnsupported(check);
     await checkBrowserRecovery(check);
     await checkBrowserRetention(check);

@@ -6,9 +6,12 @@ A TypeScript engine for retro 2D games, with WebGPU rendering and zero runtime d
 > APIs may change between releases. Pin an exact version and review changes before
 > upgrading.
 
-[Play Starfall '89](https://that-webdev-dude.github.io/ngne/) · [Engine guide](https://github.com/that-webdev-dude/ngne/blob/main/docs/guide.md) · [First scene](https://github.com/that-webdev-dude/ngne/tree/main/examples/hello)
+[Play Starfall](https://that-webdev-dude.github.io/ngne-starfall/) · [Starfall source](https://github.com/that-webdev-dude/ngne-starfall) · [Engine guide](https://github.com/that-webdev-dude/ngne/blob/main/docs/guide.md) · [First scene](https://github.com/that-webdev-dude/ngne/tree/main/examples/hello)
 
-![Starfall '89, a game built with NGNE](https://raw.githubusercontent.com/that-webdev-dude/ngne/main/docs/assets/starfall.png)
+[![Starfall campaign gameplay](https://raw.githubusercontent.com/that-webdev-dude/ngne-starfall/main/docs/screenshots/orbital-breakwater-combat.png)](https://that-webdev-dude.github.io/ngne-starfall/)
+
+Starfall is a standalone game built with the published NGNE package. Its source,
+assets and tests are maintained in its own repository.
 
 ## Engine capabilities
 
@@ -95,9 +98,10 @@ npm ci
 npm run dev
 ```
 
-Open the printed local URL for Starfall '89, `/examples/hello/` for the first scene,
-or `/examples/platformer/` for the two-level platformer. Use `npm.cmd` in Windows
+Open `/examples/hello/` for the first scene or `/examples/platformer/` for the
+two-level platformer at the printed local server address. Use `npm.cmd` in Windows
 PowerShell. These examples require a WebGPU-capable browser with hardware acceleration.
+The full Starfall game runs at its [standalone site](https://that-webdev-dude.github.io/ngne-starfall/).
 
 ## Inspect sprites and animations
 
@@ -158,5 +162,4 @@ before contributing. Include reproduction steps for bugs and relevant checks for
 
 ## License
 
-[MIT](https://github.com/that-webdev-dude/ngne/blob/main/LICENSE), including the engine
-and original showcase assets.
+[MIT](https://github.com/that-webdev-dude/ngne/blob/main/LICENSE).

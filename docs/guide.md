@@ -328,7 +328,7 @@ For audio:
   to restore it.
 
 The [audio contract](contracts/browser-and-presentation.md#audio-scopes-and-playback)
-owns voice/request limits and cleanup failures. Starfall and the platformer lease
+owns voice/request limits and cleanup failures. The platformer leases
 decoded looping music per gameplay scene alongside synthesized cues.
 
 ## Bounded decoded retention
@@ -361,7 +361,7 @@ Systems receive `WorldAccess`, not commit or enumeration authority. For headless
 create a `Game`, prepare/start a scene, then call `game.tick()`; the runtime owns world
 commits. Direct `World` construction is internal. Component queries expose `size` and
 `eachChunk`; `query()` with no components performs entity-only traversal.
-[Starfall](https://github.com/that-webdev-dude/ngne/blob/main/demo/game.ts) and the [platformer](https://github.com/that-webdev-dude/ngne/blob/main/examples/platformer/game.ts) use schema components.
+The [platformer](https://github.com/that-webdev-dude/ngne/blob/main/examples/platformer/game.ts) uses schema components.
 
 For diagnostics, read `game.scenes` and `game.enumerate()` after `game.tick()` returns;
 both return detached read-only data, never live worlds or resources. Use explicitly
@@ -443,7 +443,7 @@ const room: SceneDefinition = {
 };
 ```
 
-The browser host flushes requests after simulation commit. Disposing the scene removes its queued and active voices before its asset leases release. Cleanup failures are aggregated and leave the scope terminal. For complete consumers, read [Starfall](https://github.com/that-webdev-dude/ngne/blob/main/demo/game.ts), its [browser entry](https://github.com/that-webdev-dude/ngne/blob/main/demo/main.ts), and the [platformer](https://github.com/that-webdev-dude/ngne/blob/main/examples/platformer/README.md).
+The browser host flushes requests after simulation commit. Disposing the scene removes its queued and active voices before its asset leases release. Cleanup failures are aggregated and leave the scope terminal. For a complete consumer, read the [platformer](https://github.com/that-webdev-dude/ngne/blob/main/examples/platformer/README.md).
 
 ## Sprite and animation inspection
 

@@ -44,7 +44,7 @@ import { join, relative } from "node:path";
  * Every artifact must parse as JSON with a non-zero node or event count, or the run aborts.
  */
 const BROWSER = browserExecutable(),
-    URL_UNDER_TEST = process.env.NGNE_URL ?? "http://127.0.0.1:4173/",
+    URL_UNDER_TEST = process.env.NGNE_URL ?? "http://127.0.0.1:4173/examples/platformer/?baseline",
     WARMUP_SECONDS = Number(process.env.NGNE_WARMUP_SECONDS ?? 10),
     DURATION_SECONDS = Number(process.env.NGNE_DURATION_SECONDS ?? 60),
     DEBUG_PORT = Number(process.env.NGNE_CDP_PORT ?? 9333),
@@ -77,7 +77,8 @@ const TRACE_CATEGORIES = [
 ];
 if (EXPECTED_BACKEND && EXPECTED_BACKEND !== "webgl2" && EXPECTED_BACKEND !== "webgpu")
     throw new Error(`Unknown NGNE_EXPECTED_BACKEND ${EXPECTED_BACKEND}`);
-if (WORKLOAD && !IS_RENDERER) throw new Error(`Unknown browser benchmark workload ${WORKLOAD}`);
+if (!IS_PLATFORMER && !IS_RENDERER)
+    throw new Error(`Unknown browser benchmark workload ${WORKLOAD}`);
 if (CYCLES && (IS_RENDERER || CYCLES % 10 !== 0 || RETAINED_EVERY_SECONDS))
     throw new Error("NGNE_CYCLES needs a game page, a multiple of 10 and no retained interval");
 const HOOK = `(() => {
@@ -205,7 +206,6 @@ const READ_BACKEND = `(async () => {
     };
 })()`;
 const STATUS = `document.getElementById("status")?.textContent`;
-const FLIGHT = `document.getElementById("flight-state")?.textContent`;
 const DEATHS = `Number(/Deaths (\\d+)/.exec(document.getElementById("progress")?.textContent ?? "")?.[1])`;
 interface UiSnapshot {
     status: string;
@@ -287,16 +287,6 @@ try {
         await click(page, "start");
         await waitFor(page, `document.getElementById("status")?.textContent !== "Ready"`);
         if (CYCLES) await waitFor(page, `${STATUS} === "Reach the blue gate"`);
-    } else {
-        await waitFor(page, `document.getElementById("play")?.textContent === "START FLIGHT"`);
-        // Cycle mode starts from attract; its first step launches Chaos Lab.
-        if (!CYCLES) {
-            await click(page, "chaos");
-            await waitFor(
-                page,
-                `document.getElementById("flight-state")?.textContent.includes("CHAOS")`,
-            );
-        }
     }
     const backend = await page.evaluate<Backend>(READ_BACKEND);
     if (EXPECTED_BACKEND) assertBackend(backend, EXPECTED_BACKEND);
@@ -377,13 +367,9 @@ try {
         url: URL_UNDER_TEST,
         workload: IS_RENDERER
             ? "Fixed 10,000-sprite renderer fixture; reused authoring inputs"
-            : IS_PLATFORMER
-              ? CYCLES
-                  ? "Platformer level 1 cycles (pit death and respawn, pause, resume)"
-                  : "Platformer level 1 (idle player, active patrols, seed NGNE-15)"
-              : CYCLES
-                ? "Starfall cycles (Chaos Lab launch, pause, resume, normal flight launch)"
-                : "Starfall Chaos Lab (stress arena, seed STARFALL-1989)",
+            : CYCLES
+              ? "Platformer level 1 cycles (pit death and respawn, pause, resume)"
+              : "Platformer level 1 (idle player, active patrols, seed NGNE-15)",
         warmupSeconds: WARMUP_SECONDS,
         sampledSeconds: (end.now - begin.now) / 1000,
         ...summary,
@@ -541,67 +527,38 @@ async function sampleWindow(page: Page) {
 }
 async function runCycles(page: Page, snapshots: Record<string, Artifact>) {
     let deathsBefore = 0;
-    const steps: CycleStep[] = IS_PLATFORMER
-        ? [
-              {
-                  action: "keyDown ArrowRight",
-                  run: async (p) => {
-                      deathsBefore = await p.evaluate<number>(DEATHS);
-                      await key(p, "keyDown");
-                  },
-                  oracle: () => `${STATUS} === "Returning to checkpoint…"`,
-                  dwellMs: 0,
-              },
-              {
-                  action: "keyUp ArrowRight",
-                  run: (p) => key(p, "keyUp"),
-                  oracle: () =>
-                      `${STATUS} === "Reach the blue gate" && ${DEATHS} === ${deathsBefore + 1}`,
-                  dwellMs: 1000,
-              },
-              {
-                  action: "click #pause",
-                  run: (p) => click(p, "pause"),
-                  oracle: () =>
-                      `${STATUS} === "Paused" && document.getElementById("overlay-title")?.textContent === "Paused"`,
-                  dwellMs: 1000,
-              },
-              {
-                  action: "click #pause",
-                  run: (p) => click(p, "pause"),
-                  oracle: () =>
-                      `${STATUS} === "Reach the blue gate" && document.getElementById("overlay").hidden`,
-                  dwellMs: 1000,
-              },
-          ]
-        : [
-              {
-                  action: "click #chaos",
-                  run: (p) => click(p, "chaos"),
-                  oracle: () => `${FLIGHT} === "CHAOS LAB / INVULNERABLE"`,
-                  dwellMs: 5000,
-              },
-              {
-                  action: "click #pause",
-                  run: (p) => click(p, "pause"),
-                  oracle: () =>
-                      `${FLIGHT} === "FLIGHT PAUSED" && document.getElementById("overlay-title")?.textContent === "TAKE A BREATH."`,
-                  dwellMs: 1000,
-              },
-              {
-                  action: "click #pause",
-                  run: (p) => click(p, "pause"),
-                  oracle: () =>
-                      `${FLIGHT} === "CHAOS LAB / INVULNERABLE" && document.getElementById("overlay").hidden`,
-                  dwellMs: 2000,
-              },
-              {
-                  action: "click #play",
-                  run: (p) => click(p, "play"),
-                  oracle: () => `${FLIGHT} === "FLIGHT IN PROGRESS"`,
-                  dwellMs: 3000,
-              },
-          ];
+    const steps: CycleStep[] = [
+        {
+            action: "keyDown ArrowRight",
+            run: async (p) => {
+                deathsBefore = await p.evaluate<number>(DEATHS);
+                await key(p, "keyDown");
+            },
+            oracle: () => `${STATUS} === "Returning to checkpoint…"`,
+            dwellMs: 0,
+        },
+        {
+            action: "keyUp ArrowRight",
+            run: (p) => key(p, "keyUp"),
+            oracle: () =>
+                `${STATUS} === "Reach the blue gate" && ${DEATHS} === ${deathsBefore + 1}`,
+            dwellMs: 1000,
+        },
+        {
+            action: "click #pause",
+            run: (p) => click(p, "pause"),
+            oracle: () =>
+                `${STATUS} === "Paused" && document.getElementById("overlay-title")?.textContent === "Paused"`,
+            dwellMs: 1000,
+        },
+        {
+            action: "click #pause",
+            run: (p) => click(p, "pause"),
+            oracle: () =>
+                `${STATUS} === "Reach the blue gate" && document.getElementById("overlay").hidden`,
+            dwellMs: 1000,
+        },
+    ];
     const interval = CYCLES / 10;
     const cycleMs: number[] = [];
     const oraclesPassed: number[] = steps.map(() => 0);

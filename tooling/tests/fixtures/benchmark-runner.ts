@@ -7,7 +7,6 @@ export function benchmarkFixture() {
     const root = mkdtempSync(join(parent, "fixture-"));
     for (const p of [
         "src",
-        "demo",
         "examples",
         "tooling/suites/benchmarks/rendering/browser",
         "tooling/core",
@@ -16,12 +15,7 @@ export function benchmarkFixture() {
         "tooling/commands",
     ])
         mkdirSync(join(root, p), { recursive: true });
-    for (const p of [
-        "index.html",
-        "package-lock.json",
-        "vite.config.ts",
-        "tooling/commands/benchmark-all.ts",
-    ])
+    for (const p of ["package-lock.json", "vite.config.ts", "tooling/commands/benchmark-all.ts"])
         writeFileSync(join(root, p), "fixture\n");
     writeFileSync(join(root, "package.json"), '{"type":"module"}');
     symlinkSync(

@@ -3,7 +3,7 @@ import { test } from "node:test";
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync, unlinkSync, symlinkSync } from "node:fs";
 import { join, resolve, dirname } from "node:path";
-import { evidenceFixture, measured } from "./fixtures/benchmark-evidence.js";
+import { evidenceFixture, measured, measurement } from "./fixtures/benchmark-evidence.js";
 import { loadBenchmarkRun } from "../evidence/benchmark-results.js";
 import { compareRuns } from "../evidence/compare-runs.mjs";
 import { readJson } from "../evidence/run-results.mjs";
@@ -17,6 +17,97 @@ function reseal(directory: string, path: string) {
     file.sha256 = hash(bytes);
     writeFileSync(join(directory, "artifacts.json"), JSON.stringify(inventory));
 }
+
+test("current workload set retires Starfall while historical full runs still require it", async () => {
+    for (const workloadSet of [undefined, "engine-examples-v1", "unknown"]) {
+        const run = evidenceFixture();
+        run.manifest.policy.parameters = { workload: "all", diagnostics: false, workloadSet };
+        await run.execute(async () => {
+            for (const id of [
+                "cpu",
+                "churn",
+                "renderer-webgpu",
+                "renderer-webgpu-alternating",
+                "platformer",
+            ]) {
+                await run.stage(id, async () => {
+                    run.record(id, "measurements", {
+                        target: "internal-source-microbenchmark",
+                        raw:
+                            id === "churn"
+                                ? measurement()
+                                : id === "cpu"
+                                  ? {
+                                        workload: "ecs-grid-epoch-v1",
+                                        collisionGrid: { valid: true },
+                                    }
+                                  : { visibilityState: { atStart: "visible", atEnd: "visible" } },
+                    });
+                });
+            }
+            run.manifest.preparation = "prepared";
+        });
+        if (workloadSet === "engine-examples-v1")
+            assert.equal(loadBenchmarkRun(run.root, "candidate").results.size, 5);
+        else
+            assert.throws(
+                () => loadBenchmarkRun(run.root, "candidate"),
+                workloadSet === undefined
+                    ? /Missing expected workload: starfall-chaos/
+                    : /Unknown benchmark workload set/,
+            );
+    }
+});
+
+test("changed CPU identities omit timing comparisons but preserve historical CPU comparisons", async () => {
+    const run = evidenceFixture();
+    await run.execute(() => measured(run));
+    const original = loadBenchmarkRun(run.root, "baseline");
+    const historical = {
+        ...original,
+        results: new Map([
+            [
+                "cpu",
+                {
+                    path: "historical",
+                    value: {
+                        collisionGrid: { valid: true },
+                        ecs: { ms: { p50: 1, p95: 2, p99: 3 } },
+                        chaos: { simulationAndPreparationMs: { p50: 4, p95: 5, p99: 6 } },
+                    },
+                },
+            ],
+        ]),
+    };
+    const current = {
+        ...historical,
+        results: new Map([
+            [
+                "cpu",
+                {
+                    path: "current",
+                    value: {
+                        ...historical.results.get("cpu")!.value,
+                        workload: "ecs-grid-epoch-v1",
+                    },
+                },
+            ],
+        ]),
+    };
+    const comparison = compareRuns(historical, current);
+    assert.equal(comparison.workloads.length, 0);
+    assert.ok(
+        comparison.compatibilityWarnings.some((w) =>
+            /CPU workload identity changed/.test(w.message),
+        ),
+    );
+    assert.ok(
+        compareRuns(historical, historical).workloads[0].metrics.some(
+            (m) => m?.label === "Chaos CPU p50",
+        ),
+    );
+    assert.ok(compareRuns(current, current).workloads[0].metrics.length > 0);
+});
 
 test("current reader rejects unlisted linked directories", async () => {
     const run = evidenceFixture();

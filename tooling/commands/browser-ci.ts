@@ -62,7 +62,7 @@ interface Cdp {
 
 const session = new BrowserSession();
 const root = process.cwd();
-const origin = process.env.NGNE_BROWSER_URL ?? "http://127.0.0.1:4173";
+const origin = (process.env.NGNE_BROWSER_URL ?? "http://127.0.0.1:4173").replace(/\/$/, "");
 const debugPort = Number(process.env.NGNE_CDP_PORT ?? 9334);
 const timeoutMs = Number(process.env.NGNE_BROWSER_TIMEOUT_MS ?? 240_000);
 const artifactDirectory = join(
@@ -157,8 +157,8 @@ failures.push(
             renderer = isSoftware(environment) ? "software" : "hardware";
             if (renderer === "software")
                 skippedAsUnsupported.push("hardware-backed WebGPU execution evidence");
-            await checkStarfall();
-            await recordRenderingDevices("Starfall");
+            await checkHello();
+            await recordRenderingDevices("Hello");
             await checkPlatformer();
             await recordRenderingDevices("platformer");
             if (consoleMessages.some((message) => /^(error|exception):/i.test(message)))
@@ -196,6 +196,8 @@ function startPreview(): ChildProcess {
             "--strictPort",
             "--outDir",
             "dist-browser",
+            "--base",
+            url.pathname.replace(/\/$/, "") + "/",
         ],
         "preview",
         { cwd: root },
@@ -315,42 +317,16 @@ async function recordRenderingDevices(page: string): Promise<void> {
     }
 }
 
-async function checkStarfall(): Promise<void> {
-    await navigate(`${origin}/`);
-    await waitFor(
-        "document.getElementById('play')?.textContent === 'START FLIGHT' && !document.getElementById('play').disabled",
-        30_000,
-        "Starfall readiness",
-    );
+async function checkHello(): Promise<void> {
+    await navigate(`${origin}/examples/hello/`);
     await waitFor(
         "window.__ngneRenderingDevices?.some(device => device.submissions > 1 && device.canvasConfigurations > 0)",
-        10_000,
-        "Starfall WebGPU attract frames",
-    );
-    passed.push("Starfall built path launches WebGPU attract mode");
-    await click("document.getElementById('play').click()");
-    await waitFor(
-        "document.getElementById('flight-state')?.textContent === 'FLIGHT IN PROGRESS'",
-        30_000,
-        "Starfall launch",
-    );
-    passed.push("Starfall built path starts a flight");
-    await click("document.getElementById('pause').click()");
-    await waitFor(
-        "document.getElementById('flight-state')?.textContent === 'FLIGHT PAUSED'",
-        10_000,
-        "Starfall pause",
-    );
-    passed.push("Starfall built path pauses");
-    await click("document.getElementById('pause').click()");
-    await waitFor(
-        "document.getElementById('flight-state')?.textContent === 'FLIGHT IN PROGRESS'",
-        10_000,
-        "Starfall resume",
+        20_000,
+        "Hello WebGPU frames",
     );
     await pass(
-        "Starfall built path resumes without an error",
-        "document.getElementById('error')?.hidden === true",
+        "Hello built path presents without an error",
+        "document.querySelector('[role=alert]')?.textContent === ''",
     );
 }
 

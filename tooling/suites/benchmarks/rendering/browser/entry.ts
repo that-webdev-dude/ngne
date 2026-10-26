@@ -14,7 +14,8 @@ void start().catch((error: unknown) => {
 
 async function start(): Promise<void> {
     if (workload === "texture-updates") return startTextureUpdateBenchmark();
-    if (workload === "ordering" || workload === "chaos") return startOrderInvestigation();
+    if (workload === "chaos") throw new Error("Starfall Chaos replay is retired");
+    if (workload === "ordering") return startOrderInvestigation();
     if (workload !== "renderer-webgpu")
         throw new Error(`Unknown browser benchmark workload: ${workload ?? "none"}`);
     await startRendererBenchmark("webgpu");

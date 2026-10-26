@@ -9,11 +9,13 @@ npm test
 npm run typecheck:tooling
 ```
 
-`npm test` discovers engine tests in `tests/*.test.ts`, demo tests in
-`demo/tests/*.test.ts`, example tests in `examples/*/tests/*.test.ts`, and tooling
+`npm test` discovers engine tests in `tests/*.test.ts`, example tests in
+`examples/*/tests/*.test.ts`, and tooling
 regressions in `tooling/tests/*.test.ts`. Keep entry files flat; fixtures can be nested.
 The browser validation entry is `suites/verification/browser/validation.ts`; it
-composes engine and consumer checks from their owning directories. The Node
+composes engine and maintained example checks from their owning directories.
+[Generated atlas checks](../tests/browser-atlas-lease-checks.ts) preserve image leases,
+replacement pixels and disposal coverage without game code or artwork. The Node
 tooling configuration is independent of the browser/source-alias configuration.
 Extend its includes when introducing additional Node modules; browser code needs
 its own checked target. No public engine export changes are needed.
@@ -36,6 +38,10 @@ Install Chrome and the browser prerequisites described below. On Windows use
 On Linux, Chrome needs Vulkan support for SwiftShader and Xvfb for headed execution.
 Set `NGNE_BROWSER_HEADLESS=0`
 and run the command under `xvfb-run -a`. Do not run competing builds in this checkout.
+
+Repository browser checks navigate directly to Hello and Platformer; no root page
+or hosted game is required. `NGNE_BROWSER_URL` can include a base path, for example
+`http://127.0.0.1:4173/ngne`. CI checks both the default base and `/ngne/`.
 
 Each invocation creates a fresh `out/runs/*-verification-*` directory. It retains
 stage command logs, aggregate outcomes and browser integration artifacts; package
@@ -376,7 +382,7 @@ and independent budget outcomes. New installed-resource cross-revision compariso
 is unsupported.
 
 `npm run bench:all` uses Node orchestration for internal CPU/churn, private renderer
-and repository showcase probes. Source and build inventories identify those targets;
+and the repository Platformer example. Source and build inventories identify those targets;
 they are distinct from installed-package measurements. Existing flag aliases and
 diagnostics remain supported. Each run writes one canonical evidence tree under
 `out/runs/`, with one measurement document per workload.

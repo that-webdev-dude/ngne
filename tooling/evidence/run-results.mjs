@@ -68,6 +68,8 @@ export function validateResult(name, result) {
     if (name.startsWith("churn")) {
         validateChurn(result, name === "churn" ? "timed" : name.slice(6));
     } else if (name === "cpu") {
+        if (result.workload !== undefined && result.workload !== "ecs-grid-epoch-v1")
+            throw new Error("Unknown CPU workload identity");
         if (result.collisionGrid?.valid !== true)
             throw new Error("Invalid CPU collision-grid measurement");
     } else if (

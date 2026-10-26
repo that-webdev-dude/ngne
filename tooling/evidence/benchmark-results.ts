@@ -18,6 +18,8 @@ export function benchmarkMeasurements(directory: string, manifest: Manifest, res
     if (parameters.workload !== "all" && parameters.workload !== "churn")
         throw Error("Unknown benchmark workload");
     if (typeof parameters.diagnostics !== "boolean") throw Error("Missing diagnostics selection");
+    if (parameters.workloadSet !== undefined && parameters.workloadSet !== "engine-examples-v1")
+        throw Error("Unknown benchmark workload set");
     const expected =
         parameters.workload === "churn"
             ? ["churn"]
@@ -26,7 +28,7 @@ export function benchmarkMeasurements(directory: string, manifest: Manifest, res
                   "churn",
                   "renderer-webgpu",
                   "renderer-webgpu-alternating",
-                  "starfall-chaos",
+                  ...(parameters.workloadSet === undefined ? ["starfall-chaos"] : []),
                   "platformer",
               ];
     if (parameters.diagnostics) expected.push("churn-alloc", "churn-gc");

@@ -36,6 +36,8 @@ if (
 )
     throw Error("Invalid measurement settings");
 const cases = casesArg.split(";");
+if (cases.some((query) => new URLSearchParams(query).get("workload") === "chaos"))
+    throw Error("Starfall Chaos replay is retired; use the ordering fixture");
 const run = new Run(process.cwd(), "performance-investigation");
 console.log(run.root);
 const revision = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
@@ -203,11 +205,7 @@ const result = await run.execute(async () => {
                         /SwiftShader|WARP|llvmpipe|Basic Render/i.test(adapter.description)
                     )
                         throw Error("Software GPU is not a performance baseline");
-                    const finiteReplay = new URLSearchParams(query).get("workload") === "chaos";
-                    if (finiteReplay && profile)
-                        throw Error("Chaos finite replay does not support sampled profiles");
-                    if (!finiteReplay)
-                        await new Promise((resolve) => setTimeout(resolve, warmup * 1000));
+                    await new Promise((resolve) => setTimeout(resolve, warmup * 1000));
                     if (profile) {
                         await page.send("Performance.enable");
                         await page.send("HeapProfiler.enable");
@@ -227,14 +225,7 @@ const result = await run.execute(async () => {
                     console.log(
                         `${id} ${query}: sampling ${duration}s${profile ? " (profiled)" : ""}`,
                     );
-                    if (finiteReplay) {
-                        const replayDeadline = Date.now() + 120000;
-                        while (!(await page.evaluate<boolean>("window.__investigation.done"))) {
-                            if (Date.now() > replayDeadline || errors.length)
-                                throw Error("Chaos replay failed or timed out");
-                            await new Promise((resolve) => setTimeout(resolve, 250));
-                        }
-                    } else await new Promise((resolve) => setTimeout(resolve, duration * 1000));
+                    await new Promise((resolve) => setTimeout(resolve, duration * 1000));
                     const end = await page.evaluate<number>("performance.now()");
                     const performanceEnd = profile
                         ? await page.send("Performance.getMetrics")
@@ -252,11 +243,7 @@ const result = await run.execute(async () => {
                     const snapshot = await page.evaluate<
                         Pick<FrameMeasurements, "columns" | "samples"> & Record<string, unknown>
                     >("window.__investigation");
-                    const sampleWindow = finiteReplay
-                        ? await page.evaluate<{ begin: number; end: number }>(
-                              "({begin: window.__investigation.sampleBegin, end: window.__investigation.sampleEnd})",
-                          )
-                        : { begin, end };
+                    const sampleWindow = { begin, end };
                     payload = {
                         ...snapshot,
                         ...sampleWindow,

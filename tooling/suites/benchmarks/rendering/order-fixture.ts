@@ -1,8 +1,6 @@
 import { Camera, Frame } from "../../../../src/index.js";
 import { createGpuContext } from "../../../../src/gpu-context.js";
 import { createQuadRenderer } from "../../../../src/quad-renderer.js";
-import { Game } from "../../../../src/index.js";
-import { arena, W, H, type Progress, type ProgressCommand } from "../../../../demo/game.js";
 import { preparationStages } from "./preparation-diagnostics.js";
 import { auditOrder } from "./order-audit.js";
 
@@ -11,7 +9,8 @@ export async function startOrderInvestigation(): Promise<void> {
     const count = Number(params.get("count") ?? 64000);
     const shuffled = params.get("order") === "shuffled";
     const detailed = params.get("detail") !== "0";
-    const chaos = params.get("workload") === "chaos";
+    if (params.get("workload") !== "ordering")
+        throw Error("Only the ordering workload is supported; Starfall Chaos replay is retired");
     const audit = params.get("audit") === "1";
     const keys = params.get("keys") ?? "layers";
     if (
@@ -25,8 +24,8 @@ export async function startOrderInvestigation(): Promise<void> {
         ].includes(keys)
     )
         throw Error("Invalid key fixture");
-    const width = chaos ? W : 1440,
-        height = chaos ? H : 900;
+    const width = 1440,
+        height = 900;
     const audits: (ReturnType<typeof auditOrder> & { tick: number; canonicalIdentity: boolean })[] =
         [];
     if (!Number.isSafeInteger(count) || count < 1 || count > 128000 || count % 4 !== 0)
@@ -69,9 +68,7 @@ export async function startOrderInvestigation(): Promise<void> {
             stages: preparationStages.instrumented,
             audit,
             keys,
-            workload: chaos
-                ? "unchanged Chaos replay: seed bench, key chaos, 900 ticks, alpha 0.5, first 101 warmup"
-                : "ordering",
+            workload: "ordering",
             timing: "prepareOther includes texture validation and reorder copy; CPU only",
         },
     };
@@ -98,45 +95,8 @@ export async function startOrderInvestigation(): Promise<void> {
         [1, 1],
     );
     await renderer.texture("", white.createView());
-    let atlas: GPUTexture | undefined;
-    if (chaos) {
-        const response = await fetch(
-            new URL("../../../../demo/assets/starfall.png", import.meta.url),
-        );
-        if (!response.ok) throw Error("Chaos atlas unavailable");
-        const bitmap = await createImageBitmap(await response.blob(), {
-            premultiplyAlpha: "none",
-            colorSpaceConversion: "none",
-        });
-        try {
-            atlas = context.device.createTexture({
-                size: [bitmap.width, bitmap.height],
-                format: "rgba8unorm",
-                usage:
-                    GPUTextureUsage.TEXTURE_BINDING |
-                    GPUTextureUsage.COPY_DST |
-                    GPUTextureUsage.RENDER_ATTACHMENT,
-            });
-            context.device.queue.copyExternalImageToTexture(
-                { source: bitmap },
-                { texture: atlas },
-                [bitmap.width, bitmap.height],
-            );
-            await renderer.texture("ships", atlas.createView());
-        } finally {
-            bitmap.close();
-        }
-    }
     const frame = new Frame(),
         camera = new Camera();
-    const game = chaos
-        ? new Game<Progress, ProgressCommand>({
-              seed: "bench",
-              state: { best: 0, runs: 0, victories: 0, lastScore: 0 },
-              transition: (s) => s,
-          })
-        : undefined;
-    if (game) await game.start(await game.prepare(arena({ stress: true }), { key: "chaos" }));
     let tickIndex = 0;
     camera.pixelSnap = false;
     let sortMs = 0,
@@ -154,13 +114,10 @@ export async function startOrderInvestigation(): Promise<void> {
         if (stopped || state.error) return;
         const start = performance.now();
         tickIndex++;
-        if (chaos && tickIndex === 102) state.sampleBegin = start;
         if (document.hidden) state.hidden = true;
-        game?.tick();
         const updated = performance.now();
         frame.reset();
-        if (game) game.render(frame, 0.5);
-        else {
+        {
             frame.scene(camera, 1);
             for (let i = 0; i < count; i++) {
                 if (keys === "scenes" && i === count / 2) frame.scene(camera, 1);
@@ -235,11 +192,6 @@ export async function startOrderInvestigation(): Promise<void> {
         previous = start;
         state.ready = true;
         if (samples.length >= 30000) fail("Sample limit");
-        if (chaos && tickIndex === 900) {
-            state.done = true;
-            state.sampleEnd = performance.now();
-            return;
-        }
         raf = requestAnimationFrame(tick);
     };
     document.addEventListener("visibilitychange", () => {
@@ -253,9 +205,7 @@ export async function startOrderInvestigation(): Promise<void> {
             cancelAnimationFrame(raf);
             renderer.dispose();
             white.destroy();
-            atlas?.destroy();
             context.dispose();
-            void game?.dispose();
         },
         { once: true },
     );

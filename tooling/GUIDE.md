@@ -31,7 +31,7 @@ npm run format:check
 npm run build
 ```
 
-These check engine types, tooling/benchmark types, regression tests, formatting, then type/API checks and the production build. Successful builds write the engine to `dist/engine/` and the site to `dist/`.
+These check engine types, tooling/benchmark types, regression tests, formatting, then type/API checks and the production build. Successful builds write the engine to `dist/engine/` and the maintained examples to `dist/examples/`. There is no root app or landing page; use the [example routes](../README.md#run-the-examples).
 
 `format:check` only reports problems. `npm run format` rewrites files across the configured directories; review its changes.
 
@@ -48,7 +48,12 @@ It stops at the first required failure. Results go under `out/runs/*-verificatio
 
 ## Stage 2: Package preparation
 
-A package is what another game installs: compiled engine JavaScript, TypeScript declarations, public exports, documentation and standard package metadata. It excludes repository tooling, tests, benchmarks and demos.
+A package is what another game installs: compiled engine JavaScript, TypeScript declarations, public exports, documentation and standard package metadata. It excludes repository tooling, tests, benchmarks and examples.
+
+Hello and Platformer are maintained in this repository. Standalone Starfall is an
+external showcase linked from the [README](../README.md); its pinned published
+engine release does not validate current engine source. Engine checks require
+neither the hosted game nor a sibling checkout.
 
 Generate one to check distribution works or to try an engine update in another game. This does not publish anything to npm.
 

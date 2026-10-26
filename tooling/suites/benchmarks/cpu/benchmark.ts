@@ -4,21 +4,16 @@ import { cpus, release, totalmem } from "node:os";
 import { performance } from "node:perf_hooks";
 
 import { World, type SchemaComponentView } from "../../../../src/ecs.js";
-import { component, f64, Game, Frame } from "../../../../src/index.js";
-import { arena, type Progress, type ProgressCommand } from "../../../../demo/game.js";
+import { component, f64 } from "../../../../src/index.js";
 const ECS_ENTITIES = 20000,
     ECS_WARMUP = 100,
     ECS_SAMPLES = 300,
-    CHAOS_SEED = "bench",
-    CHAOS_TICKS = 900,
-    CHAOS_WARMUP = 101,
     GRID_CELLS = 260,
     GRID_TARGETS = 256,
     GRID_PROBES = 512,
     GRID_BATCHES = 64,
     GRID_WARMUP = 100,
-    GRID_SAMPLES = 300,
-    TICK_BUDGET_MS = 1000 / 60;
+    GRID_SAMPLES = 300;
 const p = component("position", { x: f64(), y: f64() }),
     v = component("velocity", { x: f64(1), y: f64(2) });
 const world = new World(),
@@ -48,34 +43,6 @@ for (let i = 0; i < ECS_SAMPLES; i++) {
     });
     samples.push(performance.now() - start);
 }
-const g = new Game<Progress, ProgressCommand>({
-    seed: CHAOS_SEED,
-    state: { best: 0, runs: 0, victories: 0, lastScore: 0 },
-    transition: (s) => s,
-});
-await g.start(await g.prepare(arena({ stress: true }), { key: "chaos" }));
-const frame = new Frame();
-const full: number[] = [];
-const orderSamples: { tick: number; quads: number; firstReorderedIndex: number }[] = [];
-let peak = 0;
-for (let i = 0; i < CHAOS_TICKS; i++) {
-    const start = performance.now();
-    g.tick();
-    frame.reset();
-    g.render(frame, 0.5);
-    frame.sort();
-    const time = performance.now() - start;
-    // Observe canonical output without changing the scene or accessing private sort keys.
-    // Packing starts with identity order, so any moved index requires sort/gather.
-    // Keep this applicability scan outside the existing timed interval.
-    orderSamples.push({
-        tick: i + 1,
-        quads: frame.count,
-        firstReorderedIndex: frame.order.findIndex((index, position) => index !== position),
-    });
-    if (i >= CHAOS_WARMUP) full.push(time);
-    peak = Math.max(peak, frame.count);
-}
 const grid = runCollisionGridBenchmark();
 const epoch = runEpochTraversalBenchmark();
 const smallQueries = runSmallQueriesBenchmark();
@@ -83,6 +50,8 @@ console.log(
     JSON.stringify(
         {
             revision: revision(),
+            workload: "ecs-grid-epoch-v1",
+            retiredWorkloads: ["starfall-chaos-cpu"],
             environment: {
                 node: process.version,
                 platform: process.platform,
@@ -99,57 +68,18 @@ console.log(
                 ms: summarize(samples),
                 rawMs: samples,
             },
-            chaos: {
-                seed: CHAOS_SEED,
-                ticks: CHAOS_TICKS,
-                warmupTicks: CHAOS_WARMUP,
-                sampledTicks: full.length,
-                peakSprites: peak,
-                peakEntitySlots: g.scenes[0].entityCapacity,
-                simulationAndPreparationMs: summarize(full),
-                rawMs: full,
-                tickBudgetMs: TICK_BUDGET_MS,
-                ticksOverBudget: full.filter((time) => time > TICK_BUDGET_MS).length,
-                submissionOrder: {
-                    criterion: "Canonical sorted active order is identity (order[i] === i)",
-                    instrumentation:
-                        "After the timed interval; CPU applicability, not browser performance",
-                    allFrames: summarizeOrder(orderSamples),
-                    postWarmupFrames: summarizeOrder(orderSamples.slice(CHAOS_WARMUP)),
-                    raw: orderSamples,
-                },
-            },
             collisionGrid: grid.result,
             epochTraversal: epoch,
             manySmallQueries: smallQueries,
             target: "internal-source-microbenchmark",
-            note: "CPU only. Excludes GPU submission, browser display, and input polling. Dropped ticks are a browser host-loop measure; ticksOverBudget counts sampled ticks whose CPU time exceeded one 60 Hz step.",
+            note: "CPU only. Excludes GPU submission, browser display, and input polling. Starfall Chaos simulation/render preparation is retired; this workload is not an equivalent baseline for the historical CPU suite.",
         },
         null,
         2,
     ),
 );
-g.dispose();
 world.dispose();
 grid.dispose();
-
-function summarizeOrder(samples: typeof orderSamples) {
-    const eligible = samples.filter((sample) => sample.firstReorderedIndex === -1);
-    const sizes = (frames: typeof orderSamples) =>
-        frames.length
-            ? {
-                  min: Math.min(...frames.map((s) => s.quads)),
-                  max: Math.max(...frames.map((s) => s.quads)),
-              }
-            : null;
-    return {
-        frames: samples.length,
-        eligibleFrames: eligible.length,
-        eligibleFraction: eligible.length / samples.length,
-        quads: sizes(samples),
-        eligibleQuads: sizes(eligible),
-    };
-}
 
 function runCollisionGridBenchmark() {
     const GridPosition = component("benchmark-grid-position", { x: f64(), y: f64() });

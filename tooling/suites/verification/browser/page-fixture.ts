@@ -11,10 +11,11 @@ export async function withFixture(
     prompt: string | undefined,
     run: (doc: () => Document | null | undefined) => Promise<void>,
 ): Promise<void> {
-    const page = await (await fetch(pagePath)).text();
+    const pageUrl = new URL(pagePath.replace(/^\//, ""), new URL(".", location.href));
+    const page = await (await fetch(pageUrl)).text();
     const entry = /<script\s+type="module"[^>]*\bsrc="([^"]+)"[^>]*><\/script>/.exec(page);
     if (!entry) throw new Error(`${title}: page entry script not found`);
-    const entryModule = new URL(entry[1], new URL(pagePath, location.href)).href;
+    const entryModule = new URL(entry[1], pageUrl).href;
     const container = document.createElement("section");
     container.setAttribute("aria-label", title);
     container.style.cssText =

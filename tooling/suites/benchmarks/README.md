@@ -27,12 +27,15 @@ npm.cmd run bench:all -- -Workload churn -Diagnostics -Compact
 | `-Diagnostics`                        | Add churn allocation/GC analysis and browser profiles, snapshots and traces |
 | `-Compact`                            | After success, remove stage diagnostics; retain measurements and logs       |
 | `-WarmupSeconds 1 -DurationSeconds 5` | Short browser smoke test; churn counts stay fixed                           |
-| `-SkipBuild`                          | Reuse current `dist/` and `dist-browser/` builds                            |
+| `-SkipBuild`                          | Reuse current example and browser fixture builds                            |
 | `-OutputRoot <directory>`             | Change the output location                                                  |
 
-The default suite builds both artifacts and runs CPU, churn, two renderer fixtures,
-Starfall Chaos Lab and Platformer sequentially. Diagnostics run separately from clean churn
+The default suite builds both artifacts and runs CPU, churn, two renderer fixtures
+and Platformer sequentially. Diagnostics run separately from clean churn
 measurements and can perturb browser timings.
+
+`-SkipBuild` requires Hello and Platformer in `dist/examples/` and the renderer
+fixture in `dist-browser/`. No root page, external game or sibling checkout is used.
 
 Each invocation creates a unique directory under `out/runs/`. One canonical
 `evidence/` tree contains:
@@ -66,14 +69,27 @@ processes, alternating baseline/candidate order. For replicated churn decisions,
 either condition's range exceeds 10% of its median. Otherwise, require non-overlapping
 run values and a median difference larger than both ranges. One run cannot establish this.
 
+## Retired workloads and historical results
+
+Current aggregate runs record `workloadSet: engine-examples-v1`. The Starfall
+`starfall-chaos` browser stage, CPU Chaos simulation/render preparation and
+`workload=chaos` finite rendering replay are retired without replacements.
+The direct browser runner defaults to Platformer; Chaos replay requests fail explicitly.
+
+Historical results remain readable without conversion. Historical full runs
+without the workload-set marker still require Starfall results. The reduced CPU
+suite is identified as `ecs-grid-epoch-v1`; the comparator omits CPU timing metrics
+when that identity changes. It is not an equivalent baseline for the historical
+CPU suite. Other retained workloads keep their identities and comparison limits.
+
 ## Workloads
 
-- **CPU:** ECS traversal, Chaos simulation/render preparation, collision-grid lookup and
+- **CPU:** ECS traversal, collision-grid lookup and
   first/second traversal after commit. Run separately with `npm.cmd run bench`.
 - **Churn:** 10,000 live entities, 1,000 replacements per batch, 100 warmups and 1,000 samples.
   Batch timing includes component authoring, despawn/spawn queueing and commit; no queries.
   Diagnostics capture allocation and GC, and validate trace alignment automatically.
-- **Browser:** hardware WebGPU, two 10,000-sprite renderer fixtures and both games.
+- **Browser:** hardware WebGPU, two 10,000-sprite renderer fixtures and Platformer.
   Defaults are 10 seconds warmup and 60 seconds sampling. Results include visibility,
   build identity, frame timing, dropped ticks and process cleanup.
 
@@ -81,7 +97,7 @@ CPU measurements do not measure GPU execution. Allocation bytes per batch are de
 a faster workload can allocate more bytes per second while allocating less per batch.
 Browser heap movement alone is not evidence of a leak. Replicated A/B orchestration remains
 manual; this runner executes one sample run per selected workload and mode.
-CPU, private renderer and repository showcase probes are explicitly internal-source
+CPU, private renderer and repository example probes are explicitly internal-source
 microbenchmarks, with source/build inventories; they do not establish installed-package
 acceptance. Their implementation lives in `tooling/suites/benchmarks/`; the browser
 page lives in `rendering/browser/` and imports the renderer implementation directly. The installed

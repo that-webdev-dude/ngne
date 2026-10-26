@@ -47,20 +47,19 @@ export async function allBenchmarks(repository: string, options: BenchmarkOption
     const results = join(repository, "tooling/evidence/run-results.mjs");
     const diagnostics = (name: string) => join(run.evidence, "stages", name, "diagnostics");
     const source = Object.fromEntries(
-        ["src", "demo", "examples", "tooling/suites/benchmarks/rendering/browser"].flatMap((p) =>
+        ["src", "examples", "tooling/suites/benchmarks/rendering/browser"].flatMap((p) =>
             Object.entries(identities(join(repository, p))).map(([name, sha]) => [
                 `${p}/${name}`,
                 sha,
             ]),
         ),
     );
-    source["index.html"] = hash(readFileSync(join(repository, "index.html")));
     run.manifest.policy = {
         mode: "exploratory",
-        parameters: options,
+        parameters: { ...options, workloadSet: "engine-examples-v1" },
         target: "internal-source-microbenchmarks",
         source,
-        reason: "CPU and renderer probes exercise private World and WebGpuRuntime implementation; showcase probes measure repository-owned demo workloads. Installed package evidence is the separate content-engine suite.",
+        reason: "CPU and renderer probes exercise private World and WebGpuRuntime implementation; example probes measure the repository-owned platformer. Installed package evidence is the separate content-engine suite.",
         units: "milliseconds, bytes, counts; metric-specific boundaries in raw results",
         budgets: "not established; 60 Hz tick counts are descriptive, not acceptance budgets",
         retention: { mode: "full", compactRequested: options.compact },
@@ -226,7 +225,8 @@ export async function allBenchmarks(repository: string, options: BenchmarkOption
             if (options.workload === "all") {
                 if (options.skipBuild) {
                     if (
-                        !existsSync(join(repository, "dist/index.html")) ||
+                        !existsSync(join(repository, "dist/examples/hello/index.html")) ||
+                        !existsSync(join(repository, "dist/examples/platformer/index.html")) ||
                         !existsSync(
                             join(
                                 repository,
@@ -282,7 +282,6 @@ export async function allBenchmarks(repository: string, options: BenchmarkOption
                         "/tooling/suites/benchmarks/rendering/browser/index.html?workload=renderer-webgpu&alternating=1",
                         "dist-browser",
                     ],
-                    ["starfall-chaos", "/", "dist"],
                     ["platformer", "/examples/platformer/?baseline", "dist"],
                 ];
                 for (const [index, [name, path, build]] of selections.entries()) {

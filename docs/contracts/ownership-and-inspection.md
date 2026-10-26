@@ -148,8 +148,8 @@ reusable draw buffers and sorting. Audio owns requests, voices, scope identity a
 disposal, buses, mute/ducking and device. These are rebuilt or resumed through their
 services, not simulation capture.
 
-Consumer-specific examples are recorded in the
-[Starfall ownership inventory](https://github.com/that-webdev-dude/ngne/blob/main/demo/README.md#ownership-inventory).
+Consumers own gameplay resources, collision rules and progression. Engine service
+ownership above applies independently of a particular game.
 
 ## Public inspection
 

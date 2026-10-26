@@ -390,4 +390,4 @@ Asset identity must map to one definition object per service. Leases release onc
   is dropped.
 - Audio presentation state is outside simulation enumeration.
 
-The engine provides no entity collision schema. Starfall owns a spatial grid resource and collision rules. The engine does not provide snapshot capture, restore, replay or editors.
+The engine provides no entity collision schema. Consumers own spatial indexes and collision rules. The engine does not provide snapshot capture, restore, replay or editors.

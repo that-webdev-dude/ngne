@@ -12,6 +12,6 @@
         "skipLibCheck": true,
         "noEmit": true
     },
-    "include": ["src", "demo", "examples", "tests/api-misuse.ts"],
-    "exclude": ["demo/tests", "examples/*/tests"]
+    "include": ["src", "examples", "tests/api-misuse.ts"],
+    "exclude": ["examples/*/tests"]
 }

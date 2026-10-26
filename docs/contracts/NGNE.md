@@ -29,7 +29,7 @@ Public symbols: `component`, `f32`, `f64`, `i32`, `u32`, `u8`, `bool`,
 `SystemContext`, `SceneCommands`, `SceneEvent`, `StateAccess`, `DeepReadonly` and
 `PreparedScene`.
 
-Hello, Starfall, the platformer and authoring tests consume this surface. See
+The maintained Hello and Platformer examples and authoring tests consume this surface. See
 [ECS authority](simulation.md#storage-lifetime-and-order) and
 [prepared scenes](simulation.md#scenes-and-state) for capability and handle rules.
 

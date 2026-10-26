@@ -173,6 +173,15 @@ export function compareRuns(baseline, candidate, attentionPercent = 10) {
     for (const name of [...baselineNames].filter((value) => candidateNames.has(value)).sort()) {
         const baselineResult = baseline.results.get(name).value;
         const candidateResult = candidate.results.get(name).value;
+        if (name === "cpu" && baselineResult.workload !== candidateResult.workload) {
+            inspectCpuProblems(problems, candidateResult);
+            compatibilityWarnings.push({
+                scope: name,
+                message:
+                    "CPU workload identity changed; timing comparison omitted (Starfall Chaos retired)",
+            });
+            continue;
+        }
         if (name === "cpu") {
             compareCpuEnvironment(compatibilityWarnings, baselineResult, candidateResult);
             inspectCpuProblems(problems, candidateResult);

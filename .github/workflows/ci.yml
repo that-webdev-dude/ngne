@@ -76,6 +76,13 @@ jobs:
           NGNE_BROWSER_HEADLESS: 0
           NGNE_WEBGPU_ADAPTER: swiftshader
         run: xvfb-run -a npm run test:browser
+      - name: Verify examples at the Pages subdirectory base
+        env:
+          NGNE_BROWSER_HEADLESS: 0
+          NGNE_WEBGPU_ADAPTER: swiftshader
+          NGNE_BROWSER_URL: http://127.0.0.1:4173/ngne
+          NGNE_BROWSER_ARTIFACT_DIR: .test-output/browser-pages-base
+        run: xvfb-run -a npm run test:browser
       - name: Upload browser integration artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -94,7 +101,7 @@ jobs:
             !**/profile/**
           include-hidden-files: true
           if-no-files-found: warn
-      - name: Upload showcase
+      - name: Upload examples
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
@@ -112,8 +119,8 @@ jobs:
       cancel-in-progress: false
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}examples/hello/
     steps:
-      - name: Deploy showcase
+      - name: Deploy examples
         id: deployment
         uses: actions/deploy-pages@v4
