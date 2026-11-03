@@ -6,12 +6,12 @@ A TypeScript engine for retro 2D games, with WebGPU rendering and zero runtime d
 > APIs may change between releases. Pin an exact version and review changes before
 > upgrading.
 
-[Play Starfall](https://that-webdev-dude.github.io/ngne-starfall/) · [Starfall source](https://github.com/that-webdev-dude/ngne-starfall) · [Engine guide](https://github.com/that-webdev-dude/ngne/blob/main/docs/guide.md) · [First scene](https://github.com/that-webdev-dude/ngne/tree/main/examples/hello)
+[Play Starfall](https://that-webdev-dude.github.io/ngne-games/starfall/) · [Starfall source](https://github.com/that-webdev-dude/ngne-games/tree/main/games/starfall) · [Engine guide](https://github.com/that-webdev-dude/ngne/blob/main/docs/guide.md) · [First scene](https://github.com/that-webdev-dude/ngne/tree/main/examples/hello)
 
-[![Starfall campaign gameplay](https://raw.githubusercontent.com/that-webdev-dude/ngne-starfall/main/docs/screenshots/orbital-breakwater-combat.png)](https://that-webdev-dude.github.io/ngne-starfall/)
+[![Starfall campaign gameplay](https://raw.githubusercontent.com/that-webdev-dude/ngne-games/main/games/starfall/docs/screenshots/orbital-breakwater-combat.png)](https://that-webdev-dude.github.io/ngne-games/starfall/)
 
 Starfall is a standalone game built with the published NGNE package. Its source,
-assets and tests are maintained in its own repository.
+assets and tests are maintained under `games/starfall/` in the NGNE Games collection.
 
 ## Engine capabilities
 
@@ -101,7 +101,7 @@ npm run dev
 Open `/examples/hello/` for the first scene or `/examples/platformer/` for the
 two-level platformer at the printed local server address. Use `npm.cmd` in Windows
 PowerShell. These examples require a WebGPU-capable browser with hardware acceleration.
-The full Starfall game runs at its [standalone site](https://that-webdev-dude.github.io/ngne-starfall/).
+The full Starfall game runs in the [NGNE Games collection](https://that-webdev-dude.github.io/ngne-games/starfall/).
 
 ## Inspect sprites and animations
 
