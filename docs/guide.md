@@ -8,15 +8,8 @@ Examples assume a TypeScript browser app with a canvas. The [first scene](https:
 
 ## Install from npm
 
-For registry installation, pin an exact version in your application:
-
-```sh
-npm install --save-exact @ngne/core@0.2.2
-```
-
-Normal releases use `latest`; prereleases use `next`. Commit your consumer lockfile
-and upgrade deliberately as the experimental API evolves. Use Node 24 or newer
-(`npm.cmd` in Windows PowerShell).
+Follow the [registry installation instructions](../README.md#install) for the exact
+version, release channels, lockfile policy and Node/Windows prerequisites.
 For unpublished candidates, use [a local package](#install-a-local-package).
 
 ## Configure your application
@@ -315,7 +308,7 @@ frame.sprite({
 });
 ```
 
-For audio:
+### Audio example
 
 - Call `await app.audio.unlock()` from a user gesture.
 - During setup, create `app.audio.scene('room')` and immediately register its
@@ -327,9 +320,31 @@ For audio:
   one-second fade. Use `audio.duck(.25)` for the overall mix and `audio.duck(1)`
   to restore it.
 
-The [audio contract](contracts/browser-and-presentation.md#audio-scopes-and-playback)
-owns voice/request limits and cleanup failures. The platformer leases
-decoded looping music per gameplay scene alongside synthesized cues.
+List decoded clips as scene assets and register a scope inside setup:
+
+```ts
+const music = audioAsset("room-music", new URL("./music.wav", import.meta.url).href);
+
+const room: SceneDefinition = {
+    id: "room",
+    assets: [music],
+    setup(scene) {
+        const sound = app.audio.scene("room");
+        scene.defer(() => sound.dispose());
+        sound.play({ buffer: scene.assets.get(music.id) as AudioBuffer, loop: true });
+        scene.system(({ input }) => {
+            if (input.pressed.includes("Space")) sound.play({ frequency: 440, duration: 0.15 });
+        });
+    },
+};
+```
+
+Disposing the scene removes its queued and active voices before its asset leases
+release. Cleanup failures are aggregated and leave the scope terminal. The
+[audio contract](contracts/browser-and-presentation.md#audio-scopes-and-playback)
+owns voice/request limits and cleanup failures. The
+[platformer](https://github.com/that-webdev-dude/ngne/blob/main/examples/platformer/README.md)
+leases decoded looping music per gameplay scene alongside synthesized cues.
 
 ## Bounded decoded retention
 
@@ -402,7 +417,10 @@ Await `app.start()` and `app.stop()` before issuing another start/stop call; ove
 - Continuing effects own separate poses, copy them in a `runsDuringFreeze` system and stay outside the ordinary reset callback. They keep using the supplied alpha.
 - Suspended scenes, and resumed scenes awaiting an update, receive alpha 1. Snapping rounds composed screen coordinates and never writes back to poses.
 
-The [boundary table](contracts/browser-and-presentation.md#interpolation-and-discontinuities) defines what NGNE does at each discontinuity; `/validation.html` includes selectable transition frames.
+The [boundary table](contracts/browser-and-presentation.md#interpolation-and-discontinuities)
+defines what NGNE does at each discontinuity. Selectable transition frames belong
+to the [repository browser fixture](https://github.com/that-webdev-dude/ngne/blob/main/validation.html),
+which is not included in the npm package.
 
 ### Scrolling camera and tile scenes
 
@@ -421,29 +439,6 @@ scene.system(() => {
 ```
 
 The [camera coordinate contract](contracts/browser-and-presentation.md#camera-coordinates) defines the origin and mount cut. The [platformer](https://github.com/that-webdev-dude/ngne/blob/main/examples/platformer/README.md) adds vertical clamping, a horizontal dead-zone, visible-tile rendering and game-owned collision.
-
-## Audio example
-
-After unlocking audio from a click or other user gesture, list decoded clips as scene assets and register a scope inside setup:
-
-```ts
-const music = audioAsset("room-music", new URL("./music.wav", import.meta.url).href);
-
-const room: SceneDefinition = {
-    id: "room",
-    assets: [music],
-    setup(scene) {
-        const sound = app.audio.scene("room");
-        scene.defer(() => sound.dispose());
-        sound.play({ buffer: scene.assets.get(music.id) as AudioBuffer, loop: true });
-        scene.system(({ input }) => {
-            if (input.pressed.includes("Space")) sound.play({ frequency: 440, duration: 0.15 });
-        });
-    },
-};
-```
-
-The browser host flushes requests after simulation commit. Disposing the scene removes its queued and active voices before its asset leases release. Cleanup failures are aggregated and leave the scope terminal. For a complete consumer, read the [platformer](https://github.com/that-webdev-dude/ngne/blob/main/examples/platformer/README.md).
 
 ## Sprite and animation inspection
 
@@ -557,16 +552,15 @@ not establish readability against game backgrounds, lighting, HUD or moving came
 ## Migrate from `@that-webdev-dude/ngne`
 
 `0.2.1` renamed the package to `@ngne/core` without changing exports, engine
-behavior or the `ngne-preview` command. To migrate to the current version, replace
-the dependency:
+behavior or the `ngne-preview` command. Remove the old dependency:
 
 ```sh
 npm uninstall @that-webdev-dude/ngne
-npm install --save-exact @ngne/core@0.2.2
 ```
 
-Change imports from `"@that-webdev-dude/ngne"` to `"@ngne/core"` and commit the
-updated lockfile.
+Then follow the [registry installation instructions](../README.md#install) to install
+the pinned `@ngne/core` release. Change imports from `"@that-webdev-dude/ngne"` to
+`"@ngne/core"` and commit the updated lockfile.
 
 ## Install a local package
 

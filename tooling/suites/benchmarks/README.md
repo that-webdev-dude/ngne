@@ -10,8 +10,8 @@ For installed engine resource churn, use
 [`npm.cmd run bench:content -- --explore`](content/README.md).
 This aliases `bench:engine-content` and prepares its own engine package. Game
 transition measurements are consumer-owned; no sibling checkout is selected.
-The historical [content comparator](../../evidence/compare-content.mjs) remains available for retained
-old-format runs with its strict identity and cleanup gates.
+For retained old-format content runs, see the
+[historical content comparison](#historical-content-comparison).
 
 ## Run
 
@@ -59,15 +59,44 @@ cannot be re-examined; comparisons still work.
 npm.cmd run bench:compare -- <baseline-run-directory> <candidate-run-directory>
 ```
 
-Pass the run directories printed by the benchmark command; their `evidence/` directories are also accepted. The reader validates current document identities, outcomes and artifact hashes. Full and compact runs use the same measurements. Historical output directories remain readable without conversion. Reports go under
-`.test-output/comparisons/`; use `--output <directory>` to choose another location.
-Changes of 10% are attention signals, not statistical verdicts; adjust with
-`--attention-percent <number>`.
+Pass baseline first and candidate second, using the run directories printed by the
+benchmark command; their `evidence/` directories are also accepted. There is no
+automatic latest-run selection. The [comparison command](../../commands/compare-benchmarks.ts)
+reads saved results without rerunning benchmarks. The reader checks document versions,
+run identities, final outcomes, artifact sizes/hashes and workload data. Full and
+compact runs use the same measurement payloads. Historical per-stage, consolidated
+and compact output directories remain readable without conversion. New runs never
+produce a compatibility copy.
+
+Reports are `report.md` and `comparison.json` under `.test-output/comparisons/`;
+use `--output <directory>` to choose another location. The default attention
+threshold is 10%; adjust it with `--attention-percent <number>`. A completed
+advisory scan exits zero even when it reports warnings or problems. Invalid
+arguments or unreadable/invalid input exit one. Read the report: a successful exit
+does not establish controlled performance acceptance.
+
+**Unchanged code can produce different timings.** Background activity, CPU clocks
+and temperature, garbage collection and runtime optimisation can affect results.
+`REVIEW REGRESSIONS` flags slowdowns crossing the attention threshold; it is not
+proof that code caused a regression. Attention signals are not statistical verdicts.
+Look for consistent movement; p99 and maximum are especially sensitive to occasional
+delays.
 
 Use the same machine, power mode, runtime and workload. Repeat measurements in fresh
 processes, alternating baseline/candidate order. For replicated churn decisions, stop if
 either condition's range exceeds 10% of its median. Otherwise, require non-overlapping
 run values and a median difference larger than both ranges. One run cannot establish this.
+
+### Historical content comparison
+
+```sh
+node tooling/evidence/compare-content.mjs <baseline-directory> <candidate-directory>
+```
+
+The [strict retained-content comparator](../../evidence/compare-content.mjs) preserves
+exact identity, passed acceptance and cleanup requirements, returning exit two for
+incompatibility. Its historical input family and JSON output are unchanged. New
+installed-resource cross-revision comparison remains unsupported.
 
 ## Retired workloads and historical results
 
@@ -105,8 +134,5 @@ resource workload above tests the exact fresh tarball. The aggregate suite is
 exploratory; named physical-environment baseline collection and measured-budget
 acceptance currently apply to that installed resource workload.
 
-The original PowerShell files are retired after Windows replacement checks;
-`bench:all` uses Node. Both original flag spellings and kebab-case forms (for example `--workload`,
-`--warmup-seconds`, `--output-root`, `--diagnostics`, `--compact`) are supported.
-Pass run directories directly to the advisory comparator. No automatic latest-run
-selection occurs.
+The options above also accept kebab-case forms (for example `--workload`,
+`--warmup-seconds`, `--output-root`, `--diagnostics`, `--compact`).

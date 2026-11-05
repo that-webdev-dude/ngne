@@ -108,22 +108,9 @@ The full Starfall game runs in the [NGNE Games collection](https://that-webdev-d
 The package includes `ngne-preview`, a local tool for inspecting frames and animation
 timing through the installed engine's WebGPU renderer.
 
-Create `preview.config.mjs` beside your application's `package.json`, using the
-[adapter example](https://github.com/that-webdev-dude/ngne/blob/main/docs/guide.md#sprite-and-animation-inspection).
-Your application supplies local images, frame rectangles and animation timings.
-Add this npm script:
-
-```json
-{
-    "scripts": {
-        "preview:assets": "ngne-preview ./preview.config.mjs"
-    }
-}
-```
-
-Run `npm run preview:assets` and open the printed local URL. The previewer requires
-Node 24+ and a WebGPU-capable desktop browser; it has no Vite dependency. Restart
-the previewer and reload the page after changing artwork or metadata. Ctrl+C stops it.
+Follow the [setup and adapter example](https://github.com/that-webdev-dude/ngne/blob/main/docs/guide.md#sprite-and-animation-inspection)
+to supply your application's local images, frame rectangles and animation timings.
+It covers the prerequisites, npm script, controls and restart workflow.
 
 ## Status and platform support
 

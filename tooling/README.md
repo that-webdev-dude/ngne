@@ -363,9 +363,8 @@ accounting is not process/driver memory. Focus is emulated for deterministic key
 delivery, as in the main browser harness; normal focus/background behavior still
 requires manual validation. This command makes no consumer-compatibility claim.
 
-`npm run test:installed` aliases this engine-only command. The former consumer URL
-and build-directory environment options have been retired; use explicit generic
-compatibility for consumer acceptance.
+`npm run test:installed` aliases this engine-only command. For consumer acceptance,
+use [generic compatibility verification](#consumer-evidence).
 
 ## Engine resource measurements
 
@@ -390,23 +389,10 @@ See [benchmark usage](suites/benchmarks/README.md) for retention and flag detail
 
 ## Benchmark comparisons
 
-`npm run bench:compare -- <baseline-run-directory> <candidate-run-directory>` invokes
-[the comparison command](commands/compare-benchmarks.ts). Supply run directories directly;
-`evidence/` directories are also accepted. Current-format reading checks document versions,
-run identities, final outcomes, artifact sizes/hashes and workload data. Historical
-per-stage, consolidated and compact output directories remain readable without conversion.
-New runs never produce a compatibility copy. Full and compact runs use the same measurements.
-Reports remain JSON/Markdown under `.test-output/comparisons/` by default;
-`--output` selects another directory and `--attention-percent` changes the default
-10% attention threshold. A completed advisory scan exits zero even when it finds
-problems; invalid arguments or unreadable/invalid input exit one. A comparison does
-not establish controlled performance acceptance.
-
-`node tooling/evidence/compare-content.mjs <baseline-directory> <candidate-directory>`
-invokes the strict retained-content comparator. It preserves exact identity,
-passed acceptance and cleanup requirements, returning exit two for incompatibility.
-Its historical input family and JSON output are unchanged; new installed-resource
-cross-revision comparison remains unsupported.
+The [benchmark comparison reference](suites/benchmarks/README.md#compare) owns input
+selection, integrity checks, report paths, exit codes, attention thresholds and
+measurement limits. It also covers the strict comparator for retained historical
+content runs.
 
 ## Browser sessions and protocol checks
 

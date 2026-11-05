@@ -188,11 +188,9 @@ Run the same benchmark again, then pass **baseline first, candidate second**:
 npm run bench:compare -- "out/runs/<baseline-run>" "out/runs/<candidate-run>"
 ```
 
-This reads saved results; it does not rerun benchmarks. Reports are written under `.test-output/comparisons/` as `report.md` and `comparison.json`.
-
-**Unchanged code can produce different timings.** Background activity, CPU clocks/temperature, garbage collection and runtime optimisation can affect results. `REVIEW REGRESSIONS` flags slowdowns crossing the default 10% attention threshold; it is not proof that code caused a regression.
-
-Repeat runs with the same machine, power mode, runtime and workload. Look for a consistent slowdown; p99 and maximum are especially sensitive to occasional delays. The comparator can exit zero despite warnings or detected problems, so read its report. See [comparison guidance](suites/benchmarks/README.md#compare).
+Read the report even when the command exits zero. The
+[comparison reference](suites/benchmarks/README.md#compare) explains output paths,
+integrity checks, attention thresholds, timing variability and repeated-run decisions.
 
 ## Stage 5: Consumer compatibility
 
@@ -200,7 +198,7 @@ A **consumer** is a separate game that uses NGNE. Run this before adopting or re
 
 Unlike `verify:installed`, which uses NGNE's own fixture, this invokes the separate game's verification command. It works only with consumers implementing the [verification interface](README.md#consumer-evidence), not arbitrary game folders. The checkout must be clean and committed, with its documented prerequisites ready.
 
-Example for the platformer, run from the **NGNE repository root**:
+Example for the standalone platformer checkout, run from the **NGNE repository root**:
 
 ```sh
 export NGNE_WEBGPU_ADAPTER=swiftshader
