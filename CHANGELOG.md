@@ -4,6 +4,7 @@
 
 ### Changed
 
+- Consolidated installation, sprite preview, audio and benchmark comparison guidance; corrected stale version examples and clarified repository validation links.
 - The publication workflow creates the GitHub release after registry verification passes, using the version's changelog section and the verified publication result. An existing release is accepted and never overwritten.
 - Retired the bundled Starfall demo and Starfall-specific benchmarks. The README now links to the standalone game; Hello and Platformer remain maintained examples, with engine regression coverage preserved.
 
