@@ -30,7 +30,7 @@ interface Generation {
     disposed: boolean;
 }
 /** Internal injected platform boundary; public declarations never expose GPU identifiers. */
-export interface RendererPlatform {
+interface RendererPlatform {
     readonly gpu?: GPU;
     readonly signal?: AbortSignal;
     readonly snapshot?: (source: ImageBitmap | HTMLCanvasElement) => Promise<ImageBitmap>;

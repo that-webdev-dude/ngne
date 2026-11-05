@@ -446,7 +446,6 @@ test("platformer first frame shows start and distant checkpoint at both interpol
             for (const alpha of [0, 1]) {
                 harness.output.reset();
                 harness.game.render(harness.output, alpha);
-                const offset = (harness.output.count - 1) * QUAD_STRIDE;
                 const x = centerX(harness.output, harness.output.count - 1);
                 const y = centerY(harness.output, harness.output.count - 1);
                 assert.ok(x >= 6 && x <= WIDTH - 6);

@@ -36,7 +36,7 @@ export function selectConsumer(checkout: string, revision: string): ConsumerMani
     };
 }
 
-export interface CompatibilityOptions {
+interface CompatibilityOptions {
     consumer: string;
     revision: string;
     manifest?: string;

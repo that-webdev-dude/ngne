@@ -7,7 +7,7 @@ export const readJson = (path) => JSON.parse(readFileSync(path, "utf8").replace(
 const digest = (value) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
 const save = (path, value) => writeFileSync(path, JSON.stringify(value, null, 2) + "\n");
 
-export function validateChurn(result, mode) {
+function validateChurn(result, mode) {
     const fail = (message) => {
         throw new Error(`Invalid churn ${mode}: ${message}`);
     };
@@ -86,49 +86,7 @@ export function validateResult(name, result) {
     }
 }
 
-export function collectAnalysis(directory) {
-    const manifest = readJson(join(directory, "manifest.json"));
-    const stages = manifest.stages.map((stage) => {
-        const name = stageName(stage.name),
-            path = join(directory, name, "result.json");
-        let result = null;
-        if (stage.kind === "benchmark" && existsSync(path)) {
-            try {
-                result = readJson(path);
-            } catch (error) {
-                if (stage.status === "passed") throw error;
-            }
-        }
-        if (
-            stage.kind === "benchmark" &&
-            stage.status === "passed" &&
-            (!result || typeof result !== "object")
-        )
-            throw new Error(`Missing result: ${name}`);
-        if (stage.kind === "benchmark" && stage.status === "passed") validateResult(name, result);
-        return {
-            name,
-            kind: stage.kind,
-            status: stage.status,
-            validationError: stage.validationError ?? null,
-            result,
-            resultHash: digest(result),
-        };
-    });
-    const analysis = {
-        schemaVersion: 1,
-        revision: manifest.revision,
-        startedAt: manifest.startedAt,
-        parameters: manifest.parameters,
-        environment: manifest.environment,
-        stages,
-    };
-    save(join(directory, "analysis.json"), analysis);
-    validateAnalysis(directory);
-    return analysis;
-}
-
-export function validateAnalysis(directory) {
+function validateAnalysis(directory) {
     const manifest = readJson(join(directory, "manifest.json"));
     const analysis = readJson(join(directory, "analysis.json"));
     if (manifest.status === "passed") {
@@ -233,9 +191,7 @@ export function loadRun(directory, role) {
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
     try {
         const [command, path, mode, parsed] = process.argv.slice(2);
-        if (command === "collect") collectAnalysis(path);
-        else if (command === "validate") validateAnalysis(path);
-        else if (command === "validate-churn") {
+        if (command === "validate-churn") {
             const result = readJson(path);
             if (mode === "gc") result.gcTrace = readJson(parsed);
             validateChurn(result, mode);

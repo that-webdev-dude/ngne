@@ -58,7 +58,7 @@ export interface Manifest extends Header {
     policy: Record<string, unknown>;
     prepared: Prepared | null;
 }
-export interface Artifacts extends Header {
+interface Artifacts extends Header {
     files: { path: string; sha256: string; bytes: number }[];
 }
 

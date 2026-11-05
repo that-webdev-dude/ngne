@@ -13,7 +13,7 @@ import {
 import { contained, hash, verifyArtifactInventory } from "../../../evidence/identity.js";
 import { readMeasurement } from "./measurement.js";
 
-export interface EnvironmentProfile {
+interface EnvironmentProfile {
     schemaVersion: 1;
     name: string;
     expected: Record<string, unknown>;

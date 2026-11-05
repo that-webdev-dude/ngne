@@ -22,7 +22,7 @@ export interface RegistryOptions {
     readonly overlay?: (kind: "pause" | "complete", options: OverlayOptions) => Definition;
 }
 
-export interface TransitionRegistry {
+interface TransitionRegistry {
     createLevelDefinition(level: number): Definition;
     request(intent: Intent): void;
     reconcile(game: Game<Progress, ProgressCommand>): void;

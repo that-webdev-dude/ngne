@@ -1,5 +1,4 @@
-import { centerX, centerY } from "./frame-values.js";
-import { QUAD_STRIDE } from "../src/quad-layout.js";
+import { centerX } from "./frame-values.js";
 import { emptyInput, Frame, Game, lerp, pressed } from "../src/index.js";
 import type { SceneDefinition } from "../src/index.js";
 

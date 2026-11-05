@@ -1,4 +1,4 @@
-export interface PreviewFrame {
+interface PreviewFrame {
     id: string;
     image: string;
     x: number;

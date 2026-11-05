@@ -1,5 +1,4 @@
 import { centerX, centerY } from "./frame-values.js";
-import { QUAD_STRIDE } from "../src/quad-layout.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 

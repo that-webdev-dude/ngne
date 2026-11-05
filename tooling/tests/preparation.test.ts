@@ -10,7 +10,7 @@ import {
     symlinkSync,
     writeFileSync,
 } from "node:fs";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { Run, atomic } from "../core/run.js";
 import { cleanEmission } from "../core/package.js";

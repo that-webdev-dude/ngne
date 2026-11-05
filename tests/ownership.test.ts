@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { component, f64, Frame, Game } from "../src/index.js";
+import { component, f64, Game } from "../src/index.js";
 import type { SceneDefinition } from "../src/index.js";
 
 test("completed inspection retains empty archetype order and allocator reuse", async (t) => {

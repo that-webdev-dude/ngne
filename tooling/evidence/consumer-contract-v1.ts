@@ -25,13 +25,13 @@ export interface ConsumerManifest extends Header {
     consumer: { revision: string; source: Identities; lock: Identities };
     environment: { node: string; platform: string; release: string; arch: string };
 }
-export interface ConsumerSelection {
+interface ConsumerSelection {
     runId: string;
     engineSha256: string;
     engineFilename: string;
     consumer: ConsumerManifest["consumer"];
 }
-export function readConsumerManifest(value: unknown): ConsumerManifest {
+function readConsumerManifest(value: unknown): ConsumerManifest {
     const h = readHeader(value, "consumer-manifest"),
         v = object(value);
     if (v.contractVersion !== 1) throw Error("Unsupported consumer contract version");

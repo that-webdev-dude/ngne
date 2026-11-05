@@ -1,7 +1,7 @@
 // Adapted from v03/gpu/createResourceRegistry.ts at
 // cluster-renderer 34458a987f03b00894e98a40d39fc0ae666194f6.
 /** Device-generation-local handles. A released handle is never reused. */
-export interface ResourceRegistry<T extends object> {
+interface ResourceRegistry<T extends object> {
     register(resource: T): number;
     replace(handle: number, resource: T): void;
     release(handle: number): void;

@@ -2,7 +2,7 @@ import { TILE } from "./levels.js";
 
 export const CONTACT = Object.freeze({ wall: 1, floor: 2, ceiling: 4, hazard: 8, fell: 16 });
 
-export interface TileGrid {
+interface TileGrid {
     readonly widthTiles: number;
     readonly heightTiles: number;
     readonly tiles: Uint8Array;

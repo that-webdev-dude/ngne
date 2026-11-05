@@ -1,5 +1,3 @@
-import { centerX, centerY } from "./frame-values.js";
-import { QUAD_STRIDE } from "../src/quad-layout.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
@@ -16,7 +14,7 @@ import {
     type Entity,
     type SchemaComponentView,
 } from "../src/ecs.js";
-import { Frame, Game, type SceneDefinition } from "../src/index.js";
+import { Game, type SceneDefinition } from "../src/index.js";
 
 test("schema fields use declared columns, defaults, validation, and sparse access", () => {
     const declaredFloat32 = f32(1 / 3);

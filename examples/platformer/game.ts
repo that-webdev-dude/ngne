@@ -74,7 +74,7 @@ export interface Run {
 }
 
 /** Host input and candidate delivery are environmental input, not scene state. */
-export interface LevelOptions {
+interface LevelOptions {
     readonly index: number;
     readonly data: LevelData;
     readonly audio?: Pick<Audio, "scene">;

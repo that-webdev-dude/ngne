@@ -1,5 +1,4 @@
-import { centerX, centerY } from "./frame-values.js";
-import { QUAD_STRIDE } from "../src/quad-layout.js";
+import { centerX } from "./frame-values.js";
 import { World } from "../src/ecs.js";
 import { Cleanup } from "../src/primitives.js";
 import { test } from "node:test";
@@ -15,9 +14,7 @@ import {
     Camera,
     Frame,
     Assets,
-    type SceneDefinition,
     type SceneSetup,
-    type PreparedScene,
 } from "../src/index.js";
 const Position = component("position", { x: f64(), y: f64() });
 const Velocity = component("velocity", { x: f64(), y: f64() });
