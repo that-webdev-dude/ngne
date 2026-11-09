@@ -1,6 +1,15 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync, symlinkSync } from "node:fs";
+import {
+    cpSync,
+    mkdirSync,
+    mkdtempSync,
+    readFileSync,
+    renameSync,
+    rmSync,
+    symlinkSync,
+    writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { test } from "node:test";
@@ -122,8 +131,17 @@ for (const scenario of cases.invalid) {
         );
     });
 }
-test("consumer contract static schema example conforms", () => {
-    const output = resolve("tooling/tests/fixtures/consumer-contract-v1/successful-response");
+test("consumer contract static schema example conforms", (t) => {
+    const example = resolve("tooling/tests/fixtures/consumer-contract-v1/successful-response");
+    const root = mkdtempSync(join(tmpdir(), "ngne-contract-"));
+    t.after(() => rmSync(root, { recursive: true, force: true }));
+    const output = join(root, "run");
+    cpSync(example, output, { recursive: true });
+    const packageDirectory = join(output, "evidence", "package");
+    renameSync(
+        join(packageDirectory, "synthetic-package.txt"),
+        join(packageDirectory, "synthetic.tgz"),
+    );
     assert.equal(
         validateConsumerResponse(
             output,
