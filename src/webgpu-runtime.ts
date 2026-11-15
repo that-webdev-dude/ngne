@@ -4,7 +4,7 @@ import { createQuadRenderer, type QuadRenderer } from "./quad-renderer.js";
 import type { Frame } from "./renderer.js";
 import { uploadImage, type TexturePixels } from "./texture-assets.js";
 import type { RendererResourceInspection } from "./resource-inspection.js";
-import type { RendererLifecycleEvent, TextureRegion } from "./webgpu-renderer.js";
+import type { RendererLifecycleEvent, RgbaPixels, TextureRegion } from "./webgpu-renderer.js";
 
 // Ownership spans acquisition and all replacement generations, including failed owners.
 const canvasOwners = new WeakMap<HTMLCanvasElement, WebGpuRuntime>();
@@ -562,7 +562,7 @@ export class WebGpuRuntime {
     }
     async updateTexture(
         id: string,
-        source: ImageBitmap | HTMLCanvasElement,
+        source: ImageBitmap | HTMLCanvasElement | RgbaPixels,
         region: TextureRegion,
         signal?: AbortSignal,
     ): Promise<void> {
@@ -573,9 +573,14 @@ export class WebGpuRuntime {
             throw new Error("Texture update requires a createTexture registration: " + id);
         // Copy caller-owned coordinates before queuing; queued calls cannot be retargeted.
         const rect = { ...region };
-        validateRegion(source, entry.source, rect);
+        const image = "data" in source ? rawImage(source) : source;
+        validateRegion(image, entry.source, rect);
         const updates = (entry.updates ??= { tail: Promise.resolve(), pending: 0 });
         if (updates.pending >= 32) throw new Error("Texture update queue is full: " + id);
+        // Raw bytes are copied now, so callers may reuse their storage once this call
+        // returns. Browser images are captured at their queue turn.
+        const capture = "bytes" in image ? copyRegion(image, rect) : image;
+        const read = this.platform.readRegion ?? readRegion;
         updates.pending++;
         const assertCurrent = () => {
             this.assertAlive();
@@ -585,7 +590,7 @@ export class WebGpuRuntime {
         const work = updates.tail.then(async () => {
             assertCurrent();
             signal?.throwIfAborted();
-            const pixels = await (this.platform.readRegion ?? readRegion)(source, rect);
+            const pixels = capture instanceof Uint8Array ? capture : await read(capture, rect);
             assertCurrent();
             signal?.throwIfAborted();
             if (pixels.byteLength !== rect.width * rect.height * 4)
@@ -798,6 +803,43 @@ function validateRegion(
         destinationY + height > destination.height
     )
         throw new Error("Invalid texture update region");
+}
+
+interface RawImage {
+    readonly width: number;
+    readonly height: number;
+    readonly bytes: Uint8Array;
+}
+
+/** Reads caller fields once; rejects storage that is not exactly packed sRGB RGBA8. */
+function rawImage(source: RgbaPixels): RawImage {
+    const { width, height, data } = source;
+    if (
+        !Number.isSafeInteger(width) ||
+        !Number.isSafeInteger(height) ||
+        width <= 0 ||
+        height <= 0 ||
+        !(data instanceof Uint8Array || data instanceof Uint8ClampedArray) ||
+        data.length !== width * height * 4 ||
+        ("colorSpace" in source && source.colorSpace !== "srgb")
+    )
+        throw new Error("Invalid raw RGBA8 texture source");
+    return { width, height, bytes: new Uint8Array(data.buffer, data.byteOffset, data.length) };
+}
+
+/** Copies only the requested rectangle into a tightly packed, renderer-owned patch. */
+function copyRegion(image: RawImage, rect: TextureRegion): Uint8Array<ArrayBuffer> {
+    const row = rect.width * 4,
+        stride = image.width * 4,
+        start = (rect.sourceY * image.width + rect.sourceX) * 4;
+    const patch = new Uint8Array(row * rect.height);
+    if (row === stride) patch.set(image.bytes.subarray(start, start + patch.length));
+    else
+        for (let y = 0; y < rect.height; y++) {
+            const from = start + y * stride;
+            patch.set(image.bytes.subarray(from, from + row), y * row);
+        }
+    return patch;
 }
 
 async function readRegion(

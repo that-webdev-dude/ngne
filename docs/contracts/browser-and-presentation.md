@@ -312,19 +312,29 @@ Publication waits for upload and binding validation. Cancellation or failure bef
 publication leaves no registration. Concurrent `texture()` or `releaseTexture()`
 supersedes pending initialization.
 
-`updateTexture(id, bitmapOrCanvas, region, signal?)` requires a live registration
-created by `createTexture`. `TextureRegion` contains `sourceX`, `sourceY`, `width`,
+`updateTexture(id, source, region, signal?)` requires a live registration
+created by `createTexture`. The source is an `ImageBitmap`, an `HTMLCanvasElement` or
+`RgbaPixels`. `TextureRegion` contains `sourceX`, `sourceY`, `width`,
 `height`, `destinationX` and `destinationY`. Coordinates are nonnegative safe integers;
 width and height are positive safe integers. The source and destination rectangles
 must fit their images; no clipping, scaling or resizing occurs. Empty, absent,
 asset-leased and ordinary `texture()` registrations reject. Successful `texture()`
 replacement changes an editable registration into an ordinary snapshot registration.
 
+`RgbaPixels` has `width`, `height` and `data`: rows of straight-alpha sRGB RGBA8 bytes,
+top row first, with no row padding. `data` is a `Uint8Array` or `Uint8ClampedArray` of
+exactly `width × height × 4` elements, and may be a view at any offset. sRGB `ImageData`
+is accepted. A `colorSpace` other than `"srgb"`, other typed arrays, wrong lengths and
+detached buffers reject before queuing and leave accepted pixels unchanged. The call
+copies the requested region before it returns its promise; the caller may then change,
+reuse or transfer the buffer. Raw updates create no bitmap, draw to no canvas and read
+no pixels back.
+
 Updates to one registration execute in call order, including source capture and
 overlapping writes. At most 32 calls, including the active call, may be pending;
-excess calls reject without copying. Coordinates are copied at invocation. Keep the
-source open and unchanged until the returned promise settles; afterwards the caller
-may change or close it. Capture/read failures and cancellation before submission
+excess calls reject without copying. Coordinates and raw source bytes are copied at
+invocation. Keep a bitmap or canvas source open and unchanged until the returned
+promise settles; afterwards the caller may change or close it. Capture/read failures and cancellation before submission
 leave accepted content unchanged. Queued cancellation is observed when its turn
 arrives; outstanding browser operations must settle before their cleanup completes.
 
@@ -339,8 +349,13 @@ updates; late work cannot affect a new registration with the same ID.
 One renderer-owned straight-alpha sRGB byte image retains all accepted edits;
 there is no retained patch history. Initialization and recovery transfer the full
 image; ordinary edits capture, transfer and commit only the requested rectangle,
-reusing storage and binding. Source capture uses browser 2D sRGB readback, including
-its alpha precision limits; the same resulting bytes feed the GPU and recovery image.
+reusing storage and binding. Bitmap and canvas sources are captured through browser 2D
+sRGB readback, including its premultiplication round trip and backend-dependent alpha
+precision limits. Raw sources are written without colour conversion or premultiplication:
+every supplied byte, including colour under zero alpha, reaches the texture and the
+recovery image unchanged. Either way, the same bytes feed the GPU and the recovery image.
+Displayed colour still depends on shader blending and framebuffer rounding, and raw input
+cannot restore bytes lost before the call.
 Transparent pixels replace destination pixels rather than blending with them.
 During recovery, unsubmitted updates wait for readiness. Loss during submitted
 validation rejects that update and restores the previous accepted image before

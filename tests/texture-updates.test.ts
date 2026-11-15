@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { WebGpuRuntime } from "../src/webgpu-runtime.js";
-import type { TextureRegion } from "../src/index.js";
+import type { RgbaPixels, TextureRegion } from "../src/index.js";
 import { deferred, fakeBitmap, fakePlatform } from "./gpu-fixture.js";
 
 const region: TextureRegion = {
@@ -544,3 +544,275 @@ test("update rejection preserves validation and cleanup errors while releasing e
         f.runtime.dispose();
     }
 });
+
+/** Distinct straight-alpha bytes: varying RGB, alpha 0 with nonzero RGB, and translucent alpha. */
+function rawBytes(width: number, height: number, seed: number): Uint8Array<ArrayBuffer> {
+    const bytes = new Uint8Array(width * height * 4);
+    for (let i = 0; i < bytes.length; i++) bytes[i] = (i * 37 + seed * 101 + 11) & 255;
+    for (let p = 0; p < width * height; p++) bytes[p * 4 + 3] = [0, 1, 127, 254, 255][p % 5];
+    return bytes;
+}
+/** Expected renderer-owned image after copying `rect` of a raw source into `image`. */
+function applyPatch(
+    image: Uint8Array,
+    imageWidth: number,
+    source: Uint8Array,
+    sourceWidth: number,
+    rect: TextureRegion,
+): void {
+    for (let y = 0; y < rect.height; y++)
+        for (let x = 0; x < rect.width * 4; x++)
+            image[((rect.destinationY + y) * imageWidth + rect.destinationX) * 4 + x] =
+                source[((rect.sourceY + y) * sourceWidth + rect.sourceX) * 4 + x];
+}
+/** Destroys the current device and returns the editable image uploaded by recovery. */
+async function recoveredImage(f: Awaited<ReturnType<typeof fixture>>): Promise<number[]> {
+    const device = f.devices[f.devices.length - 1];
+    device.destroy();
+    await device.lost;
+    await f.runtime.ready();
+    return Array.from(f.devices[f.devices.length - 1].textureWrites[1].data);
+}
+
+test("raw full and offset patches preserve exact bytes in GPU writes and the recovery image without capture", async () => {
+    const f = await fixture();
+    try {
+        await f.runtime.createTexture("edit", 4, 3);
+        const device = f.devices[0],
+            textures = [...device.textures],
+            bindings = [...device.bindings];
+        const expected = new Uint8Array(4 * 3 * 4);
+        const whole = rawBytes(4, 3, 1);
+        // An ImageData-compatible clamped view over an offset buffer region.
+        const backing = new Uint8ClampedArray(whole.length + 8);
+        backing.set(whole, 8);
+        const full = { ...region, width: 4, height: 3 };
+        await f.runtime.updateTexture(
+            "edit",
+            { width: 4, height: 3, data: backing.subarray(8), colorSpace: "srgb" },
+            full,
+        );
+        applyPatch(expected, 4, whole, 4, full);
+        assert.deepEqual(Array.from(device.textureWrites[2].data), Array.from(whole));
+        const source = rawBytes(5, 4, 2);
+        const offset = {
+            sourceX: 1,
+            sourceY: 2,
+            width: 2,
+            height: 2,
+            destinationX: 1,
+            destinationY: 1,
+        };
+        await f.runtime.updateTexture("edit", { width: 5, height: 4, data: source }, offset);
+        const write = device.textureWrites[3];
+        assert.deepEqual(write.destination.origin, [1, 1]);
+        assert.deepEqual(write.size, [2, 2]);
+        assert.deepEqual(Array.from(write.data), [
+            ...source.subarray((2 * 5 + 1) * 4, (2 * 5 + 3) * 4),
+            ...source.subarray((3 * 5 + 1) * 4, (3 * 5 + 3) * 4),
+        ]);
+        applyPatch(expected, 4, source, 5, offset);
+        // A transparent patch replaces, rather than blends with, accepted bytes.
+        const clear = { ...offset, sourceX: 0, sourceY: 0, width: 1, height: 1, destinationX: 3 };
+        await f.runtime.updateTexture(
+            "edit",
+            { width: 1, height: 1, data: new Uint8Array(4) },
+            clear,
+        );
+        applyPatch(expected, 4, new Uint8Array(4), 1, clear);
+        assert.ok(
+            expected.some(
+                (byte, i) => i % 4 !== 3 && byte !== 0 && expected[i - (i % 4) + 3] === 0,
+            ),
+            "fixture keeps nonzero RGB under zero alpha",
+        );
+        assert.ok(expected.some((byte, i) => i % 4 === 3 && byte > 0 && byte < 255));
+        assert.deepEqual(device.textures, textures);
+        assert.deepEqual(device.bindings, bindings);
+        assert.equal(f.reads.length, 0, "raw updates bypass browser capture");
+        assert.deepEqual(await recoveredImage(f), Array.from(expected));
+        assert.deepEqual(await recoveredImage(f), Array.from(expected));
+    } finally {
+        f.runtime.dispose();
+    }
+});
+
+test("raw sources are copied at invocation; callers may mutate, reuse or transfer storage while queued", async () => {
+    const f = await fixture();
+    try {
+        await f.runtime.createTexture("edit", 2, 2);
+        const gate = deferred<void>();
+        f.gate(gate.promise);
+        f.value(5);
+        const blocker = f.runtime.updateTexture("edit", f.source, { ...region, width: 2 });
+        const scratch = rawBytes(2, 2, 3);
+        const original = Array.from(scratch);
+        const pixels = { width: 2, height: 2, data: scratch };
+        const first = f.runtime.updateTexture("edit", pixels, { ...region, width: 2, height: 2 });
+        scratch.fill(9); // Reused scratch storage cannot alter the queued update.
+        const second = f.runtime.updateTexture("edit", pixels, {
+            ...region,
+            sourceY: 1,
+            destinationY: 1,
+            width: 2,
+        });
+        void scratch.buffer.transfer(); // A detached buffer cannot alter it either.
+        await tick();
+        assert.equal(f.devices[0].textureWrites.length, 2);
+        gate.resolve();
+        await Promise.all([blocker, first, second]);
+        const writes = f.devices[0].textureWrites.slice(2).map((write) => Array.from(write.data));
+        assert.deepEqual(writes, [Array(8).fill(5), original, Array(8).fill(9)]);
+        assert.deepEqual(await recoveredImage(f), [...original.slice(0, 8), ...Array(8).fill(9)]);
+        await assert.rejects(f.runtime.updateTexture("edit", pixels, region), /raw RGBA8/);
+    } finally {
+        f.runtime.dispose();
+    }
+});
+
+test("malformed raw sources and rectangles reject before queuing without altering accepted pixels", async () => {
+    const f = await fixture();
+    try {
+        await f.runtime.createTexture("edit", 2, 2);
+        await f.runtime.texture("static", f.source);
+        const accepted = rawBytes(2, 2, 4);
+        const full = { ...region, width: 2, height: 2 };
+        await f.runtime.updateTexture("edit", { width: 2, height: 2, data: accepted }, full);
+        const writes = f.devices[0].textureWrites.length;
+        const data = new Uint8Array(16);
+        const malformed: unknown[] = [
+            ...[0, -1, 1.5, NaN, Infinity, "2"].flatMap((bad) => [
+                { width: bad, height: 2, data },
+                { width: 2, height: bad, data },
+            ]),
+            { width: 2, height: 2, data: new Uint8Array(15) },
+            { width: 2, height: 2, data: new Uint8Array(20) },
+            { width: 2, height: 2, data: new Uint16Array(16) },
+            { width: 2, height: 2, data: new Int8Array(16) },
+            { width: 2, height: 2, data: new Float32Array(16) },
+            { width: 2, height: 2, data: new DataView(new ArrayBuffer(16)) },
+            { width: 2, height: 2, data: Array.from(data) },
+            { width: 2, height: 2, data: new Uint8ClampedArray(16), colorSpace: "display-p3" },
+        ];
+        for (const source of malformed)
+            await assert.rejects(
+                // Deliberately malformed runtime input that the public type rejects.
+                f.runtime.updateTexture("edit", source as RgbaPixels, region),
+                /raw RGBA8/,
+            );
+        const pixels = { width: 2, height: 2, data };
+        for (const rect of [
+            { ...region, sourceX: 2 },
+            { ...region, width: 2, sourceX: 1 },
+            { ...region, height: 3 },
+            { ...region, destinationX: 2 },
+            { ...region, width: 0 },
+        ])
+            await assert.rejects(f.runtime.updateTexture("edit", pixels, rect), /region/);
+        await assert.rejects(f.runtime.updateTexture("static", pixels, region), /createTexture/);
+        assert.equal(f.devices[0].textureWrites.length, writes);
+        // Rejected calls hold no queue slot: all 32 slots are still free at once.
+        await Promise.all(
+            Array.from({ length: 32 }, () =>
+                f.runtime.updateTexture("edit", pixels, { ...region, destinationX: 1 }),
+            ),
+        );
+        assert.equal(f.devices[0].textureWrites.length, writes + 32);
+        const expected = Array.from(accepted);
+        expected.splice(4, 4, 0, 0, 0, 0);
+        assert.deepEqual(await recoveredImage(f), expected);
+    } finally {
+        f.runtime.dispose();
+    }
+});
+
+for (const outcome of [
+    "full",
+    "abort",
+    "release",
+    "replace",
+    "dispose",
+    "submitted-loss",
+    "unsubmitted-loss",
+] as const)
+    test(`queued raw update keeps the documented ${outcome} outcome`, async () => {
+        const f = await fixture();
+        const deviceGate = deferred<void>();
+        try {
+            await f.runtime.createTexture("edit", 2, 2);
+            const accepted = rawBytes(2, 2, 5);
+            const full = { ...region, width: 2, height: 2 };
+            await f.runtime.updateTexture("edit", { width: 2, height: 2, data: accepted }, full);
+            const next = { width: 2, height: 2, data: rawBytes(2, 2, 6) };
+            const gate = deferred<void>(),
+                abort = new AbortController();
+            f.gate(gate.promise);
+            const blocker = f.runtime.updateTexture("edit", f.source, region);
+            void blocker.catch(() => {});
+            if (outcome === "full") {
+                const queued = Array.from({ length: 31 }, () =>
+                    f.runtime.updateTexture("edit", next, full),
+                );
+                await assert.rejects(f.runtime.updateTexture("edit", next, full), /queue is full/);
+                gate.resolve();
+                await Promise.all([blocker, ...queued]);
+                assert.equal(f.devices[0].textureWrites.length, 2 + 1 + 1 + 31);
+                assert.deepEqual(await recoveredImage(f), Array.from(next.data));
+            } else if (outcome === "submitted-loss") {
+                gate.resolve();
+                await blocker;
+                const scopes = deferred<GPUError | null>();
+                f.devices[0].scopeWait = scopes.promise;
+                const rejected = assert.rejects(f.runtime.updateTexture("edit", next, full));
+                await tick();
+                f.devices[0].scopeWait = undefined;
+                const restored = await recoveredImage(f);
+                scopes.resolve(null);
+                await rejected;
+                assert.deepEqual(restored, [1, 1, 1, 1, ...accepted.slice(4)]);
+            } else if (outcome === "unsubmitted-loss") {
+                f.delayDevice(deviceGate.promise);
+                const queued = f.runtime.updateTexture("edit", next, full);
+                f.devices[0].destroy();
+                await f.devices[0].lost;
+                gate.resolve();
+                await tick();
+                assert.equal(f.devices.length, 1, "queued updates wait for replacement readiness");
+                deviceGate.resolve();
+                await Promise.all([blocker, queued]);
+                const writes = f.devices[1].textureWrites.map((write) => Array.from(write.data));
+                assert.deepEqual(writes.slice(1), [
+                    Array.from(accepted),
+                    [1, 1, 1, 1],
+                    Array.from(next.data),
+                ]);
+                assert.deepEqual(await recoveredImage(f), Array.from(next.data));
+            } else {
+                const queued = f.runtime.updateTexture("edit", next, full, abort.signal);
+                const rejected = assert.rejects(queued);
+                await tick();
+                if (outcome === "abort") abort.abort();
+                else if (outcome === "release") {
+                    f.runtime.releaseTexture("edit");
+                    await f.runtime.createTexture("edit", 2, 2);
+                } else if (outcome === "replace") await f.runtime.texture("edit", f.source);
+                else f.runtime.dispose();
+                const writes = f.devices[0].textureWrites.length;
+                gate.resolve();
+                await rejected;
+                // Only the unaborted image blocker may still write.
+                assert.equal(
+                    f.devices[0].textureWrites.length,
+                    writes + (outcome === "abort" ? 1 : 0),
+                    "no late raw write",
+                );
+                if (outcome === "abort")
+                    assert.deepEqual(await recoveredImage(f), [1, 1, 1, 1, ...accepted.slice(4)]);
+                if (outcome === "release")
+                    assert.deepEqual(await recoveredImage(f), Array(16).fill(0));
+            }
+        } finally {
+            deviceGate.resolve();
+            f.runtime.dispose();
+        }
+    });

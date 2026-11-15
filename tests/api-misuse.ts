@@ -250,6 +250,13 @@ async function webgpuBoundary(canvas: HTMLCanvasElement, bitmap: ImageBitmap): P
     await renderer.updateTexture("editable", bitmap, patch, new AbortController().signal);
     // @ts-expect-error Patch dimensions and both origins are required.
     renderer.updateTexture("editable", bitmap, { width: 2, height: 2 });
+    const pixels: engine.RgbaPixels = { width: 2, height: 2, data: new Uint8ClampedArray(16) };
+    await renderer.updateTexture("editable", pixels, patch);
+    await renderer.updateTexture("editable", new ImageData(pixels.width, pixels.height), patch);
+    // @ts-expect-error Raw sources store RGBA8 bytes, not 16-bit values.
+    renderer.updateTexture("editable", { width: 2, height: 2, data: new Uint16Array(16) }, patch);
+    // @ts-expect-error Raw source fields are readonly.
+    pixels.data = new Uint8Array(16);
     // @ts-expect-error Patch dimensions are readonly.
     patch.width = 4;
     const released: void = renderer.releaseTexture(image.id);

@@ -13,6 +13,15 @@ export interface TextureRegion {
     readonly destinationX: number;
     readonly destinationY: number;
 }
+/**
+ * Tightly packed, row-major straight-alpha sRGB RGBA8 pixels; sRGB `ImageData` is compatible.
+ * `updateTexture` copies the requested region before returning its promise.
+ */
+export interface RgbaPixels {
+    readonly width: number;
+    readonly height: number;
+    readonly data: Uint8Array | Uint8ClampedArray;
+}
 export type RendererLifecycleEvent =
     | { readonly status: "recovering" | "ready" }
     | { readonly status: "failed"; readonly error: Error };
@@ -85,7 +94,7 @@ export class WebGPURenderer {
     }
     updateTexture(
         id: string,
-        source: ImageBitmap | HTMLCanvasElement,
+        source: ImageBitmap | HTMLCanvasElement | RgbaPixels,
         region: TextureRegion,
         signal?: AbortSignal,
     ): Promise<void> {

@@ -5,6 +5,7 @@ import {
     WebGPURenderer,
     type PreparedScene,
     type RendererLifecycleEvent,
+    type RgbaPixels,
     type TextureRegion,
 } from "@ngne/core";
 declare const host: BrowserGame<unknown, never>;
@@ -82,8 +83,23 @@ renderer.createTexture(42, 4, 4);
 renderer.createTexture("editable", "4", 4);
 // @ts-expect-error Editable initialization requires an AbortSignal when supplied.
 renderer.createTexture("editable", 4, 4, {});
-// @ts-expect-error Updates require a bitmap or canvas source.
-renderer.updateTexture("editable", new ImageData(4, 4), region);
+const pixels: RgbaPixels = { width: 4, height: 4, data: new Uint8Array(64) };
+const rawEdit: Promise<void> = renderer.updateTexture("editable", pixels, region);
+const imageDataEdit: Promise<void> = renderer.updateTexture(
+    "editable",
+    new ImageData(4, 4),
+    region,
+);
+void rawEdit;
+void imageDataEdit;
+// @ts-expect-error Raw sources store RGBA8 bytes, not floats.
+renderer.updateTexture("editable", { width: 4, height: 4, data: new Float32Array(64) }, region);
+// @ts-expect-error Raw sources require their dimensions.
+renderer.updateTexture("editable", { data: new Uint8Array(64) }, region);
+// @ts-expect-error Raw source fields are readonly.
+pixels.width = 2;
+// @ts-expect-error Updates require a bitmap, canvas or raw RGBA8 source.
+renderer.updateTexture("editable", new Uint8Array(64), region);
 // @ts-expect-error Regions require both origins as well as dimensions.
 renderer.updateTexture("editable", canvas, { width: 1, height: 2 });
 // @ts-expect-error Region coordinates are numbers.

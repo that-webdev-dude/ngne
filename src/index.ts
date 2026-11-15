@@ -41,7 +41,12 @@ export type { InspectionValue } from "./inspection.js";
 export { Frame } from "./renderer.js";
 export type { Sprite } from "./renderer.js";
 export { WebGPURenderer } from "./webgpu-renderer.js";
-export type { RendererStatus, RendererLifecycleEvent, TextureRegion } from "./webgpu-renderer.js";
+export type {
+    RendererStatus,
+    RendererLifecycleEvent,
+    RgbaPixels,
+    TextureRegion,
+} from "./webgpu-renderer.js";
 export type { RendererResourceInspection } from "./resource-inspection.js";
 export * from "./audio.js";
 export * from "./browser.js";

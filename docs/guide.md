@@ -163,10 +163,22 @@ await renderer.updateTexture("preview-edit", canvas, {
     destinationX: 8,
     destinationY: 12,
 });
+```
+
+CPU-authored pixels skip canvas capture. The region is copied before the call returns, so
+a scratch buffer can be reused at once:
+
+```ts
+const pixels = new Uint8ClampedArray(16 * 16 * 4); // Straight-alpha sRGB RGBA8.
+await renderer.updateTexture(
+    "preview-edit",
+    { width: 16, height: 16, data: pixels },
+    { sourceX: 0, sourceY: 0, width: 16, height: 16, destinationX: 8, destinationY: 12 },
+);
 renderer.releaseTexture("preview-edit");
 ```
 
-Keep the source open and unchanged until the update settles. Updates reuse the
+Keep a canvas or bitmap source open and unchanged until the update settles. Updates reuse the
 fixed-size texture and binding; `texture()` remains the transactional replacement
 operation. Cancellation only prevents an update before submission; a submitted
 write finishes validation, and failure removes the uncertain registration. See

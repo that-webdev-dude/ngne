@@ -48,7 +48,7 @@ Public symbols: `Game`, `BrowserGame`, `Assets`, `Input`, `Frame`,
 `WebGPURenderer`, `Audio`, `FixedStep`, `emptyInput`; types `GameOptions`,
 `SceneCandidates`, `SceneCandidateOptions`, `BrowserOptions`, `FrameScheduler`,
 `DisplaySnapshot`, `InputSnapshot`, `Stats`, `RendererStatus`, `RendererLifecycleEvent`, `AssetRetention`,
-`AssetsOptions`, `AssetClaim` and `TextureRegion`.
+`AssetsOptions`, `AssetClaim`, `TextureRegion` and `RgbaPixels`.
 
 The browser host, headless runners, renderer/audio/asset tests and benchmarks
 consume this surface. Host lifecycle, candidate coordination, tick, render and
@@ -66,6 +66,7 @@ ownership and rejection rules.
 Public manual texture operations: `texture(id, source, signal?)`,
 `createTexture(id, width, height, signal?)`, `updateTexture(id, source, region, signal?)`
 and `releaseTexture(id)`; `TextureRegion` describes source and destination rectangles.
+`RgbaPixels` describes raw RGBA8 update sources.
 See [editable manual textures](browser-and-presentation.md#editable-manual-textures)
 for initialization, ordering, ownership, validation, cancellation and recovery.
 
