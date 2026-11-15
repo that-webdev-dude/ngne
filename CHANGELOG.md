@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-11-15
+
 ### Added
 
 - Raw RGBA8 input for `WebGPURenderer.updateTexture()` with the `RgbaPixels` type: tightly packed, straight-alpha sRGB bytes, with sRGB `ImageData` accepted. The requested region is copied when the call is made, so callers can reuse their buffer at once. Raw updates skip bitmap creation, canvas drawing and pixel readback, and keep every supplied byte, including colour under zero alpha, in the texture and the recovery image. Bitmap and canvas sources keep their existing capture and precision limits. See [editable manual textures](docs/contracts/browser-and-presentation.md#editable-manual-textures).
