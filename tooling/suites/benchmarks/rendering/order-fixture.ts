@@ -2,7 +2,8 @@ import { Camera, Frame } from "../../../../src/index.js";
 import { createGpuContext } from "../../../../src/gpu-context.js";
 import { createQuadRenderer } from "../../../../src/quad-renderer.js";
 import { preparationStages } from "./preparation-diagnostics.js";
-import { auditOrder } from "./order-audit.js";
+import { auditOrder, sortFastPathGuard } from "./order-audit.js";
+import { ATLAS, TILESETS, emitTilemap, fittedZoom, tilemapPlan } from "./tilemap-fixture.js";
 
 export async function startOrderInvestigation(): Promise<void> {
     const params = new URLSearchParams(location.search);
@@ -21,15 +22,27 @@ export async function startOrderInvestigation(): Promise<void> {
             "late-depth-down",
             "wide-layers",
             "scenes",
+            "tilemap",
         ].includes(keys)
     )
         throw Error("Invalid key fixture");
     const width = 1440,
         height = 900;
-    const audits: (ReturnType<typeof auditOrder> & { tick: number; canonicalIdentity: boolean })[] =
-        [];
-    if (!Number.isSafeInteger(count) || count < 1 || count > 128000 || count % 4 !== 0)
+    const audits: (ReturnType<typeof auditOrder> &
+        ReturnType<typeof sortFastPathGuard> & {
+            tick: number;
+            canonicalIdentity: boolean;
+            comparatorSort: boolean;
+        })[] = [];
+    const tilemap = keys === "tilemap";
+    if (
+        !Number.isSafeInteger(count) ||
+        count < 1 ||
+        count > (tilemap ? 1048576 : 128000) ||
+        count % 4 !== 0
+    )
         throw Error("Invalid count");
+    const plan = tilemap ? tilemapPlan(count, Number(params.get("columns") ?? 256)) : undefined;
     const samples: number[][] = [];
     const state = {
         ready: false,
@@ -57,6 +70,7 @@ export async function startOrderInvestigation(): Promise<void> {
             "gather",
             "update",
             "tick",
+            "upload",
         ],
         samples,
         metadata: {
@@ -68,8 +82,14 @@ export async function startOrderInvestigation(): Promise<void> {
             stages: preparationStages.instrumented,
             audit,
             keys,
+            tilemap: plan && {
+                layers: plan.layers,
+                columns: plan.columns,
+                rows: plan.rows,
+                tilesets: TILESETS.length,
+            },
             workload: "ordering",
-            timing: "prepareOther includes texture validation and reorder copy; CPU only",
+            timing: "prepareOther includes texture validation and reorder copy; upload is the instance writeBuffer call; CPU only",
         },
     };
     Object.assign(window, { __investigation: state });
@@ -95,10 +115,39 @@ export async function startOrderInvestigation(): Promise<void> {
         [1, 1],
     );
     await renderer.texture("", white.createView());
+    const atlases = TILESETS.map((id, set) => {
+        const texture = context.device.createTexture({
+            size: [ATLAS, ATLAS],
+            format: "rgba8unorm",
+            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+        });
+        const pixels = new Uint8Array(ATLAS * ATLAS * 4);
+        for (let i = 0; i < ATLAS * ATLAS; i++)
+            pixels.set([(i * 7 + set * 90) & 255, (i >> 8) & 255, set ? 200 : 60, 255], i * 4);
+        context.device.queue.writeTexture({ texture }, pixels, { bytesPerRow: ATLAS * 4 }, [
+            ATLAS,
+            ATLAS,
+        ]);
+        return { id, texture };
+    });
+    if (tilemap)
+        for (const atlas of atlases) await renderer.texture(atlas.id, atlas.texture.createView());
     const frame = new Frame(),
         camera = new Camera();
     let tickIndex = 0;
     camera.pixelSnap = false;
+    if (plan) camera.cut(0, 0, fittedZoom(plan, width, height));
+    let comparatorSorts = 0;
+    if (audit)
+        // Observes which path Frame.sort() takes without changing it: only the comparator
+        // fallback calls order.sort().
+        Object.defineProperty(frame.order, "sort", {
+            configurable: true,
+            value(this: number[], compare: (a: number, b: number) => number) {
+                comparatorSorts++;
+                return Array.prototype.sort.call(this, compare);
+            },
+        });
     let sortMs = 0,
         previous = 0,
         stopped = false,
@@ -117,7 +166,10 @@ export async function startOrderInvestigation(): Promise<void> {
         if (document.hidden) state.hidden = true;
         const updated = performance.now();
         frame.reset();
-        {
+        if (plan) {
+            frame.scene(camera, 1);
+            emitTilemap(frame, plan);
+        } else {
             frame.scene(camera, 1);
             for (let i = 0; i < count; i++) {
                 if (keys === "scenes" && i === count / 2) frame.scene(camera, 1);
@@ -158,6 +210,8 @@ export async function startOrderInvestigation(): Promise<void> {
         }
         const packed = performance.now();
         const observation = audit ? auditOrder(frame) : undefined;
+        const guard = audit ? sortFastPathGuard(frame) : undefined;
+        comparatorSorts = 0;
         const preparing = performance.now();
         renderer.prepare(frame);
         const prepared = performance.now();
@@ -182,10 +236,13 @@ export async function startOrderInvestigation(): Promise<void> {
             preparationStages.instrumented ? preparationStages.gather : -1,
             updated - start,
             tickIndex,
+            preparationStages.instrumented ? preparationStages.upload : -1,
         ]);
-        if (observation)
+        if (observation && guard)
             audits.push({
                 ...observation,
+                ...guard,
+                comparatorSort: comparatorSorts > 0,
                 tick: tickIndex,
                 canonicalIdentity: frame.order.every((index, position) => index === position),
             });
@@ -205,6 +262,7 @@ export async function startOrderInvestigation(): Promise<void> {
             cancelAnimationFrame(raf);
             renderer.dispose();
             white.destroy();
+            for (const atlas of atlases) atlas.texture.destroy();
             context.dispose();
         },
         { once: true },

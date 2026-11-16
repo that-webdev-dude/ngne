@@ -1,4 +1,4 @@
-/** Boundary timers only: keep every validation, sort, allocation and gathering statement intact. */
+/** Boundary timers only: keep every validation, sort, allocation, gathering and upload statement intact. */
 export function instrumentPreparation(source: string, diagnosticsModule: string): string {
     if (source.includes("diagnosticStart"))
         throw Error("Diagnostic anchor changed: already instrumented");
@@ -30,6 +30,12 @@ export function instrumentPreparation(source: string, diagnosticsModule: string)
         `                preparationStages.gather = performance.now() - diagnosticGather;
             },
             encode(`,
+    );
+    insert(
+        "                    device.queue.writeBuffer(instances, 0, upload, 0, frame.count * QUAD_STRIDE);",
+        `                    const diagnosticUpload = performance.now();
+                    device.queue.writeBuffer(instances, 0, upload, 0, frame.count * QUAD_STRIDE);
+                    preparationStages.upload = performance.now() - diagnosticUpload;`,
     );
     return `import { preparationStages } from ${JSON.stringify(diagnosticsModule)};\npreparationStages.instrumented = true;\n${code}`;
 }

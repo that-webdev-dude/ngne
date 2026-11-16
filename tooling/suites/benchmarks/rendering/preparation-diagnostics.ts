@@ -5,4 +5,5 @@ export const preparationStages = {
     sort: 0,
     growth: 0,
     gather: 0,
+    upload: 0,
 };
