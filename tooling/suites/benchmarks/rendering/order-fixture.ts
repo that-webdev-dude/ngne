@@ -3,15 +3,44 @@ import { createGpuContext } from "../../../../src/gpu-context.js";
 import { createQuadRenderer } from "../../../../src/quad-renderer.js";
 import { preparationStages } from "./preparation-diagnostics.js";
 import { auditOrder, sortFastPathGuard } from "./order-audit.js";
-import { ATLAS, TILESETS, emitTilemap, fittedZoom, tilemapPlan } from "./tilemap-fixture.js";
+import {
+    ATLAS,
+    TILESETS,
+    emitTilemap,
+    fittedZoom,
+    tilemapPlan,
+    type TilemapPlan,
+} from "./tilemap-fixture.js";
+
+/** One deterministic 256×256 atlas per tileset; setup only, outside every timed region. */
+function createAtlas(device: GPUDevice, set: number): GPUTexture {
+    const texture = device.createTexture({
+        size: [ATLAS, ATLAS],
+        format: "rgba8unorm",
+        usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+    });
+    const pixels = new Uint8Array(ATLAS * ATLAS * 4);
+    for (let i = 0, o = 0; i < ATLAS * ATLAS; i++, o += 4) {
+        pixels[o] = (i * 7 + set * 90) & 255;
+        pixels[o + 1] = (i >> 8) & 255;
+        pixels[o + 2] = set ? 200 : 60;
+        pixels[o + 3] = 255;
+    }
+    device.queue.writeTexture({ texture }, pixels, { bytesPerRow: ATLAS * 4 }, [ATLAS, ATLAS]);
+    return texture;
+}
 
 export async function startOrderInvestigation(): Promise<void> {
     const params = new URLSearchParams(location.search);
-    const count = Number(params.get("count") ?? 64000);
+    // The tilemap defaults to its live-tier size; an explicit count needs explicit columns.
+    const tilemapDefault = params.get("keys") === "tilemap" && !params.has("count");
+    const count = Number(params.get("count") ?? (tilemapDefault ? 66560 : 64000));
     const shuffled = params.get("order") === "shuffled";
     const detailed = params.get("detail") !== "0";
     if (params.get("workload") !== "ordering")
-        throw Error("Only the ordering workload is supported; Starfall Chaos replay is retired");
+        throw new Error(
+            "Only the ordering workload is supported; Starfall Chaos replay is retired",
+        );
     const audit = params.get("audit") === "1";
     const keys = params.get("keys") ?? "layers";
     if (
@@ -25,7 +54,7 @@ export async function startOrderInvestigation(): Promise<void> {
             "tilemap",
         ].includes(keys)
     )
-        throw Error("Invalid key fixture");
+        throw new Error("Invalid key fixture");
     const width = 1440,
         height = 900;
     const audits: (ReturnType<typeof auditOrder> &
@@ -33,6 +62,7 @@ export async function startOrderInvestigation(): Promise<void> {
             tick: number;
             canonicalIdentity: boolean;
             comparatorSort: boolean;
+            guardAgrees: boolean;
         })[] = [];
     const tilemap = keys === "tilemap";
     if (
@@ -41,8 +71,12 @@ export async function startOrderInvestigation(): Promise<void> {
         count > (tilemap ? 1048576 : 128000) ||
         count % 4 !== 0
     )
-        throw Error("Invalid count");
-    const plan = tilemap ? tilemapPlan(count, Number(params.get("columns") ?? 256)) : undefined;
+        throw new Error("Invalid count");
+    let plan: TilemapPlan | undefined;
+    if (tilemap) {
+        const defaultColumns = tilemapDefault ? 130 : Number.NaN;
+        plan = tilemapPlan(count, Number(params.get("columns") ?? defaultColumns));
+    }
     const samples: number[][] = [];
     const state = {
         ready: false,
@@ -115,23 +149,12 @@ export async function startOrderInvestigation(): Promise<void> {
         [1, 1],
     );
     await renderer.texture("", white.createView());
-    const atlases = TILESETS.map((id, set) => {
-        const texture = context.device.createTexture({
-            size: [ATLAS, ATLAS],
-            format: "rgba8unorm",
-            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
-        });
-        const pixels = new Uint8Array(ATLAS * ATLAS * 4);
-        for (let i = 0; i < ATLAS * ATLAS; i++)
-            pixels.set([(i * 7 + set * 90) & 255, (i >> 8) & 255, set ? 200 : 60, 255], i * 4);
-        context.device.queue.writeTexture({ texture }, pixels, { bytesPerRow: ATLAS * 4 }, [
-            ATLAS,
-            ATLAS,
-        ]);
-        return { id, texture };
-    });
-    if (tilemap)
-        for (const atlas of atlases) await renderer.texture(atlas.id, atlas.texture.createView());
+    // Atlases exist only for the tilemap workload so other ordering cases keep their setup.
+    const atlases = (plan ? TILESETS : []).map((id, set) => ({
+        id,
+        texture: createAtlas(context.device, set),
+    }));
+    for (const atlas of atlases) await renderer.texture(atlas.id, atlas.texture.createView());
     const frame = new Frame(),
         camera = new Camera();
     let tickIndex = 0;
@@ -219,11 +242,15 @@ export async function startOrderInvestigation(): Promise<void> {
         renderer.encode(encoder, context.acquire(), frame, width, height, 0x090e20);
         context.submit(encoder);
         const end = performance.now();
+        // Untimed: the frame's measurements are already taken.
+        let sortColumn = -1;
+        if (preparationStages.instrumented) sortColumn = preparationStages.sort;
+        else if (detailed) sortColumn = sortMs;
         samples.push([
             start,
             previous ? start - previous : 0,
             packed - updated,
-            preparationStages.instrumented ? preparationStages.sort : detailed ? sortMs : -1,
+            sortColumn,
             detailed && !preparationStages.instrumented ? prepared - preparing - sortMs : -1,
             end - prepared,
             end - start,
@@ -243,6 +270,9 @@ export async function startOrderInvestigation(): Promise<void> {
                 ...observation,
                 ...guard,
                 comparatorSort: comparatorSorts > 0,
+                // The observed comparator call is ground truth; disagreement means the
+                // guard mirror in order-audit.ts drifted from Frame.sort().
+                guardAgrees: guard.eligible === (comparatorSorts === 0),
                 tick: tickIndex,
                 canonicalIdentity: frame.order.every((index, position) => index === position),
             });

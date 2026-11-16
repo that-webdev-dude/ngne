@@ -6,7 +6,10 @@ import { Camera } from "../../src/primitives.js";
 import { Frame } from "../../src/renderer.js";
 import { auditOrder, sortFastPathGuard } from "../suites/benchmarks/rendering/order-audit.js";
 import {
+    ATLAS,
+    TILE,
     TILESETS,
+    VARIANTS,
     emitTilemap,
     tilemapPlan,
 } from "../suites/benchmarks/rendering/tilemap-fixture.js";
@@ -72,6 +75,10 @@ test("boundary instrumentation fails closed when source anchors drift", () => {
         /preparationStages\.upload = performance\.now\(\) - diagnosticUpload/,
     );
     assert.equal((transformed.match(/device\.queue\.writeBuffer\(instances/g) ?? []).length, 1);
+    // A frame without an upload must not report the previous frame's upload time.
+    const reset = transformed.indexOf("preparationStages.upload = 0;");
+    assert.ok(reset > transformed.indexOf("const diagnosticStart"));
+    assert.ok(reset < transformed.indexOf("preparationStages.validation ="));
     assert.equal((transformed.match(/frame\.sort\(\)/g) ?? []).length, 1);
     assert.throws(() => instrumentPreparation(transformed, "./diagnostics.js"), /anchor changed/);
     assert.throws(
@@ -117,7 +124,11 @@ test("tilemap plan authors dense layer-ordered tiles grouped by tileset", () => 
         plan.groups.reduce((sum, group) => sum + group.variants.filter(Boolean).length, 0) / 66560;
     assert.ok(transformed > 0.1 && transformed < 0.15, `transformed share ${transformed}`);
     assert.deepEqual(tilemapPlan(66560, 130), plan);
-    assert.throws(() => tilemapPlan(66561, 130), /multiple/);
+    assert.throws(
+        () => tilemapPlan(64000, 256),
+        /count \(64000\) must be a positive multiple of columns \(256\) × layers \(8\)/,
+    );
+    assert.throws(() => tilemapPlan(66560, NaN), /multiple/);
 
     const frame = new Frame();
     frame.scene(new Camera(), 1);
@@ -173,6 +184,16 @@ test("fast-path guard mirror agrees with the observed sort path", () => {
             "mixed depths not already in layer → depth order",
         ],
         [
+            "ordered depth tail",
+            (f, i) => f.sprite({ x: 0, y: 0, width: 1, height: 1, depth: i > 30000 ? 1 : 0 }),
+            null,
+        ],
+        [
+            "non-finite tail depth",
+            (f, i) => f.sprite({ x: 0, y: 0, width: 1, height: 1, depth: i === 40000 ? NaN : 0 }),
+            "non-finite depth",
+        ],
+        [
             "depth after interleaving",
             (f, i) =>
                 f.sprite({
@@ -207,4 +228,45 @@ test("fast-path guard mirror agrees with the observed sort path", () => {
     small.rect(0, 0, 1, 1, 0);
     assert.equal(sortFastPathGuard(small).failingGuard, "count below 32,768");
     assert.equal(observedSort(small), true);
+});
+
+test("tilemap lookup tables author the same sprites as per-variant fields", () => {
+    const plan = tilemapPlan(16384, 64);
+    const actual = new Frame();
+    actual.scene(new Camera(), 1);
+    emitTilemap(actual, plan);
+    const expected = new Frame();
+    expected.scene(new Camera(), 1);
+    const span = TILE / ATLAS,
+        perRow = ATLAS / TILE;
+    for (const group of plan.groups)
+        group.cells.forEach((cell, k) => {
+            const column = cell % plan.columns,
+                [flipX, flipY, turns] = VARIANTS[group.variants[k]];
+            expected.sprite({
+                x: column * TILE + TILE / 2,
+                y: ((cell - column) / plan.columns) * TILE + TILE / 2,
+                width: flipX ? -TILE : TILE,
+                height: flipY ? -TILE : TILE,
+                rotation: (turns * Math.PI) / 2,
+                texture: group.texture,
+                u: (group.tiles[k] % perRow) * span,
+                v: Math.floor(group.tiles[k] / perRow) * span,
+                uw: span,
+                vh: span,
+                alpha: group.layer === plan.layers - 1 ? 0.75 : 1,
+                layer: 0,
+                depth: group.layer,
+            });
+        });
+    assert.equal(actual.count, expected.count);
+    assert.deepEqual(
+        actual.data.subarray(0, actual.count * 14),
+        expected.data.subarray(0, expected.count * 14),
+    );
+    assert.deepEqual(
+        actual.textures.slice(0, actual.count),
+        expected.textures.slice(0, expected.count),
+    );
+    assert.ok(plan.groups.some((group) => group.variants.some((variant) => variant === 7)));
 });

@@ -37,7 +37,9 @@ export function tilemapPlan(count: number, columns: number, layers = 8): Tilemap
         count < 1 ||
         count % (columns * layers) !== 0
     )
-        throw Error("Tilemap count must be a positive multiple of columns × layers");
+        throw new Error(
+            `Tilemap count (${count}) must be a positive multiple of columns (${columns}) × layers (${layers})`,
+        );
     const rows = count / (columns * layers);
     const groups: TileGroup[] = [];
     for (let layer = 0; layer < layers; layer++) {
@@ -68,8 +70,8 @@ export function tilemapPlan(count: number, columns: number, layers = 8): Tilemap
     return { layers, columns, rows, count, groups };
 }
 
-// [flipX, flipY, quarter turns] per variant.
-const VARIANTS: readonly (readonly [boolean, boolean, number])[] = [
+/** [flipX, flipY, quarter turns] per variant; expanded into lookup tables below. */
+export const VARIANTS: readonly (readonly [boolean, boolean, number])[] = [
     [false, false, 0],
     [true, false, 0],
     [false, true, 0],
@@ -79,15 +81,21 @@ const VARIANTS: readonly (readonly [boolean, boolean, number])[] = [
     [false, false, 3],
     [true, false, 1],
 ];
+// Per-variant and per-tile tables keep harness work out of the timed authoring loop.
+const WIDTHS = Float64Array.from(VARIANTS, ([flipX]) => (flipX ? -TILE : TILE));
+const HEIGHTS = Float64Array.from(VARIANTS, ([, flipY]) => (flipY ? -TILE : TILE));
+const ROTATIONS = Float64Array.from(VARIANTS, ([, , turns]) => (turns * Math.PI) / 2);
+const SPAN = TILE / ATLAS,
+    PER_ROW = ATLAS / TILE;
+const US = Float64Array.from({ length: 256 }, (_, tile) => (tile % PER_ROW) * SPAN);
+const VS = Float64Array.from({ length: 256 }, (_, tile) => Math.floor(tile / PER_ROW) * SPAN);
 
 /**
  * Authors one sprite per cell, layer by layer, one depth per layer and the top layer at 75%
  * opacity: the emission pattern a tilemap editor's live tier uses through the public API.
  */
 export function emitTilemap(frame: Frame, plan: TilemapPlan): void {
-    const columns = plan.columns,
-        span = TILE / ATLAS,
-        perRow = ATLAS / TILE;
+    const columns = plan.columns;
     for (const group of plan.groups) {
         const { cells, tiles, variants, texture, layer } = group;
         const alpha = layer === plan.layers - 1 ? 0.75 : 1;
@@ -96,18 +104,18 @@ export function emitTilemap(frame: Frame, plan: TilemapPlan): void {
                 column = cell % columns,
                 row = (cell - column) / columns,
                 tile = tiles[k],
-                [flipX, flipY, turns] = VARIANTS[variants[k]];
+                variant = variants[k];
             frame.sprite({
                 x: column * TILE + TILE / 2,
                 y: row * TILE + TILE / 2,
-                width: flipX ? -TILE : TILE,
-                height: flipY ? -TILE : TILE,
-                rotation: (turns * Math.PI) / 2,
+                width: WIDTHS[variant],
+                height: HEIGHTS[variant],
+                rotation: ROTATIONS[variant],
                 texture,
-                u: (tile % perRow) * span,
-                v: Math.floor(tile / perRow) * span,
-                uw: span,
-                vh: span,
+                u: US[tile],
+                v: VS[tile],
+                uw: SPAN,
+                vh: SPAN,
                 alpha,
                 layer: 0,
                 depth: layer,

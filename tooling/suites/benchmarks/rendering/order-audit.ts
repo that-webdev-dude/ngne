@@ -10,9 +10,9 @@ export function auditOrder(frame: Frame) {
     const layers: unknown = Reflect.get(frame, "layers");
     const depths: unknown = Reflect.get(frame, "depths");
     if (!numbers(scenes) || !numbers(layers) || !numbers(depths))
-        throw Error("Frame diagnostic key layout changed");
+        throw new Error("Frame diagnostic key layout changed");
     if ([scenes, layers, depths].some((keys) => keys.length < frame.count))
-        throw Error("Missing active keys");
+        throw new Error("Missing active keys");
     // Only this full scan is timed. Reflection, shape checks and distribution allocation are excluded.
     const start = performance.now();
     let identity = true,
@@ -63,10 +63,51 @@ export function auditOrder(frame: Frame) {
 }
 
 /**
- * Mirrors the guards of `Frame.sort()`'s private layer-counting path on the authored
- * (pre-sort) frame and names the first one that fails. Diagnostic only: the fixture checks
- * this against the observed comparator use in the same tick.
+ * Names the first failing guard of `Frame.sort()`'s private layer-counting path on the
+ * authored (pre-sort) frame. It copies the private bounds (32,768, 262,144, span 64) and
+ * guard order from `src/renderer.ts`, so it is for naming only: the fixture's observed
+ * comparator call is ground truth, and its `guardAgrees` field exposes drift. Update this
+ * mirror and `tooling/tests/order-diagnostics.test.ts` with any change to those guards.
  */
+interface GuardKeys {
+    order: readonly number[];
+    scenes: number[];
+    layers: number[];
+    depths: number[];
+    scene: number;
+}
+
+/** Guards every entry shares: identity input order, one scene, safe-integer layer. */
+function entryGuard(keys: GuardKeys, i: number): string | null {
+    if (keys.order[i] !== i) return "non-identity input order";
+    if (keys.scenes[i] !== keys.scene) return "more than one scene";
+    if (!Number.isSafeInteger(keys.layers[i])) return "non-integer layer";
+    return null;
+}
+
+/** From the first depth change on, entries must already be in layer → depth order. */
+function depthTailGuard(keys: GuardKeys, start: number, count: number): string | null {
+    const { layers, depths } = keys;
+    for (let i = start; i < count; i++) {
+        const entry = entryGuard(keys, i);
+        if (entry) return entry;
+        if (!Number.isFinite(depths[i])) return "non-finite depth";
+        if (layers[i] < layers[i - 1] || (layers[i] === layers[i - 1] && depths[i] < depths[i - 1]))
+            return "mixed depths not already in layer → depth order";
+    }
+    return null;
+}
+
+function layerSpan(layers: number[], count: number): number {
+    let min = layers[0],
+        max = min;
+    for (let i = 1; i < count; i++) {
+        min = Math.min(min, layers[i]);
+        max = Math.max(max, layers[i]);
+    }
+    return max - min + 1;
+}
+
 export function sortFastPathGuard(frame: Frame): {
     eligible: boolean;
     failingGuard: string | null;
@@ -75,7 +116,7 @@ export function sortFastPathGuard(frame: Frame): {
     const layers: unknown = Reflect.get(frame, "layers");
     const depths: unknown = Reflect.get(frame, "depths");
     if (!numbers(scenes) || !numbers(layers) || !numbers(depths))
-        throw Error("Frame diagnostic key layout changed");
+        throw new Error("Frame diagnostic key layout changed");
     const count = frame.count,
         fail = (failingGuard: string) => ({ eligible: false, failingGuard });
     if (count < 32768) return fail("count below 32,768");
@@ -84,39 +125,23 @@ export function sortFastPathGuard(frame: Frame): {
         depth = depths[0];
     if (!Number.isFinite(scene) || !Number.isFinite(depth))
         return fail("non-finite scene or depth");
-    let min = layers[0],
-        max = min,
-        ordered = true,
-        tail = -1;
+    const keys: GuardKeys = { order: frame.order, scenes, layers, depths, scene };
+    let ordered = true,
+        max = layers[0];
     for (let i = 0; i < count; i++) {
-        if (frame.order[i] !== i) return fail("non-identity input order");
-        if (scenes[i] !== scene) return fail("more than one scene");
-        if (!Number.isSafeInteger(layers[i])) return fail("non-integer layer");
+        const entry = entryGuard(keys, i);
+        if (entry) return fail(entry);
         if (depths[i] !== depth) {
-            tail = i;
+            if (!ordered) return fail("mixed depths with out-of-order layers");
+            const tail = depthTailGuard(keys, i, count);
+            if (tail) return fail(tail);
             break;
         }
         if (layers[i] < max) ordered = false;
-        min = Math.min(min, layers[i]);
         max = Math.max(max, layers[i]);
     }
-    if (tail >= 0) {
-        if (!ordered) return fail("mixed depths with out-of-order layers");
-        for (let i = tail; i < count; i++) {
-            if (frame.order[i] !== i) return fail("non-identity input order");
-            if (scenes[i] !== scene) return fail("more than one scene");
-            if (!Number.isSafeInteger(layers[i])) return fail("non-integer layer");
-            if (!Number.isFinite(depths[i])) return fail("non-finite depth");
-            if (
-                layers[i] < layers[i - 1] ||
-                (layers[i] === layers[i - 1] && depths[i] < depths[i - 1])
-            )
-                return fail("mixed depths not already in layer → depth order");
-            min = Math.min(min, layers[i]);
-            max = Math.max(max, layers[i]);
-        }
-    }
-    const span = max - min + 1;
+    // Reached only when every entry passed, so the span covers the whole active prefix.
+    const span = layerSpan(layers, count);
     if (!Number.isSafeInteger(span) || span > 64) return fail("layer span above 64");
     return { eligible: true, failingGuard: null };
 }

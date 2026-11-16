@@ -1,15 +1,17 @@
 /** Boundary timers only: keep every validation, sort, allocation, gathering and upload statement intact. */
 export function instrumentPreparation(source: string, diagnosticsModule: string): string {
     if (source.includes("diagnosticStart"))
-        throw Error("Diagnostic anchor changed: already instrumented");
+        throw new Error("Diagnostic anchor changed: already instrumented");
     let code = source.replaceAll("\r\n", "\n");
     const insert = (anchor: string, replacement: string) => {
-        if (code.split(anchor).length !== 2) throw Error(`Diagnostic anchor changed: ${anchor}`);
+        if (code.split(anchor).length !== 2)
+            throw new Error(`Diagnostic anchor changed: ${anchor}`);
         code = code.replace(anchor, replacement);
     };
     insert(
         "prepare(frame: Frame): void {",
-        "prepare(frame: Frame): void {\n                const diagnosticStart = performance.now();",
+        // Upload is timed in encode; reset here so a frame without an upload records 0.
+        "prepare(frame: Frame): void {\n                const diagnosticStart = performance.now();\n                preparationStages.upload = 0;",
     );
     insert(
         "                frame.sort();",
