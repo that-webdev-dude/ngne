@@ -184,7 +184,7 @@ so later notices or errors cannot hide startup or terminal failures. Use Browser
 u0, v0, du, dv, r, g, b, a`. The first six values transform unit-square corners:
 `position = translation + corner.x * (ix, iy) + corner.y * (jx, jy)`.
 Authoring still uses centered XY, signed size and rotation radians. Camera/shake
-subtraction happens before affine conversion; with `pixelSnap` the packed translation
+subtraction and zoom scaling happen before affine conversion; with `pixelSnap` the packed translation
 is then rounded (see [interpolation and discontinuities](#interpolation-and-discontinuities)). Sorting
 remains scene, layer, depth and insertion. Adjacent texture runs batch without
 texture-driven reordering. CPU/GPU buffers grow geometrically; there is no
@@ -198,6 +198,8 @@ This avoids repeated backing-array growth for a steady workload.
 ### Camera coordinates
 
 `camera.x/y` is the world position of the viewport's top-left. No-argument `cut()` copies current coordinates to previous coordinates without moving the camera. `cut(x, y)` assigns both current and previous coordinates to the supplied position. The engine's post-mount cut is the no-argument form, so scene setup must position the camera before returning.
+
+`camera.zoom` (default 1) scales world space about the viewport's top-left: a world point maps to `(point − camera) × zoom`, so `camera.x/y` stays the world position at the top-left at any zoom. `beginTick()` copies it to `previousZoom`, frame preparation interpolates it with the scene alpha, no-argument `cut()` copies it, and `cut(x, y, zoom)` assigns both. Shake is a world-unit offset and scales with zoom. A zoom must be a finite number greater than 0: `cut(x, y, zoom)` throws a `RangeError` without changing the camera, and an invalid assigned `zoom` or `previousZoom` makes frame preparation throw a `RangeError`. Engine cuts never throw.
 
 Camera base and gameplay poses share interpolation; snapping happens after composing camera and pose, without simulation writes. Shake is a separate offset. Authors own previous/current component fields and register resets. Presentation systems that continue during freeze own separate particle values. Mounting initializes previous/current together.
 
@@ -217,14 +219,17 @@ Camera base and gameplay poses share interpolation; snapping happens after compo
 `SceneInstance.canInterpolate` is presentation eligibility, excluded from simulation
 inspection. Stack selection and this flag choose the same alpha for `Frame.scene`
 and the authored render callback; it changes no simulation state. Frame preparation
-subtracts interpolated camera plus shake, then, when `pixelSnap` is true, rounds the
+subtracts interpolated camera plus shake, multiplies the offset and size by the interpolated
+zoom, then, when `pixelSnap` is true, rounds the
 packed translation `(tx, ty)` with `Math.round`; the linear part `(ix, iy, jx, jy)` is
 unchanged and the centre moves at most half a pixel per axis. Unrotated and quarter-turn
 quads with integer sizes, including odd and negative (flipped) sizes, cover whole pixels;
 flipping does not change the covered pixels, and even-sized unrotated quads keep their
 previous placement. Other rotations snap only the translation corner. Screen-space
-sprites bypass camera/shake but still snap. Packed coordinates are float32; JavaScript
-half-pixel rounding (ties toward +∞) applies, including negative coordinates.
+sprites bypass camera/shake/zoom but still snap. Packed coordinates are float32; JavaScript
+half-pixel rounding (ties toward +∞) applies, including negative coordinates. At integer
+zoom, snapped integer sizes map each texel to zoom × zoom whole pixels; at other zooms only
+the translation corner is whole.
 
 WebGPU uses the premultiplied pipeline and retained source ownership described above. The shared asset cache follows the opt-in retention policy below.
 

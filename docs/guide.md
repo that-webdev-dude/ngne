@@ -452,6 +452,8 @@ scene.system(() => {
 
 The [camera coordinate contract](contracts/browser-and-presentation.md#camera-coordinates) defines the origin and mount cut. The [platformer](https://github.com/that-webdev-dude/ngne/blob/main/examples/platformer/README.md) adds vertical clamping, a horizontal dead-zone, visible-tile rendering and game-owned collision.
 
+Set `scene.camera.zoom` to scale the world view; screen-space sprites are unaffected. Zoom keeps the top-left fixed, so divide viewport extents by the zoom when centring or clamping, e.g. `camera.x = player.x - 240 / camera.zoom`. Use `camera.cut(x, y, zoom)` for an instant zoom change.
+
 ## Sprite and animation inspection
 
 The installed package includes `ngne-preview`, a local development tool using that

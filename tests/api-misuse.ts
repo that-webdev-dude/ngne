@@ -56,6 +56,14 @@ function authoringBoundary(
     random.restore(2);
     // @ts-expect-error RNG state is private; use snapshot and restore.
     random.state = 3;
+    const camera = new engine.Camera();
+    camera.cut(0, 0, 2);
+    const zoom: number = camera.view(0.5).zoom;
+    camera.previousZoom = camera.zoom = zoom;
+    // @ts-expect-error Camera zoom is a number.
+    camera.zoom = "2";
+    // @ts-expect-error Camera cuts take a numeric zoom.
+    camera.cut(0, 0, "2");
 
     // @ts-expect-error Lifecycle is runtime-owned.
     game.lifecycle = "Running";

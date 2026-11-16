@@ -47,26 +47,44 @@ export class Cleanup {
         if (errors.length) throw new AggregateError(errors, "Cleanup failed");
     }
 }
+/** Zoom must be a finite number greater than zero; plain fields are checked where they are used. */
+function requireZoom(zoom: number): void {
+    if (!(zoom > 0 && zoom < Infinity))
+        throw new RangeError(`Camera zoom must be a finite number greater than 0, got ${zoom}`);
+}
 export class Camera {
     x = 0;
     y = 0;
     previousX = 0;
     previousY = 0;
+    /** World-to-screen scale about the viewport's top-left (`x`, `y`). */
+    zoom = 1;
+    previousZoom = 1;
     shakeX = 0;
     shakeY = 0;
     pixelSnap = true;
     beginTick() {
         this.previousX = this.x;
         this.previousY = this.y;
+        this.previousZoom = this.zoom;
     }
-    cut(x = this.x, y = this.y) {
+    /**
+     * Only an explicit zoom is validated: the engine's no-argument cuts run inside scene
+     * commits and must not throw, so an assigned invalid zoom fails at frame preparation.
+     */
+    cut(x = this.x, y = this.y, zoom?: number) {
+        if (zoom !== undefined) requireZoom(zoom);
         this.x = this.previousX = x;
         this.y = this.previousY = y;
+        this.zoom = this.previousZoom = zoom ?? this.zoom;
     }
     view(alpha: number) {
+        requireZoom(this.previousZoom);
+        requireZoom(this.zoom);
         return {
             x: lerp(this.previousX, this.x, alpha) + this.shakeX,
             y: lerp(this.previousY, this.y, alpha) + this.shakeY,
+            zoom: lerp(this.previousZoom, this.zoom, alpha),
         };
     }
 }

@@ -30,7 +30,7 @@ export class Frame {
     private sortIndices?: Uint32Array;
     private layerCursors?: Uint32Array;
     private sceneIndex = -1;
-    private camera = { x: 0, y: 0 };
+    private camera = { x: 0, y: 0, zoom: 1 };
     private snap = true;
     reset() {
         this.count = 0;
@@ -38,8 +38,9 @@ export class Frame {
         // Keep backing arrays warm while packing. sort() trims the active prefix.
     }
     scene(camera: Camera, alpha: number) {
-        this.sceneIndex++;
+        // view() validates zoom before this frame records the scene.
         this.camera = camera.view(alpha);
+        this.sceneIndex++;
         this.snap = camera.pixelSnap;
     }
     sprite(s: Sprite) {
@@ -94,8 +95,14 @@ export class Frame {
             o = i * STRIDE;
         if (o + STRIDE > this.data.length) this.grow();
         if (!screen) {
-            x -= this.camera.x;
-            y -= this.camera.y;
+            // Scale about the viewport's top-left; snapping then works in screen pixels.
+            // Multiplying by a zoom of exactly 1 leaves every value bit-identical.
+            const camera = this.camera,
+                zoom = camera.zoom;
+            x = (x - camera.x) * zoom;
+            y = (y - camera.y) * zoom;
+            w *= zoom;
+            h *= zoom;
         }
         this.packAffine(o, x, y, w, h, angle);
         const d = this.data;

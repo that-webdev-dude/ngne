@@ -1616,6 +1616,10 @@ function canonicalStateHash(inspection: GameInspection): string {
             (entities[composition] ??= []).push(canonicalJson(tuple));
         }
         for (const tuples of Object.values(entities)) tuples.sort();
+        // The pre-migration camera had no zoom: hash its fields and pin zoom at its default.
+        const { zoom, previousZoom, ...camera } = record(scene.camera);
+        assert.equal(zoom, 1);
+        assert.equal(previousZoom, 1);
         return {
             id: scene.id,
             definition: scene.definition,
@@ -1623,7 +1627,7 @@ function canonicalStateHash(inspection: GameInspection): string {
             seed: scene.seed,
             resources: scene.resources,
             random: scene.random,
-            camera: scene.camera,
+            camera,
             entities,
         };
     });

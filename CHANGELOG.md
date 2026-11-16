@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- `Camera.zoom` and `Camera.previousZoom` (default 1) scale world-space quads about the viewport's top-left, so `camera.x/y` stays the world position at that corner. Zoom interpolates with the scene alpha; `beginTick()` copies it, `cut()` resets it and `cut(x, y, zoom)` sets it. Shake is a world-unit offset scaled with the camera; `pixelSnap` rounds in screen pixels after scaling, so integer zoom maps each texel to whole pixels. Screen-space sprites are unaffected, and zoom 1 packs and renders exactly as before. A zoom must be a finite number greater than 0: `cut(x, y, zoom)` throws a `RangeError` for an invalid argument without changing the camera, and an invalid assigned `zoom` or `previousZoom` makes frame preparation throw a `RangeError`, which fails a `BrowserGame`. Scene inspection now lists both zoom fields with the camera. See [camera coordinates](docs/contracts/browser-and-presentation.md#camera-coordinates).
+
 ### Fixed
 
 - With `camera.pixelSnap` true, frame preparation rounds the packed translation corner instead of the centre, so snapped quads of any integer width and height, including odd and flipped sizes and quarter-turn rotations, cover whole pixels and map texels 1:1. Odd-sized quads can move half a pixel compared with 0.3.1; even-sized unrotated quads and `pixelSnap = false` output are unchanged. Other rotations snap only the translation corner. See [interpolation and discontinuities](docs/contracts/browser-and-presentation.md#interpolation-and-discontinuities).
