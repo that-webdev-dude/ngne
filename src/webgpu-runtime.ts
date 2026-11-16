@@ -1,8 +1,9 @@
-import type { ImageAsset, Lease } from "./assets.js";
+import type { ImageAsset, Lease, TextureSampling } from "./assets.js";
 import { createGpuContext, validateGpuOperation, type GpuContext } from "./gpu-context.js";
 import { createQuadRenderer, type QuadRenderer } from "./quad-renderer.js";
 import type { Frame } from "./renderer.js";
 import { uploadImage, type TexturePixels } from "./texture-assets.js";
+import { normalizeSampling, type Sampling } from "./texture-sampling.js";
 import type { RendererResourceInspection } from "./resource-inspection.js";
 import type { RendererLifecycleEvent, RgbaPixels, TextureRegion } from "./webgpu-renderer.js";
 
@@ -13,6 +14,8 @@ interface ImageEntry {
     readonly id: string;
     readonly definition?: ImageAsset;
     readonly source: ImageBitmap | TexturePixels;
+    /** Fixed at registration; every generation, including recovery, binds with it. */
+    readonly sampling: Sampling;
     readonly releaseSource: () => void;
     refs: number;
     released: boolean;
@@ -162,7 +165,8 @@ export class WebGpuRuntime {
     }
     private notify(event: RendererLifecycleEvent): void {
         Object.freeze(event);
-        for (const observer of [...this.observers]) {
+        // Iterate a snapshot: observers subscribed during delivery wait for the next event.
+        for (const observer of new Set(this.observers)) {
             if (!this.observers.has(observer)) continue;
             try {
                 // Contain returned promise rejections without delaying ordered delivery.
@@ -254,16 +258,7 @@ export class WebGpuRuntime {
                 this.canvas,
                 generation.abort.signal,
                 (message) => this.lost(generation, message),
-                (error) => {
-                    if (this.generation !== generation && this.pending !== generation) return;
-                    const key =
-                        typeof error === "object" && error !== null && "message" in error
-                            ? String(error.message)
-                            : String(error);
-                    if (generation.uncaptured.has(key)) return;
-                    generation.uncaptured.add(key);
-                    this.report(error);
-                },
+                (error) => this.uncaptured(generation, error),
                 this.platform.gpu,
             );
             generation.context = context;
@@ -293,6 +288,7 @@ export class WebGpuRuntime {
             await quad.texture("", generation.white.createView());
             this.assertGeneration(generation);
             // Repeat after awaits: membership can change during source upload/recovery.
+            // The final scan and publication stay in one synchronous turn.
             for (;;) {
                 let missing: ImageEntry | undefined;
                 for (const entry of this.entries.values())
@@ -321,6 +317,17 @@ export class WebGpuRuntime {
             }
             throw error;
         }
+    }
+    /** Reports each uncaptured device error message once per live or pending generation. */
+    private uncaptured(generation: Generation, error: unknown): void {
+        if (this.generation !== generation && this.pending !== generation) return;
+        const key =
+            typeof error === "object" && error !== null && "message" in error
+                ? String(error.message)
+                : String(error);
+        if (generation.uncaptured.has(key)) return;
+        generation.uncaptured.add(key);
+        this.report(error);
     }
     private lost(generation: Generation, message: string): void {
         if (generation !== this.generation || this.status !== "ready") return;
@@ -351,6 +358,7 @@ export class WebGpuRuntime {
     private async upload(
         generation: Generation,
         source: ImageBitmap | TexturePixels,
+        sampling: Sampling,
     ): Promise<{ texture: GPUTexture; binding: GPUBindGroup }> {
         this.assertGeneration(generation);
         const { context, quad } = generation;
@@ -358,7 +366,7 @@ export class WebGpuRuntime {
         const texture = await uploadImage(context.device, source);
         try {
             this.assertGeneration(generation);
-            const binding = await quad.binding(texture.createView());
+            const binding = await quad.binding(texture.createView(), sampling);
             this.assertGeneration(generation);
             return { texture, binding };
         } catch (error) {
@@ -376,7 +384,7 @@ export class WebGpuRuntime {
         if (previous) return previous;
         const upload = (async () => {
             if (entry.released) throw new Error("Image consumer released: " + entry.id);
-            const result = await this.upload(generation, entry.source);
+            const result = await this.upload(generation, entry.source, entry.sampling);
             try {
                 this.assertGeneration(generation);
                 if (entry.released || this.entries.get(entry.id) !== entry)
@@ -439,10 +447,12 @@ export class WebGpuRuntime {
                 source.release();
                 entry = previous;
             } else {
+                const sampling = normalizeSampling(definition.sampling);
                 entry = {
                     id: definition.id,
                     definition,
                     source: source.value,
+                    sampling,
                     releaseSource: () => source.release(),
                     refs: 0,
                     released: false,
@@ -519,12 +529,14 @@ export class WebGpuRuntime {
         width: number,
         height: number,
         signal?: AbortSignal,
+        textureSampling?: TextureSampling,
     ): Promise<void> {
         this.assertAlive();
         signal?.throwIfAborted();
         if (!id || this.entries.has(id) || this.replacements.has(id))
             throw new Error("Texture ID is reserved or already registered: " + id);
         validateDimensions(width, height);
+        const sampling = normalizeSampling(textureSampling);
         const token = {};
         this.replacements.set(id, token);
         try {
@@ -550,6 +562,7 @@ export class WebGpuRuntime {
             await this.publishTexture(
                 id,
                 source,
+                sampling,
                 () => {
                     source.pixels = new Uint8Array(0);
                 },
@@ -639,8 +652,11 @@ export class WebGpuRuntime {
                 if (generation === this.generation && !entry.released)
                     try {
                         this.releaseEntry(entry);
-                    } catch (cleanup) {
-                        throw new AggregateError([error, cleanup], "Texture update cleanup failed");
+                    } catch (cleanupError) {
+                        throw new AggregateError(
+                            [error, cleanupError],
+                            "Texture update cleanup failed",
+                        );
                     }
                 throw error;
             }
@@ -659,11 +675,14 @@ export class WebGpuRuntime {
         id: string,
         source: ImageBitmap | HTMLCanvasElement,
         signal?: AbortSignal,
+        textureSampling?: TextureSampling,
     ): Promise<void> {
         this.assertAlive();
         signal?.throwIfAborted();
         if (!id || this.entries.get(id)?.definition)
             throw new Error("Texture ID is reserved or leased: " + id);
+        // Validate before the token supersedes pending work for this ID.
+        const sampling = normalizeSampling(textureSampling);
         const token = {};
         this.replacements.set(id, token);
         try {
@@ -673,7 +692,14 @@ export class WebGpuRuntime {
                       premultiplyAlpha: "none",
                       colorSpaceConversion: "none",
                   }));
-            await this.publishTexture(id, snapshot, () => snapshot.close(), token, signal);
+            await this.publishTexture(
+                id,
+                snapshot,
+                sampling,
+                () => snapshot.close(),
+                token,
+                signal,
+            );
         } finally {
             if (this.replacements.get(id) === token) this.replacements.delete(id);
         }
@@ -681,6 +707,7 @@ export class WebGpuRuntime {
     private async publishTexture(
         id: string,
         source: ImageBitmap | TexturePixels,
+        sampling: Sampling,
         releaseSource: () => void,
         token: object,
         signal?: AbortSignal,
@@ -688,52 +715,65 @@ export class WebGpuRuntime {
         let owned = true;
         try {
             for (;;) {
-                this.assertAlive();
-                signal?.throwIfAborted();
-                if (this.replacements.get(id) !== token)
-                    throw new Error("Texture replacement superseded: " + id);
+                this.assertReplacement(id, token, signal);
                 await this.ready();
-                this.assertAlive();
-                signal?.throwIfAborted();
-                if (this.replacements.get(id) !== token)
-                    throw new Error("Texture replacement superseded: " + id);
+                this.assertReplacement(id, token, signal);
                 const generation = this.generation;
                 if (!generation) continue;
                 let result: { texture: GPUTexture; binding: GPUBindGroup };
                 try {
-                    result = await this.upload(generation, source);
+                    result = await this.upload(generation, source, sampling);
                 } catch (error) {
                     if (this.status === "recovering" || generation !== this.generation) continue;
                     throw error;
                 }
-                let published = false;
-                try {
-                    this.assertAlive();
-                    signal?.throwIfAborted();
-                    if (this.replacements.get(id) !== token)
-                        throw new Error("Texture replacement superseded: " + id);
-                    if (generation !== this.generation || this.status !== "ready") continue;
-                    const entry: ImageEntry = {
-                        id,
-                        source,
-                        releaseSource,
-                        refs: 1,
-                        released: false,
-                    };
-                    generation.quad?.setTexture(id, result.binding);
-                    const previous = this.entries.get(id);
-                    this.entries.set(id, entry);
-                    generation.images.set(entry, result.texture);
-                    owned = false;
-                    published = true;
-                    if (previous) this.releaseEntry(previous);
-                    return;
-                } finally {
-                    if (!published) result.texture.destroy();
-                }
+                const entry: ImageEntry = {
+                    id,
+                    source,
+                    sampling,
+                    releaseSource,
+                    refs: 1,
+                    released: false,
+                };
+                const publication = this.commitTexture(generation, entry, result, token, signal);
+                if (!publication) continue;
+                owned = false;
+                if (publication.previous) this.releaseEntry(publication.previous);
+                return;
             }
         } finally {
             if (owned) releaseSource();
+        }
+    }
+    private assertReplacement(id: string, token: object, signal?: AbortSignal): void {
+        this.assertAlive();
+        signal?.throwIfAborted();
+        if (this.replacements.get(id) !== token)
+            throw new Error("Texture replacement superseded: " + id);
+    }
+    /**
+     * Synchronously publishes an uploaded manual entry, or destroys its texture when the
+     * replacement is stale or throws. Undefined means the generation changed: retry.
+     */
+    private commitTexture(
+        generation: Generation,
+        entry: ImageEntry,
+        result: { texture: GPUTexture; binding: GPUBindGroup },
+        token: object,
+        signal?: AbortSignal,
+    ): { previous?: ImageEntry } | undefined {
+        let published = false;
+        try {
+            this.assertReplacement(entry.id, token, signal);
+            if (generation !== this.generation || this.status !== "ready") return undefined;
+            generation.quad?.setTexture(entry.id, result.binding);
+            const previous = this.entries.get(entry.id);
+            this.entries.set(entry.id, entry);
+            generation.images.set(entry, result.texture);
+            published = true;
+            return { previous };
+        } finally {
+            if (!published) result.texture.destroy();
         }
     }
     render(frame: Frame, clear: number): void {

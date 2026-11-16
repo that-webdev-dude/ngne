@@ -11,6 +11,7 @@ import {
 import { FRAME_UNIFORM_BYTES, getQuadShaderSource } from "./quad-shader.js";
 import type { Frame } from "./renderer.js";
 import { createResourceRegistry } from "./resource-registry.js";
+import { DEFAULT_SAMPLING, type Sampling } from "./texture-sampling.js";
 
 export interface QuadRenderer {
     readonly stats: {
@@ -21,7 +22,7 @@ export interface QuadRenderer {
         capacity: number;
         bindings: number;
     };
-    binding(view: GPUTextureView): Promise<GPUBindGroup>;
+    binding(view: GPUTextureView, sampling?: Sampling): Promise<GPUBindGroup>;
     setTexture(id: string, group: GPUBindGroup): void;
     texture(id: string, view: GPUTextureView): Promise<void>;
     release(id: string): void;
@@ -112,12 +113,21 @@ export async function createQuadRenderer(
             device.queue.writeBuffer(indices, 0, new Uint16Array([0, 1, 2, 0, 2, 3]));
             const instances = allocate(stats.capacity * BYTES_PER_QUAD, GPUBufferUsage.VERTEX);
             const uniform = allocate(FRAME_UNIFORM_BYTES, GPUBufferUsage.UNIFORM);
-            const sampler = device.createSampler({
-                magFilter: "nearest",
-                minFilter: "nearest",
-                addressModeU: "clamp-to-edge",
-                addressModeV: "clamp-to-edge",
-            });
+            // One immutable sampler per combination; the default descriptor is unchanged.
+            const samplers = new Map<string, GPUSampler>();
+            for (const filter of ["nearest", "linear"] as const)
+                for (const address of ["clamp", "repeat"] as const) {
+                    const mode = address === "repeat" ? "repeat" : "clamp-to-edge";
+                    samplers.set(
+                        filter + ":" + address,
+                        device.createSampler({
+                            magFilter: filter,
+                            minFilter: filter,
+                            addressModeU: mode,
+                            addressModeV: mode,
+                        }),
+                    );
+                }
             const shader = device.createShaderModule({
                 label: "NGNE affine quad",
                 code: getQuadShaderSource(),
@@ -129,7 +139,7 @@ export async function createQuadRenderer(
                 indices,
                 instances,
                 uniform,
-                sampler,
+                samplers,
                 shader,
             };
         });
@@ -159,8 +169,13 @@ export async function createQuadRenderer(
         };
         return {
             stats,
-            async binding(view: GPUTextureView): Promise<GPUBindGroup> {
+            async binding(
+                view: GPUTextureView,
+                sampling: Sampling = DEFAULT_SAMPLING,
+            ): Promise<GPUBindGroup> {
                 assertAlive();
+                const sampler = resources.samplers.get(sampling.filter + ":" + sampling.address);
+                if (!sampler) throw new Error("Invalid texture sampling");
                 const group = await validateGpuOperation(device, () =>
                     device.createBindGroup({
                         layout: resources.layout,
@@ -169,7 +184,7 @@ export async function createQuadRenderer(
                                 binding: 0,
                                 resource: { buffer: resources.uniform, size: FRAME_UNIFORM_BYTES },
                             },
-                            { binding: 1, resource: resources.sampler },
+                            { binding: 1, resource: sampler },
                             { binding: 2, resource: view },
                         ],
                     }),

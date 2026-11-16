@@ -222,31 +222,43 @@ async function webgpuBoundary(canvas: HTMLCanvasElement, bitmap: ImageBitmap): P
     void pending;
     const ready: Promise<void> = renderer.ready(abort.signal);
     void ready;
-    const resized: void = renderer.resize(960, 540);
-    const dimensions: readonly number[] = [renderer.width, renderer.height];
-    void resized;
-    void dimensions;
+    renderer.resize(960, 540) satisfies void;
+    renderer.resize(renderer.width, renderer.height) satisfies void;
     // @ts-expect-error Logical dimensions are observable but readonly.
     renderer.width = 100;
     // @ts-expect-error Logical dimensions are observable but readonly.
     renderer.height = 100;
     // @ts-expect-error Resize requires numeric dimensions.
     renderer.resize("960", 540);
+    const failures: Error[] = [];
     const unsubscribe: () => void = renderer.onLifecycle((event: engine.RendererLifecycleEvent) => {
-        if (event.status === "failed") {
-            const error: Error = event.error;
-            void error;
-        }
+        if (event.status === "failed") failures.push(event.error);
         // @ts-expect-error Events are readonly.
         event.status = "ready";
     });
     unsubscribe();
     // @ts-expect-error Readiness takes an AbortSignal.
-    renderer.ready({});
+    void renderer.ready({});
     const image: engine.ImageAsset = engine.imageAsset("image", "./image.png");
     const upload: Promise<void> = renderer.texture(image.id, bitmap);
     await upload;
     await renderer.createTexture("editable", 64, 64);
+    const sampling: engine.TextureSampling = { filter: "linear", address: "repeat" };
+    await renderer.texture("filtered", bitmap, undefined, sampling);
+    await renderer.createTexture("tiled", 8, 8, new AbortController().signal, {
+        address: "repeat",
+    });
+    const sampled: engine.ImageAsset = engine.imageAsset("sampled", "./image.png", {
+        filter: "linear",
+    });
+    const assetSampling: engine.TextureSampling | undefined = sampled.sampling;
+    await renderer.texture("asset-sampled", bitmap, undefined, assetSampling);
+    // @ts-expect-error Filtering is nearest or linear.
+    void renderer.texture("filtered", bitmap, undefined, { filter: "bilinear" });
+    // @ts-expect-error Addressing is clamp or repeat.
+    void renderer.createTexture("tiled", 8, 8, undefined, { address: "mirror-repeat" });
+    // @ts-expect-error Sampling fields are readonly.
+    sampling.filter = "nearest";
     const patch: engine.TextureRegion = {
         sourceX: 0,
         sourceY: 0,
@@ -257,12 +269,13 @@ async function webgpuBoundary(canvas: HTMLCanvasElement, bitmap: ImageBitmap): P
     };
     await renderer.updateTexture("editable", bitmap, patch, new AbortController().signal);
     // @ts-expect-error Patch dimensions and both origins are required.
-    renderer.updateTexture("editable", bitmap, { width: 2, height: 2 });
+    void renderer.updateTexture("editable", bitmap, { width: 2, height: 2 });
     const pixels: engine.RgbaPixels = { width: 2, height: 2, data: new Uint8ClampedArray(16) };
     await renderer.updateTexture("editable", pixels, patch);
     await renderer.updateTexture("editable", new ImageData(pixels.width, pixels.height), patch);
+    const wide = { width: 2, height: 2, data: new Uint16Array(16) };
     // @ts-expect-error Raw sources store RGBA8 bytes, not 16-bit values.
-    renderer.updateTexture("editable", { width: 2, height: 2, data: new Uint16Array(16) }, patch);
+    void renderer.updateTexture("editable", wide, patch);
     // @ts-expect-error Raw source fields are readonly.
     pixels.data = new Uint8Array(16);
     // @ts-expect-error Patch dimensions are readonly.

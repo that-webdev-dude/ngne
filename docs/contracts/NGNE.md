@@ -36,8 +36,8 @@ The maintained Hello and Platformer examples and authoring tests consume this su
 ### Authoring and presentation
 
 Public symbols: `Camera`, `Random`, `clamp`, `lerp`, `seedOf`, `down`, `pressed`,
-`imageAsset`, `audioAsset`; types `Asset`, `ImageAsset`, `Lease`, `Sprite`, `Sound`
-and `Clip`.
+`imageAsset`, `audioAsset`; types `Asset`, `ImageAsset`, `Lease`, `Sprite`, `Sound`,
+`Clip` and `TextureSampling`.
 
 Scene authors use this surface for explicitly acquired or injected values. See
 [state ownership](ownership-and-inspection.md#simulation-state-ownership-inventory).
@@ -63,10 +63,11 @@ report the current logical dimensions. See the
 [browser and presentation contract](browser-and-presentation.md#renderer) for dimension
 ownership and rejection rules.
 
-Public manual texture operations: `texture(id, source, signal?)`,
-`createTexture(id, width, height, signal?)`, `updateTexture(id, source, region, signal?)`
+Public manual texture operations: `texture(id, source, signal?, sampling?)`,
+`createTexture(id, width, height, signal?, sampling?)`, `updateTexture(id, source, region, signal?)`
 and `releaseTexture(id)`; `TextureRegion` describes source and destination rectangles.
-`RgbaPixels` describes raw RGBA8 update sources.
+`RgbaPixels` describes raw RGBA8 update sources. `TextureSampling` selects per-texture
+filtering and addressing; see [texture sampling](browser-and-presentation.md#texture-sampling).
 See [editable manual textures](browser-and-presentation.md#editable-manual-textures)
 for initialization, ordering, ownership, validation, cancellation and recovery.
 

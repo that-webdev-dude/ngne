@@ -1,4 +1,4 @@
-import type { ImageAsset, Lease } from "./assets.js";
+import type { ImageAsset, Lease, TextureSampling } from "./assets.js";
 import type { Frame } from "./renderer.js";
 import { ACQUIRE_IMAGE, CREATE_RENDERER, RENDERER_READY } from "./renderer-host.js";
 import { WebGpuRuntime } from "./webgpu-runtime.js";
@@ -83,14 +83,21 @@ export class WebGPURenderer {
         id: string,
         source: ImageBitmap | HTMLCanvasElement,
         signal?: AbortSignal,
+        sampling?: TextureSampling,
     ): Promise<void> {
-        return this.#runtime.texture(id, source, signal);
+        return this.#runtime.texture(id, source, signal, sampling);
     }
     releaseTexture(id: string): void {
         this.#runtime.releaseTexture(id);
     }
-    createTexture(id: string, width: number, height: number, signal?: AbortSignal): Promise<void> {
-        return this.#runtime.createTexture(id, width, height, signal);
+    createTexture(
+        id: string,
+        width: number,
+        height: number,
+        signal?: AbortSignal,
+        sampling?: TextureSampling,
+    ): Promise<void> {
+        return this.#runtime.createTexture(id, width, height, signal, sampling);
     }
     updateTexture(
         id: string,

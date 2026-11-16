@@ -109,6 +109,9 @@ export class FakeDevice extends EventTarget {
     readonly textures: { destroyed: number }[] = [];
     readonly pipelines: object[] = [];
     readonly bindings: object[] = [];
+    readonly samplers: GPUSamplerDescriptor[] = [];
+    /** Sampler descriptor bound by each bind group, in creation order with `bindings`. */
+    readonly bindingSamplers = new Map<object, GPUSamplerDescriptor | undefined>();
     readonly usedPipelines: object[] = [];
     readonly usedBindings: object[] = [];
     readonly writes: { size: number | undefined; dataLength: number; prefix: number[] }[] = [];
@@ -167,13 +170,12 @@ export class FakeDevice extends EventTarget {
     }
     createTexture() {
         const record = { destroyed: 0 };
-        const device = this;
         this.textures.push(record);
         return {
             createView: () => ({}),
-            destroy() {
+            destroy: () => {
                 record.destroyed++;
-                if (device.textureDestroyError) throw device.textureDestroyError;
+                if (this.textureDestroyError) throw this.textureDestroyError;
             },
         };
     }
@@ -183,8 +185,9 @@ export class FakeDevice extends EventTarget {
     createPipelineLayout() {
         return {};
     }
-    createSampler() {
-        return {};
+    createSampler(descriptor: GPUSamplerDescriptor) {
+        this.samplers.push(descriptor);
+        return { descriptor };
     }
     createShaderModule() {
         return {};
@@ -195,9 +198,15 @@ export class FakeDevice extends EventTarget {
         this.pipelines.push(pipeline);
         return pipeline;
     }
-    createBindGroup() {
+    createBindGroup(descriptor: { entries: Iterable<{ resource: unknown }> }) {
         const binding = {};
         this.bindings.push(binding);
+        const sampler = [...descriptor.entries]
+            .map(({ resource }) => resource)
+            .find((resource): resource is { descriptor: GPUSamplerDescriptor } =>
+                Boolean(resource && typeof resource === "object" && "descriptor" in resource),
+            );
+        this.bindingSamplers.set(binding, sampler?.descriptor);
         return binding;
     }
     createCommandEncoder() {

@@ -151,6 +151,18 @@ and release with `renderer.releaseTexture('preview')` when finished. See the
 [manual-texture lifetime contract](contracts/browser-and-presentation.md#assets-and-audio)
 for cancellation, ID reuse and reserved/leased IDs.
 
+Textures sample nearest with clamped edges by default. Opt into filtering or tiling per
+registration:
+
+```ts
+const backdrop = imageAsset("backdrop", url, { filter: "linear" });
+await renderer.texture("water", canvas, undefined, { address: "repeat" });
+frame.sprite({ x: 128, y: 128, width: 256, height: 256, texture: "water", uw: 4, vh: 4 }); // 4×4 tiles
+```
+
+Repeat tiles whole textures, not atlas frames. See
+[texture sampling](contracts/browser-and-presentation.md#texture-sampling).
+
 For repeated edits, initialize reusable storage, then await each dirty rectangle:
 
 ```ts

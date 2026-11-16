@@ -1,3 +1,5 @@
+import { normalizeSampling } from "./texture-sampling.js";
+
 export interface Asset<T = unknown> {
     readonly id: string;
     readonly kind?: "image" | "audio";
@@ -11,13 +13,25 @@ export interface Lease<T = unknown> {
     readonly value: T;
     release(): void;
 }
+/**
+ * Per-texture GPU sampling. `filter` defaults to `"nearest"`, `address` to `"clamp"`.
+ * `"repeat"` tiles whole-texture UVs outside 0–1; it cannot tile an atlas sub-rectangle.
+ */
+export interface TextureSampling {
+    readonly filter?: "nearest" | "linear";
+    readonly address?: "clamp" | "repeat";
+}
 export interface ImageAsset extends Asset<ImageBitmap> {
     readonly kind: "image";
+    /** Read once each time the renderer registers this definition; keep it unchanged. */
+    readonly sampling?: TextureSampling;
 }
-export function imageAsset(id: string, url: string): ImageAsset {
+export function imageAsset(id: string, url: string, sampling?: TextureSampling): ImageAsset {
+    const fixed = sampling === undefined ? undefined : normalizeSampling(sampling);
     return {
         id,
         kind: "image",
+        ...(fixed && { sampling: fixed }),
         estimateBytes: (bitmap) => bitmap.width * bitmap.height * 4,
         async load(signal) {
             const response = await fetch(url, { signal });

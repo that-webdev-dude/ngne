@@ -313,6 +313,27 @@ its original after resolution. Replacement is transactional; cancellation/failur
 preserves the old ready binding. Already-premultiplied inputs may have lost precision
 before snapshotting; the renderer cannot reconstruct those original bytes.
 
+### Texture sampling
+
+`TextureSampling` has optional `filter` (`"nearest"` or `"linear"`) and `address`
+(`"clamp"` or `"repeat"`); omitted fields default to nearest and clamp, which match
+registrations without sampling exactly. `texture()` and `createTexture()` take it as
+their last argument; `imageAsset(id, url, sampling?)` validates and freezes a copy on
+the definition, and custom `ImageAsset.sampling` is read at each registration. Unknown
+keys, other values and non-object sampling reject before any snapshot, upload or
+replacement token: an existing registration and a pending replacement for that ID are
+unaffected, and a rejected asset acquisition releases its lease. `imageAsset()` throws
+synchronously.
+
+Sampling is fixed per registration and applies to both axes. `texture()` replacement
+takes the replacement's sampling; `updateTexture()` keeps it. Device recovery rebinds
+every registration with its sampling. Draw runs still batch by texture ID only. Repeat
+tiles the whole texture when UVs leave 0–1; it cannot tile an atlas sub-rectangle, and
+linear filtering samples neighbouring texels at sub-rectangle edges. Filtering
+interpolates straight-alpha texels before premultiplication, so colour under
+transparent texels darkens or tints edges. There are no mipmaps: linear minification
+below half scale can alias.
+
 ### Editable manual textures
 
 `WebGPURenderer.createTexture(id, width, height, signal?)` initializes a transparent,
