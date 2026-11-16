@@ -49,7 +49,7 @@ export function fakePlatform() {
         getCurrentTexture() {
             if (this.failAcquire) throw new Error("Injected acquisition failure");
             this.acquisitions++;
-            return { createView: () => ({}) };
+            return { width: canvas.width, height: canvas.height, createView: () => ({}) };
         },
     };
     const canvas = { width: 64, height: 64, getContext: () => surface } as HTMLCanvasElement;
@@ -114,6 +114,8 @@ export class FakeDevice extends EventTarget {
     readonly bindingSamplers = new Map<object, GPUSamplerDescriptor | undefined>();
     readonly usedPipelines: object[] = [];
     readonly usedBindings: object[] = [];
+    /** Encoded pass commands in order: `scissor x,y,w,h` and `draw <instances>`. */
+    readonly commands: string[] = [];
     readonly writes: { size: number | undefined; dataLength: number; prefix: number[] }[] = [];
     readonly textureWrites: {
         destination: GPUImageCopyTexture;
@@ -168,10 +170,13 @@ export class FakeDevice extends EventTarget {
             },
         };
     }
-    createTexture() {
+    createTexture(descriptor?: { size: number[] }) {
         const record = { destroyed: 0 };
         this.textures.push(record);
+        const [width = 64, height = 64] = descriptor?.size ?? [];
         return {
+            width,
+            height,
             createView: () => ({}),
             destroy: () => {
                 record.destroyed++;
@@ -222,8 +227,12 @@ export class FakeDevice extends EventTarget {
                     setBindGroup: (_index: number, binding: object) => {
                         this.usedBindings.push(binding);
                     },
-                    drawIndexed: () => {
+                    setScissorRect: (x: number, y: number, width: number, height: number) => {
+                        this.commands.push(`scissor ${x},${y},${width},${height}`);
+                    },
+                    drawIndexed: (_indices: number, instances: number) => {
                         if (this.failEncode) throw new Error("Injected encode failure");
+                        this.commands.push(`draw ${instances}`);
                     },
                     end: () => {
                         this.endedPasses++;

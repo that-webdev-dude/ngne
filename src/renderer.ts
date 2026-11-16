@@ -1,5 +1,6 @@
 import { Camera } from "./primitives.js";
 import { QUAD_STRIDE as STRIDE } from "./quad-layout.js";
+import { SpriteClips, type ClipRect } from "./sprite-clip.js";
 export interface Sprite {
     x: number;
     y: number;
@@ -16,10 +17,20 @@ export interface Sprite {
     layer?: number;
     depth?: number;
     screen?: boolean;
+    /** Scissor in render-target pixels, copied when the sprite is added. */
+    clip?: ClipRect;
 }
 const SNAP_GRID = 2 ** 20;
+let activeClips: (frame: Frame) => SpriteClips | undefined;
+/** Clip snapshots of a frame with at least one clipped sprite; internal to the renderer. */
+export function frameClips(frame: Frame): SpriteClips | undefined {
+    return activeClips(frame);
+}
 /** Renderer input contains no entities. Ordering is scene -> layer -> depth -> insertion. */
 export class Frame {
+    static {
+        activeClips = (frame) => (frame.clipping ? frame.clips : undefined);
+    }
     data = new Float32Array(STRIDE * 2048);
     count = 0;
     readonly textures: (string | undefined)[] = [];
@@ -32,9 +43,12 @@ export class Frame {
     private sceneIndex = -1;
     private camera = { x: 0, y: 0, zoom: 1 };
     private snap = true;
+    private readonly clips = new SpriteClips();
+    private clipping = false;
     reset() {
         this.count = 0;
         this.sceneIndex = -1;
+        this.clipping = false;
         // Keep backing arrays warm while packing. sort() trims the active prefix.
     }
     scene(camera: Camera, alpha: number) {
@@ -61,6 +75,9 @@ export class Frame {
             s.rotation ?? 0,
             s.screen ?? false,
         );
+        const clip = s.clip;
+        if (clip !== undefined) this.clip(this.count - 1, clip);
+        else if (this.clipping) this.clips.none(this.count - 1);
     }
     rect(
         x: number,
@@ -73,6 +90,14 @@ export class Frame {
         screen = false,
     ) {
         this.add(x, y, width, height, color, alpha, layer, 0, undefined, 0, 0, 1, 1, 0, screen);
+        if (this.clipping) this.clips.none(this.count - 1);
+    }
+    private clip(index: number, clip: ClipRect) {
+        if (!this.clipping) {
+            this.clipping = true;
+            this.clips.begin(index);
+        }
+        this.clips.set(index, clip);
     }
     private add(
         x: number,

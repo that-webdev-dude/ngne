@@ -53,7 +53,7 @@ export async function checkBrowserInterpolation(
         for (const { frame, label, alpha } of samples) {
             quad.prepare(frame);
             const encoder = device.createCommandEncoder();
-            quad.encode(encoder, target.createView(), frame, 128, 96, 0x090e20);
+            quad.encode(encoder, target, frame, 128, 96, 0x090e20);
             encoder.copyTextureToBuffer(
                 { texture: target },
                 { buffer: readback, bytesPerRow: 512 },

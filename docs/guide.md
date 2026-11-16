@@ -163,6 +163,23 @@ frame.sprite({ x: 128, y: 128, width: 256, height: 256, texture: "water", uw: 4,
 Repeat tiles whole textures, not atlas frames. See
 [texture sampling](contracts/browser-and-presentation.md#texture-sampling).
 
+To clip a sprite, pass `clip` in render-target pixels:
+
+```ts
+frame.sprite({
+    x: 40,
+    y: 20,
+    width: 96,
+    height: 96,
+    texture: "map",
+    clip: { x: 16, y: 8, width: 64, height: 32 },
+});
+```
+
+Clips use backing pixels; when the canvas backing size differs from the logical size,
+scale the rectangle yourself. See
+[sprite clipping](contracts/browser-and-presentation.md#sprite-clipping).
+
 For repeated edits, initialize reusable storage, then await each dirty rectangle:
 
 ```ts

@@ -186,14 +186,42 @@ u0, v0, du, dv, r, g, b, a`. The first six values transform unit-square corners:
 Authoring still uses centered XY, signed size and rotation radians. Camera/shake
 subtraction and zoom scaling happen before affine conversion; with `pixelSnap` the packed translation
 is then rounded (see [interpolation and discontinuities](#interpolation-and-discontinuities)). Sorting
-remains scene, layer, depth and insertion. Adjacent texture runs batch without
-texture-driven reordering. CPU/GPU buffers grow geometrically; there is no
+remains scene, layer, depth and insertion. Adjacent sprites with the same texture batch
+without texture-driven reordering; [clips](#sprite-clipping) also split runs. CPU/GPU buffers grow geometrically; there is no
 per-entity GPU object or ECS access from rendering.
 
 `Frame.count` defines the active prefix while packing. `reset()` resets logical
 contents and retains metadata array capacity; raw readers must not traverse stale
 tails. `sort()` trims `order` and `textures` to the active count before ordering.
 This avoids repeated backing-array growth for a steady workload.
+
+### Sprite clipping
+
+`Sprite.clip` is an optional `ClipRect` `{ x, y, width, height }` in integer
+render-target (backing) pixels: top-left origin, exclusive right and bottom edges. It
+is neither CSS pixels nor logical pixels multiplied by the device pixel ratio; when
+logical and backing sizes differ, clips use backing pixels, including after resize and
+device recovery. World and `screen: true` sprites use the same clip. Camera
+interpolation, shake, zoom and `pixelSnap` move sprite geometry and never transform or
+snap the clip. `Frame.rect` takes no clip.
+
+`Frame.sprite` copies the four values when the sprite is added; later changes to the
+caller's object, `reset()` and later unclipped sprites cannot alter a recorded clip.
+Clipping adds no sort key or scene barrier: ordering stays scene, layer, depth and
+insertion.
+
+The effective clip is the rectangle intersected with the current render target; an
+unclipped sprite's effective clip is the whole target. Adjacent sprites batch while
+their texture and effective clip are equal by value; a change splits the draw, and
+later unclipped sprites draw to the whole target again. An empty intersection,
+including zero width or height, draws nothing. Instance layout and upload, texture
+readiness checks (fully clipped sprites included), the full-target clear and `sprites`
+are unchanged; `drawCalls` counts encoded draws.
+
+Origins may be negative. Each value must be a safe integer, `width` and `height` must
+not be negative, and `x + width` and `y + height` must be safe integers. An invalid
+clip fails frame preparation before encoding with a `RangeError`: the submission is
+skipped and reported under the frame-fault rules above, and later valid frames render.
 
 ### Camera coordinates
 
@@ -327,7 +355,7 @@ synchronously.
 
 Sampling is fixed per registration and applies to both axes. `texture()` replacement
 takes the replacement's sampling; `updateTexture()` keeps it. Device recovery rebinds
-every registration with its sampling. Draw runs still batch by texture ID only. Repeat
+every registration with its sampling. Sampling does not affect batching. Repeat
 tiles the whole texture when UVs leave 0–1; it cannot tile an atlas sub-rectangle, and
 linear filtering samples neighbouring texels at sub-rectangle edges. Filtering
 interpolates straight-alpha texels before premultiplication, so colour under

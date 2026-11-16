@@ -237,6 +237,7 @@ async function webgpuBoundary(canvas: HTMLCanvasElement, bitmap: ImageBitmap): P
         event.status = "ready";
     });
     unsubscribe();
+    failures.at(0) satisfies Error | undefined;
     // @ts-expect-error Readiness takes an AbortSignal.
     void renderer.ready({});
     const image: engine.ImageAsset = engine.imageAsset("image", "./image.png");
@@ -280,14 +281,23 @@ async function webgpuBoundary(canvas: HTMLCanvasElement, bitmap: ImageBitmap): P
     pixels.data = new Uint8Array(16);
     // @ts-expect-error Patch dimensions are readonly.
     patch.width = 4;
-    const released: void = renderer.releaseTexture(image.id);
-    void released;
+    renderer.releaseTexture(image.id) satisfies void;
     // @ts-expect-error Manual texture release takes a string ID.
     renderer.releaseTexture(image);
-    const submitted: void = renderer.render(new engine.Frame());
-    const status: engine.RendererStatus = renderer.status;
-    void submitted;
-    void status;
+    const clip: engine.ClipRect = { x: -2, y: 0, width: 16, height: 8 };
+    const clipped = new engine.Frame();
+    clipped.sprite({ x: 0, y: 0, width: 4, height: 4, clip });
+    (({}) as engine.Sprite).clip satisfies engine.ClipRect | undefined;
+    // @ts-expect-error Clip rectangles need all four fields.
+    clipped.sprite({ x: 0, y: 0, width: 4, height: 4, clip: { x: 0, y: 0, width: 4 } });
+    // @ts-expect-error Clip rectangles are objects, not tuples.
+    clipped.sprite({ x: 0, y: 0, width: 4, height: 4, clip: [0, 0, 4, 4] });
+    // @ts-expect-error Clip snapshots are internal to Frame.
+    clipped.clips satisfies unknown;
+    // @ts-expect-error Rectangles take no clip; use Frame.sprite.
+    clipped.rect(0, 0, 4, 4, 0xffffff, 1, 0, false, clip);
+    renderer.render(clipped) satisfies void;
+    renderer.status satisfies engine.RendererStatus;
     // @ts-expect-error Presentation status cannot be overwritten by consumers.
     renderer.status = "ready";
     // @ts-expect-error GPU construction is asynchronous through create().

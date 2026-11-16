@@ -91,7 +91,7 @@ export async function checkWebGPUCore(
         frame.sprite({ x: 48, y: 32, width: 32, height: 64, texture: "blue" });
         quad.prepare(frame);
         const encoder = device.createCommandEncoder();
-        quad.encode(encoder, target.createView(), frame, 64, 64, 0);
+        quad.encode(encoder, target, frame, 64, 64, 0);
         encoder.copyTextureToBuffer(
             { texture: target },
             { buffer: readback, bytesPerRow: 256 },
@@ -120,7 +120,7 @@ export async function checkWebGPUCore(
         const readFrame = async (input: Frame, x = 32, y = 32) => {
             quad.prepare(input);
             const commands = device.createCommandEncoder();
-            quad.encode(commands, target.createView(), input, 64, 64, 0);
+            quad.encode(commands, target, input, 64, 64, 0);
             commands.copyTextureToBuffer(
                 { texture: target },
                 { buffer: readback, bytesPerRow: 256 },

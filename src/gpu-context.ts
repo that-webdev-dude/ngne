@@ -4,7 +4,8 @@ export interface GpuContext {
     readonly device: GPUDevice;
     readonly format: GPUTextureFormat;
     assertReady(): void;
-    acquire(): GPUTextureView;
+    /** The current canvas texture; its size is the backing size clips are applied in. */
+    acquire(): GPUTexture;
     submit(encoder: GPUCommandEncoder): void;
     dispose(): void;
 }
@@ -114,7 +115,7 @@ export async function createGpuContext(
                 height > device.limits.maxTextureDimension2D
             )
                 throw new Error("Invalid WebGPU canvas dimensions");
-            return context.getCurrentTexture().createView();
+            return context.getCurrentTexture();
         },
         submit(encoder) {
             assertReady();

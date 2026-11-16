@@ -277,7 +277,7 @@ test("candidate and comparator produce identical uploaded bytes and adjacent tex
     const encoder = device.createCommandEncoder();
     renderer.encode(
         encoder as unknown as GPUCommandEncoder,
-        {} as GPUTextureView,
+        device.createTexture() as unknown as GPUTexture,
         frame,
         64,
         64,

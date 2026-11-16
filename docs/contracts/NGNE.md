@@ -37,10 +37,12 @@ The maintained Hello and Platformer examples and authoring tests consume this su
 
 Public symbols: `Camera`, `Random`, `clamp`, `lerp`, `seedOf`, `down`, `pressed`,
 `imageAsset`, `audioAsset`; types `Asset`, `ImageAsset`, `Lease`, `Sprite`, `Sound`,
-`Clip` and `TextureSampling`.
+`Clip`, `ClipRect` and `TextureSampling`.
 
 Scene authors use this surface for explicitly acquired or injected values. See
 [state ownership](ownership-and-inspection.md#simulation-state-ownership-inventory).
+`Sprite.clip` takes a `ClipRect`; see
+[sprite clipping](browser-and-presentation.md#sprite-clipping).
 
 ### Platform integration
 

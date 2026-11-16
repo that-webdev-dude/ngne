@@ -9,8 +9,9 @@ import {
     QUAD_INSTANCE_BUFFER_LAYOUT,
 } from "./quad-layout.js";
 import { FRAME_UNIFORM_BYTES, getQuadShaderSource } from "./quad-shader.js";
-import type { Frame } from "./renderer.js";
+import { frameClips, type Frame } from "./renderer.js";
 import { createResourceRegistry } from "./resource-registry.js";
+import type { SpriteClips } from "./sprite-clip.js";
 import { DEFAULT_SAMPLING, type Sampling } from "./texture-sampling.js";
 
 export interface QuadRenderer {
@@ -27,9 +28,10 @@ export interface QuadRenderer {
     texture(id: string, view: GPUTextureView): Promise<void>;
     release(id: string): void;
     prepare(frame: Frame): void;
+    /** Clips apply in `target` pixels; `width` and `height` are the logical projection. */
     encode(
         encoder: GPUCommandEncoder,
-        view: GPUTextureView,
+        target: GPUTexture,
         frame: Frame,
         width: number,
         height: number,
@@ -61,6 +63,39 @@ export async function createQuadRenderer(
     stats.capacity = Math.min(stats.capacity, maxQuads);
     let upload = new Float32Array(stats.capacity * QUAD_STRIDE);
     const uniforms = new Float32Array(FRAME_UNIFORM_BYTES / 4);
+    // Effective scissor [left, top, right, bottom] of the run being gathered and of the pass.
+    const run = new Float64Array(4),
+        scissor = new Float64Array(4);
+    /** End of the run starting at `start`: one texture and, when clipped, one effective clip. */
+    const runEnd = (
+        frame: Frame,
+        start: number,
+        id: string,
+        clips: SpriteClips | undefined,
+        width: number,
+        height: number,
+    ) => {
+        let end = start + 1;
+        while (end < frame.count) {
+            const source = frame.order[end];
+            if ((frame.textures[source] ?? "") !== id) break;
+            if (clips && !clips.matches(source, width, height, run)) break;
+            end++;
+        }
+        return end;
+    };
+    /** Sets the pass scissor to `run` unless it already is. */
+    const applyScissor = (pass: GPURenderPassEncoder) => {
+        if (
+            run[0] === scissor[0] &&
+            run[1] === scissor[1] &&
+            run[2] === scissor[2] &&
+            run[3] === scissor[3]
+        )
+            return;
+        pass.setScissorRect(run[0], run[1], run[2] - run[0], run[3] - run[1]);
+        scissor.set(run);
+    };
     uniforms[2] = debug ? 1 : 0;
     uniforms[4] = uniforms[7] = 1;
     const allocate = (size: number, usage: GPUBufferUsageFlags) => {
@@ -226,6 +261,7 @@ export async function createQuadRenderer(
                     if (!textures.has(frame.textures[i] ?? ""))
                         throw new Error("Texture is not ready: " + frame.textures[i]);
                 }
+                frameClips(frame)?.validate(count);
                 frame.sort();
                 if (count > stats.capacity) {
                     const capacity = Math.min(
@@ -275,13 +311,16 @@ export async function createQuadRenderer(
             },
             encode(
                 encoder: GPUCommandEncoder,
-                view: GPUTextureView,
+                target: GPUTexture,
                 frame: Frame,
                 width: number,
                 height: number,
                 clear: number,
             ): void {
                 assertAlive();
+                const clips = frameClips(frame),
+                    targetWidth = target.width,
+                    targetHeight = target.height;
                 uniforms[0] = width;
                 uniforms[1] = height;
                 device.queue.writeBuffer(resources.uniform, 0, uniforms);
@@ -293,7 +332,7 @@ export async function createQuadRenderer(
                 const pass = encoder.beginRenderPass({
                     colorAttachments: [
                         {
-                            view,
+                            view: target.createView(),
                             clearValue: {
                                 r: ((clear >>> 16) & 255) / 255,
                                 g: ((clear >>> 8) & 255) / 255,
@@ -309,14 +348,24 @@ export async function createQuadRenderer(
                     pass.setPipeline(pipeline);
                     pass.setVertexBuffer(0, resources.corners);
                     pass.setIndexBuffer(resources.indices, "uint16");
+                    // A pass starts with the full-target scissor, so unclipped frames never set it.
+                    scissor.fill(0);
+                    scissor[2] = targetWidth;
+                    scissor[3] = targetHeight;
                     let start = 0;
                     while (start < frame.count) {
-                        const id = frame.textures[frame.order[start]] ?? "";
-                        let end = start + 1;
-                        while (end < frame.count && (frame.textures[frame.order[end]] ?? "") === id)
-                            end++;
+                        const first = frame.order[start];
+                        const id = frame.textures[first] ?? "";
+                        clips?.bounds(first, targetWidth, targetHeight, run);
+                        const end = runEnd(frame, start, id, clips, targetWidth, targetHeight);
                         const handle = textures.get(id);
                         if (handle === undefined) throw new Error("Texture is not ready: " + id);
+                        // Empty intersections are all zeros and draw nothing.
+                        if (clips && run[2] === 0) {
+                            start = end;
+                            continue;
+                        }
+                        if (clips) applyScissor(pass);
                         pass.setBindGroup(0, registry.get(handle));
                         pass.setVertexBuffer(1, instances, start * BYTES_PER_QUAD);
                         pass.drawIndexed(6, end - start);

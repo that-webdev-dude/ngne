@@ -94,7 +94,7 @@ export async function createOddTextureHarness(unavailable: string): Promise<OddT
         async render(frame) {
             quad.prepare(frame);
             const encoder = device.createCommandEncoder();
-            quad.encode(encoder, target.createView(), frame, SIZE, SIZE, 0);
+            quad.encode(encoder, target, frame, SIZE, SIZE, 0);
             encoder.copyTextureToBuffer(
                 { texture: target },
                 { buffer: readback, bytesPerRow: ROW_BYTES },

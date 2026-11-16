@@ -40,6 +40,7 @@ export type {
 export type { InspectionValue } from "./inspection.js";
 export { Frame } from "./renderer.js";
 export type { Sprite } from "./renderer.js";
+export type { ClipRect } from "./sprite-clip.js";
 export { WebGPURenderer } from "./webgpu-renderer.js";
 export type {
     RendererStatus,

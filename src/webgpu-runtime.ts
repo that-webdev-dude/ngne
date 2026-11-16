@@ -290,12 +290,7 @@ export class WebGpuRuntime {
             // Repeat after awaits: membership can change during source upload/recovery.
             // The final scan and publication stay in one synchronous turn.
             for (;;) {
-                let missing: ImageEntry | undefined;
-                for (const entry of this.entries.values())
-                    if (!generation.images.has(entry)) {
-                        missing = entry;
-                        break;
-                    }
+                const missing = this.firstMissing(generation);
                 if (!missing) break;
                 try {
                     await this.ensureImage(generation, missing);
@@ -317,6 +312,11 @@ export class WebGpuRuntime {
             }
             throw error;
         }
+    }
+    /** First live entry, in registration order, not yet uploaded to `generation`. */
+    private firstMissing(generation: Generation): ImageEntry | undefined {
+        for (const entry of this.entries.values()) if (!generation.images.has(entry)) return entry;
+        return undefined;
     }
     /** Reports each uncaptured device error message once per live or pending generation. */
     private uncaptured(generation: Generation, error: unknown): void {
@@ -783,9 +783,9 @@ export class WebGpuRuntime {
         if (!generation?.quad || !generation.context) return;
         try {
             generation.quad.prepare(frame);
-            const view = generation.context.acquire();
+            const target = generation.context.acquire();
             const encoder = generation.context.device.createCommandEncoder();
-            generation.quad.encode(encoder, view, frame, this.width, this.height, clear);
+            generation.quad.encode(encoder, target, frame, this.width, this.height, clear);
             generation.context.submit(encoder);
             this.drawCalls = generation.quad.stats.drawCalls;
             this.sprites = frame.count;
