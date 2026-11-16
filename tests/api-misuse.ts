@@ -15,7 +15,7 @@ import {
 import * as engine from "@ngne/core";
 
 // Compiled against source during typecheck and emitted declarations during build.
-function authoringBoundary(
+export function authoringBoundary(
     game: Game,
     setup: SceneSetup,
     ctx: SystemContext,
@@ -127,14 +127,13 @@ function authoringBoundary(
     // @ts-expect-error Platform failure capability is internal.
     engine.FAIL_GAME;
 }
-void authoringBoundary;
 
 interface Progress {
     rooms: { scores: number[] };
     best: number;
 }
 type Command = { type: "score"; payload: { values: number[] } };
-function committedStateBoundary(game: Game<Progress, Command>): void {
+export function committedStateBoundary(game: Game<Progress, Command>): void {
     const scene: engine.SceneDefinition<Progress, Command> = {
         id: "progress",
         setup(setup) {
@@ -207,9 +206,11 @@ function committedStateBoundary(game: Game<Progress, Command>): void {
         { key: "inferred" },
     );
 }
-void committedStateBoundary;
 
-async function webgpuBoundary(canvas: HTMLCanvasElement, bitmap: ImageBitmap): Promise<void> {
+export async function webgpuBoundary(
+    canvas: HTMLCanvasElement,
+    bitmap: ImageBitmap,
+): Promise<void> {
     const renderer = await engine.WebGPURenderer.create(canvas, 640, 360);
     const abort = new AbortController();
     const pending: Promise<engine.WebGPURenderer> = engine.WebGPURenderer.create(
@@ -222,6 +223,11 @@ async function webgpuBoundary(canvas: HTMLCanvasElement, bitmap: ImageBitmap): P
     void pending;
     const ready: Promise<void> = renderer.ready(abort.signal);
     void ready;
+    const completed: Promise<void> = renderer.submittedWorkDone(abort.signal);
+    void completed;
+    void renderer.submittedWorkDone();
+    // @ts-expect-error Completion waits take an AbortSignal.
+    void renderer.submittedWorkDone({});
     renderer.resize(960, 540) satisfies void;
     renderer.resize(renderer.width, renderer.height) satisfies void;
     // @ts-expect-error Logical dimensions are observable but readonly.
@@ -320,4 +326,3 @@ async function webgpuBoundary(canvas: HTMLCanvasElement, bitmap: ImageBitmap): P
     // @ts-expect-error The pre-WebGPU Renderer class was removed.
     new engine.Renderer(canvas, 640, 360);
 }
-void webgpuBoundary;

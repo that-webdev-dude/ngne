@@ -153,7 +153,34 @@ export class FakeDevice extends EventTarget {
             if (this.failSubmit) throw new Error("Injected submit failure");
             this.submissions++;
         },
+        /** Settles when `completeWork` reaches the submissions made before this call. */
+        onSubmittedWorkDone: () => {
+            this.workDoneQueries++;
+            const target = this.submissions;
+            if (target <= this.completed) return Promise.resolve(undefined);
+            const wait = deferred<undefined>();
+            this.workWaiters.push({ target, ...wait });
+            return wait.promise;
+        },
     };
+    /** Simulated GPU progress; destroy and loss deliberately leave queue waits pending. */
+    completed = 0;
+    workDoneQueries = 0;
+    readonly workWaiters: {
+        target: number;
+        resolve: (value: undefined) => void;
+        reject: (error: unknown) => void;
+    }[] = [];
+    completeWork(count = this.submissions) {
+        this.completed = count;
+        const done = this.workWaiters.filter((waiter) => waiter.target <= count);
+        const waiting = this.workWaiters.filter((waiter) => waiter.target > count);
+        this.workWaiters.splice(0, this.workWaiters.length, ...waiting);
+        for (const waiter of done) waiter.resolve(undefined);
+    }
+    failWork(error: Error) {
+        for (const waiter of this.workWaiters.splice(0)) waiter.reject(error);
+    }
     pushErrorScope() {
         this.scopeDepth++;
     }

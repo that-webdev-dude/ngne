@@ -129,6 +129,16 @@ calls, including remaining delivery in progress. Observer exceptions are contain
 and reported through `onError`. Disposal clears observers and emits no event;
 `status` remains `disposed`.
 
+`submittedWorkDone(signal?)` resolves once GPU work submitted before the call, including
+`render()` submissions and texture uploads, has completed. Frames that skip submission
+are never waited on, and the renderer tracks nothing per frame. Already-complete work
+resolves asynchronously. Cancelling one wait rejects with `signal.reason` without
+affecting others. Device loss resolves pending waits because the lost device's work is
+abandoned; a call during recovery resolves at once, and waits after recovery cover only
+the replacement device. After terminal failure, calls reject with the recovery error.
+Disposal rejects pending and later waits. A queue error reported by the browser rejects
+the affected waits.
+
 `BrowserGame` always renders through WebGPU; `BrowserGame.renderer` is a
 `WebGPURenderer` once acquired. Unsupported WebGPU rejects with an actionable message and
 there is no fallback backend.

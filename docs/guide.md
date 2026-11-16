@@ -226,6 +226,17 @@ const unsubscribe = renderer.onLifecycle((event) => {
 const wait = new AbortController();
 await renderer.ready(wait.signal);
 renderer.resize(960, 540); // Updates projection and backing size; preserves uploaded images.
+// Cap frames in flight: render only while fewer than two submissions are pending.
+let inFlight = 0;
+function draw(frame: Frame) {
+    if (inFlight >= 2) return;
+    renderer.render(frame);
+    inFlight++;
+    void renderer.submittedWorkDone().then(
+        () => inFlight--,
+        () => inFlight--,
+    );
+}
 // When the host finishes:
 unsubscribe();
 renderer.dispose();

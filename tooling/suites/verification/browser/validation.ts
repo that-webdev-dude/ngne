@@ -15,6 +15,7 @@ import { checkBrowserPixelSnap } from "../../../../tests/browser-pixel-snap-chec
 import { checkBrowserCameraZoom } from "../../../../tests/browser-camera-zoom-checks.js";
 import { checkBrowserTextureSampling } from "../../../../tests/browser-texture-sampling-checks.js";
 import { checkBrowserSpriteClip } from "../../../../tests/browser-sprite-clip-checks.js";
+import { checkBrowserSubmittedWork } from "../../../../tests/browser-submitted-work-checks.js";
 import {
     checkWebGPUEnvironment,
     checkWebGPUCore,
@@ -69,6 +70,7 @@ async function main() {
     await checkBrowserRecovery(check);
     await checkBrowserRetention(check);
     await checkBrowserGpuHost(check);
+    await checkBrowserSubmittedWork(check);
     await checkBrowserResize(check);
     await checkBrowserInput((condition, message) => check(condition, "WebGPU " + message));
     await checkBrowserInterpolation(check);

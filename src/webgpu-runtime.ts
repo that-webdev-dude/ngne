@@ -155,6 +155,46 @@ export class WebGpuRuntime {
             if (readiness === this.readiness && this.status === "ready") return;
         }
     }
+    /**
+     * Settles once queue work submitted to the current device before the call completes.
+     * Nothing is tracked per frame; each call makes one queue query. A lost generation's work
+     * is abandoned rather than in flight, so its waits resolve on loss instead of hanging.
+     */
+    submittedWorkDone(signal?: AbortSignal): Promise<void> {
+        try {
+            this.assertAlive();
+            signal?.throwIfAborted();
+        } catch (error) {
+            return Promise.reject(error);
+        }
+        const generation = this.generation;
+        const context = generation?.context;
+        // Recovery skips every submission and the lost device's work is abandoned.
+        if (this.status !== "ready" || !generation || !context) return Promise.resolve();
+        const lifetime = this.lifetime.signal,
+            lost = generation.abort.signal;
+        return new Promise<void>((resolve, reject) => {
+            // Query synchronously, before any listener: a throw here rejects this promise.
+            const work = context.device.queue.onSubmittedWorkDone();
+            const settle = (action: () => void) => {
+                signal?.removeEventListener("abort", cancel);
+                lifetime.removeEventListener("abort", dispose);
+                lost.removeEventListener("abort", abandon);
+                action();
+            };
+            const cancel = () => settle(() => reject(signal?.reason));
+            // Disposal aborts the lifetime before its generations, so it rejects first.
+            const dispose = () => settle(() => reject(lifetime.reason));
+            const abandon = () => settle(resolve);
+            signal?.addEventListener("abort", cancel, { once: true });
+            lifetime.addEventListener("abort", dispose, { once: true });
+            lost.addEventListener("abort", abandon, { once: true });
+            void work.then(
+                () => settle(resolve),
+                (error: unknown) => settle(() => (lost.aborted ? resolve() : reject(error))),
+            );
+        });
+    }
     onLifecycle(notify: (event: RendererLifecycleEvent) => void): () => void {
         if (this.status === "disposed") return () => {};
         const observer = { notify };

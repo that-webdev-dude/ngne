@@ -57,7 +57,7 @@ consume this surface. Host lifecycle, candidate coordination, tick, render and
 service operations are intentional integration APIs.
 
 Public renderer lifecycle operations: `WebGPURenderer.create` with optional creation
-signal, `ready(signal?)` and `onLifecycle(observer)`. Exact lifecycle semantics belong
+signal, `ready(signal?)`, `onLifecycle(observer)` and `submittedWorkDone(signal?)`. Exact lifecycle semantics belong
 to the [browser and presentation contract](browser-and-presentation.md#renderer).
 
 Public renderer viewport operation: `resize(width, height)`; readonly `width`/`height`

@@ -120,6 +120,14 @@ export class WebGPURenderer {
     ready(signal?: AbortSignal): Promise<void> {
         return this.#runtime.ready(signal);
     }
+    /**
+     * Resolves once GPU work submitted before the call, including `render()` frames and
+     * texture uploads, has completed. Device loss resolves; cancellation rejects with
+     * `signal.reason`; terminal failure and disposal reject.
+     */
+    submittedWorkDone(signal?: AbortSignal): Promise<void> {
+        return this.#runtime.submittedWorkDone(signal);
+    }
     onLifecycle(observer: (event: RendererLifecycleEvent) => void): () => void {
         return this.#runtime.onLifecycle(observer);
     }
