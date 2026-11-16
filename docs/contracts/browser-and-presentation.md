@@ -184,7 +184,8 @@ so later notices or errors cannot hide startup or terminal failures. Use Browser
 u0, v0, du, dv, r, g, b, a`. The first six values transform unit-square corners:
 `position = translation + corner.x * (ix, iy) + corner.y * (jx, jy)`.
 Authoring still uses centered XY, signed size and rotation radians. Camera/shake
-subtraction and optional center rounding happen before affine conversion. Sorting
+subtraction happens before affine conversion; with `pixelSnap` the packed translation
+is then rounded (see [interpolation and discontinuities](#interpolation-and-discontinuities)). Sorting
 remains scene, layer, depth and insertion. Adjacent texture runs batch without
 texture-driven reordering. CPU/GPU buffers grow geometrically; there is no
 per-entity GPU object or ECS access from rendering.
@@ -216,9 +217,14 @@ Camera base and gameplay poses share interpolation; snapping happens after compo
 `SceneInstance.canInterpolate` is presentation eligibility, excluded from simulation
 inspection. Stack selection and this flag choose the same alpha for `Frame.scene`
 and the authored render callback; it changes no simulation state. Frame preparation
-subtracts interpolated camera plus shake before `Math.round` when `pixelSnap` is true.
-Screen-space sprites bypass camera/shake but still snap. Packed coordinates are
-float32; JavaScript half-pixel rounding applies, including negative coordinates.
+subtracts interpolated camera plus shake, then, when `pixelSnap` is true, rounds the
+packed translation `(tx, ty)` with `Math.round`; the linear part `(ix, iy, jx, jy)` is
+unchanged and the centre moves at most half a pixel per axis. Unrotated and quarter-turn
+quads with integer sizes, including odd and negative (flipped) sizes, cover whole pixels;
+flipping does not change the covered pixels, and even-sized unrotated quads keep their
+previous placement. Other rotations snap only the translation corner. Screen-space
+sprites bypass camera/shake but still snap. Packed coordinates are float32; JavaScript
+half-pixel rounding (ties toward +∞) applies, including negative coordinates.
 
 WebGPU uses the premultiplied pipeline and retained source ownership described above. The shared asset cache follows the opt-in retention policy below.
 

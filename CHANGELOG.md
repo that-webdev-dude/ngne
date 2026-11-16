@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- With `camera.pixelSnap` true, frame preparation rounds the packed translation corner instead of the centre, so snapped quads of any integer width and height, including odd and flipped sizes and quarter-turn rotations, cover whole pixels and map texels 1:1. Odd-sized quads can move half a pixel compared with 0.3.1; even-sized unrotated quads and `pixelSnap = false` output are unchanged. Other rotations snap only the translation corner. See [interpolation and discontinuities](docs/contracts/browser-and-presentation.md#interpolation-and-discontinuities).
+
 ## [0.3.1] - 2026-11-15
 
 ### Added

@@ -11,6 +11,7 @@ import { checkBrowserRecovery } from "../../../../tests/browser-recovery-checks.
 import { checkBrowserRetention } from "../../../../tests/browser-retention-checks.js";
 import { checkBrowserGpuHost } from "../../../../tests/browser-gpu-host-checks.js";
 import { checkBrowserResize } from "../../../../tests/browser-resize-checks.js";
+import { checkBrowserPixelSnap } from "../../../../tests/browser-pixel-snap-checks.js";
 import {
     checkWebGPUEnvironment,
     checkWebGPUCore,
@@ -52,6 +53,7 @@ async function main() {
         check(false, "intentional CI assertion failure");
     await checkBrowserAudio(check);
     await checkWebGPUCore(check);
+    await checkBrowserPixelSnap(check);
     await checkBrowserHost(check);
     await checkBrowserLifecycle((condition, message) => check(condition, "WebGPU " + message));
     await checkBrowserImages(check);

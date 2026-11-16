@@ -17,6 +17,7 @@ export interface Sprite {
     depth?: number;
     screen?: boolean;
 }
+const SNAP_GRID = 2 ** 20;
 /** Renderer input contains no entities. Ordering is scene -> layer -> depth -> insertion. */
 export class Frame {
     data = new Float32Array(STRIDE * 2048);
@@ -96,12 +97,8 @@ export class Frame {
             x -= this.camera.x;
             y -= this.camera.y;
         }
-        if (this.snap) {
-            x = Math.round(x);
-            y = Math.round(y);
-        }
+        this.packAffine(o, x, y, w, h, angle);
         const d = this.data;
-        packAffine(d, o, x, y, w, h, angle);
         d[o + 6] = u;
         d[o + 7] = v;
         d[o + 8] = uw;
@@ -204,30 +201,41 @@ export class Frame {
         const span = max - min + 1;
         return Number.isSafeInteger(span) && span <= 64;
     }
-}
-/**
- * Writes a centered rectangle as translation plus column vectors. Kept separate so
- * Frame.add stays within V8's default inlining budget in hot authoring loops.
- */
-function packAffine(
-    d: Float32Array,
-    o: number,
-    x: number,
-    y: number,
-    w: number,
-    h: number,
-    angle: number,
-): void {
-    const c = Math.cos(angle),
-        s = Math.sin(angle);
-    const ix = c * w,
-        iy = s * w,
-        jx = -s * h,
-        jy = c * h;
-    d[o] = x - (ix + jx) / 2;
-    d[o + 1] = y - (iy + jy) / 2;
-    d[o + 2] = ix;
-    d[o + 3] = iy;
-    d[o + 4] = jx;
-    d[o + 5] = jy;
+    /**
+     * Writes a centered rectangle as translation plus column vectors. Kept separate so
+     * Frame.add stays within V8's default inlining budget in hot authoring loops.
+     *
+     * Snapping rounds the translation corner, `round(x - hx)`, computed as
+     * `round(x - frac(hx)) - floor(hx)`: exact integers, and identical to the former centre
+     * rounding whenever the half extent `hx` is an integer (even unrotated sizes). The half
+     * extent is first quantized to 2^-20 so quarter-turn trigonometric noise
+     * (cos(π/2) ≈ 6e-17) cannot move half-pixel ties; multiples of 2^-20, integers
+     * included, are unchanged.
+     */
+    private packAffine(o: number, x: number, y: number, w: number, h: number, angle: number) {
+        const d = this.data;
+        const c = Math.cos(angle),
+            s = Math.sin(angle);
+        const ix = c * w,
+            iy = s * w,
+            jx = -s * h,
+            jy = c * h;
+        const hx = (ix + jx) / 2,
+            hy = (iy + jy) / 2;
+        if (this.snap) {
+            const qx = Math.round(hx * SNAP_GRID) / SNAP_GRID,
+                qy = Math.round(hy * SNAP_GRID) / SNAP_GRID;
+            const fx = Math.floor(qx),
+                fy = Math.floor(qy);
+            d[o] = Math.round(x - (qx - fx)) - fx;
+            d[o + 1] = Math.round(y - (qy - fy)) - fy;
+        } else {
+            d[o] = x - hx;
+            d[o + 1] = y - hy;
+        }
+        d[o + 2] = ix;
+        d[o + 3] = iy;
+        d[o + 4] = jx;
+        d[o + 5] = jy;
+    }
 }

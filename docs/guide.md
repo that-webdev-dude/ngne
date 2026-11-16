@@ -427,7 +427,7 @@ Await `app.start()` and `app.stop()` before issuing another start/stop call; ove
 - Teleport an actor by assigning both coordinates together, e.g. `p.px = p.x = x`; use `camera.cut(x, y)` for a camera cut. The two are independent; reset both axes when applicable.
 - Register `scene.resetInterpolation(() => ...)` to copy ordinary current poses to previous. NGNE invokes it after mount commit and when freeze first activates, so a stale in-between pose is never rendered.
 - Continuing effects own separate poses, copy them in a `runsDuringFreeze` system and stay outside the ordinary reset callback. They keep using the supplied alpha.
-- Suspended scenes, and resumed scenes awaiting an update, receive alpha 1. Snapping rounds composed screen coordinates and never writes back to poses.
+- Suspended scenes, and resumed scenes awaiting an update, receive alpha 1. Snapping rounds each quad's composed screen-space corner, so integer sizes cover whole pixels, and never writes back to poses.
 
 The [boundary table](contracts/browser-and-presentation.md#interpolation-and-discontinuities)
 defines what NGNE does at each discontinuity. Selectable transition frames belong
