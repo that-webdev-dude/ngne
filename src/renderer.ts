@@ -75,9 +75,11 @@ export class Frame {
             s.rotation ?? 0,
             s.screen ?? false,
         );
+        // Keep this tail minimal: sprite(), add() and packAffine() share V8's cumulative inlining
+        // budget in the caller's loop. When packAffine() no longer fits, every sprite pays an
+        // out-of-line call with boxed doubles, about doubling unclipped preparation.
         const clip = s.clip;
-        if (clip !== undefined) this.clip(this.count - 1, clip);
-        else if (this.clipping) this.clips.none(this.count - 1);
+        if (clip !== undefined || this.clipping) this.clip(clip);
     }
     rect(
         x: number,
@@ -92,7 +94,13 @@ export class Frame {
         this.add(x, y, width, height, color, alpha, layer, 0, undefined, 0, 0, 1, 1, 0, screen);
         if (this.clipping) this.clips.none(this.count - 1);
     }
-    private clip(index: number, clip: ClipRect) {
+    /** Records the clip of the sprite just added; only called once the frame needs clip data. */
+    private clip(clip: ClipRect | undefined) {
+        const index = this.count - 1;
+        if (clip === undefined) {
+            this.clips.none(index);
+            return;
+        }
         if (!this.clipping) {
             this.clipping = true;
             this.clips.begin(index);
@@ -235,7 +243,8 @@ export class Frame {
     }
     /**
      * Writes a centered rectangle as translation plus column vectors. Kept separate so
-     * Frame.add stays within V8's default inlining budget in hot authoring loops.
+     * Frame.add stays within V8's default inlining budget in hot authoring loops. The single
+     * `Math` lookup keeps the bytecode small enough to inline after sprite() and add().
      *
      * Snapping rounds the translation corner, `round(x - hx)`, computed as
      * `round(x - frac(hx)) - floor(hx)`: exact integers, and identical to the former centre
@@ -245,9 +254,10 @@ export class Frame {
      * included, are unchanged.
      */
     private packAffine(o: number, x: number, y: number, w: number, h: number, angle: number) {
-        const d = this.data;
-        const c = Math.cos(angle),
-            s = Math.sin(angle);
+        const d = this.data,
+            { cos, sin, round, floor } = Math;
+        const c = cos(angle),
+            s = sin(angle);
         const ix = c * w,
             iy = s * w,
             jx = -s * h,
@@ -255,12 +265,12 @@ export class Frame {
         const hx = (ix + jx) / 2,
             hy = (iy + jy) / 2;
         if (this.snap) {
-            const qx = Math.round(hx * SNAP_GRID) / SNAP_GRID,
-                qy = Math.round(hy * SNAP_GRID) / SNAP_GRID;
-            const fx = Math.floor(qx),
-                fy = Math.floor(qy);
-            d[o] = Math.round(x - (qx - fx)) - fx;
-            d[o + 1] = Math.round(y - (qy - fy)) - fy;
+            const qx = round(hx * SNAP_GRID) / SNAP_GRID,
+                qy = round(hy * SNAP_GRID) / SNAP_GRID;
+            const fx = floor(qx),
+                fy = floor(qy);
+            d[o] = round(x - (qx - fx)) - fx;
+            d[o + 1] = round(y - (qy - fy)) - fy;
         } else {
             d[o] = x - hx;
             d[o + 1] = y - hy;

@@ -4,7 +4,7 @@ Examples assume a TypeScript browser app with a canvas. The [first scene](https:
 
 [First scene](#your-first-scene) · [Sprites](#image-sprites) · [Input](#browser-input) ·
 [Scenes](#scene-authoring) · [Assets and audio](#assets-sprites-and-audio) ·
-[Sprite previewer](#sprite-and-animation-inspection)
+[Many sprites](#many-sprites-per-frame) · [Sprite previewer](#sprite-and-animation-inspection)
 
 ## Install from npm
 
@@ -493,6 +493,34 @@ scene.system(() => {
 The [camera coordinate contract](contracts/browser-and-presentation.md#camera-coordinates) defines the origin and mount cut. The [platformer](https://github.com/that-webdev-dude/ngne/blob/main/examples/platformer/README.md) adds vertical clamping, a horizontal dead-zone, visible-tile rendering and game-owned collision.
 
 Set `scene.camera.zoom` to scale the world view; screen-space sprites are unaffected. Zoom keeps the top-left fixed, so divide viewport extents by the zoom when centring or clamping, e.g. `camera.x = player.x - 240 / camera.zoom`. Use `camera.cut(x, y, zoom)` for an instant zoom change.
+
+## Many sprites per frame
+
+Every `frame.sprite()` and `frame.rect()` call runs on the main thread each frame. With a few hundred sprites the cost is negligible; with tens of thousands (large tilemaps, particles) it takes a visible share of the frame. Browsers optimize the drawing loop best when it stays small:
+
+- Reuse one `Sprite` object and assign its fields in the loop instead of creating an object per sprite. If you keep several sprite objects, create them with the same fields in the same order.
+- Keep the drawing loop lean. Compute animation, AI and tints in systems; the render callback only copies values into the sprite and adds it.
+- Leave `clip` unset on sprites that need none. Clipped sprites take a slightly slower path, and each change of clip splits a draw.
+- Measure in the browsers you ship on. JavaScript engines optimize hot loops differently, so a loop that is fast in one browser can be slower in another.
+
+```ts
+import { lerp, type Sprite } from "@ngne/core";
+
+// Inside setup: one reused sprite; `particles` is a scene-owned query.
+const sprite: Sprite = { x: 0, y: 0, width: 4, height: 4, texture: "spark" };
+scene.render((frame, alpha) => {
+    particles.eachChunk((chunk) => {
+        const position = chunk.views.position;
+        for (let row = 0, count = chunk.count; row < count; row++) {
+            sprite.x = lerp(position.previousX[row], position.x[row], alpha);
+            sprite.y = position.y[row];
+            frame.sprite(sprite);
+        }
+    });
+});
+```
+
+Values are copied when the sprite is added, so changing the reused object afterwards never affects sprites already in the frame.
 
 ## Sprite and animation inspection
 
